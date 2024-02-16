@@ -157,6 +157,7 @@
     <color name="black_200">#181818</color>
     <color name="black_100">#191919</color>
     <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
     <color name ="violet_1500">#a23eef</color>
     <color name ="violet_1400">#a24df3</color>
