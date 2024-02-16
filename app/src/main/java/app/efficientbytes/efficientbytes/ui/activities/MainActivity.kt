@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,6 +12,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import app.efficientbytes.efficientbytes.R
 import app.efficientbytes.efficientbytes.databinding.ActivityMainBinding
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -39,6 +41,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.coursesFragment -> {
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
+                    enableToolbarCollapse()
+                    binding.mainInfiniteViewPager.visibility = View.VISIBLE
+                }
+
+                R.id.accountSettingsFragment -> {
+                    preventToolbarCollapse()
+                    binding.mainInfiniteViewPager.visibility = View.GONE
                 }
 
                 else -> {
@@ -54,5 +63,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return true
+    }
+
+    private fun preventToolbarCollapse() {
+        val behaviour = getAppBarBehaviour()
+        behaviour.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                return false
+            }
+        })
+    }
+
+    private fun enableToolbarCollapse() {
+        val behaviour = getAppBarBehaviour()
+        behaviour.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                return true
+            }
+        })
+    }
+
+    private fun getAppBarBehaviour(): AppBarLayout.Behavior {
+        val params = binding.mainAppBar.layoutParams as CoordinatorLayout.LayoutParams
+        if (params.behavior == null)
+            params.behavior = AppBarLayout.Behavior()
+        return params.behavior as AppBarLayout.Behavior
     }
 }
