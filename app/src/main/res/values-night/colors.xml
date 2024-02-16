@@ -141,21 +141,21 @@
     <color name="md_theme_surfaceContainerHigh_highContrast">#2B292F</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#36343A</color>
 
-    <color name="black_1500">#0a0705</color>
-    <color name="black_1400">#0c0907</color>
-    <color name="black_1300">#0d0b09</color>
-    <color name="black_1200">#0e0c0b</color>
-    <color name="black_1100">#0f0e0d</color>
-    <color name="black_1000">#110f0e</color>
-    <color name="black_900">#121010</color>
-    <color name="black_800">#131211</color>
-    <color name="black_700">#141312</color>
-    <color name="black_600">#151414</color>
-    <color name="black_500">#161515</color>
-    <color name="black_400">#161616</color>
-    <color name="black_300">#171717</color>
-    <color name="black_200">#181818</color>
-    <color name="black_100">#191919</color>
+    <color name="black_1500">#0a0a0a</color>
+    <color name="black_1400">#0c0c0c</color>
+    <color name="black_1300">#0d0d0d</color>
+    <color name="black_1200">#0f0f0f</color>
+    <color name="black_1100">#101010</color>
+    <color name="black_1000">#111111</color>
+    <color name="black_900">#121212</color>
+    <color name="black_800">#131313</color>
+    <color name="black_700">#141414</color>
+    <color name="black_600">#151515</color>
+    <color name="black_500">#161616</color>
+    <color name="black_400">#171717</color>
+    <color name="black_300">#181818</color>
+    <color name="black_200">#191919</color>
+    <color name="black_100">#1a1a1a</color>
     <color name="black">#000000</color>
 
     <color name ="violet_1500">#a23eef</color>
@@ -189,5 +189,4 @@
     <color name="white_300">#9b9b9b</color>
     <color name="white_200">#939393</color>
     <color name="white_100">#8b8b8b</color>
-
 </resources>
