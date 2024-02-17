@@ -66,7 +66,7 @@ class CoursesFragment : Fragment() {
         val inflater = LayoutInflater.from(requireContext())
         val filterList = resources.getStringArray(R.array.array_course_filters)
         coursesFilterIdMapping = HashMap()
-        var id = 1;
+        var id = 1
         filterList.forEach {
             val chipCoursesFilterBinding: ChipCoursesFilterBinding =
                 ChipCoursesFilterBinding.inflate(inflater)
