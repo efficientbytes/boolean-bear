@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">efficient bytes</string>
     <string name="account">Account</string>
+
+    <string-array name="array_course_filters">
+        <item>Concept learning</item>
+        <item>Implementation</item>
+        <item>Projects</item>
+        <item>Series</item>
+        <item>System designs</item>
+        <item>Algorithms</item>
+        <item>Installation setup</item>
+    </string-array>
 </resources>
