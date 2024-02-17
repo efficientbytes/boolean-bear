@@ -49,4 +49,6 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     //coil
     implementation ("io.coil-kt:coil:2.4.0")
+    // Koin
+    implementation("io.insert-koin:koin-android:3.6.0-wasm-alpha2")
 }
