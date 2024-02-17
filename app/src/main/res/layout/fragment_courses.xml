@@ -1,15 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.fragments.CoursesFragment">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <HorizontalScrollView
+                android:id="@+id/coursesContentTypeHorizontalView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="8dp"
+                android:scrollIndicators="none"
+                android:scrollbars="none"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/coursesContentTypeFilterChipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    app:chipSpacingHorizontal="8dp"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true">
+
+                </com.google.android.material.chip.ChipGroup>
+
+            </HorizontalScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
 </layout>
