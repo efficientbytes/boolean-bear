@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("kotlin-kapt")
+    id("kotlin-kapt")
 }
 
 android {
@@ -45,10 +45,14 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     //navigation UI
-    implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     //coil
-    implementation ("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil:2.4.0")
     // Koin
     implementation("io.insert-koin:koin-android:3.6.0-wasm-alpha2")
+    // retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // moshi
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
