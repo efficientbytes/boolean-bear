@@ -1,4 +1,4 @@
-package app.efficientbytes.efficientbytes.services.models
+package app.efficientbytes.efficientbytes.models
 
 data class FeedShortsCourse(
     val courseId: String,

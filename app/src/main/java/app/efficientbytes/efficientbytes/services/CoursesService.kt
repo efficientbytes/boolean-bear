@@ -1,7 +1,8 @@
 package app.efficientbytes.efficientbytes.services
 
-import app.efficientbytes.efficientbytes.services.models.FeedShortsCourse
-import app.efficientbytes.efficientbytes.services.models.WatchShortsCourse
+import app.efficientbytes.efficientbytes.enums.COURSE_CONTENT_TYPE
+import app.efficientbytes.efficientbytes.models.FeedShortsCourse
+import app.efficientbytes.efficientbytes.models.WatchShortsCourse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -11,7 +12,7 @@ interface CoursesService {
 
     @GET("byte-courses/shorts")
     suspend fun getAllShortsCourses(
-        @Query("contentType") contentType: String
+        @Query("contentType") contentType: String=COURSE_CONTENT_TYPE.CONCEPT_LEARNING.getContentType()
     ): Response<List<FeedShortsCourse>>
 
     @GET("byte-courses/shorts/{courseId}")

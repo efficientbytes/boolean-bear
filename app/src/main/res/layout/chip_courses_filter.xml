@@ -23,6 +23,7 @@
         android:textSize="10sp"
         android:checked="@{isChecked}"
         app:chipCornerRadius="6dp"
+        android:fontFamily="@font/montserrat"
         app:chipStrokeWidth="1dp"
         tools:text="Concept learning" />
 </layout>
