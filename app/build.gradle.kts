@@ -55,4 +55,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // moshi
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    //coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 }
