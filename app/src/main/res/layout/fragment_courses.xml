@@ -7,54 +7,91 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.fragments.CoursesFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <HorizontalScrollView
+            android:id="@+id/coursesContentTypeHorizontalView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp"
+            android:scrollIndicators="none"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <HorizontalScrollView
-                android:id="@+id/coursesContentTypeHorizontalView"
-                android:layout_width="0dp"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/coursesContentTypeFilterChipGroup"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="8dp"
-                android:scrollIndicators="none"
-                android:scrollbars="none"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:paddingEnd="10dp"
+                app:chipSpacingHorizontal="8dp"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true">
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/coursesContentTypeFilterChipGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="10dp"
-                    app:chipSpacingHorizontal="8dp"
-                    app:selectionRequired="true"
-                    app:singleLine="true"
-                    app:singleSelection="true">
+            </com.google.android.material.chip.ChipGroup>
 
-                </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
-            </HorizontalScrollView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/coursesContentTypeHorizontalView"
+            tools:listitem="@layout/recycler_view_item_short_courses">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                tools:listitem="@layout/recycler_view_item_short_courses"
-                tools:itemCount="8"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/coursesContentTypeHorizontalView">
+        </androidx.recyclerview.widget.RecyclerView>
 
-            </androidx.recyclerview.widget.RecyclerView>
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/shimmerLayoutNestedScrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            android:background="@color/md_theme_background"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/coursesContentTypeHorizontalView">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/md_theme_background">
 
-    </androidx.core.widget.NestedScrollView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/md_theme_background"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                    <include layout="@layout/shimmer_view_item_short_courses" />
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

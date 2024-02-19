@@ -7,14 +7,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import app.efficientbytes.efficientbytes.BR
 import app.efficientbytes.efficientbytes.R
 import app.efficientbytes.efficientbytes.databinding.ChipCoursesFilterBinding
 import app.efficientbytes.efficientbytes.databinding.FragmentCoursesBinding
+import app.efficientbytes.efficientbytes.enums.COURSE_CONTENT_TYPE
+import app.efficientbytes.efficientbytes.repositories.models.DataStatus
+import app.efficientbytes.efficientbytes.ui.adapters.GenericAdapter
+import app.efficientbytes.efficientbytes.viewmodels.CourseViewModel
+import org.koin.android.ext.android.inject
 
 class CoursesFragment : Fragment() {
 
@@ -23,6 +29,7 @@ class CoursesFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private var coursesFilterIdMapping: HashMap<Int, String>? = null
+    private val viewModel: CourseViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +37,9 @@ class CoursesFragment : Fragment() {
     ): View {
         _binding = FragmentCoursesBinding.inflate(inflater, container, false)
         rootView = binding.root
+        binding.lifecycleOwner = viewLifecycleOwner
+        lifecycle.addObserver(viewModel)
+        populateChipGroup()
         return rootView
     }
 
@@ -51,14 +61,43 @@ class CoursesFragment : Fragment() {
                 return false
             }
         }, viewLifecycleOwner)
-        populateChipGroup()
         binding.coursesContentTypeFilterChipGroup.setOnCheckedStateChangeListener { group, _ ->
             val contentType = coursesFilterIdMapping?.get(group.checkedChipId)
-            Toast.makeText(
-                requireContext(),
-                "The content type is : $contentType",
-                Toast.LENGTH_LONG
-            ).show()
+            contentType?.apply {
+                viewModel.pullAllShortCourses(
+                    COURSE_CONTENT_TYPE.findContentType(this).getContentType()
+                )
+            }
+        }
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        viewModel.allShortCourses.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayout.visibility = View.GONE
+                    binding.recyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
+                    binding.shimmerLayout.visibility = View.VISIBLE
+                    binding.shimmerLayout.startShimmer()
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.recyclerView.visibility = View.VISIBLE
+                    it.data?.apply {
+                        binding.recyclerView.adapter = GenericAdapter(
+                            this,
+                            R.layout.recycler_view_item_short_courses,
+                            BR.course
+                        )
+                    }
+                }
+            }
         }
     }
 
