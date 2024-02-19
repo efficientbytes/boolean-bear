@@ -74,15 +74,22 @@ class CoursesFragment : Fragment() {
         viewModel.allShortCourses.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayout.visibility = View.GONE
+                    binding.recyclerView.visibility = View.GONE
                 }
 
                 DataStatus.Status.Loading -> {
-
+                    binding.recyclerView.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
+                    binding.shimmerLayout.visibility = View.VISIBLE
+                    binding.shimmerLayout.startShimmer()
                 }
 
                 DataStatus.Status.Success -> {
-                    Log.i("Fragment", "List is : ${it.data.toString()}")
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.recyclerView.visibility = View.VISIBLE
                     it.data?.apply {
                         binding.recyclerView.adapter = GenericAdapter(
                             this,
