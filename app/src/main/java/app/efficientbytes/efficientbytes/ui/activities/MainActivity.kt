@@ -1,5 +1,6 @@
 package app.efficientbytes.efficientbytes.ui.activities
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,8 +18,11 @@ import app.efficientbytes.efficientbytes.R
 import app.efficientbytes.efficientbytes.databinding.ActivityMainBinding
 import app.efficientbytes.efficientbytes.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.efficientbytes.ui.models.CoursesBanner
+import app.efficientbytes.efficientbytes.utils.ConnectivityListener
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -30,6 +34,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val appBarConfiguration by lazy {
         AppBarConfiguration(setOf(R.id.coursesFragment))
     }
+    private val connectivityListener: ConnectivityListener by inject()
+    private var networkNotAvailable: Boolean = false
     private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
     private var sampleList: MutableList<CoursesBanner> = mutableListOf()
     private val handler = Handler(Looper.getMainLooper())
@@ -43,6 +49,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(binding.mainToolbar)
         setupNavigation()
         setupViewPager()
+        setupConnectivityListener()
+    }
+
+    private fun setupConnectivityListener() {
+        connectivityListener.observe(this) { isAvailable ->
+            when (isAvailable) {
+                true -> {
+                    if (networkNotAvailable) {
+                        networkNotAvailable = false
+                        val snackBar = Snackbar.make(
+                            binding.mainCoordinatorLayout,
+                            "Yay! You're back online.", Snackbar.LENGTH_LONG
+                        )
+                        snackBar.setBackgroundTint(Color.parseColor("#4CAF50"))
+                        snackBar.setTextColor(Color.parseColor("#FFFFFF"))
+                        snackBar.show()
+                    }
+                }
+
+                false -> {
+                    networkNotAvailable = true
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        "Oops! Looks like you're offline.",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.setBackgroundTint(Color.parseColor("#B00020"))
+                    snackBar.setTextColor(Color.parseColor("#FFFFFF"))
+                    snackBar.show()
+                }
+            }
+        }
+        connectivityListener.isNetworkAvailable().apply {
+            if (!this) {
+                networkNotAvailable = true
+                val snackBar = Snackbar.make(
+                    binding.mainCoordinatorLayout,
+                    "Oops! Looks like you're offline.",
+                    Snackbar.LENGTH_LONG
+                )
+                snackBar.setBackgroundTint(Color.parseColor("#B00020"))
+                snackBar.setTextColor(Color.parseColor("#FFFFFF"))
+                snackBar.show()
+            }
+        }
     }
 
     private fun setupViewPager() {
