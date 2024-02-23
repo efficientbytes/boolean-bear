@@ -20,6 +20,8 @@ import app.efficientbytes.efficientbytes.models.FeedShortsCourse
 import app.efficientbytes.efficientbytes.repositories.CourseRepository
 import app.efficientbytes.efficientbytes.repositories.models.DataStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 
 class CourseViewModel(private val courseRepository: CourseRepository) : ViewModel(),
@@ -29,8 +31,13 @@ class CourseViewModel(private val courseRepository: CourseRepository) : ViewMode
         MutableLiveData()
     val allShortCourses: LiveData<DataStatus<List<FeedShortsCourse>>> = _allShortCourses
 
-    fun pullAllShortCourses(contentType: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    private var allCoursesJob : Job? = null
+
+    suspend fun pullAllShortCourses(contentType: String) {
+        if (allCoursesJob?.isActive==true){
+            allCoursesJob?.cancelAndJoin()
+        }
+        allCoursesJob = viewModelScope.launch(Dispatchers.IO) {
             courseRepository.pullShortCourses(contentType).collect {
                 Log.i("ViewModel","List is : ${it.data.toString()}")
                 _allShortCourses.postValue(it)
@@ -41,11 +48,13 @@ class CourseViewModel(private val courseRepository: CourseRepository) : ViewMode
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-
+                allCoursesJob = viewModelScope.launch {
+                    pullAllShortCourses(COURSE_CONTENT_TYPE.CONCEPT_LEARNING.getContentType())
+                }
             }
 
             ON_START -> {
-                pullAllShortCourses(COURSE_CONTENT_TYPE.CONCEPT_LEARNING.getContentType())
+
             }
 
             ON_RESUME -> {

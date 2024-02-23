@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.efficientbytes.BR
@@ -20,6 +21,8 @@ import app.efficientbytes.efficientbytes.enums.COURSE_CONTENT_TYPE
 import app.efficientbytes.efficientbytes.repositories.models.DataStatus
 import app.efficientbytes.efficientbytes.ui.adapters.GenericAdapter
 import app.efficientbytes.efficientbytes.viewmodels.CourseViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class CoursesFragment : Fragment() {
@@ -63,10 +66,12 @@ class CoursesFragment : Fragment() {
         }, viewLifecycleOwner)
         binding.coursesContentTypeFilterChipGroup.setOnCheckedStateChangeListener { group, _ ->
             val contentType = coursesFilterIdMapping?.get(group.checkedChipId)
-            contentType?.apply {
-                viewModel.pullAllShortCourses(
-                    COURSE_CONTENT_TYPE.findContentType(this).getContentType()
-                )
+            lifecycleScope.launch(Dispatchers.IO) {
+                contentType?.apply {
+                    viewModel.pullAllShortCourses(
+                        COURSE_CONTENT_TYPE.findContentType(this).getContentType()
+                    )
+                }
             }
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
