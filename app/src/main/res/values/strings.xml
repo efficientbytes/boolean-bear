@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android Now</string>
+    <string name="app_name">android now</string>
     <string name="account">Account</string>
 
     <string-array name="array_course_filters">

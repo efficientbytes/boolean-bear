@@ -62,4 +62,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     //shimmer layout
     implementation ("com.facebook.shimmer:shimmer:0.5.0")
+    //for splash api
+    implementation ("androidx.core:core-splashscreen:1.0.1")
 }
