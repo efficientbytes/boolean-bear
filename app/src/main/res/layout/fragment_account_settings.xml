@@ -1,8 +1,321 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragments.AccountSettingsFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-</FrameLayout>
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        tools:context=".ui.fragments.AccountSettingsFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/accountIcon"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="64dp"
+                android:src="@drawable/signed_in_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </ImageView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/signInTxt"
+                style="@style/TextRippleColorOnPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Sign In"
+                android:textColor="@color/violet_1500"
+                android:textSize="32sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@+id/accountIcon"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/newUserLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="New user?"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@+id/accountIcon"
+                app:layout_constraintTop_toBottomOf="@+id/signInTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/signUpTxt"
+                style="@style/TextRippleColorOnPrimary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Sign Up"
+                android:textColor="@color/violet_1500"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/newUserLabel"
+                app:layout_constraintStart_toEndOf="@+id/newUserLabel"
+                app:layout_constraintTop_toTopOf="@+id/newUserLabel"
+                app:layout_constraintVertical_bias="1.0">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/helloLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="66dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Hello"
+                android:textColor="@color/violet_1500"
+                android:textSize="24sp"
+                android:visibility="visible"
+                app:layout_constraintStart_toEndOf="@+id/accountIcon"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/firstNameTxt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_medium"
+                android:textSize="28sp"
+                android:visibility="visible"
+                android:textColor="@color/white"
+                android:text="Anubhav"
+                app:layout_constraintStart_toEndOf="@id/accountIcon"
+                app:layout_constraintTop_toBottomOf="@+id/helloLabel"
+                tools:text="Anubhav" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/settingsLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:paddingVertical="12dp"
+                android:paddingStart="18dp"
+                android:text="Settings"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/accountIcon">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/editProfileTxt"
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:paddingVertical="12dp"
+                android:paddingStart="38dp"
+                android:paddingEnd="18dp"
+                android:text="Edit profile"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settingsLabel">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notificationTxt"
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:paddingVertical="12dp"
+                android:paddingStart="38dp"
+                android:paddingEnd="18dp"
+                android:text="Notifications"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editProfileTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/shareNAboutLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:paddingStart="18dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="Share &amp; About"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notificationTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/aboutAndroidNowTxt"
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:paddingVertical="12dp"
+                android:paddingStart="38dp"
+                android:paddingEnd="18dp"
+                android:text="About Android Now"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shareNAboutLabel">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/inviteFriendsTxt"
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:paddingVertical="12dp"
+                android:paddingStart="38dp"
+                android:paddingEnd="18dp"
+                android:text="Invite friends"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/aboutAndroidNowTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/helpNSupportLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:paddingVertical="12dp"
+                android:paddingStart="18dp"
+                android:text="Support"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inviteFriendsTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/contactHelpTxt"
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:paddingVertical="12dp"
+                android:paddingStart="38dp"
+                android:paddingEnd="18dp"
+                android:text="Contact support"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/helpNSupportLabel">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/signOutTxt"
+                style="@style/TextRippleColorOnPrimary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Sign Out"
+                android:textColor="@color/violet_1500"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/contactHelpTxt">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/appVersionTxt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="100dp"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/signOutTxt"
+                tools:text="Version 24.6.8">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+</layout>

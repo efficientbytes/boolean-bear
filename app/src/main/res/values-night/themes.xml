@@ -49,4 +49,23 @@
         <item name="android:statusBarColor">@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
     </style>
+
+    <style name="SelectableThemeOnPrimary" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorControlHighlight">@color/violet_1500_alpha</item>
+    </style>
+
+    <style name="TextRippleColorOnPrimary">
+        <item name="android:theme">@style/SelectableThemeOnPrimary</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="SelectableThemeOnBlack" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorControlHighlight">@color/black_1500</item>
+    </style>
+
+    <style name="TextRippleColorOnBlack">
+        <item name="android:theme">@style/SelectableThemeOnBlack</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
 </resources>

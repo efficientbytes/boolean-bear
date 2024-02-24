@@ -192,5 +192,6 @@
     <color name="white_100">#8b8b8b</color>
 
     <color name="text_dark_transparent_background">#B90E0E0E</color>
+    <color name ="violet_1500_alpha">#22E5C5FF</color>
 
 </resources>
