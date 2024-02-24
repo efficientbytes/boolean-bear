@@ -69,4 +69,10 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
+    <style name="ToolbarTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">@font/montserrat_alternates_semibold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
 </resources>

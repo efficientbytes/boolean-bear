@@ -26,10 +26,11 @@
                 android:layout_height="64dp"
                 android:background="@color/black"
                 android:paddingEnd="10dp"
+                app:titleTextAppearance="@style/ToolbarTheme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:title="efficient bytes"
+                app:title="android now"
                 app:titleTextColor="@color/white">
 
             </com.google.android.material.appbar.MaterialToolbar>
