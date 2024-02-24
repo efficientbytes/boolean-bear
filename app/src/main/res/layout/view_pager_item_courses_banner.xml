@@ -7,7 +7,7 @@
 
         <variable
             name="banner"
-            type="app.efficientbytes.efficientbytes.ui.models.CoursesBanner" />
+            type="app.efficientbytes.androidnow.ui.models.CoursesBanner" />
 
     </data>
 

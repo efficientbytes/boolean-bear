@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "efficient bytes"
+rootProject.name = "Android Now"
 include(":app")
  
