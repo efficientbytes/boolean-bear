@@ -21,5 +21,17 @@
         <action
             android:id="@+id/accountSettingsFragment_to_coursesFragment"
             app:destination="@id/coursesFragment" />
+        <action
+            android:id="@+id/accountSettingsFragment_to_loginOrSignUpFragment"
+            app:destination="@id/loginOrSignUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginOrSignUpFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.LoginOrSignUpFragment"
+        android:label="Login or Sign Up"
+        tools:layout="@layout/fragment_login_or_sign_up" >
+        <action
+            android:id="@+id/loginOrSignUpFragment_to_accountSettingsFragment"
+            app:destination="@id/accountSettingsFragment" />
     </fragment>
 </navigation>
