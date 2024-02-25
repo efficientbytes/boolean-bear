@@ -27,7 +27,7 @@ class AccountSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.editProfileTxt.setOnClickListener {
+        binding.loginOrSignUpLabelTextView.setOnClickListener {
             it.findNavController().navigate(R.id.accountSettingsFragment_to_loginOrSignUpFragment)
         }
     }

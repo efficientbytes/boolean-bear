@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:scrollbars="none"
+        tools:ignore="ContentDescription"
         tools:context=".ui.fragments.OTPVerificationFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +36,7 @@
                 android:layout_marginStart="22dp"
                 android:layout_marginEnd="30dp"
                 android:fontFamily="@font/montserrat"
-                android:text="Please enter the verification code sent to your mobile number."
+                android:text="@string/please_enter_the_verification_code_sent_to_your_mobile_number"
                 android:textAlignment="textStart"
                 android:textColor="@color/white"
                 android:textSize="12sp"
@@ -53,13 +54,13 @@
                 android:layout_marginHorizontal="36dp"
                 android:layout_marginTop="22dp"
                 android:fontFamily="@font/montserrat"
-                android:text="OTP sent to +919150472796"
                 android:textAlignment="textStart"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guideline2">
+                app:layout_constraintTop_toBottomOf="@id/guideline2"
+                tools:text="OTP sent to +919150472796">
 
             </com.google.android.material.textview.MaterialTextView>
 
@@ -101,9 +102,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
-                android:textSize="14sp"
                 android:fontFamily="@font/montserrat"
-                android:text="Didn't receive?"
+                android:text="@string/didn_t_receive"
+                android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@id/otpTextInputLayout"
                 app:layout_constraintTop_toBottomOf="@id/otpTextInputLayout">
 
@@ -115,13 +116,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
-                android:textSize="14sp"
-                android:fontFamily="@font/montserrat_medium"
                 android:clickable="true"
                 android:focusable="true"
+                android:fontFamily="@font/montserrat_medium"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="Resend OTP"
+                android:text="@string/resend_otp"
                 android:textColor="@color/violet_100"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="@id/otpTextInputLayout"
                 app:layout_constraintTop_toBottomOf="@id/otpTextInputLayout">
 
@@ -133,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="34dp"
                 android:layout_marginTop="18dp"
-                android:text="Verify"
+                android:text="@string/verify"
                 android:textColor="@color/black"
                 app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
