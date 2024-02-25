@@ -33,5 +33,13 @@
         <action
             android:id="@+id/loginOrSignUpFragment_to_accountSettingsFragment"
             app:destination="@id/accountSettingsFragment" />
+        <action
+            android:id="@+id/action_loginOrSignUpFragment_to_OTPVerificationFragment"
+            app:destination="@id/OTPVerificationFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/OTPVerificationFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.OTPVerificationFragment"
+        android:label="Phone Verification"
+        tools:layout="@layout/fragment_o_t_p_verification" />
 </navigation>
