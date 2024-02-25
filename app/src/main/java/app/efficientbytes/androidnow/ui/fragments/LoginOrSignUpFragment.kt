@@ -29,7 +29,7 @@ class LoginOrSignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.continueButton.setOnClickListener {
-            it.findNavController().navigate(R.id.OTPVerificationFragment)
+            it.findNavController().navigate(R.id.loginOrSignUpFragment_to_OTPVerificationFragment)
         }
     }
 
