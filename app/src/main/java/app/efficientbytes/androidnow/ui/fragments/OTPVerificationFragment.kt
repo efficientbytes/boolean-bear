@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import app.efficientbytes.androidnow.R
-import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
+import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
 
-class LoginOrSignUpFragment : Fragment() {
+class OTPVerificationFragment : Fragment() {
 
-    private val tagCoursesFragment: String = "Login-Sign-Up-Fragment"
-    private lateinit var _binding: FragmentLoginOrSignUpBinding
+    private val tagCoursesFragment: String = "OTP-Verification-Fragment"
+    private lateinit var _binding: FragmentOTPVerificationBinding
     private val binding get() = _binding
     private lateinit var rootView: View
 
@@ -20,7 +18,7 @@ class LoginOrSignUpFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentLoginOrSignUpBinding.inflate(inflater, container, false)
+        _binding = FragmentOTPVerificationBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         return rootView
@@ -28,9 +26,7 @@ class LoginOrSignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.continueButton.setOnClickListener {
-            it.findNavController().navigate(R.id.OTPVerificationFragment)
-        }
+
     }
 
 }
