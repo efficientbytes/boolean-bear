@@ -5,21 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import app.efficientbytes.androidnow.R
-import app.efficientbytes.androidnow.databinding.FragmentAccountSettingsBinding
+import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
 
-class AccountSettingsFragment : Fragment() {
+class LoginOrSignUpFragment : Fragment() {
 
-    private val tagCoursesFragment: String = "Account-Settings-Fragment"
-    private lateinit var _binding: FragmentAccountSettingsBinding
+    private val tagCoursesFragment: String = "Login-Sign-Up-Fragment"
+    private lateinit var _binding: FragmentLoginOrSignUpBinding
     private val binding get() = _binding
     private lateinit var rootView: View
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAccountSettingsBinding.inflate(inflater, container, false)
+        _binding = FragmentLoginOrSignUpBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         return rootView
@@ -27,9 +26,7 @@ class AccountSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.editProfileTxt.setOnClickListener {
-            it.findNavController().navigate(R.id.accountSettingsFragment_to_loginOrSignUpFragment)
-        }
+
     }
 
 }
