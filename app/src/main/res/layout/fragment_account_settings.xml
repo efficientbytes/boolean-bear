@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none"
-        tools:context=".ui.fragments.AccountSettingsFragment">
+        tools:context=".ui.fragments.AccountSettingsFragment"
+        tools:ignore="RtlSymmetry">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -37,7 +38,8 @@
                     android:layout_margin="12dp"
                     android:src="@drawable/racoon_outline"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription">
 
                 </ImageView>
 
@@ -45,19 +47,19 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/loginOrSignUpLabelTextView"
-                android:foreground="?attr/selectableItemBackground"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_medium"
-                android:layout_marginStart="12dp"
+                android:foreground="?attr/selectableItemBackground"
                 android:text="@string/login_or_sign_up"
                 android:textColor="@color/violet_800"
                 android:textSize="20sp"
                 android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/appLogoCardView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/appLogoCardView"
                 app:layout_constraintTop_toTopOf="@id/appLogoCardView">
 

@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:scrollbars="none"
+        tools:ignore="ContentDescription"
         tools:context=".ui.fragments.LoginOrSignUpFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
