@@ -11,7 +11,9 @@
         tools:layout="@layout/fragment_courses">
         <action
             android:id="@+id/coursesFragment_to_accountSettingsFragment"
-            app:destination="@id/accountSettingsFragment" />
+            app:destination="@id/accountSettingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -23,7 +25,9 @@
             app:destination="@id/coursesFragment" />
         <action
             android:id="@+id/accountSettingsFragment_to_loginOrSignUpFragment"
-            app:destination="@id/loginOrSignUpFragment" />
+            app:destination="@id/loginOrSignUpFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/loginOrSignUpFragment"
@@ -31,11 +35,10 @@
         android:label="Login or Sign Up"
         tools:layout="@layout/fragment_login_or_sign_up" >
         <action
-            android:id="@+id/loginOrSignUpFragment_to_accountSettingsFragment"
-            app:destination="@id/accountSettingsFragment" />
-        <action
-            android:id="@+id/action_loginOrSignUpFragment_to_OTPVerificationFragment"
-            app:destination="@id/OTPVerificationFragment" />
+            android:id="@+id/loginOrSignUpFragment_to_OTPVerificationFragment"
+            app:destination="@id/OTPVerificationFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/OTPVerificationFragment"

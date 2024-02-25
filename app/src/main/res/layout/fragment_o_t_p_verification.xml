@@ -34,7 +34,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="22dp"
-                android:layout_marginEnd="30dp"
+                android:layout_marginEnd="36dp"
                 android:fontFamily="@font/montserrat"
                 android:text="@string/please_enter_the_verification_code_sent_to_your_mobile_number"
                 android:textAlignment="textStart"
