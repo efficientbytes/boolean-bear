@@ -57,7 +57,7 @@
 
     <style name="TextRippleColorOnPrimary">
         <item name="android:theme">@style/SelectableThemeOnPrimary</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
     </style>
 
     <style name="SelectableThemeOnBlack" parent="Theme.Material3.Dark.NoActionBar">

@@ -17,122 +17,108 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/accountIcon"
-                android:layout_width="128dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/appLogoCardView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="64dp"
-                android:src="@drawable/signed_in_icon"
+                android:layout_marginStart="42dp"
+                app:cardBackgroundColor="@color/black"
+                app:cardCornerRadius="100dp"
+                app:layout_constraintBottom_toTopOf="@id/guideline2"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/guideline1"
+                app:strokeColor="@color/white"
+                app:strokeWidth="4dp">
 
-            </ImageView>
+                <ImageView
+                    android:id="@+id/appLogoImageView"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_margin="12dp"
+                    android:src="@drawable/racoon_outline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </ImageView>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/signInTxt"
-                style="@style/TextRippleColorOnPrimary"
-                android:layout_width="wrap_content"
+                android:id="@+id/loginOrSignUpLabelTextView"
+                android:foreground="?attr/selectableItemBackground"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="64dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="Sign In"
-                android:textColor="@color/violet_1500"
-                android:textSize="32sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toEndOf="@+id/accountIcon"
-                app:layout_constraintTop_toTopOf="parent">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/newUserLabel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="New user?"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toEndOf="@+id/accountIcon"
-                app:layout_constraintTop_toBottomOf="@+id/signInTxt">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/signUpTxt"
-                style="@style/TextRippleColorOnPrimary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="Sign Up"
-                android:textColor="@color/violet_1500"
-                android:textSize="16sp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/newUserLabel"
-                app:layout_constraintStart_toEndOf="@+id/newUserLabel"
-                app:layout_constraintTop_toTopOf="@+id/newUserLabel"
-                app:layout_constraintVertical_bias="1.0">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/helloLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="66dp"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="Hello"
-                android:textColor="@color/violet_1500"
-                android:textSize="24sp"
+                android:layout_marginStart="12dp"
+                android:text="@string/login_or_sign_up"
+                android:textColor="@color/violet_800"
+                android:textSize="20sp"
                 android:visibility="visible"
-                app:layout_constraintStart_toEndOf="@+id/accountIcon"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/appLogoCardView"
+                app:layout_constraintStart_toEndOf="@+id/appLogoCardView"
+                app:layout_constraintTop_toTopOf="@id/appLogoCardView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/firstNameTxt"
+                android:id="@+id/hiUserValueTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat_medium"
-                android:textSize="28sp"
-                android:visibility="visible"
-                android:textColor="@color/white"
-                android:text="Anubhav"
-                app:layout_constraintStart_toEndOf="@id/accountIcon"
-                app:layout_constraintTop_toBottomOf="@+id/helloLabel"
-                tools:text="Anubhav" />
+                android:maxLines="1"
+                android:paddingEnd="48dp"
+                android:textColor="@color/violet_800"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/appLogoCardView"
+                app:layout_constraintTop_toTopOf="@id/appLogoCardView"
+                tools:text="Hi Frank Aaron Richard thomas">
+
+            </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/settingsLabel"
+                android:id="@+id/goodToHaveYouLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="60dp"
+                android:fontFamily="@font/montserrat"
+                android:maxLines="2"
+                android:paddingEnd="80dp"
+                android:text="@string/it_s_a_pleasure_to_have_you_with_us"
+                android:textSize="14sp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/hiUserValueTextView"
+                app:layout_constraintTop_toBottomOf="@id/hiUserValueTextView">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/settingsLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:fontFamily="@font/montserrat_medium"
                 android:paddingVertical="12dp"
                 android:paddingStart="18dp"
-                android:text="Settings"
+                android:text="@string/settings"
                 android:textColor="@color/white"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/accountIcon">
+                app:layout_constraintTop_toBottomOf="@+id/guideline2">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/editProfileTxt"
-                style="@style/TextRippleColorOnBlack"
+                android:id="@+id/editProfileLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -140,22 +126,22 @@
                 android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:paddingVertical="12dp"
                 android:paddingStart="38dp"
                 android:paddingEnd="18dp"
-                android:text="Edit profile"
+                android:text="@string/edit_profile"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settingsLabel">
+                app:layout_constraintTop_toBottomOf="@+id/settingsLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/notificationTxt"
-                style="@style/TextRippleColorOnBlack"
+                android:id="@+id/notificationLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -163,21 +149,22 @@
                 android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:paddingVertical="12dp"
                 android:paddingStart="38dp"
                 android:paddingEnd="18dp"
-                android:text="Notifications"
+                android:text="@string/notifications"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editProfileTxt">
+                app:layout_constraintTop_toBottomOf="@+id/editProfileLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/shareNAboutLabel"
+                android:id="@+id/shareNAboutLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -185,18 +172,17 @@
                 android:paddingStart="18dp"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
-                android:text="Share &amp; About"
+                android:text="@string/share_amp_about"
                 android:textColor="@color/white"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notificationTxt">
+                app:layout_constraintTop_toBottomOf="@+id/notificationLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/aboutAndroidNowTxt"
-                style="@style/TextRippleColorOnBlack"
+                android:id="@+id/aboutAndroidNowLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -204,21 +190,21 @@
                 android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:paddingVertical="12dp"
                 android:paddingStart="38dp"
                 android:paddingEnd="18dp"
-                android:text="About Android Now"
+                android:text="@string/about_android_now"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/shareNAboutLabel">
+                app:layout_constraintTop_toBottomOf="@id/shareNAboutLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/inviteFriendsTxt"
-                style="@style/TextRippleColorOnBlack"
+                android:id="@+id/inviteFriendsLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -226,39 +212,39 @@
                 android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:paddingVertical="12dp"
                 android:paddingStart="38dp"
                 android:paddingEnd="18dp"
-                android:text="Invite friends"
+                android:text="@string/invite_friends"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/aboutAndroidNowTxt">
+                app:layout_constraintTop_toBottomOf="@id/aboutAndroidNowLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/helpNSupportLabel"
+                android:id="@+id/helpNSupportLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/montserrat_medium"
                 android:paddingVertical="12dp"
                 android:paddingStart="18dp"
-                android:text="Support"
+                android:text="@string/support"
                 android:textColor="@color/white"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/inviteFriendsTxt">
+                app:layout_constraintTop_toBottomOf="@+id/inviteFriendsLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/contactHelpTxt"
-                style="@style/TextRippleColorOnBlack"
+                android:id="@+id/contactHelpLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -266,20 +252,21 @@
                 android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:paddingVertical="12dp"
                 android:paddingStart="38dp"
                 android:paddingEnd="18dp"
-                android:text="Contact support"
+                android:text="@string/contact_support"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/helpNSupportLabel">
+                app:layout_constraintTop_toBottomOf="@id/helpNSupportLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/signOutTxt"
+                android:id="@+id/signOutLabelTextView"
                 style="@style/TextRippleColorOnPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -288,17 +275,17 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="Sign Out"
-                android:textColor="@color/violet_1500"
+                android:text="@string/sign_out"
+                android:textColor="@color/violet_800"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/contactHelpTxt">
+                app:layout_constraintTop_toBottomOf="@+id/contactHelpLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/appVersionTxt"
+                android:id="@+id/appVersionLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -310,10 +297,24 @@
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/signOutTxt"
+                app:layout_constraintTop_toBottomOf="@id/signOutLabelTextView"
                 tools:text="Version 24.6.8">
 
             </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.02" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.20" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
