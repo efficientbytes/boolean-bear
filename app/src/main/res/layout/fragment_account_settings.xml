@@ -49,7 +49,7 @@
                 android:id="@+id/loginOrSignUpLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="18dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_medium"

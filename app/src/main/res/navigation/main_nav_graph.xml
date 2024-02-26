@@ -44,5 +44,16 @@
         android:id="@+id/OTPVerificationFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.OTPVerificationFragment"
         android:label="Phone Verification"
-        tools:layout="@layout/fragment_o_t_p_verification" />
+        tools:layout="@layout/fragment_o_t_p_verification" >
+        <action
+            android:id="@+id/verificationFragment_to_completeProfileFragment"
+            app:destination="@id/completeProfileFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/completeProfileFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.CompleteProfileFragment"
+        android:label="Setup Profile"
+        tools:layout="@layout/fragment_complete_profile" />
 </navigation>
