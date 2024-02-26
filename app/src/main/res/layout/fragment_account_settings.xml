@@ -10,7 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none"
+        android:scrollbars="vertical"
+        android:scrollbarSize="0dp"
         tools:context=".ui.fragments.AccountSettingsFragment"
         tools:ignore="RtlSymmetry">
 
@@ -49,7 +50,7 @@
                 android:id="@+id/loginOrSignUpLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="18dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="@font/montserrat_medium"

@@ -10,8 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none"
+        android:scrollbars="vertical"
+        android:scrollbarSize="0dp"
         tools:ignore="ContentDescription"
         tools:context=".ui.fragments.LoginOrSignUpFragment">
 
@@ -50,7 +50,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
-                android:text="@string/login_or_signup_to_continue"
+                android:text="@string/login_or_sign_up_to_continue"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="18sp"

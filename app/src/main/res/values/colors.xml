@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="md_theme_primary">#CFBDFE</color>
     <color name="md_theme_onPrimary">#36275D</color>
     <color name="md_theme_primaryContainer">#4D3D75</color>
@@ -193,5 +193,6 @@
 
     <color name="text_dark_transparent_background">#B90E0E0E</color>
     <color name ="violet_1500_alpha">#22E5C5FF</color>
+    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/white</color>
 
 </resources>

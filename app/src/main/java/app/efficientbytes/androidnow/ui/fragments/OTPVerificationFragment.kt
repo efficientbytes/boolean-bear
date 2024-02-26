@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
 
 class OTPVerificationFragment : Fragment() {
@@ -26,7 +28,9 @@ class OTPVerificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.verifyButton.setOnClickListener {
+            findNavController().navigate(R.id.verificationFragment_to_completeProfileFragment)
+        }
     }
 
 }

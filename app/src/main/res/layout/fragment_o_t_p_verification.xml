@@ -10,8 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none"
+        android:scrollbars="vertical"
+        android:scrollbarSize="0dp"
         tools:ignore="ContentDescription"
         tools:context=".ui.fragments.OTPVerificationFragment">
 
