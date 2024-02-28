@@ -1,5 +1,6 @@
 package app.efficientbytes.androidnow.utils
 
+import com.google.android.material.textfield.TextInputLayout
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Currency
@@ -50,4 +51,18 @@ fun pluralize(value: Long, unit: String): String {
     } else {
         "$value ${unit}s ago"
     }
+}
+
+fun validatePhoneNumberFormat(phoneNumberTextInputLayout : TextInputLayout, input : String?) : Boolean{
+    if (input.isNullOrBlank()){
+        phoneNumberTextInputLayout.error = "Please enter phone number to continue."
+        return false
+    }
+    phoneNumberTextInputLayout.error = null
+    if (!input.matches(Regex("^[1-9]\\d{9}$"))){
+        phoneNumberTextInputLayout.error = "Invalid phone number format."
+        return false
+    }
+    phoneNumberTextInputLayout.error = null
+    return true
 }
