@@ -6,4 +6,5 @@ val serviceModule = module {
     single { baseUrl }
     single { provideRetrofit(get()) }
     single { provideCoursesService(get()) }
+    single { provideVerificationService(get()) }
 }
