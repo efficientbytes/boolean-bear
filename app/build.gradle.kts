@@ -64,4 +64,6 @@ dependencies {
     implementation ("com.facebook.shimmer:shimmer:0.5.0")
     //for splash api
     implementation ("androidx.core:core-splashscreen:1.0.1")
+    //otp pin view
+    implementation ("com.github.aabhasr1:OtpView:v1.1.2-ktx")
 }

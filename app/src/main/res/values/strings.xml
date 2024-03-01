@@ -16,7 +16,7 @@
     <string name="login_or_sign_up_to_continue">Login or Sign up to continue</string>
     <string name="enter_your_phone_number">Enter your phone number</string>
     <string name="continue_">Continue</string>
-    <string name="please_enter_the_verification_code_sent_to_your_mobile_number">Please enter the verification code sent to your mobile number.</string>
+    <string name="please_enter_the_verification_code_sent_to_your_phone_number">Please enter the verification code sent to your phone number.</string>
     <string name="didn_t_receive">Didn\'t receive?</string>
     <string name="resend_otp">Resend OTP</string>
     <string name="verify">Verify</string>
