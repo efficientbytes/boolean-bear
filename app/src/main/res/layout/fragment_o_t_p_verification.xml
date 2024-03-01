@@ -89,7 +89,6 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 app:fontFamily="@font/montserrat"
-                android:text="Incorrect OTP"
                 android:textSize="14sp"
                 android:visibility="gone"
                 android:textColor="@color/md_theme_error"
