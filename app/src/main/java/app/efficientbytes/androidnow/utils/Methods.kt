@@ -66,3 +66,6 @@ fun validatePhoneNumberFormat(phoneNumberTextInputLayout : TextInputLayout, inpu
     phoneNumberTextInputLayout.error = null
     return true
 }
+fun validateOTPFormat(input : String) : Boolean {
+    return input.matches(Regex("""^\d{6}$"""))
+}
