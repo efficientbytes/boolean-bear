@@ -6,7 +6,6 @@ import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.utils.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 const val baseUrl = BASE_URL
 
