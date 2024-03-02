@@ -19,5 +19,5 @@ fun provideCoursesService(retrofit: Retrofit): CoursesService =
 fun provideVerificationService(retrofit: Retrofit): VerificationService =
     retrofit.create(VerificationService::class.java)
 
-fun provideUserProfileService(retrofit: Retrofit) : UserProfileService =
+fun provideUserProfileService(retrofit: Retrofit): UserProfileService =
     retrofit.create(UserProfileService::class.java)

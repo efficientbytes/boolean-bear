@@ -1,6 +1,7 @@
 package app.efficientbytes.androidnow.services
 
-import app.efficientbytes.androidnow.services.models.UserProfile
+import app.efficientbytes.androidnow.models.UserProfile
+import app.efficientbytes.androidnow.services.models.UserProfilePayload
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -12,12 +13,12 @@ interface UserProfileService {
     @POST("user-profile/update")
     suspend fun updateUserProfile(
         @Body userProfile: UserProfile
-    ): Response<UserProfile>
+    ): Response<UserProfilePayload>
 
-    @GET("user-profile/search")
+    @GET("user-profile")
     suspend fun getUserProfile(
         @Query("phoneNumber") phoneNumber: String? = null,
         @Query("userAccountId") userAccountId: String? = null
-    ): Response<UserProfile>
+    ): Response<UserProfilePayload>
 
 }

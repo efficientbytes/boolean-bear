@@ -1,14 +1,22 @@
 package app.efficientbytes.androidnow.repositories
 
+import app.efficientbytes.androidnow.database.dao.UserProfileDao
+import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.UserProfileService
-import app.efficientbytes.androidnow.services.models.UserProfile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class UserProfileRepository(private val userProfileService: UserProfileService) {
+class UserProfileRepository(
+    private val userProfileService: UserProfileService,
+    private val userProfileDao: UserProfileDao
+) {
+
+    private val tagUserProfileRepository = "User-Profile-Repository"
+    val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
 
     suspend fun getUserProfile(phoneNumber: String? = null, userAccountId: String? = null) = flow {
         emit(DataStatus.loading())
@@ -19,23 +27,31 @@ class UserProfileRepository(private val userProfileService: UserProfileService) 
         val responseCode = response.code()
         when {
             responseCode == 200 -> {
-                val userProfile = response.body()
-                emit(DataStatus.success(userProfile))
+                val responseUserProfile = response.body()
+                responseUserProfile?.let {
+                    it.userProfile?.let { profile ->
+                        userProfileDao.insertUserProfile(
+                            profile
+                        )
+                    }
+                }
+                emit(DataStatus.success(responseUserProfile))
             }
 
             responseCode == 400 -> {
-                val userProfile = response.body()
-                val errorMessage = "Not yet implemented"
-                emit(DataStatus.failed(errorMessage))
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
             }
 
             responseCode == 503 -> {
-                val userProfile = response.body()
-                val errorMessage = "Not yet implemented"
-                emit(DataStatus.failed(errorMessage))
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
             }
 
-            responseCode >= 401 -> emit(DataStatus.failed(response.message()))
+            responseCode >= 401 -> {
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
+            }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
@@ -47,22 +63,30 @@ class UserProfileRepository(private val userProfileService: UserProfileService) 
         when {
             responseCode == 200 -> {
                 val responseUserProfile = response.body()
+                responseUserProfile?.let {
+                    it.userProfile?.let { profile ->
+                        userProfileDao.insertUserProfile(
+                            profile
+                        )
+                    }
+                }
                 emit(DataStatus.success(responseUserProfile))
             }
 
             responseCode == 400 -> {
-                val responseUserProfile = response.body()
-                val errorMessage = "Not yet implemented"
-                emit(DataStatus.failed(errorMessage))
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
             }
 
             responseCode == 503 -> {
-                val responseUserProfile = response.body()
-                val errorMessage = "Not yet implemented"
-                emit(DataStatus.failed(errorMessage))
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
             }
 
-            responseCode >= 401 -> emit(DataStatus.failed(response.message()))
+            responseCode >= 401 -> {
+                val errorMessage = response.body()?.message
+                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
+            }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)

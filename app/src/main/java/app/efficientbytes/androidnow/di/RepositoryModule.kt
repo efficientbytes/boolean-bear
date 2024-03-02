@@ -8,5 +8,5 @@ import org.koin.dsl.module
 val repositoryModule = module {
     factory { CourseRepository(get()) }
     factory { VerificationRepository(get()) }
-    factory { UserProfileRepository(get()) }
+    factory { UserProfileRepository(get(), get()) }
 }
