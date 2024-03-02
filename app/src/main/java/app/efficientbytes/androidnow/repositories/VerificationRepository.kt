@@ -1,6 +1,5 @@
 package app.efficientbytes.androidnow.repositories
 
-import android.util.Log
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
@@ -22,21 +21,7 @@ class VerificationRepository(private val verificationService: VerificationServic
                 emit(DataStatus.success(phoneNumberVerificationStatus))
             }
 
-            responseCode == 400 -> {
-                val phoneNumberVerificationStatus = response.body()
-                val errorMessage =
-                    "${phoneNumberVerificationStatus?.verificationStatus} : ${phoneNumberVerificationStatus?.verificationMessage}"
-                emit(DataStatus.failed(errorMessage))
-            }
-
-            responseCode == 503 -> {
-                val phoneNumberVerificationStatus = response.body()
-                val errorMessage =
-                    "${phoneNumberVerificationStatus?.verificationStatus} : ${phoneNumberVerificationStatus?.verificationMessage}"
-                emit(DataStatus.failed(errorMessage))
-            }
-
-            responseCode >= 401 -> emit(DataStatus.failed(response.message()))
+            responseCode >= 400 -> emit(DataStatus.failed("OTP processing failed : Error code $responseCode"))
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
@@ -45,22 +30,13 @@ class VerificationRepository(private val verificationService: VerificationServic
         emit(DataStatus.loading())
         val response = verificationService.verifyPhoneNumberOTP(verifyPhoneNumber)
         val responseCode = response.code()
-        Log.i(tagVerificationRepository, "Response  is ${response.body()}")
         when {
             responseCode == 200 -> {
                 val phoneNumberVerificationStatus = response.body()
                 emit(DataStatus.success(phoneNumberVerificationStatus))
             }
 
-            responseCode == 400 || responseCode == 401 -> {
-                emit(DataStatus.failed("Verification failed : Error code status $responseCode"))
-            }
-
-            responseCode == 503 -> {
-                emit(DataStatus.failed("Verification failed : Error code status $responseCode"))
-            }
-
-            responseCode >= 402 -> emit(DataStatus.failed(response.message()))
+            responseCode >= 400 -> emit(DataStatus.failed("Verification failed : Error code $responseCode"))
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)

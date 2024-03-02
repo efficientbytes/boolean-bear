@@ -1,7 +1,15 @@
 package app.efficientbytes.androidnow.services.models
 
+import com.google.gson.annotations.Expose
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class PhoneNumberVerificationStatus(
-    val phoneNumber: String?=null,
-    val verificationMessage: String?=null,
-    val verificationStatus: String?=null
+    @Json(name = "message")
+    @Expose
+    val message: String?=null,
+    @Json(name = "phoneNumber")
+    @Expose
+    val phoneNumber: String?=null
 )

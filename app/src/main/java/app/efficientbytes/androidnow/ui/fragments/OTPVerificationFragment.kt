@@ -68,11 +68,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressBar.visibility = View.INVISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
-                    val directions =
-                        OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
-                            phoneNumber
-                        )
-                    rootView.findNavController().navigate(directions)
                 }
 
                 DataStatus.Status.Loading -> {
@@ -87,8 +82,14 @@ class OTPVerificationFragment : Fragment() {
                     binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.INVISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "${it.data?.verificationStatus} : ${it.data?.verificationMessage}"
+                    binding.progressStatusValueTextView.text = it.data?.message
+                    it.data?.phoneNumber?.also { phoneNumber ->
+                        val directions =
+                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
+                                phoneNumber
+                            )
+                        rootView.findNavController().navigate(directions)
+                    }
                 }
             }
         }
