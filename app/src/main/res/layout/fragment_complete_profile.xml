@@ -10,8 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
         android:scrollbarSize="0dp"
+        android:scrollbars="vertical"
         tools:context=".ui.fragments.CompleteProfileFragment"
         tools:ignore="PrivateResource">
 
@@ -54,8 +54,8 @@
                 android:id="@+id/progressBar"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_marginStart="26dp"
-                android:visibility="gone"
+                android:layout_marginStart="50dp"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
                 app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView">
@@ -68,14 +68,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="18dp"
-                android:layout_marginEnd="26dp"
-                tools:text="Please wait while we update your profile..."
+                android:layout_marginEnd="50dp"
                 android:textSize="14sp"
-                android:visibility="gone"
+                android:visibility="invisible"
                 app:fontFamily="@font/montserrat"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/progressBar"
-                app:layout_constraintTop_toBottomOf="@id/tellUsMoreLabelTextView">
+                app:layout_constraintTop_toBottomOf="@id/tellUsMoreLabelTextView"
+                tools:text="Please wait while we update your profile...">
 
             </com.google.android.material.textview.MaterialTextView>
 

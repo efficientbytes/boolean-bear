@@ -20,7 +20,7 @@ data class UserProfile(
     val universityName: String? = null,
     val createdOn: Long? = null,
     val lastUpdatedOn: Long? = null,
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "rowId")
     @Transient val rowId: Int = 1
 )

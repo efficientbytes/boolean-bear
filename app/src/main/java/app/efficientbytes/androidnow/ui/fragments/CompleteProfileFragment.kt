@@ -3,7 +3,6 @@ package app.efficientbytes.androidnow.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentCompleteProfileBinding
+import app.efficientbytes.androidnow.models.UserProfile
+import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validateEmailIdFormat
 import app.efficientbytes.androidnow.utils.validateNameFormat
+import app.efficientbytes.androidnow.viewmodels.CompleteProfileViewModel
+import org.koin.android.ext.android.inject
 import java.util.Locale
 
 class CompleteProfileFragment : Fragment() {
@@ -25,6 +28,7 @@ class CompleteProfileFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var phoneNumber: String
     private var selectedProfessionCategoryPosition: Int = 0
+    private val viewModel: CompleteProfileViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,15 +114,54 @@ class CompleteProfileFragment : Fragment() {
         binding.submitButton.setOnClickListener {
             val firstName = binding.firstNameTextInputEditText.text.toString().trim()
             val lastName = binding.lastNameTextInputEditText.text.toString().trim()
-            val emailAddress = binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT).trim()
+            val emailAddress =
+                binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT).trim()
             val profession = currentProfessionCategories[selectedProfessionCategoryPosition]
             if (validateFormInputFormat(firstName, lastName, emailAddress)) {
-                //make server call to save the profile
-                Log.i(
-                    tagCompleteProfileFragment,
-                    "First Name : $firstName, Last Name : $lastName, Email : $emailAddress, Profession : $profession, Phone number : $phoneNumber"
+                viewModel.updateUserProfile(
+                    UserProfile(
+                        userAccountId = "aflcI7kP601DQPOyJ1nx",
+                        firstName = firstName,
+                        lastName = lastName,
+                        emailAddress = emailAddress,
+                        phoneNumber = phoneNumber,
+                        phoneNumberPrefix = "+91",
+                        completePhoneNumber = "+91${phoneNumber}",
+                        profession = profession
+                    )
                 )
-                findNavController().popBackStack(R.id.coursesFragment, false)
+            }
+        }
+        viewModel.userProfileServerResponse.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.submitButton.isEnabled = true
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    it.data?.also { userPayLoad ->
+                        binding.progressStatusValueTextView.text = userPayLoad.message.toString()
+                    }
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.submitButton.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "Updating your profile..."
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.submitButton.isEnabled = true
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    it.data?.also { userPayLoad ->
+                        binding.progressStatusValueTextView.text = userPayLoad.message.toString()
+                        userPayLoad.userProfile?.also { userProfile ->
+                            viewModel.saveUserProfile(userProfile)
+                        }
+                    }
+                    findNavController().popBackStack(R.id.coursesFragment, false)
+                }
             }
         }
     }
