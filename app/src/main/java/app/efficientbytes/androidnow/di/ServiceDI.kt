@@ -1,10 +1,12 @@
 package app.efficientbytes.androidnow.di
 
 import app.efficientbytes.androidnow.services.CoursesService
+import app.efficientbytes.androidnow.services.UserProfileService
 import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.utils.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 const val baseUrl = BASE_URL
 
@@ -17,3 +19,6 @@ fun provideCoursesService(retrofit: Retrofit): CoursesService =
 
 fun provideVerificationService(retrofit: Retrofit): VerificationService =
     retrofit.create(VerificationService::class.java)
+
+fun provideUserProfileService(retrofit: Retrofit) : UserProfileService =
+    retrofit.create(UserProfileService::class.java)
