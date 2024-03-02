@@ -69,3 +69,28 @@ fun validatePhoneNumberFormat(phoneNumberTextInputLayout : TextInputLayout, inpu
 fun validateOTPFormat(input : String) : Boolean {
     return input.matches(Regex("""^\d{6}$"""))
 }
+
+fun validateEmailIdFormat(
+    inputLayout: TextInputLayout,
+    input: String?
+): Boolean {
+    if (input?.matches(Regex("""^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$""")) == false) {
+        inputLayout.error = "Invalid format"
+        return false
+    }
+    inputLayout.error = null
+    return true
+}
+
+fun validateNameFormat(
+    inputLayout: TextInputLayout,
+    input: String?
+): Boolean {
+    if (input?.isBlank()==true) return true
+    if (input?.matches(Regex("""^[a-zA-Z\s]+$""")) == false) {
+        inputLayout.error = "Invalid format"
+        return false
+    }
+    inputLayout.error = null
+    return true
+}

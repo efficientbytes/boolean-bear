@@ -10,8 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
         android:scrollbarSize="0dp"
+        android:scrollbars="vertical"
         tools:context=".ui.fragments.CompleteProfileFragment"
         tools:ignore="PrivateResource">
 
@@ -50,6 +50,35 @@
 
             </com.google.android.material.textview.MaterialTextView>
 
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="50dp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                app:layout_constraintStart_toEndOf="@id/guideline3"
+                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView">
+
+            </ProgressBar>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/progressStatusValueTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="50dp"
+                android:textSize="14sp"
+                android:visibility="invisible"
+                app:fontFamily="@font/montserrat"
+                app:layout_constraintEnd_toStartOf="@id/guideline4"
+                app:layout_constraintStart_toEndOf="@id/progressBar"
+                app:layout_constraintTop_toBottomOf="@id/tellUsMoreLabelTextView"
+                tools:text="Please wait while we update your profile...">
+
+            </com.google.android.material.textview.MaterialTextView>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/firstNameTextInputLayout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -72,7 +101,7 @@
                 app:hintAnimationEnabled="true"
                 app:layout_constraintEnd_toStartOf="@id/guideline2"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/tellUsMoreLabelTextView">
+                app:layout_constraintTop_toBottomOf="@id/barrier1">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/firstNameTextInputEditText"
@@ -107,51 +136,13 @@
                 app:hintAnimationEnabled="true"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline2"
-                app:layout_constraintTop_toBottomOf="@id/tellUsMoreLabelTextView">
+                app:layout_constraintTop_toBottomOf="@id/barrier1">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/lastNameTextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="textPersonName"
-                    android:textColor="@color/white">
-
-                </com.google.android.material.textfield.TextInputEditText>
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/phoneNumberTextInputLayout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:enabled="false"
-                android:fontFamily="@font/montserrat"
-                android:hint="@string/phone_number"
-                android:paddingHorizontal="8dp"
-                app:boxBackgroundColor="#FF0E0E0E"
-                app:boxCornerRadiusBottomEnd="8dp"
-                app:boxCornerRadiusBottomStart="8dp"
-                app:boxCornerRadiusTopEnd="8dp"
-                app:boxCornerRadiusTopStart="8dp"
-                app:endIconMode="clear_text"
-                app:endIconTint="@color/white"
-                app:expandedHintEnabled="false"
-                app:hintAnimationEnabled="false"
-                app:layout_constraintEnd_toStartOf="@id/guideline4"
-                app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/firstNameTextInputLayout"
-                app:prefixText="+ 91"
-                app:prefixTextColor="@color/white">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phoneNumberTextInputEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="phone"
-                    android:longClickable="false"
-                    android:maxLength="10"
                     android:textColor="@color/white">
 
                 </com.google.android.material.textfield.TextInputEditText>
@@ -180,7 +171,7 @@
                 app:hintAnimationEnabled="true"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/firstNameTextInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/emailTextInputEditText"
@@ -188,6 +179,42 @@
                     android:layout_height="match_parent"
                     android:inputType="textEmailAddress"
                     android:textColor="@color/white">
+
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/phoneNumberTextInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:enabled="false"
+                android:fontFamily="@font/montserrat"
+                android:hint="@string/phone_number"
+                android:paddingHorizontal="8dp"
+                app:boxBackgroundColor="#FF0E0E0E"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:endIconMode="clear_text"
+                app:endIconTint="@color/white"
+                app:expandedHintEnabled="false"
+                app:hintAnimationEnabled="false"
+                app:layout_constraintEnd_toStartOf="@id/guideline4"
+                app:layout_constraintStart_toEndOf="@id/guideline3"
+                app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout"
+                app:prefixText="+ 91">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/phoneNumberTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="phone"
+                    android:longClickable="false"
+                    android:maxLength="10">
 
                 </com.google.android.material.textfield.TextInputEditText>
 
@@ -214,7 +241,7 @@
                 app:hintEnabled="false"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
 
                 <AutoCompleteTextView
                     android:id="@+id/currentProfessionAutoCompleteTextView"
@@ -269,6 +296,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.96" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="progressStatusValueTextView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

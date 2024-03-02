@@ -8,9 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
+import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validatePhoneNumberFormat
+import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
+import org.koin.android.ext.android.inject
 
 class LoginOrSignUpFragment : Fragment() {
 
@@ -18,6 +20,7 @@ class LoginOrSignUpFragment : Fragment() {
     private lateinit var _binding: FragmentLoginOrSignUpBinding
     private val binding get() = _binding
     private lateinit var rootView: View
+    private val viewModel: LoginOrSignUpViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,10 +36,8 @@ class LoginOrSignUpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
-            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout,input)) {
-                binding.phoneNumberTextInputEditText.text=null
-                //make server call to verify by adding prefix
-                it.findNavController().navigate(R.id.loginOrSignUpFragment_to_OTPVerificationFragment)
+            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
+                viewModel.sendOTPToPhoneNumber(input)
             }
         }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
@@ -51,6 +52,39 @@ class LoginOrSignUpFragment : Fragment() {
             }
 
         })
+        viewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.continueButton.isEnabled = false
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "${it.message}"
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.continueButton.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Please wait while we send the OTP..."
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.continueButton.isEnabled = false
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.data?.message
+                    binding.phoneNumberTextInputEditText.text = null
+                    it.data?.phoneNumber?.also { phoneNumber ->
+                        val directions =
+                            LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToOTPVerificationFragment(
+                                phoneNumber
+                            )
+                        rootView.findNavController().navigate(directions)
+                    }
+                }
+            }
+        }
     }
 
 }

@@ -6,4 +6,5 @@ import org.koin.dsl.module
 val databaseModule = module {
     single { appDatabaseName }
     single { provideRoomDatabase(androidContext()) }
+    single { provideUserProfileDao(get()) }
 }

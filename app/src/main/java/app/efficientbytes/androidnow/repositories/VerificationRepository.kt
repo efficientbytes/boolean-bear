@@ -1,0 +1,45 @@
+package app.efficientbytes.androidnow.repositories
+
+import app.efficientbytes.androidnow.repositories.models.DataStatus
+import app.efficientbytes.androidnow.services.VerificationService
+import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+
+class VerificationRepository(private val verificationService: VerificationService) {
+
+    private val tagVerificationRepository = "Verification Repository"
+    suspend fun sendOTPToPhoneNumber(verifyPhoneNumber: VerifyPhoneNumber) = flow {
+        emit(DataStatus.loading())
+        val response = verificationService.sendOtpToPhoneNumber(verifyPhoneNumber)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val phoneNumberVerificationStatus = response.body()
+                emit(DataStatus.success(phoneNumberVerificationStatus))
+            }
+
+            responseCode >= 400 -> emit(DataStatus.failed("OTP processing failed : Error code $responseCode"))
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    suspend fun verifyPhoneNumberOTP(verifyPhoneNumber: VerifyPhoneNumber) = flow {
+        emit(DataStatus.loading())
+        val response = verificationService.verifyPhoneNumberOTP(verifyPhoneNumber)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val phoneNumberVerificationStatus = response.body()
+                emit(DataStatus.success(phoneNumberVerificationStatus))
+            }
+
+            responseCode >= 400 -> emit(DataStatus.failed("Verification failed : Error code $responseCode"))
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+
+}

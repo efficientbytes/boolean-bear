@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findNavController(R.id.fragmentContainer)
     }
     private val appBarConfiguration by lazy {
-        AppBarConfiguration(setOf(R.id.coursesFragment))
+        AppBarConfiguration(setOf(R.id.coursesFragment,R.id.completeProfileFragment))
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var networkNotAvailable: Boolean = false

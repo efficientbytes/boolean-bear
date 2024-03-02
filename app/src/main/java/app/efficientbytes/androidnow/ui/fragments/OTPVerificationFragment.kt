@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import app.efficientbytes.androidnow.R
+import androidx.navigation.findNavController
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
+import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validateOTPFormat
+import app.efficientbytes.androidnow.viewmodels.PhoneNumberOTPVerificationViewModel
 import `in`.aabhasjindal.otptextview.OTPListener
+import org.koin.android.ext.android.inject
 
 class OTPVerificationFragment : Fragment() {
 
@@ -17,6 +19,16 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var _binding: FragmentOTPVerificationBinding
     private val binding get() = _binding
     private lateinit var rootView: View
+    private lateinit var phoneNumber: String
+    private val viewModel: PhoneNumberOTPVerificationViewModel by inject()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bundle = arguments ?: return
+        val args = OTPVerificationFragmentArgs.fromBundle(bundle)
+        val phoneNumber = args.phoneNumber
+        this.phoneNumber = phoneNumber
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,11 +42,11 @@ class OTPVerificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.otpSentToLabelTextView.text = "OTP sent to +91${phoneNumber}"
         binding.verifyButton.setOnClickListener {
             binding.otpPinViewLayout.otp?.apply {
                 if (validateOTPFormat(this)) {
-                    //make server call to verify the otp
-                    findNavController().navigate(R.id.verificationFragment_to_completeProfileFragment)
+                    viewModel.verifyPhoneNumberOTP(phoneNumber, this)
                 }
             }
         }
@@ -47,6 +59,38 @@ class OTPVerificationFragment : Fragment() {
 
             override fun onOTPComplete(otp: String) {
                 binding.verifyButton.isEnabled = true
+            }
+        }
+        viewModel.verifyPhoneNumberOTPResponse.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.verifyButton.isEnabled = true
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "${it.message}"
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.verifyButton.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Please wait while we verify the OTP..."
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.verifyButton.isEnabled = false
+                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.data?.message
+                    it.data?.phoneNumber?.also { phoneNumber ->
+                        val directions =
+                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
+                                phoneNumber
+                            )
+                        rootView.findNavController().navigate(directions)
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,21 @@
+package app.efficientbytes.androidnow.services
+
+import app.efficientbytes.androidnow.services.models.PhoneNumberVerificationStatus
+import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.POST
+
+interface VerificationService {
+
+    @POST("verification/phone-number/send-otp")
+    suspend fun sendOtpToPhoneNumber(
+        @Body sendPhoneNumberOTP: VerifyPhoneNumber
+    ): Response<PhoneNumberVerificationStatus>
+
+    @POST("verification/phone-number/verify-otp")
+    suspend fun verifyPhoneNumberOTP(
+        @Body verifyOTP: VerifyPhoneNumber
+    ): Response<PhoneNumberVerificationStatus>
+
+}
