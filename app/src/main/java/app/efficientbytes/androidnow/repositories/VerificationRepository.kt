@@ -1,5 +1,6 @@
 package app.efficientbytes.androidnow.repositories
 
+import android.util.Log
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.flowOn
 
 class VerificationRepository(private val verificationService: VerificationService) {
 
+    private val tagVerificationRepository = "Verification Repository"
     suspend fun sendOTPToPhoneNumber(verifyPhoneNumber: VerifyPhoneNumber) = flow {
         emit(DataStatus.loading())
         val response = verificationService.sendOtpToPhoneNumber(verifyPhoneNumber)
@@ -23,14 +25,14 @@ class VerificationRepository(private val verificationService: VerificationServic
             responseCode == 400 -> {
                 val phoneNumberVerificationStatus = response.body()
                 val errorMessage =
-                    "${phoneNumberVerificationStatus?.status} : ${phoneNumberVerificationStatus?.message}"
+                    "${phoneNumberVerificationStatus?.verificationStatus} : ${phoneNumberVerificationStatus?.verificationMessage}"
                 emit(DataStatus.failed(errorMessage))
             }
 
             responseCode == 503 -> {
                 val phoneNumberVerificationStatus = response.body()
                 val errorMessage =
-                    "${phoneNumberVerificationStatus?.status} : ${phoneNumberVerificationStatus?.message}"
+                    "${phoneNumberVerificationStatus?.verificationStatus} : ${phoneNumberVerificationStatus?.verificationMessage}"
                 emit(DataStatus.failed(errorMessage))
             }
 
@@ -43,17 +45,19 @@ class VerificationRepository(private val verificationService: VerificationServic
         emit(DataStatus.loading())
         val response = verificationService.verifyPhoneNumberOTP(verifyPhoneNumber)
         val responseCode = response.code()
+        Log.i(tagVerificationRepository, "Response  is ${response.body()}")
         when {
             responseCode == 200 -> {
                 val phoneNumberVerificationStatus = response.body()
                 emit(DataStatus.success(phoneNumberVerificationStatus))
             }
 
-            responseCode == 400 || responseCode == 401 || responseCode == 503 -> {
-                val phoneNumberVerificationStatus = response.body()
-                val errorMessage =
-                    "${phoneNumberVerificationStatus?.status} : ${phoneNumberVerificationStatus?.message}"
-                emit(DataStatus.failed(errorMessage))
+            responseCode == 400 || responseCode == 401 -> {
+                emit(DataStatus.failed("Verification failed : Error code status $responseCode"))
+            }
+
+            responseCode == 503 -> {
+                emit(DataStatus.failed("Verification failed : Error code status $responseCode"))
             }
 
             responseCode >= 402 -> emit(DataStatus.failed(response.message()))

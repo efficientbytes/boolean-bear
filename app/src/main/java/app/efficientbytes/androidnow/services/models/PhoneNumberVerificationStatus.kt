@@ -1,7 +1,7 @@
 package app.efficientbytes.androidnow.services.models
 
 data class PhoneNumberVerificationStatus(
-    val status: String,
-    val message: String,
-    val phoneNumber : String
+    val phoneNumber: String?=null,
+    val verificationMessage: String?=null,
+    val verificationStatus: String?=null
 )
