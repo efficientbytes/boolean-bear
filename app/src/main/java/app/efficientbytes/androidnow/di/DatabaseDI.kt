@@ -10,3 +10,5 @@ const val appDatabaseName = DATABASE_NAME
 fun provideRoomDatabase(context: Context) =
     Room.databaseBuilder(context, AppDatabase::class.java, appDatabaseName).allowMainThreadQueries()
         .fallbackToDestructiveMigration().build()
+
+fun provideUserProfileDao(database: AppDatabase) = database.userProfileDa()
