@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
 import app.efficientbytes.androidnow.utils.validateOTPFormat
 import `in`.aabhasjindal.otptextview.OTPListener
