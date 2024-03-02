@@ -22,7 +22,9 @@
         tools:layout="@layout/fragment_account_settings">
         <action
             android:id="@+id/accountSettingsFragment_to_coursesFragment"
-            app:destination="@id/coursesFragment" />
+            app:destination="@id/coursesFragment"
+            app:restoreState="true"
+            app:popUpToSaveState="true"/>
         <action
             android:id="@+id/accountSettingsFragment_to_loginOrSignUpFragment"
             app:destination="@id/loginOrSignUpFragment"
@@ -46,14 +48,23 @@
         android:label="Phone Verification"
         tools:layout="@layout/fragment_o_t_p_verification" >
         <action
-            android:id="@+id/verificationFragment_to_completeProfileFragment"
+            android:id="@+id/otpVerificationFragment_to_completeProfileFragment"
             app:destination="@id/completeProfileFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string"
+            app:nullable="false" />
     </fragment>
     <fragment
         android:id="@+id/completeProfileFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.CompleteProfileFragment"
         android:label="Setup Profile"
-        tools:layout="@layout/fragment_complete_profile" />
+        tools:layout="@layout/fragment_complete_profile" >
+        <argument
+            android:name="phoneNumber"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
 </navigation>

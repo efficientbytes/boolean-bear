@@ -31,6 +31,13 @@
         <item>Installation setup</item>
     </string-array>
 
+    <string-array name="array_current_profession_categories">
+        <item>I\'m studying in school.</item>
+        <item>I\'m studying in university/college.</item>
+        <item>I\'m employed.</item>
+        <item>I\'m a freelancer.</item>
+    </string-array>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hello_there_welcome_aboard">Hello there! Welcome aboard</string>
     <string name="tell_us_more_about_yourselves">Tell us more about yourselves</string>

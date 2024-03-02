@@ -121,44 +121,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/phoneNumberTextInputLayout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:enabled="false"
-                android:fontFamily="@font/montserrat"
-                android:hint="@string/phone_number"
-                android:paddingHorizontal="8dp"
-                app:boxBackgroundColor="#FF0E0E0E"
-                app:boxCornerRadiusBottomEnd="8dp"
-                app:boxCornerRadiusBottomStart="8dp"
-                app:boxCornerRadiusTopEnd="8dp"
-                app:boxCornerRadiusTopStart="8dp"
-                app:endIconMode="clear_text"
-                app:endIconTint="@color/white"
-                app:expandedHintEnabled="false"
-                app:hintAnimationEnabled="false"
-                app:layout_constraintEnd_toStartOf="@id/guideline4"
-                app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/firstNameTextInputLayout"
-                app:prefixText="+ 91"
-                app:prefixTextColor="@color/white">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phoneNumberTextInputEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="phone"
-                    android:longClickable="false"
-                    android:maxLength="10"
-                    android:textColor="@color/white">
-
-                </com.google.android.material.textfield.TextInputEditText>
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/emailTextInputLayout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
@@ -180,7 +142,7 @@
                 app:hintAnimationEnabled="true"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/firstNameTextInputLayout">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/emailTextInputEditText"
@@ -188,6 +150,42 @@
                     android:layout_height="match_parent"
                     android:inputType="textEmailAddress"
                     android:textColor="@color/white">
+
+                </com.google.android.material.textfield.TextInputEditText>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/phoneNumberTextInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:enabled="false"
+                android:fontFamily="@font/montserrat"
+                android:hint="@string/phone_number"
+                android:paddingHorizontal="8dp"
+                app:boxBackgroundColor="#FF0E0E0E"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:endIconMode="clear_text"
+                app:endIconTint="@color/white"
+                app:expandedHintEnabled="false"
+                app:hintAnimationEnabled="false"
+                app:layout_constraintEnd_toStartOf="@id/guideline4"
+                app:layout_constraintStart_toEndOf="@id/guideline3"
+                app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout"
+                app:prefixText="+ 91">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/phoneNumberTextInputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="phone"
+                    android:longClickable="false"
+                    android:maxLength="10">
 
                 </com.google.android.material.textfield.TextInputEditText>
 
@@ -212,9 +210,10 @@
                 app:expandedHintEnabled="false"
                 app:hintAnimationEnabled="false"
                 app:hintEnabled="false"
+                android:text="I'm studying in school"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
-                app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
 
                 <AutoCompleteTextView
                     android:id="@+id/currentProfessionAutoCompleteTextView"
