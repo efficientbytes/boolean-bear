@@ -108,9 +108,9 @@ class CompleteProfileFragment : Fragment() {
             selectedProfessionCategoryPosition = position
         }
         binding.submitButton.setOnClickListener {
-            val firstName = binding.firstNameTextInputEditText.text.toString()
-            val lastName = binding.lastNameTextInputEditText.text.toString()
-            val emailAddress = binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT)
+            val firstName = binding.firstNameTextInputEditText.text.toString().trim()
+            val lastName = binding.lastNameTextInputEditText.text.toString().trim()
+            val emailAddress = binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT).trim()
             val profession = currentProfessionCategories[selectedProfessionCategoryPosition]
             if (validateFormInputFormat(firstName, lastName, emailAddress)) {
                 //make server call to save the profile

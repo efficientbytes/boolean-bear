@@ -87,7 +87,7 @@ fun validateNameFormat(
     input: String?
 ): Boolean {
     if (input?.isBlank()==true) return true
-    if (input?.matches(Regex("""^[a-zA-Z]+$""")) == false) {
+    if (input?.matches(Regex("""^[a-zA-Z\s]+$""")) == false) {
         inputLayout.error = "Invalid format"
         return false
     }
