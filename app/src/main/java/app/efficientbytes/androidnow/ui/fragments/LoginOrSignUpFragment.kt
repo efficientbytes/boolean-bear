@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.androidnow.utils.validatePhoneNumberFormat
 
@@ -33,10 +32,14 @@ class LoginOrSignUpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
-            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout,input)) {
-                binding.phoneNumberTextInputEditText.text=null
+            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
+                binding.phoneNumberTextInputEditText.text = null
                 //make server call to verify by adding prefix
-                it.findNavController().navigate(R.id.loginOrSignUpFragment_to_OTPVerificationFragment)
+                val directions =
+                    LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToOTPVerificationFragment(
+                        input
+                    )
+                rootView.findNavController().navigate(directions)
             }
         }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
