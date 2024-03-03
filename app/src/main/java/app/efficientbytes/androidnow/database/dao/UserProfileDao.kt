@@ -17,7 +17,7 @@ interface UserProfileDao {
     @Query("DELETE FROM $USER_PROFILE_TABLE")
     suspend fun delete()
 
-    @Query("SELECT * FROM $USER_PROFILE_TABLE WHERE rowId is 0")
+    @Query("SELECT * FROM $USER_PROFILE_TABLE WHERE rowId is 1")
     fun getUserProfile(): Flow<UserProfile>
 
 }

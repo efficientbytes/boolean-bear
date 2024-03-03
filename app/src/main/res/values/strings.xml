@@ -46,6 +46,7 @@
     <string name="email_address">Email address</string>
     <string name="submit">Submit</string>
     <string name="phone_number">Phone number</string>
+    <string name="take_me_to_homepage">Take me to homepage</string>
 
 
 </resources>

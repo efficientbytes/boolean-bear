@@ -28,13 +28,6 @@ class UserProfileRepository(
         when {
             responseCode == 200 -> {
                 val responseUserProfile = response.body()
-                responseUserProfile?.let {
-                    it.userProfile?.let { profile ->
-                        userProfileDao.insertUserProfile(
-                            profile
-                        )
-                    }
-                }
                 emit(DataStatus.success(responseUserProfile))
             }
 
@@ -85,6 +78,9 @@ class UserProfileRepository(
         .flowOn(Dispatchers.IO)
 
     suspend fun saveUserProfile(userProfile: UserProfile) {
+        userProfile.apply {
+            rowId = 1
+        }
         userProfileDao.insertUserProfile(userProfile)
     }
 

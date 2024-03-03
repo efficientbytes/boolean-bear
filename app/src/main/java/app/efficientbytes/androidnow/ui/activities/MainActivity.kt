@@ -15,6 +15,7 @@ import androidx.navigation.ui.navigateUp
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ActivityMainBinding
 import app.efficientbytes.androidnow.utils.ConnectivityListener
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -28,10 +29,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         findNavController(R.id.fragmentContainer)
     }
     private val appBarConfiguration by lazy {
-        AppBarConfiguration(setOf(R.id.coursesFragment,R.id.completeProfileFragment))
+        AppBarConfiguration(setOf(R.id.coursesFragment, R.id.completeProfileFragment))
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var networkNotAvailable: Boolean = false
+    private val viewModel: MainViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(binding.mainToolbar)
         setupNavigation()
         setupConnectivityListener()
+        lifecycle.addObserver(viewModel)
     }
 
     private fun setupConnectivityListener() {

@@ -1,5 +1,6 @@
 package app.efficientbytes.androidnow.di
 
+import app.efficientbytes.androidnow.services.AuthenticationService
 import app.efficientbytes.androidnow.services.CoursesService
 import app.efficientbytes.androidnow.services.UserProfileService
 import app.efficientbytes.androidnow.services.VerificationService
@@ -24,3 +25,6 @@ fun provideVerificationService(retrofit: Retrofit): VerificationService =
 
 fun provideUserProfileService(retrofit: Retrofit): UserProfileService =
     retrofit.create(UserProfileService::class.java)
+
+fun provideAuthenticationService(retrofit: Retrofit): AuthenticationService =
+    retrofit.create(AuthenticationService::class.java)

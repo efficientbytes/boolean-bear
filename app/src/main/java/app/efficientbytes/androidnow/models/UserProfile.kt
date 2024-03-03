@@ -14,15 +14,17 @@ data class UserProfile(
     val phoneNumberPrefix: String,
     val completePhoneNumber: String,
     val userAccountId: String,
+    val activityId: String? = null,
     val profession: String? = null,
     val fcmToken: String? = null,
     val lastName: String? = null,
     val emailAddress: String? = null,
     val linkedInAddress: String? = null,
+    val gitHubUsername: String? = null,
     val universityName: String? = null,
     val createdOn: Long? = null,
     val lastUpdatedOn: Long? = null,
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "rowId")
-    @Transient val rowId: Int = 1
+    var rowId: Int? = 1
 )
