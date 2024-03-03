@@ -27,6 +27,7 @@ class CompleteProfileFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private lateinit var phoneNumber: String
+    private lateinit var userAccountId: String
     private var selectedProfessionCategoryPosition: Int = 0
     private val viewModel: CompleteProfileViewModel by inject()
 
@@ -35,7 +36,9 @@ class CompleteProfileFragment : Fragment() {
         val bundle = arguments ?: return
         val args = CompleteProfileFragmentArgs.fromBundle(bundle)
         val phoneNumber = args.phoneNumber
+        val userAccountId = args.userAccountId
         this.phoneNumber = phoneNumber
+        this.userAccountId = userAccountId
         val backPressedCallback: OnBackPressedCallback =
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
@@ -120,7 +123,7 @@ class CompleteProfileFragment : Fragment() {
             if (validateFormInputFormat(firstName, lastName, emailAddress)) {
                 viewModel.updateUserProfile(
                     UserProfile(
-                        userAccountId = "aflcI7kP601DQPOyJ1nx",
+                        userAccountId = userAccountId,
                         firstName = firstName,
                         lastName = lastName,
                         emailAddress = emailAddress,

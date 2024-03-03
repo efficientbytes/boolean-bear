@@ -158,6 +158,22 @@
 
             </com.google.android.material.button.MaterialButton>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/takeMeToHomePageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:enabled="true"
+                android:text="@string/take_me_to_homepage"
+                android:textColor="@color/black"
+                app:cornerRadius="4dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/otpPinViewLayout"
+                app:layout_constraintStart_toStartOf="@id/otpPinViewLayout"
+                app:layout_constraintTop_toBottomOf="@id/verifyButton">
+
+            </com.google.android.material.button.MaterialButton>
+
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline1"
                 android:layout_width="wrap_content"

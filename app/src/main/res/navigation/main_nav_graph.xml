@@ -13,7 +13,7 @@
             android:id="@+id/coursesFragment_to_accountSettingsFragment"
             app:destination="@id/accountSettingsFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -23,8 +23,8 @@
         <action
             android:id="@+id/accountSettingsFragment_to_coursesFragment"
             app:destination="@id/coursesFragment"
-            app:restoreState="true"
-            app:popUpToSaveState="true"/>
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
         <action
             android:id="@+id/accountSettingsFragment_to_loginOrSignUpFragment"
             app:destination="@id/loginOrSignUpFragment"
@@ -35,18 +35,18 @@
         android:id="@+id/loginOrSignUpFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.LoginOrSignUpFragment"
         android:label="Login or Sign Up"
-        tools:layout="@layout/fragment_login_or_sign_up" >
+        tools:layout="@layout/fragment_login_or_sign_up">
         <action
             android:id="@+id/loginOrSignUpFragment_to_OTPVerificationFragment"
             app:destination="@id/OTPVerificationFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/OTPVerificationFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.OTPVerificationFragment"
         android:label="Phone Verification"
-        tools:layout="@layout/fragment_o_t_p_verification" >
+        tools:layout="@layout/fragment_o_t_p_verification">
         <action
             android:id="@+id/otpVerificationFragment_to_completeProfileFragment"
             app:destination="@id/completeProfileFragment"
@@ -61,9 +61,13 @@
         android:id="@+id/completeProfileFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.CompleteProfileFragment"
         android:label="Setup Profile"
-        tools:layout="@layout/fragment_complete_profile" >
+        tools:layout="@layout/fragment_complete_profile">
         <argument
             android:name="phoneNumber"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="userAccountId"
             app:argType="string"
             app:nullable="false" />
     </fragment>

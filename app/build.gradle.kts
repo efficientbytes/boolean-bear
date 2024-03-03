@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -76,4 +77,11 @@ dependencies {
     implementation("com.squareup.moshi:moshi:$moshiVersion")
     ksp("com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    //firebase
+    //Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+
 }
