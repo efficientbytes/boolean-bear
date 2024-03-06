@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.efficientbytes.androidnow.utils.USER_PROFILE_TABLE
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -19,11 +20,12 @@ data class UserProfile(
     var fcmToken: String? = null,
     var lastName: String? = null,
     var emailAddress: String? = null,
-    var linkedInAddress: String? = null,
+    var linkedInUsername: String? = null,
     var gitHubUsername: String? = null,
     var universityName: String? = null,
     var createdOn: Long? = null,
     var lastUpdatedOn: Long? = null,
+    @Json(ignore = true)
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "rowId")
     var rowId: Int? = 1

@@ -2,6 +2,7 @@ package app.efficientbytes.androidnow.ui.activities
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -14,12 +15,14 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ActivityMainBinding
+import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.ConnectivityListener
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -33,17 +36,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var networkNotAvailable: Boolean = false
-    private val viewModel: MainViewModel by inject()
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
+        lifecycle.addObserver(viewModel)
         setSupportActionBar(binding.mainToolbar)
         setupNavigation()
         setupConnectivityListener()
-        lifecycle.addObserver(viewModel)
+        setUpLiveDataObserver()
+    }
+
+    private fun setUpLiveDataObserver() {
+        viewModel.userProfile.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        "Failed to download latest user profile.",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.setBackgroundTint(Color.parseColor("#B00020"))
+                    snackBar.setTextColor(Color.parseColor("#FFFFFF"))
+                    snackBar.show()
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { userProfilePayload ->
+                        userProfilePayload.userProfile?.let { userProfile ->
+                            viewModel.saveUserProfile(userProfile)
+                        }
+                    }
+                }
+            }
+        }
+        viewModel.authState.observe(this) {
+            it.let {
+                when (it) {
+                    true -> {
+                        viewModel.getUserProfile()
+                    }
+
+                    false -> {
+                        viewModel.deleteUserProfile()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {

@@ -16,10 +16,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
+import app.efficientbytes.androidnow.repositories.UserProfileRepository
+import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.SignInToken
+import app.efficientbytes.androidnow.services.models.UserProfilePayload
 import app.efficientbytes.androidnow.utils.authStateFlow
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -32,7 +36,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val application: Application,
-    private val authenticationRepository: AuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository,
+    private val userProfileRepository: UserProfileRepository
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -95,7 +100,7 @@ class MainViewModel(
         authStateListenerJob = viewModelScope.launch {
             auth.authStateFlow().collect { authState ->
                 Log.i(tagMainViewModel, "Auth State is : $authState")
-                _authState.postValue(false)
+                _authState.postValue(authState is AuthState.Authenticated)
             }
         }
         Log.i(
@@ -129,8 +134,29 @@ class MainViewModel(
         }
     }
 
-    fun getUserProfile() {
+    private val _userProfile: MutableLiveData<DataStatus<UserProfilePayload?>> = MutableLiveData()
+    val userProfile: LiveData<DataStatus<UserProfilePayload?>> = _userProfile
 
+    fun getUserProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            auth.currentUser?.let { firebaseUser ->
+                userProfileRepository.getUserProfile(firebaseUser.uid).collect {
+                    _userProfile.postValue(it)
+                }
+            }
+        }
+    }
+
+    fun saveUserProfile(userProfile: UserProfile) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userProfileRepository.saveUserProfile(userProfile)
+        }
+    }
+
+    fun deleteUserProfile(){
+        viewModelScope.launch (Dispatchers.IO){
+            userProfileRepository.deleteUserProfile()
+        }
     }
 
     fun signOutUser() {
@@ -143,12 +169,17 @@ class MainViewModel(
         when (event) {
             ON_CREATE -> {
                 listenForAuthStateChanges()
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    getUserProfile()
+                }
             }
 
             ON_START -> {
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     _isUserSignedIn.postValue(DataStatus.success(true))
+                    Log.i(tagMainViewModel,"User profile uid is ${currentUser.uid}")
                 } else {
                     _isUserSignedIn.postValue(DataStatus.success(false))
                 }
