@@ -1,7 +1,6 @@
 package app.efficientbytes.androidnow.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -122,7 +121,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     //sign the user with the received sign in token
                     it.data?.let { signInToken ->
-                        Log.i(tagOTPVerification, "user profile is $signInToken")
                         mainViewModel.signInWithToken(signInToken)
                         userAccountId = signInToken.userAccountId
                         profileUpdated = signInToken.basicProfileDetailsUpdated

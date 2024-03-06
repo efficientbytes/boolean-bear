@@ -1,6 +1,5 @@
 package app.efficientbytes.androidnow.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
 import androidx.lifecycle.Lifecycle.Event.ON_CREATE
@@ -39,7 +38,6 @@ class CourseViewModel(private val courseRepository: CourseRepository) : ViewMode
         }
         allCoursesJob = viewModelScope.launch(Dispatchers.IO) {
             courseRepository.pullShortCourses(contentType).collect {
-                Log.i("ViewModel","List is : ${it.data.toString()}")
                 _allShortCourses.postValue(it)
             }
         }
