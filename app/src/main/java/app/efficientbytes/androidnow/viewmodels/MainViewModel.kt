@@ -17,8 +17,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
-import app.efficientbytes.androidnow.repositories.UserProfileRepository
-import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.SignInToken
@@ -89,7 +87,6 @@ class MainViewModel(
 
     private val _authState: MutableLiveData<Boolean> = MutableLiveData()
     val authState: LiveData<Boolean> = _authState
-
     val authSat = false
     fun listenForAuthStateChanges() {
         Log.i(tagMainViewModel, "Auth state listener invoked")
@@ -134,12 +131,12 @@ class MainViewModel(
         }
     }
 
-    fun getUserProfile(){
+    fun getUserProfile() {
 
     }
 
-    fun signOutUser(){
-        if (auth.currentUser!=null){
+    fun signOutUser() {
+        if (auth.currentUser != null) {
             auth.signOut()
         }
     }

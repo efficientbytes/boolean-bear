@@ -9,10 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
-import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
-import app.efficientbytes.androidnow.services.models.UserProfilePayload
 import app.efficientbytes.androidnow.utils.validateOTPFormat
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import app.efficientbytes.androidnow.viewmodels.PhoneNumberOTPVerificationViewModel
