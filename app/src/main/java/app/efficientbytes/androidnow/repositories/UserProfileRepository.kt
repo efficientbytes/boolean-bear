@@ -4,6 +4,8 @@ import app.efficientbytes.androidnow.database.dao.UserProfileDao
 import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.UserProfileService
+import app.efficientbytes.androidnow.services.models.UserProfilePayload
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -17,6 +19,7 @@ class UserProfileRepository(
 
     private val tagUserProfileRepository = "User-Profile-Repository"
     val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
+    private val gson = Gson()
 
     suspend fun getUserProfile(userAccountId: String? = null) = flow {
         emit(DataStatus.loading())
@@ -30,19 +33,13 @@ class UserProfileRepository(
                 emit(DataStatus.success(responseUserProfile))
             }
 
-            responseCode == 400 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
-            }
-
-            responseCode == 503 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
-            }
-
-            responseCode >= 401 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
             }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
@@ -58,19 +55,13 @@ class UserProfileRepository(
                 emit(DataStatus.success(responseUserProfile))
             }
 
-            responseCode == 400 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
-            }
-
-            responseCode == 503 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
-            }
-
-            responseCode >= 401 -> {
-                val errorMessage = response.body()?.message
-                emit(DataStatus.failed(errorMessage ?: "Server message could not be read."))
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
             }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }

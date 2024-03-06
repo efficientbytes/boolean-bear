@@ -139,7 +139,7 @@ class CompleteProfileFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.submitButton.isEnabled = true
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     it.data?.also { userPayLoad ->
                         binding.progressStatusValueTextView.text = userPayLoad.message.toString()
@@ -155,7 +155,7 @@ class CompleteProfileFragment : Fragment() {
 
                 DataStatus.Status.Success -> {
                     binding.submitButton.isEnabled = true
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     it.data?.also { userPayLoad ->
                         binding.progressStatusValueTextView.text = userPayLoad.message.toString()

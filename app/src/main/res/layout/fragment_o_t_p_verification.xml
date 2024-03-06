@@ -10,10 +10,10 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
         android:scrollbarSize="0dp"
-        tools:ignore="ContentDescription"
-        tools:context=".ui.fragments.OTPVerificationFragment">
+        android:scrollbars="vertical"
+        tools:context=".ui.fragments.OTPVerificationFragment"
+        tools:ignore="ContentDescription">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -28,40 +28,51 @@
                 android:fontFamily="@font/montserrat_medium"
                 android:text="@string/please_enter_the_verification_code_sent_to_your_phone_number"
                 android:textAlignment="textStart"
-                android:textSize="16sp"
                 android:textColor="@color/violet_800"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@id/guideline5"
                 app:layout_constraintStart_toEndOf="@id/guideline4"
                 app:layout_constraintTop_toBottomOf="@id/guideline2">
 
             </com.google.android.material.textview.MaterialTextView>
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
-                app:layout_constraintStart_toStartOf="@id/pleaseEnterVerificationCodeLabelTextView"
-                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView">
-
-            </ProgressBar>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/progressStatusValueTextView"
+            <LinearLayout
+                android:id="@+id/progressLinearLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
                 android:layout_marginTop="18dp"
-                android:textSize="14sp"
-                android:visibility="gone"
-                app:fontFamily="@font/montserrat"
-                app:layout_constraintEnd_toEndOf="@id/pleaseEnterVerificationCodeLabelTextView"
-                app:layout_constraintStart_toEndOf="@id/progressBar"
-                app:layout_constraintTop_toBottomOf="@id/pleaseEnterVerificationCodeLabelTextView"
-                tools:text="Please wait while we verify your OTP...">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="4dp"
+                app:layout_constraintEnd_toStartOf="@id/guideline5"
+                app:layout_constraintStart_toEndOf="@id/guideline4"
+                app:layout_constraintTop_toBottomOf="@id/pleaseEnterVerificationCodeLabelTextView">
 
-            </com.google.android.material.textview.MaterialTextView>
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="12dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                    app:layout_constraintStart_toEndOf="@id/guideline2"
+                    app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/progressStatusValueTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    app:fontFamily="@font/montserrat"
+                    android:textAlignment="center"
+                    app:layout_constraintEnd_toStartOf="@id/guideline3"
+                    app:layout_constraintStart_toEndOf="@id/progressBar"
+                    app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
+                    tools:text="Please wait while we verify your OTP..." />
+
+            </LinearLayout>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/otpSentToLabelTextView"
@@ -166,8 +177,8 @@
                 android:enabled="true"
                 android:text="@string/take_me_to_homepage"
                 android:textColor="@color/black"
-                app:cornerRadius="4dp"
                 android:visibility="gone"
+                app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="@id/otpPinViewLayout"
                 app:layout_constraintStart_toStartOf="@id/otpPinViewLayout"
                 app:layout_constraintTop_toBottomOf="@id/verifyButton">
@@ -221,7 +232,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="progressStatusValueTextView" />
+                app:constraint_referenced_ids="progressLinearLayout" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

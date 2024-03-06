@@ -21,7 +21,6 @@ import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.SignInToken
 import app.efficientbytes.androidnow.utils.authStateFlow
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
@@ -77,17 +76,16 @@ class MainViewModel(
             val currentUser = auth.currentUser
             currentUser?.let {
                 it.getIdToken(true)
-                    .addOnSuccessListener(OnSuccessListener<GetTokenResult> { result ->
+                    .addOnSuccessListener { result ->
                         _firebaseUserToken.postValue(DataStatus.success(result))
-                        Log.i(tagMainViewModel, "Profile updated is ${result.claims}")
-                    })
+                    }
             }
         }
     }
 
     private val _authState: MutableLiveData<Boolean> = MutableLiveData()
     val authState: LiveData<Boolean> = _authState
-    val authSat = false
+
     fun listenForAuthStateChanges() {
         Log.i(tagMainViewModel, "Auth state listener invoked")
         Log.i(
@@ -97,7 +95,7 @@ class MainViewModel(
         authStateListenerJob = viewModelScope.launch {
             auth.authStateFlow().collect { authState ->
                 Log.i(tagMainViewModel, "Auth State is : $authState")
-                _authState.value = false
+                _authState.postValue(false)
             }
         }
         Log.i(

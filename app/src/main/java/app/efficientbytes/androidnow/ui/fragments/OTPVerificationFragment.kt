@@ -1,7 +1,6 @@
 package app.efficientbytes.androidnow.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,7 +71,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = true
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE
@@ -102,7 +101,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE
@@ -122,7 +121,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     //sign the user with the received sign in token
                     it.data?.let { signInToken ->
-                        Log.i(tagOTPVerification, "user profile is $signInToken")
                         mainViewModel.signInWithToken(signInToken)
                         userAccountId = signInToken.userAccountId
                         profileUpdated = signInToken.basicProfileDetailsUpdated
@@ -134,7 +132,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE

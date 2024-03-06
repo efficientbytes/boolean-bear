@@ -1,6 +1,5 @@
 package app.efficientbytes.androidnow.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +25,6 @@ class CompleteProfileViewModel(private val userProfileRepository: UserProfileRep
     fun updateUserProfile(userProfile: UserProfile) {
         viewModelScope.launch(Dispatchers.IO) {
             userProfileRepository.updateUserProfile(userProfile).collect {
-                Log.i(tagCompleteProfileViewModel, "User profile payload is ${it.data}")
                 _userProfileServerResponse.postValue(it)
             }
         }
