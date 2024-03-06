@@ -18,10 +18,9 @@ class UserProfileRepository(
     private val tagUserProfileRepository = "User-Profile-Repository"
     val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
 
-    suspend fun getUserProfile(phoneNumber: String? = null, userAccountId: String? = null) = flow {
+    suspend fun getUserProfile(userAccountId: String? = null) = flow {
         emit(DataStatus.loading())
         val response = userProfileService.getUserProfile(
-            phoneNumber = phoneNumber,
             userAccountId = userAccountId
         )
         val responseCode = response.code()

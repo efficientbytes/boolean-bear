@@ -1,6 +1,7 @@
 package app.efficientbytes.androidnow.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +14,6 @@ import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.utils.validateOTPFormat
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import app.efficientbytes.androidnow.viewmodels.PhoneNumberOTPVerificationViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import `in`.aabhasjindal.otptextview.OTPListener
 import org.koin.android.ext.android.inject
 
@@ -27,6 +26,8 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var phoneNumber: String
     private val viewModel: PhoneNumberOTPVerificationViewModel by inject()
     private val mainViewModel: MainViewModel by inject()
+    private var profileUpdated: Boolean? = false
+    private var userAccountId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +122,10 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     //sign the user with the received sign in token
                     it.data?.let { signInToken ->
+                        Log.i(tagOTPVerification, "user profile is $signInToken")
                         mainViewModel.signInWithToken(signInToken)
+                        userAccountId = signInToken.userAccountId
+                        profileUpdated = signInToken.basicProfileDetailsUpdated
                     }
                 }
             }
@@ -152,8 +156,23 @@ class OTPVerificationFragment : Fragment() {
                             binding.progressStatusValueTextView.visibility = View.VISIBLE
                             binding.progressStatusValueTextView.text =
                                 "You have been signed in successfully"
-                            //get the firebase user token so that we can extract the custom claims
-                            mainViewModel.getFirebaseUserToken()
+                            userAccountId?.let { userAccountId ->
+                                profileUpdated?.let { profileUpdated ->
+                                    if (profileUpdated) {
+                                        findNavController().popBackStack(
+                                            R.id.coursesFragment,
+                                            false
+                                        )
+                                    } else {
+                                        val directions =
+                                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
+                                                phoneNumber,
+                                                userAccountId
+                                            )
+                                        findNavController().navigate(directions)
+                                    }
+                                }
+                            }
                         }
 
                         false -> {
@@ -162,48 +181,6 @@ class OTPVerificationFragment : Fragment() {
 
                         null -> {
 
-                        }
-                    }
-                }
-            }
-        }
-        mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "${it.message}"
-                    findNavController().popBackStack(R.id.coursesFragment, false)
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Getting user profile..."
-                }
-
-                DataStatus.Status.Success -> {
-                    it.data?.let { token ->
-                        val profileUpdated: Any? = token.claims["profileUpdated"]
-                        profileUpdated?.let { claim ->
-                            if (claim is Boolean) {
-                                if (claim == false) { // if profile is not updated , show setup profile
-                                    val userId = Firebase.auth.currentUser?.uid
-                                    userId?.let { userAccountId ->
-                                        val directions =
-                                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
-                                                phoneNumber,
-                                                userAccountId
-                                            )
-                                        findNavController().navigate(directions)
-                                    }
-                                } else { // if profile is updated , go to course fragment
-                                    findNavController().popBackStack(R.id.coursesFragment, false)
-                                }
-                            }
                         }
                     }
                 }
