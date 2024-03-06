@@ -1,6 +1,7 @@
 package app.efficientbytes.androidnow.viewmodels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
@@ -16,14 +17,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
+import app.efficientbytes.androidnow.repositories.UserProfileRepository
+import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.SignInToken
+import app.efficientbytes.androidnow.utils.authStateFlow
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -36,6 +43,7 @@ class MainViewModel(
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }
+    private var authStateListenerJob: Job? = null
     private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
     val isUserSignedIn: LiveData<DataStatus<Boolean>> = _isUserSignedIn
     private val _signInToken: MutableLiveData<DataStatus<SignInToken?>> = MutableLiveData()
@@ -68,19 +76,78 @@ class MainViewModel(
 
     fun getFirebaseUserToken(refresh: Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
-            Firebase.auth.currentUser?.getIdToken(refresh)
-                ?.addOnSuccessListener { result ->
-                    _firebaseUserToken.postValue(DataStatus.success(result))
-                }?.addOnFailureListener {
-                    _firebaseUserToken.postValue(DataStatus.failed(it.message.toString()))
+            val currentUser = auth.currentUser
+            currentUser?.let {
+                it.getIdToken(true)
+                    .addOnSuccessListener(OnSuccessListener<GetTokenResult> { result ->
+                        _firebaseUserToken.postValue(DataStatus.success(result))
+                        Log.i(tagMainViewModel, "Profile updated is ${result.claims}")
+                    })
+            }
+        }
+    }
+
+    private val _authState: MutableLiveData<Boolean> = MutableLiveData()
+    val authState: LiveData<Boolean> = _authState
+
+    val authSat = false
+    fun listenForAuthStateChanges() {
+        Log.i(tagMainViewModel, "Auth state listener invoked")
+        Log.i(
+            tagMainViewModel,
+            "Auth state listener coroutine status is active? ${authStateListenerJob?.isActive}"
+        )
+        authStateListenerJob = viewModelScope.launch {
+            auth.authStateFlow().collect { authState ->
+                Log.i(tagMainViewModel, "Auth State is : $authState")
+                _authState.value = false
+            }
+        }
+        Log.i(
+            tagMainViewModel,
+            "Auth state listener coroutine status is active? ${authStateListenerJob?.isActive}"
+        )
+    }
+
+    fun cancelListeningToAuthState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.i(tagMainViewModel, "Cancel listening to auth state changes function invoked")
+            if (authStateListenerJob != null) {
+                if (authStateListenerJob?.isActive == true) {
+                    Log.i(
+                        tagMainViewModel,
+                        "Auth state listener coroutine status is active before cancelling ? ${authStateListenerJob?.isActive}"
+                    )
+                    authStateListenerJob?.cancelAndJoin()
+                    Log.i(
+                        tagMainViewModel,
+                        "Auth state listener coroutine status is active after cancelling ? ${authStateListenerJob?.isActive}"
+                    )
+                    authStateListenerJob = null
+                } else {
+                    Log.i(
+                        tagMainViewModel,
+                        "Auth state listener coroutine status is not active"
+                    )
                 }
+            }
+        }
+    }
+
+    fun getUserProfile(){
+
+    }
+
+    fun signOutUser(){
+        if (auth.currentUser!=null){
+            auth.signOut()
         }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-
+                listenForAuthStateChanges()
             }
 
             ON_START -> {
@@ -93,6 +160,7 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
+
             }
 
             ON_PAUSE -> {
@@ -102,6 +170,7 @@ class MainViewModel(
             }
 
             ON_DESTROY -> {
+                cancelListeningToAuthState()
             }
 
             ON_ANY -> {

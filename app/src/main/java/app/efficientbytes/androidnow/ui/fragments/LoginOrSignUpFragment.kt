@@ -12,6 +12,8 @@ import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validatePhoneNumberFormat
 import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import org.koin.android.ext.android.inject
 
 class LoginOrSignUpFragment : Fragment() {
@@ -34,6 +36,7 @@ class LoginOrSignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (Firebase.auth.currentUser!=null) Firebase.auth.signOut()
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {

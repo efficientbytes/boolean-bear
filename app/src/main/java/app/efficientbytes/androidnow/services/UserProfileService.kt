@@ -10,14 +10,13 @@ import retrofit2.http.Query
 
 interface UserProfileService {
 
-    @POST("user-profile/update")
+    @POST("user/profile/update/basic-details")
     suspend fun updateUserProfile(
         @Body userProfile: UserProfile
     ): Response<UserProfilePayload>
 
-    @GET("user-profile")
+    @GET("/user/profile")
     suspend fun getUserProfile(
-        @Query("phoneNumber") phoneNumber: String? = null,
         @Query("userAccountId") userAccountId: String? = null
     ): Response<UserProfilePayload>
 

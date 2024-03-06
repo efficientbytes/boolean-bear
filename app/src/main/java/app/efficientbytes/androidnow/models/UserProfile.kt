@@ -9,21 +9,21 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 @Entity(tableName = USER_PROFILE_TABLE)
 data class UserProfile(
-    val firstName: String,
-    val phoneNumber: String,
-    val phoneNumberPrefix: String,
-    val completePhoneNumber: String,
-    val userAccountId: String,
-    val activityId: String? = null,
-    val profession: String? = null,
-    val fcmToken: String? = null,
-    val lastName: String? = null,
-    val emailAddress: String? = null,
-    val linkedInAddress: String? = null,
-    val gitHubUsername: String? = null,
-    val universityName: String? = null,
-    val createdOn: Long? = null,
-    val lastUpdatedOn: Long? = null,
+    var firstName: String,
+    var phoneNumber: String,
+    var phoneNumberPrefix: String,
+    var completePhoneNumber: String,
+    var userAccountId: String,
+    var activityId: String? = null,
+    var profession: String? = null,
+    var fcmToken: String? = null,
+    var lastName: String? = null,
+    var emailAddress: String? = null,
+    var linkedInAddress: String? = null,
+    var gitHubUsername: String? = null,
+    var universityName: String? = null,
+    var createdOn: Long? = null,
+    var lastUpdatedOn: Long? = null,
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "rowId")
     var rowId: Int? = 1
