@@ -11,28 +11,34 @@ class CourseRepository(private val coursesService: CoursesService) {
 
     suspend fun pullShortCourses(contentType: String) = flow {
         emit(DataStatus.loading())
-        val result = coursesService.getAllShortsCourses(contentType)
-        when (result.code()) {
-            200 -> {
-                val courseList = result.body() ?: emptyList()
+        val response = coursesService.getAllShortsCourses(contentType)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val courseList = response.body() ?: emptyList()
                 emit(DataStatus.success(courseList))
             }
 
-            400, 500 -> emit(DataStatus.failed(result.message().toString()))
+            responseCode >= 400 -> {
+                emit(DataStatus.failed(response.message().toString()))
+            }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun pullShortCourse(courseID: String) = flow {
         emit(DataStatus.loading())
-        val result = coursesService.getShortsCourse(courseID)
-        when (result.code()) {
-            200 -> {
-                val course = result.body()
+        val response = coursesService.getShortsCourse(courseID)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val course = response.body()
                 emit(DataStatus.success(course))
             }
 
-            400, 500 -> emit(DataStatus.failed(result.message().toString()))
+            responseCode >= 400 -> {
+                emit(DataStatus.failed(response.message().toString()))
+            }
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)

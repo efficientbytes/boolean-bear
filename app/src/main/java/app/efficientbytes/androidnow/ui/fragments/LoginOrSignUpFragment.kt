@@ -58,7 +58,7 @@ class LoginOrSignUpFragment : Fragment() {
         viewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    binding.continueButton.isEnabled = false
+                    binding.continueButton.isEnabled = true
                     binding.progressBar.visibility = View.INVISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"

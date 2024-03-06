@@ -87,7 +87,7 @@ class MainViewModel(
 
     private val _authState: MutableLiveData<Boolean> = MutableLiveData()
     val authState: LiveData<Boolean> = _authState
-    val authSat = false
+
     fun listenForAuthStateChanges() {
         Log.i(tagMainViewModel, "Auth state listener invoked")
         Log.i(
@@ -97,7 +97,7 @@ class MainViewModel(
         authStateListenerJob = viewModelScope.launch {
             auth.authStateFlow().collect { authState ->
                 Log.i(tagMainViewModel, "Auth State is : $authState")
-                _authState.value = false
+                _authState.postValue( false)
             }
         }
         Log.i(
