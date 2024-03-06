@@ -59,7 +59,7 @@ class LoginOrSignUpFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.continueButton.isEnabled = true
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                 }
@@ -74,7 +74,7 @@ class LoginOrSignUpFragment : Fragment() {
 
                 DataStatus.Status.Success -> {
                     binding.continueButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.data?.message
                     binding.phoneNumberTextInputEditText.text = null

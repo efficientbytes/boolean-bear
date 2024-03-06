@@ -72,7 +72,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = true
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE
@@ -102,7 +102,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE
@@ -134,7 +134,7 @@ class OTPVerificationFragment : Fragment() {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.verifyButton.isEnabled = false
-                    binding.progressBar.visibility = View.INVISIBLE
+                    binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
                     binding.takeMeToHomePageButton.visibility = View.VISIBLE
