@@ -150,27 +150,6 @@
         </com.google.android.material.textview.MaterialTextView>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/aboutAndroidNowLabelTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-            android:focusable="true"
-            android:fontFamily="@font/montserrat"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:paddingVertical="12dp"
-            android:paddingStart="28dp"
-            android:paddingEnd="18dp"
-            android:text="@string/about_android_now"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/notificationLabelTextView">
-
-        </com.google.android.material.textview.MaterialTextView>
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/inviteFriendsLabelTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -187,7 +166,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aboutAndroidNowLabelTextView">
+            app:layout_constraintTop_toBottomOf="@id/notificationLabelTextView">
 
         </com.google.android.material.textview.MaterialTextView>
 
@@ -215,22 +194,24 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/signOutLabelTextView"
-            style="@style/TextRippleColorOnPrimary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="26dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
             android:focusable="true"
-            android:fontFamily="@font/montserrat_medium"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingVertical="12dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="18dp"
             android:onClick="@{()-> mainViewModel.signOutUser()}"
             android:text="@string/sign_out"
-            android:textColor="@color/violet_800"
-            android:textSize="20sp"
+            android:textColor="@color/white"
             android:visibility="@{(mainViewModel.authState==true)?View.VISIBLE : View.GONE}"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/contactHelpLabelTextView">
+            app:layout_constraintTop_toBottomOf="@id/contactHelpLabelTextView">
 
         </com.google.android.material.textview.MaterialTextView>
 
@@ -253,11 +234,11 @@
 
         <View
             android:layout_width="50dp"
-            android:layout_height="3dp"
+            android:layout_height="2dp"
             android:background="@color/white_400"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline3"></View>
+            app:layout_constraintTop_toBottomOf="@id/guideline3" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline1"
