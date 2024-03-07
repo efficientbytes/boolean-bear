@@ -19,8 +19,10 @@ import org.koin.android.ext.android.inject
 class AccountSettingsFragment : BottomSheetDialogFragment() {
 
     companion object {
+
         val tagAccountSettings: String = "Account-Settings-Fragment"
     }
+
     private lateinit var _binding: FragmentAccountSettingsBinding
     private val binding get() = _binding
     private lateinit var rootView: View
@@ -43,6 +45,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.loginOrSignUpLabelTextView.setOnClickListener {
             dismiss()
             findNavController().navigate(R.id.coursesFragment_to_loginOrSignUpFragment)
@@ -54,6 +57,16 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+        val versionName = "vers " + getVersionCode()
+        binding.appVersionLabelTextView.text = versionName
+    }
+
+    private fun getVersionCode(): String? {
+        var version: String = ""
+        activity?.let {
+            version = it.packageManager.getPackageInfo(it.packageName, 0).versionName
+        }
+        return version
     }
 
 }
