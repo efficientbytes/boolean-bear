@@ -1,5 +1,6 @@
 package app.efficientbytes.androidnow.di
 
+import app.efficientbytes.androidnow.viewmodels.AccountSettingsViewModel
 import app.efficientbytes.androidnow.viewmodels.CompleteProfileViewModel
 import app.efficientbytes.androidnow.viewmodels.CourseViewModel
 import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
@@ -14,5 +15,6 @@ val viewModelModule = module {
     viewModel { LoginOrSignUpViewModel(get()) }
     viewModel { PhoneNumberOTPVerificationViewModel(get()) }
     viewModel { CompleteProfileViewModel(get()) }
-    viewModel { MainViewModel(androidApplication(), get()) }
+    viewModel { MainViewModel(androidApplication(), get(), get()) }
+    viewModel { AccountSettingsViewModel(get()) }
 }

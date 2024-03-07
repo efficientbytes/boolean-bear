@@ -74,5 +74,9 @@ class UserProfileRepository(
         userProfileDao.insertUserProfile(userProfile)
     }
 
+    suspend fun deleteUserProfile(){
+        userProfileDao.delete()
+    }
+
 
 }

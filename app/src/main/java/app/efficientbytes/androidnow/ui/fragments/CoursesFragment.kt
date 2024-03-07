@@ -13,7 +13,6 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.androidnow.BR
@@ -67,8 +66,11 @@ class CoursesFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.accountSettingsMenu -> {
-                        view.findNavController()
-                            .navigate(R.id.coursesFragment_to_accountSettingsFragment)
+                        val accountSettingsFragment = AccountSettingsFragment()
+                        accountSettingsFragment.show(
+                            parentFragmentManager,
+                            AccountSettingsFragment.tagAccountSettings
+                        )
                         return true
                     }
                 }
