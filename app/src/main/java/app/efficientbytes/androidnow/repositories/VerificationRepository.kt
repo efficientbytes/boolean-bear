@@ -3,7 +3,9 @@ package app.efficientbytes.androidnow.repositories
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.services.models.PhoneNumberVerificationStatus
+import app.efficientbytes.androidnow.services.models.PrimaryEmailAddressVerificationStatus
 import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
+import app.efficientbytes.androidnow.services.models.VerifyPrimaryEmailAddress
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -56,6 +58,28 @@ class VerificationRepository(private val verificationService: VerificationServic
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
+
+    suspend fun verifyPrimaryEmailAddress(verifyPrimaryEmailAddress: VerifyPrimaryEmailAddress) =
+        flow {
+            emit(DataStatus.loading())
+            val response = verificationService.verifyPrimaryEmailAddress(verifyPrimaryEmailAddress)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val verificationStatus = response.body()
+                    emit(DataStatus.success(verificationStatus))
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: PrimaryEmailAddressVerificationStatus = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        PrimaryEmailAddressVerificationStatus::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        }
 
 
 }

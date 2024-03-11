@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="field"
+            type="app.efficientbytes.androidnow.ui.models.EDIT_PROFILE_FIELD" />
+
+        <variable
+            name="emailVerified"
+            type="Boolean" />
+
+        <import type="android.view.View" />
+
+        <import type="app.efficientbytes.androidnow.ui.models.EDIT_PROFILE_FIELD" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="26dp"
+        android:paddingTop="18dp"
+        tools:context=".ui.fragments.EditProfileFieldFragment">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/descriptionValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="@font/montserrat"
+            android:text="@{field.description}"
+            android:textAlignment="textStart"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="This is how your first name in certificates, event registrations will look like. Please enter your first name carefully - you can only change it a limited number of times.">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fieldTextInputLayout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:enabled="@{field.enabled}"
+            android:fontFamily="@font/montserrat"
+            android:hint="@{field.hintMessage}"
+            android:visibility="@{ (field!=EDIT_PROFILE_FIELD.PROFESSION &amp;&amp; field!= EDIT_PROFILE_FIELD.UNIVERSITY_NAME)  ? View.VISIBLE : View.GONE }"
+            app:boxBackgroundColor="@color/black"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="1dp"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/white"
+            app:expandedHintEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionValueTextView">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/fieldTextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="@{field.inputType}"
+                android:textColor="@color/white">
+
+            </com.google.android.material.textfield.TextInputEditText>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/currentProfessionTextInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:fontFamily="@font/montserrat"
+            android:textColorHint="@color/white"
+            android:visibility="@{ (field==EDIT_PROFILE_FIELD.PROFESSION) ? View.VISIBLE : View.GONE }"
+            app:boxBackgroundColor="#FF0E0E0E"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:endIconTint="@color/white"
+            app:expandedHintEnabled="false"
+            app:hintAnimationEnabled="false"
+            app:hintEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionValueTextView">
+
+            <AutoCompleteTextView
+                android:id="@+id/currentProfessionAutoCompleteTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat"
+                android:inputType="none"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/universityTextInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:fontFamily="@font/montserrat"
+            android:hint="@{field.hintMessage}"
+            android:textColorHint="@color/violet_300"
+            android:visibility="@{ (field==EDIT_PROFILE_FIELD.UNIVERSITY_NAME) ? View.VISIBLE : View.GONE }"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:expandedHintEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:hintEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/descriptionValueTextView">
+
+            <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/universityAutoCompleteTextView"
+                style="@style/Widget.MaterialComponents.AutoCompleteTextView.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:lines="1"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/additionalMessageValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/montserrat_light"
+            android:text="@{field.additionalMessage}"
+            android:textColor="@color/violet_300"
+            android:textSize="14sp"
+            android:visibility="@{ (field!=EDIT_PROFILE_FIELD.EMAIL_ADDRESS) ? View.VISIBLE : View.GONE }"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier2"
+            tools:text="It is optional">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/emailVerifiedMessageLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/verified_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/montserrat"
+            android:text="@string/your_email_address_has_been_verified"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="@{ (field==EDIT_PROFILE_FIELD.EMAIL_ADDRESS &amp;&amp; emailVerified == true) ? View.VISIBLE : View.GONE }"
+            app:drawableTint="#98F159"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fieldTextInputLayout">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/emailNotVerifiedMessageLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/exclamation"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/montserrat"
+            android:text="@string/your_email_address_has_not_been_verified"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="@{ (field==EDIT_PROFILE_FIELD.EMAIL_ADDRESS &amp;&amp; emailVerified != true) ? View.VISIBLE : View.GONE }"
+            app:drawableTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fieldTextInputLayout">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <LinearLayout
+            android:id="@+id/progressLinearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier1">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                app:layout_constraintStart_toEndOf="@id/guideline2"
+                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/progressStatusValueTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:visibility="visible"
+                app:fontFamily="@font/montserrat"
+                app:layout_constraintEnd_toStartOf="@id/guideline3"
+                app:layout_constraintStart_toEndOf="@id/progressBar"
+                app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
+                tools:text="Please wait while we update your profile..." />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            android:text="@string/save"
+            android:visibility="@{ (field!=EDIT_PROFILE_FIELD.EMAIL_ADDRESS &amp;&amp; field!=EDIT_PROFILE_FIELD.PHONE_NUMBER) ? View.VISIBLE : View.GONE }"
+            app:cornerRadius="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/verifyButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            android:text="@string/verify"
+            android:visibility="@{ (field==EDIT_PROFILE_FIELD.EMAIL_ADDRESS &amp;&amp; field!=EDIT_PROFILE_FIELD.PHONE_NUMBER) ? View.VISIBLE : View.GONE }"
+            app:cornerRadius="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="additionalMessageValueTextView,emailNotVerifiedMessageLabelTextView,emailVerifiedMessageLabelTextView" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="fieldTextInputLayout,currentProfessionTextInputLayout,universityTextInputLayout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

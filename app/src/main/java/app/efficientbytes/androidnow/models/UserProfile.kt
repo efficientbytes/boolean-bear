@@ -30,3 +30,12 @@ data class UserProfile(
     @ColumnInfo(name = "rowId")
     var rowId: Int? = 1
 )
+
+object SingletonUserData{
+    private var userProfile : UserProfile?=null
+    fun getInstance() = userProfile
+
+    fun setInstance(userProfile: UserProfile) {
+        this.userProfile = userProfile
+    }
+}

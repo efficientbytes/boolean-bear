@@ -19,6 +19,11 @@
             app:destination="@id/loginOrSignUpFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_coursesFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -70,5 +75,25 @@
             android:name="userAccountId"
             app:argType="string"
             app:nullable="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/editProfileFragment_to_editProfileFieldFragment"
+            app:destination="@id/editProfileFieldFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFieldFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFieldFragment"
+        android:label="Edit"
+        tools:layout="@layout/fragment_edit_profile_field" >
+        <argument
+            android:name="index"
+            app:argType="integer" />
     </fragment>
 </navigation>

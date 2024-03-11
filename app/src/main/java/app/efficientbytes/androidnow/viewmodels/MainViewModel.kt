@@ -15,6 +15,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
@@ -82,6 +83,7 @@ class MainViewModel(
             currentUser?.let {
                 it.getIdToken(true)
                     .addOnSuccessListener { result ->
+                        Log.i(tagMainViewModel,"User claims is  ${result.claims}")
                         _firebaseUserToken.postValue(DataStatus.success(result))
                     }
             }
@@ -134,6 +136,7 @@ class MainViewModel(
         }
     }
 
+    val getUserProfile = userProfileRepository.userProfile.asLiveData()
     private val _userProfile: MutableLiveData<DataStatus<UserProfilePayload?>> = MutableLiveData()
     val userProfile: LiveData<DataStatus<UserProfilePayload?>> = _userProfile
 
@@ -169,15 +172,12 @@ class MainViewModel(
         when (event) {
             ON_CREATE -> {
                 listenForAuthStateChanges()
-                val currentUser = auth.currentUser
-                if (currentUser != null) {
-                    getUserProfile()
-                }
             }
 
             ON_START -> {
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
+                    getFirebaseUserToken()
                     _isUserSignedIn.postValue(DataStatus.success(true))
                     Log.i(tagMainViewModel,"User profile uid is ${currentUser.uid}")
                 } else {
