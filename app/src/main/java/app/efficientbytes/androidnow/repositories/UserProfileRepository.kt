@@ -45,9 +45,31 @@ class UserProfileRepository(
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun updateUserProfile(userProfile: UserProfile) = flow {
+    suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
         emit(DataStatus.loading())
-        val response = userProfileService.updateUserProfile(userProfile)
+        val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val responseUserProfile = response.body()
+                emit(DataStatus.success(responseUserProfile))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
+        emit(DataStatus.loading())
+        val response = userProfileService.updateUserPrivateProfile(userProfile)
         val responseCode = response.code()
         when {
             responseCode == 200 -> {

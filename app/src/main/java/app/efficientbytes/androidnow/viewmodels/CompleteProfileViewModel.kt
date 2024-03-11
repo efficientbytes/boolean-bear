@@ -22,9 +22,9 @@ class CompleteProfileViewModel(private val userProfileRepository: UserProfileRep
     val userProfileServerResponse: LiveData<DataStatus<UserProfilePayload?>> =
         _userProfileServerResponse
 
-    fun updateUserProfile(userProfile: UserProfile) {
+    fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) {
         viewModelScope.launch(Dispatchers.IO) {
-            userProfileRepository.updateUserProfile(userProfile).collect {
+            userProfileRepository.updateUserPrivateProfileBasicDetails(userProfile).collect {
                 _userProfileServerResponse.postValue(it)
             }
         }

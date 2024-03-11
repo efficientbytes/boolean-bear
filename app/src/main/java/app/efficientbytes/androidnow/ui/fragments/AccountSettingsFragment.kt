@@ -53,6 +53,10 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
             dismiss()
             findNavController().navigate(R.id.coursesFragment_to_loginOrSignUpFragment)
         }
+        binding.editProfileLabelTextView.setOnClickListener {
+            dismiss()
+            findNavController().navigate(R.id.action_coursesFragment_to_editProfileFragment)
+        }
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
                 it?.let { userProfile ->
@@ -60,19 +64,9 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
                 }
             }
         }
-        val versionName = "version " + getVersionCode()
-        binding.appVersionLabelTextView.text = versionName
         binding.inviteFriendsLabelTextView.setOnClickListener {
             inviteFriends()
         }
-    }
-
-    private fun getVersionCode(): String {
-        var version: String = ""
-        activity?.let {
-            version = it.packageManager.getPackageInfo(it.packageName, 0).versionName
-        }
-        return version
     }
 
     private fun inviteFriends() {
@@ -92,7 +86,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         return super.onCreateDialog(savedInstanceState).apply {
             (this as? BottomSheetDialog)
                 ?.behavior
-                ?.setPeekHeight(900, true)
+                ?.setPeekHeight(800, true)
         }
     }
 }

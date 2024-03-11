@@ -3,6 +3,7 @@ package app.efficientbytes.androidnow.di
 import app.efficientbytes.androidnow.viewmodels.AccountSettingsViewModel
 import app.efficientbytes.androidnow.viewmodels.CompleteProfileViewModel
 import app.efficientbytes.androidnow.viewmodels.CourseViewModel
+import app.efficientbytes.androidnow.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import app.efficientbytes.androidnow.viewmodels.PhoneNumberOTPVerificationViewModel
@@ -17,4 +18,5 @@ val viewModelModule = module {
     viewModel { CompleteProfileViewModel(get()) }
     viewModel { MainViewModel(androidApplication(), get(), get()) }
     viewModel { AccountSettingsViewModel(get()) }
+    viewModel { EditProfileFieldViewModel(get(),get()) }
 }

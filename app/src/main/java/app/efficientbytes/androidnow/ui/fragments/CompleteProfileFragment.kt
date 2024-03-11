@@ -121,7 +121,7 @@ class CompleteProfileFragment : Fragment() {
                 binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT).trim()
             val profession = currentProfessionCategories[selectedProfessionCategoryPosition]
             if (validateFormInputFormat(firstName, lastName, emailAddress)) {
-                viewModel.updateUserProfile(
+                viewModel.updateUserPrivateProfileBasicDetails(
                     UserProfile(
                         userAccountId = userAccountId,
                         firstName = firstName,

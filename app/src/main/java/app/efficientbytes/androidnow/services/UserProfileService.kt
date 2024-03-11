@@ -11,7 +11,12 @@ import retrofit2.http.Query
 interface UserProfileService {
 
     @POST("user/profile/update/basic-details")
-    suspend fun updateUserProfile(
+    suspend fun updateUserPrivateProfileBasicDetails(
+        @Body userProfile: UserProfile
+    ): Response<UserProfilePayload>
+
+    @POST("user/profile/update")
+    suspend fun updateUserPrivateProfile(
         @Body userProfile: UserProfile
     ): Response<UserProfilePayload>
 

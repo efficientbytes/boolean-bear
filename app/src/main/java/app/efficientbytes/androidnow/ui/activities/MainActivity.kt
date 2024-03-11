@@ -2,8 +2,10 @@ package app.efficientbytes.androidnow.ui.activities
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -80,11 +82,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it.let {
                 when (it) {
                     true -> {
+                        Log.i(tagMainActivity,"User sign in")
                         viewModel.getUserProfile()
                     }
 
                     false -> {
                         viewModel.deleteUserProfile()
+                        Toast.makeText(this,"You have been signed out.",Toast.LENGTH_LONG).show()
                     }
                 }
             }

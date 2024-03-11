@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="mainViewModel"
+            type="app.efficientbytes.androidnow.viewmodels.MainViewModel" />
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarSize="0dp"
+        android:scrollbars="vertical"
+        tools:context=".ui.fragments.EditProfileFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:paddingHorizontal="22dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="18dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/provideDetailsLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/white"
+                android:text="@string/provide_details_about_yourself_and_any_other_pertinent_information"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <View
+                android:id="@+id/view1"
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="18dp"
+                android:background="@color/black_1200"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/provideDetailsLabelTextView">
+
+            </View>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/basicInformationLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/basic_information"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view1">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/basicDetailsConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingVertical="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/basicInformationLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/firstNameLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/first_name"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lastNameLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/last_name"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/firstNameLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/emailAddressLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/email_address"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lastNameLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/phoneNumberLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/phone_number"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/emailAddressLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/onlineInformationLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/online_information"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/basicDetailsConstraintLayout">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/onlineInformationConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingVertical="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/onlineInformationLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/professionLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/profession"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+              <!--  <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/universityNameLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/university_name"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/professionLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>-->
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/linkedInUsernameLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/linkedin_username"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/professionLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/githubUsernameLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/github_username"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/linkedInUsernameLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/deleteAccountConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/onlineInformationConstraintLayout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/deleteAccountLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:drawableStart="@drawable/delete_icon"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/delete_account"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/signOutConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deleteAccountConstraintLayout">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/signOutLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:drawablePadding="8dp"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/sign_out"
+                    android:drawableStart="@drawable/sign_out_icon"
+                    app:drawableTint="@color/white"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/appVersionLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/montserrat"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/signOutConstraintLayout"
+                tools:text="Version 4.5.60">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</layout>

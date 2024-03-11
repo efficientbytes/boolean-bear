@@ -144,7 +144,6 @@
     <color name="black_1500">#0a0705</color>
     <color name="black_1400">#0c0907</color>
     <color name="black_1300">#0d0b09</color>
-    <color name="black_1200">#0e0c0b</color>
     <color name="black_1100">#0f0e0d</color>
     <color name="black_1000">#110f0e</color>
     <color name="black_900">#121010</color>
@@ -156,6 +155,8 @@
     <color name="black_300">#171717</color>
     <color name="black_200">#181818</color>
     <color name="black_100">#191919</color>
+
+    <color name="black_1200">#101010</color>  //new set of color ,do not override
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 

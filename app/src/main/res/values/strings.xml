@@ -7,7 +7,7 @@
     <string name="share_amp_about"><![CDATA[Share & About]]></string>
     <string name="about_android_now">About Android Now</string>
     <string name="invite_friends">Invite friends</string>
-    <string name="contact_support">Contact support</string>
+    <string name="contact_us">Contact us</string>
     <string name="support">Support</string>
     <string name="sign_out">Sign Out</string>
     <string name="it_s_a_pleasure_to_have_you_with_us">It\'s a pleasure to have you with us.</string>
@@ -47,6 +47,17 @@
     <string name="submit">Submit</string>
     <string name="phone_number">Phone number</string>
     <string name="take_me_to_homepage">Take me to homepage</string>
+    <string name="online_information">Online Information</string>
+    <string name="basic_information">Basic Information</string>
+    <string name="provide_details_about_yourself_and_any_other_pertinent_information">Provide details about yourself and any other pertinent information</string>
+    <string name="profession">Profession</string>
+    <string name="university_name">University name</string>
+    <string name="linkedin_username">LinkedIn username</string>
+    <string name="github_username">GitHub username</string>
+    <string name="your_email_address_has_not_been_verified">Your email address has not been verified</string>
+    <string name="your_email_address_has_been_verified">Your email address has been verified</string>
+    <string name="save">Save</string>
+    <string name="delete_account">Delete account</string>
 
 
 </resources>
