@@ -5,6 +5,10 @@ import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.UserProfileService
 import app.efficientbytes.androidnow.services.models.UserProfilePayload
+import app.efficientbytes.androidnow.utils.USER_PROFILE_DOCUMENT_PATH
+import app.efficientbytes.androidnow.utils.addSnapshotListenerFlow
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -96,9 +100,26 @@ class UserProfileRepository(
         userProfileDao.insertUserProfile(userProfile)
     }
 
-    suspend fun deleteUserProfile(){
+    suspend fun deleteUserProfile() {
         userProfileDao.delete()
     }
+
+    suspend fun listenToUserProfileChange(userAccountId: String) = flow {
+        val userProfileSnapshot =
+            Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
+        userProfileSnapshot.addSnapshotListenerFlow().collect {
+            when {
+                it.status == DataStatus.Status.Failed -> {
+                    emit(it)
+                }
+
+                it.status == DataStatus.Status.Success -> {
+                    emit(it)
+                }
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
 
 }

@@ -29,6 +29,7 @@ import app.efficientbytes.androidnow.utils.authStateFlow
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,7 +84,7 @@ class MainViewModel(
             currentUser?.let {
                 it.getIdToken(true)
                     .addOnSuccessListener { result ->
-                        Log.i(tagMainViewModel,"User claims is  ${result.claims}")
+                        Log.i(tagMainViewModel, "User claims is  ${result.claims}")
                         _firebaseUserToken.postValue(DataStatus.success(result))
                     }
             }
@@ -136,7 +137,7 @@ class MainViewModel(
         }
     }
 
-    val getUserProfile = userProfileRepository.userProfile.asLiveData()
+    val listenToUserProfileFromDB = userProfileRepository.userProfile.asLiveData()
     private val _userProfile: MutableLiveData<DataStatus<UserProfilePayload?>> = MutableLiveData()
     val userProfile: LiveData<DataStatus<UserProfilePayload?>> = _userProfile
 
@@ -150,14 +151,66 @@ class MainViewModel(
         }
     }
 
+    private var userProfileListenerJob: Job? = null
+    private val _userProfileLiveDocument: MutableLiveData<DataStatus<DocumentSnapshot?>> =
+        MutableLiveData()
+    val userProfileLiveDocument: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileLiveDocument
+
+    fun listenToUserProfileChanges(userAccountId: String) {
+        Log.i(tagMainViewModel, "Listening to user profile")
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            Log.i(
+                tagMainViewModel,
+                "User profile listener coroutine job is active? ${userProfileListenerJob?.isActive}"
+            )
+            userProfileListenerJob = viewModelScope.launch {
+                userProfileRepository.listenToUserProfileChange(userAccountId).collect {
+                    _userProfileLiveDocument.postValue(it)
+                }
+            }
+            Log.i(
+                tagMainViewModel,
+                "User profile listener coroutine job is active? ${userProfileListenerJob?.isActive}"
+            )
+        }
+    }
+
+    fun cancelListeningToUserProfileChanges() = viewModelScope.launch {
+        Log.i(tagMainViewModel, "Cancel listening to user profile changes")
+        if (userProfileListenerJob != null) {
+            if (userProfileListenerJob?.isActive == true) {
+                Log.i(
+                    tagMainViewModel,
+                    "User profile listener coroutine status job is active? ${userProfileListenerJob?.isActive}"
+                )
+                userProfileListenerJob?.cancelAndJoin()
+                Log.i(
+                    tagMainViewModel,
+                    "User profile listener coroutine status job is active? ${userProfileListenerJob?.isActive}"
+                )
+                userProfileListenerJob = null
+            } else {
+                Log.i(
+                    tagMainViewModel,
+                    "User profile listener coroutine status is active? ${userProfileListenerJob?.isActive}"
+                )
+            }
+        } else {
+            Log.i(
+                tagMainViewModel,
+                "User profile listener coroutine status is active? ${userProfileListenerJob?.isActive}"
+            )
+        }
+    }
+
     fun saveUserProfile(userProfile: UserProfile) {
         viewModelScope.launch(Dispatchers.IO) {
             userProfileRepository.saveUserProfile(userProfile)
         }
     }
 
-    fun deleteUserProfile(){
-        viewModelScope.launch (Dispatchers.IO){
+    fun deleteUserProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
             userProfileRepository.deleteUserProfile()
         }
     }
@@ -179,7 +232,7 @@ class MainViewModel(
                 if (currentUser != null) {
                     getFirebaseUserToken()
                     _isUserSignedIn.postValue(DataStatus.success(true))
-                    Log.i(tagMainViewModel,"User profile uid is ${currentUser.uid}")
+                    Log.i(tagMainViewModel, "User profile uid is ${currentUser.uid}")
                 } else {
                     _isUserSignedIn.postValue(DataStatus.success(false))
                 }
@@ -197,6 +250,7 @@ class MainViewModel(
 
             ON_DESTROY -> {
                 cancelListeningToAuthState()
+                cancelListeningToUserProfileChanges()
             }
 
             ON_ANY -> {
