@@ -22,6 +22,7 @@ import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -82,14 +83,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it.let {
                 when (it) {
                     true -> {
-                        Log.i(tagMainActivity,"User sign in")
+                        Log.i(tagMainActivity, "User sign in")
                         viewModel.getUserProfile()
+                        FirebaseAuth.getInstance().currentUser?.let { user ->
+                            viewModel.listenToUserProfileChanges(user.uid)
+                        }
                     }
 
                     false -> {
+                        FirebaseAuth.getInstance().currentUser?.let { user ->
+                            viewModel.listenToUserProfileChanges(user.uid)
+                        }
+                        viewModel.cancelListeningToUserProfileChanges()
                         viewModel.deleteUserProfile()
-                        Toast.makeText(this,"You have been signed out.",Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
+                }
+            }
+        }
+        viewModel.userProfileLiveDocument.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    Log.i(tagMainActivity, "User profile is null")
+                }
+
+                DataStatus.Status.Success -> {
+                    Log.i(tagMainActivity, "User profile has been modified")
+                    viewModel.getUserProfile()
+                    viewModel.getFirebaseUserToken()
+                }
+
+                DataStatus.Status.Loading -> {
+
                 }
             }
         }

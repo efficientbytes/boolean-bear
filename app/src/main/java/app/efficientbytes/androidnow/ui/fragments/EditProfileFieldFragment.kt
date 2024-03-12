@@ -71,24 +71,27 @@ class EditProfileFieldFragment : Fragment() {
         binding.currentProfessionAutoCompleteTextView.setAdapter(
             currentProfessionCategoryDropDownAdapter
         )
-        mainViewModel.firebaseUserToken.observe(viewLifecycleOwner){
-            when(it.status){
+        mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
+            when (it.status) {
                 DataStatus.Status.Failed -> {
 
                 }
+
                 DataStatus.Status.Loading -> {
 
                 }
+
                 DataStatus.Status.Success -> {
-                    it.data?.let { token->
+                    it.data?.let { token ->
                         val isEmailVerified = token.claims["emailVerified"]
-                        if(isEmailVerified is Boolean) this@EditProfileFieldFragment.emailVerified = isEmailVerified
+                        if (isEmailVerified is Boolean) this@EditProfileFieldFragment.emailVerified =
+                            isEmailVerified
                         binding.emailVerified = this@EditProfileFieldFragment.emailVerified
                     }
                 }
             }
         }
-        mainViewModel.getUserProfile.observe(viewLifecycleOwner) { userProfile ->
+        mainViewModel.listenToUserProfileFromDB.observe(viewLifecycleOwner) { userProfile ->
             userProfile?.let {
                 SingletonUserData.setInstance(it)
                 when (index) {
