@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var networkNotAvailable: Boolean = false
+    private var networkNotAvailableAtAppLoading: Boolean = false
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,14 +57,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewModel.userProfile.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    val snackBar = Snackbar.make(
-                        binding.mainCoordinatorLayout,
-                        "Failed to download latest user profile.",
-                        Snackbar.LENGTH_LONG
-                    )
-                    snackBar.setBackgroundTint(Color.parseColor("#B00020"))
-                    snackBar.setTextColor(Color.parseColor("#FFFFFF"))
-                    snackBar.show()
+                    if (connectivityListener.isInternetAvailable()) {
+                        val snackBar = Snackbar.make(
+                            binding.mainCoordinatorLayout,
+                            "Failed to download latest user profile.",
+                            Snackbar.LENGTH_LONG
+                        )
+                        snackBar.setBackgroundTint(Color.parseColor("#B00020"))
+                        snackBar.setTextColor(Color.parseColor("#FFFFFF"))
+                        snackBar.show()
+                    }
                 }
 
                 DataStatus.Status.Loading -> {
@@ -133,6 +136,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         snackBar.setBackgroundTint(Color.parseColor("#4CAF50"))
                         snackBar.setTextColor(Color.parseColor("#FFFFFF"))
                         snackBar.show()
+
+                    }
+                    if (networkNotAvailableAtAppLoading) {
+                        networkNotAvailableAtAppLoading = false
+                        viewModel.getUserProfile()
                     }
                 }
 
@@ -149,7 +157,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        connectivityListener.isNetworkAvailable().apply {
+        connectivityListener.isInternetAvailable().apply {
             if (!this) {
                 networkNotAvailable = true
                 val snackBar = Snackbar.make(
@@ -218,4 +226,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return params.behavior as AppBarLayout.Behavior
     }
 
+    override fun onResume() {
+        super.onResume()
+        connectivityListener.isInternetAvailable().apply {
+            if (!this) {
+                networkNotAvailableAtAppLoading = true
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        networkNotAvailableAtAppLoading = false
+    }
 }
