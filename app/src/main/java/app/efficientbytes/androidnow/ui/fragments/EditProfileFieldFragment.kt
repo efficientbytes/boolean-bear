@@ -210,7 +210,9 @@ class EditProfileFieldFragment : Fragment() {
                         EDIT_PROFILE_FIELD.UNIVERSITY_NAME -> universityName = input
                         EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> linkedInUsername = input
                         EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> gitHubUsername = input
-                        EDIT_PROFILE_FIELD.DEFAULT -> null
+                        EDIT_PROFILE_FIELD.DEFAULT -> {
+
+                        }
                     }
                     viewModel.updateUserProfile(this)
                 }
