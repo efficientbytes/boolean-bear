@@ -1,6 +1,6 @@
 package app.efficientbytes.androidnow.di
 
-import android.app.Application
+import android.content.Context
 import app.efficientbytes.androidnow.utils.ConnectivityListener
 
-fun provideConnectivityListener(application: Application) = ConnectivityListener(application)
+fun provideConnectivityListener(context: Context) = ConnectivityListener(context)
