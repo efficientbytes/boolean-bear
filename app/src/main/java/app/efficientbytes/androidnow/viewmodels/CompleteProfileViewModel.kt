@@ -8,9 +8,7 @@ import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.UserProfileRepository
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.UserProfilePayload
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class CompleteProfileViewModel(private val userProfileRepository: UserProfileRepository) :
@@ -27,13 +25,6 @@ class CompleteProfileViewModel(private val userProfileRepository: UserProfileRep
             userProfileRepository.updateUserPrivateProfileBasicDetails(userProfile).collect {
                 _userProfileServerResponse.postValue(it)
             }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun saveUserProfile(userProfile: UserProfile) {
-        GlobalScope.launch {
-            userProfileRepository.saveUserProfile(userProfile)
         }
     }
 
