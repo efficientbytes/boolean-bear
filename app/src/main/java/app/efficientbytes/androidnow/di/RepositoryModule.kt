@@ -10,5 +10,5 @@ val repositoryModule = module {
     factory { CourseRepository(get()) }
     factory { VerificationRepository(get()) }
     factory { UserProfileRepository(get(), get()) }
-    factory { AuthenticationRepository(get()) }
+    factory { AuthenticationRepository(get(), get()) }
 }

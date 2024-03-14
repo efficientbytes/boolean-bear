@@ -12,3 +12,5 @@ fun provideRoomDatabase(context: Context) =
         .fallbackToDestructiveMigration().build()
 
 fun provideUserProfileDao(database: AppDatabase) = database.userProfileDa()
+
+fun provideAuthenticationDao(database: AppDatabase) = database.authenticationDao()

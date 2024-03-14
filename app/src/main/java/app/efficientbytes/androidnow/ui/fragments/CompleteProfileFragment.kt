@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentCompleteProfileBinding
@@ -17,6 +18,7 @@ import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validateEmailIdFormat
 import app.efficientbytes.androidnow.utils.validateNameFormat
 import app.efficientbytes.androidnow.viewmodels.CompleteProfileViewModel
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import org.koin.android.ext.android.inject
 import java.util.Locale
 
@@ -30,6 +32,7 @@ class CompleteProfileFragment : Fragment() {
     private lateinit var userAccountId: String
     private var selectedProfessionCategoryPosition: Int = 0
     private val viewModel: CompleteProfileViewModel by inject()
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,7 +163,7 @@ class CompleteProfileFragment : Fragment() {
                     it.data?.also { userPayLoad ->
                         binding.progressStatusValueTextView.text = userPayLoad.message.toString()
                         userPayLoad.userProfile?.also { userProfile ->
-                            viewModel.saveUserProfile(userProfile)
+                            mainViewModel.saveUserProfile(userProfile)
                         }
                     }
                     findNavController().popBackStack(R.id.coursesFragment, false)
