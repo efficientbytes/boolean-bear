@@ -36,6 +36,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.apache.commons.net.ntp.NTPUDPClient
+import org.apache.commons.net.ntp.TimeInfo
+import java.net.InetAddress
 
 class MainViewModel(
     private val application: Application,
@@ -304,6 +308,30 @@ class MainViewModel(
         }
     }
 
+    private val _serverTime =
+        MutableLiveData<DataStatus<Long?>>()
+    val serverTime: LiveData<DataStatus<Long?>> = _serverTime
+    fun fetchServerTime() {
+        _serverTime.postValue(DataStatus.loading())
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                val timeServer = "time.google.com"
+                val client = NTPUDPClient()
+                client.defaultTimeout = 10_000
+                try {
+                    val inetAddress = InetAddress.getByName(timeServer)
+                    val timeInfo: TimeInfo = client.getTime(inetAddress)
+                    val time = timeInfo.message.receiveTimeStamp.time
+                    _serverTime.postValue(DataStatus.success(time))
+                } catch (e: Exception) {
+                    _serverTime.postValue(DataStatus.failed(e.message.toString()))
+                } finally {
+                    client.close()
+                }
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
@@ -325,7 +353,7 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
-
+                fetchServerTime()
             }
 
             ON_PAUSE -> {

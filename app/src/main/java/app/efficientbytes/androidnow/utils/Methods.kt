@@ -106,3 +106,9 @@ fun compareDeviceId(
 ): Boolean {
     return singleDeviceLoginFromDB.deviceId == singleDeviceLoginFromServer.deviceId && singleDeviceLoginFromDB.createdOn == singleDeviceLoginFromServer.createdOn
 }
+
+fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
+    val date = Date(timestampInMillisecond)
+    val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+    return dateFormat.format(date)
+}
