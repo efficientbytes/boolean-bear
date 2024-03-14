@@ -1,5 +1,6 @@
 package app.efficientbytes.androidnow.utils
 
+import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import com.google.android.material.textfield.TextInputLayout
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -53,20 +54,24 @@ fun pluralize(value: Long, unit: String): String {
     }
 }
 
-fun validatePhoneNumberFormat(phoneNumberTextInputLayout : TextInputLayout, input : String?) : Boolean{
-    if (input.isNullOrBlank()){
+fun validatePhoneNumberFormat(
+    phoneNumberTextInputLayout: TextInputLayout,
+    input: String?
+): Boolean {
+    if (input.isNullOrBlank()) {
         phoneNumberTextInputLayout.error = "Please enter phone number to continue."
         return false
     }
     phoneNumberTextInputLayout.error = null
-    if (!input.matches(Regex("^[1-9]\\d{9}$"))){
+    if (!input.matches(Regex("^[1-9]\\d{9}$"))) {
         phoneNumberTextInputLayout.error = "Invalid phone number format."
         return false
     }
     phoneNumberTextInputLayout.error = null
     return true
 }
-fun validateOTPFormat(input : String) : Boolean {
+
+fun validateOTPFormat(input: String): Boolean {
     return input.matches(Regex("""^\d{6}$"""))
 }
 
@@ -86,11 +91,18 @@ fun validateNameFormat(
     inputLayout: TextInputLayout,
     input: String?
 ): Boolean {
-    if (input?.isBlank()==true) return true
+    if (input?.isBlank() == true) return true
     if (input?.matches(Regex("""^[a-zA-Z\s]+$""")) == false) {
         inputLayout.error = "Invalid format"
         return false
     }
     inputLayout.error = null
     return true
+}
+
+fun compareDeviceId(
+    singleDeviceLoginFromDB: SingleDeviceLogin,
+    singleDeviceLoginFromServer: SingleDeviceLogin
+): Boolean {
+    return singleDeviceLoginFromDB.deviceId == singleDeviceLoginFromServer.deviceId && singleDeviceLoginFromDB.createdOn == singleDeviceLoginFromServer.createdOn
 }
