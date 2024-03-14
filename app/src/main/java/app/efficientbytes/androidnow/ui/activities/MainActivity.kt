@@ -16,10 +16,13 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ActivityMainBinding
+import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.ConnectivityListener
+import app.efficientbytes.androidnow.utils.compareDeviceId
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +43,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var networkNotAvailable: Boolean = false
     private var networkNotAvailableAtAppLoading: Boolean = false
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
+    private var singleDeviceLogin: SingleDeviceLogin? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,14 +94,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.getUserProfile()
                         FirebaseAuth.getInstance().currentUser?.let { user ->
                             viewModel.listenToUserProfileChanges(user.uid)
+                            viewModel.listenToSingleDeviceLoginChanges(user.uid)
+                            viewModel.getSingleDeviceLogin(user.uid)
                         }
                     }
 
                     false -> {
-                        FirebaseAuth.getInstance().currentUser?.let { user ->
-                            viewModel.listenToUserProfileChanges(user.uid)
-                        }
+                        viewModel.deleteSingleDeviceLogin()
                         viewModel.cancelListeningToUserProfileChanges()
+                        viewModel.cancelListeningToSingleDeviceLoginChanges()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
@@ -121,6 +126,82 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
+        viewModel.singleDeviceLoginFromDB.observe(this) {
+            Log.i(tagMainActivity, "Device id from DB is $it")
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            this.singleDeviceLogin = it
+            if (currentUser != null && it == null) {
+                //show device id does not exist , please login again.
+                viewModel.signOutUser()
+                MaterialAlertDialogBuilder(
+                    this@MainActivity,
+                    com.google.android.material.R.style.MaterialAlertDialog_Material3
+                )
+                    .setTitle("Multiple Device Login")
+                    .setMessage("We have identified multiple device login associated with this same account. We are logging you out from this device. If you want to use account in this device login again.")
+                    .setPositiveButton("ok", null)
+                    .setCancelable(false)
+                    .show()
+            }
+        }
+        viewModel.singleDeviceLoginFromServer.observe(this) {
+            Log.i(tagMainActivity, "DEVICE ID FROM SERVER IS ${it}")
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    /*//failed to fetch try again
+                    FirebaseAuth.getInstance().currentUser?.let { user ->
+                        viewModel.getSingleDeviceLogin(user.uid)
+                    }*/
+                    Log.i(tagMainActivity, "Failed to get device id from server ${it.message}")
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { singleDeviceLoginFromServer ->
+                        this@MainActivity.singleDeviceLogin?.let { singleDeviceLoginFromDB ->
+                            if (!compareDeviceId(
+                                    singleDeviceLoginFromDB,
+                                    singleDeviceLoginFromServer
+                                )
+                            ) {
+                                viewModel.signOutUser()
+                                MaterialAlertDialogBuilder(
+                                    this@MainActivity,
+                                    com.google.android.material.R.style.MaterialAlertDialog_Material3
+                                )
+                                    .setTitle("Multiple Device Login")
+                                    .setMessage("We have identified multiple device login associated with this same account. We are logging you out from this device. If you want to use account in this device login again.")
+                                    .setPositiveButton("ok", null)
+                                    .setCancelable(false)
+                                    .show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        viewModel.singleDeviceLiveDocument.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    Log.i(tagMainActivity, "Device Id is null")
+                }
+
+                DataStatus.Status.Success -> {
+                    Log.i(tagMainActivity, "Device Id has been modified")
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null) {
+                        viewModel.getSingleDeviceLogin(currentUser.uid)
+                    }
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {
@@ -136,11 +217,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         snackBar.setBackgroundTint(Color.parseColor("#4CAF50"))
                         snackBar.setTextColor(Color.parseColor("#FFFFFF"))
                         snackBar.show()
-
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser != null) {
+                            viewModel.getSingleDeviceLogin(currentUser.uid)
+                        }
                     }
                     if (networkNotAvailableAtAppLoading) {
                         networkNotAvailableAtAppLoading = false
-                        viewModel.getUserProfile()
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser != null) {
+                            viewModel.getUserProfile()
+                            viewModel.getSingleDeviceLogin(currentUser.uid)
+                        }
                     }
                 }
 

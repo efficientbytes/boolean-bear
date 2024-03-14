@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
+import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.utils.validateOTPFormat
@@ -28,6 +29,7 @@ class OTPVerificationFragment : Fragment() {
     private val mainViewModel: MainViewModel by inject()
     private var profileUpdated: Boolean? = false
     private var userAccountId: String? = null
+    private var singleDeviceLogin: SingleDeviceLogin? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +124,7 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     //sign the user with the received sign in token
                     it.data?.let { signInToken ->
+                        singleDeviceLogin = signInToken.singleDeviceLogin
                         mainViewModel.signInWithToken(signInToken)
                         userAccountId = signInToken.userAccountId
                         profileUpdated = signInToken.basicProfileDetailsUpdated
@@ -155,7 +158,14 @@ class OTPVerificationFragment : Fragment() {
                             binding.progressStatusValueTextView.visibility = View.VISIBLE
                             binding.progressStatusValueTextView.text =
                                 "You have been signed in successfully"
-                            Toast.makeText(requireContext(),"Signed in successfully.", Toast.LENGTH_SHORT).show()
+                            singleDeviceLogin?.let { singleDeviceLogin ->
+                                mainViewModel.saveSingleDeviceLogin(singleDeviceLogin)
+                            }
+                            Toast.makeText(
+                                requireContext(),
+                                "Signed in successfully.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             userAccountId?.let { userAccountId ->
                                 profileUpdated?.let { profileUpdated ->
                                     if (profileUpdated) {
