@@ -84,5 +84,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore:24.10.3")
+    //for server time
+    implementation("commons-net:commons-net:3.9.0")
 
 }

@@ -1,6 +1,7 @@
 package app.efficientbytes.androidnow.ui.activities
 
 import android.graphics.Color
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -20,6 +21,7 @@ import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.ConnectivityListener
 import app.efficientbytes.androidnow.utils.compareDeviceId
+import app.efficientbytes.androidnow.utils.formatMillisecondToDateString
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -169,8 +172,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     this@MainActivity,
                                     com.google.android.material.R.style.MaterialAlertDialog_Material3
                                 )
-                                    .setTitle("Multiple Device Login")
-                                    .setMessage("We have identified multiple device login associated with this same account. We are logging you out from this device. If you want to use account in this device login again.")
+                                    .setTitle("Multiple Account Login")
+                                    .setMessage("We have detected multiple device logins associated with your account. As a security measure, we are logging you out from this device. If you wish to continue using your account on this device, please log in again.")
                                     .setPositiveButton("ok", null)
                                     .setCancelable(false)
                                     .show()
@@ -195,6 +198,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 DataStatus.Status.Loading -> {
 
+                }
+            }
+        }
+        viewModel.serverTime.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+
+                DataStatus.Status.Success -> {
+                    val calendar: Calendar = Calendar.getInstance()
+                    val now: Long = calendar.timeInMillis
+                    Log.i(
+                        tagMainActivity, "Server time is ${
+                            it.data?.let { it1 ->
+                                formatMillisecondToDateString(
+                                    it1
+                                )
+                            }
+                        }"
+                    )
+                    it.data?.let { serverTime ->
+                        if ((serverTime - now).absoluteValue > 300000) {
+                            MaterialAlertDialogBuilder(
+                                this@MainActivity,
+                                com.google.android.material.R.style.MaterialAlertDialog_Material3
+                            )
+                                .setTitle("Time Not Synced")
+                                .setMessage("Please synchronize your device's time to continue using the app.")
+                                .setPositiveButton("ok") { _, _ ->
+                                    viewModel.fetchServerTime()
+                                }
+                                .setCancelable(false)
+                                .show()
+                        }
+                    }
                 }
             }
         }
