@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         viewModel.singleDeviceLoginFromDB.observe(this) {
-            Log.i(tagMainActivity, "Device id from DB is $it")
             val currentUser = FirebaseAuth.getInstance().currentUser
             this.singleDeviceLogin = it
             if (currentUser != null && it == null) {
@@ -145,14 +144,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         viewModel.singleDeviceLoginFromServer.observe(this) {
-            Log.i(tagMainActivity, "DEVICE ID FROM SERVER IS ${it}")
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     /*//failed to fetch try again
                     FirebaseAuth.getInstance().currentUser?.let { user ->
                         viewModel.getSingleDeviceLogin(user.uid)
                     }*/
-                    Log.i(tagMainActivity, "Failed to get device id from server ${it.message}")
+
                 }
 
                 DataStatus.Status.Loading -> {
@@ -186,11 +184,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewModel.singleDeviceLiveDocument.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    Log.i(tagMainActivity, "Device Id is null")
+
                 }
 
                 DataStatus.Status.Success -> {
-                    Log.i(tagMainActivity, "Device Id has been modified")
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser != null) {
                         viewModel.getSingleDeviceLogin(currentUser.uid)

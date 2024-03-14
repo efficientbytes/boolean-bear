@@ -48,14 +48,8 @@ class MainViewModel(
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }
-    private var authStateListenerJob: Job? = null
-    private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val isUserSignedIn: LiveData<DataStatus<Boolean>> = _isUserSignedIn
     private val _signInToken: MutableLiveData<DataStatus<SignInToken?>> = MutableLiveData()
     val signInToken: LiveData<DataStatus<SignInToken?>> = _signInToken
-    private val _firebaseUserToken: MutableLiveData<DataStatus<GetTokenResult>> = MutableLiveData()
-    val firebaseUserToken: LiveData<DataStatus<GetTokenResult>> = _firebaseUserToken
-
     fun getSignInToken(phoneNumber: PhoneNumber) {
         viewModelScope.launch(Dispatchers.IO) {
             authenticationRepository.getSignInToken(phoneNumber).collect {
@@ -64,6 +58,8 @@ class MainViewModel(
         }
     }
 
+    private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean?>> = MutableLiveData(null)
+    val isUserSignedIn: LiveData<DataStatus<Boolean?>> = _isUserSignedIn
     fun signInWithToken(token: SignInToken) {
         viewModelScope.launch(Dispatchers.IO) {
             token.token?.let {
@@ -79,6 +75,9 @@ class MainViewModel(
         }
     }
 
+    private val _firebaseUserToken: MutableLiveData<DataStatus<GetTokenResult>> = MutableLiveData()
+    val firebaseUserToken: LiveData<DataStatus<GetTokenResult>> = _firebaseUserToken
+
     fun getFirebaseUserToken(refresh: Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentUser = auth.currentUser
@@ -92,6 +91,7 @@ class MainViewModel(
         }
     }
 
+    private var authStateListenerJob: Job? = null
     private val _authState: MutableLiveData<Boolean> = MutableLiveData()
     val authState: LiveData<Boolean> = _authState
 
@@ -152,6 +152,18 @@ class MainViewModel(
         }
     }
 
+    fun saveUserProfile(userProfile: UserProfile) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userProfileRepository.saveUserProfile(userProfile)
+        }
+    }
+
+    fun deleteUserProfile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            userProfileRepository.deleteUserProfile()
+        }
+    }
+
     private var userProfileListenerJob: Job? = null
     private val _userProfileLiveDocument: MutableLiveData<DataStatus<DocumentSnapshot?>> =
         MutableLiveData()
@@ -204,6 +216,8 @@ class MainViewModel(
         }
     }
 
+    val singleDeviceLoginFromDB: LiveData<SingleDeviceLogin?> =
+        authenticationRepository.singleDeviceLoginFromDB.asLiveData()
     private val _singleDeviceLoginFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
         MutableLiveData()
     val singleDeviceLoginFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
@@ -218,9 +232,6 @@ class MainViewModel(
             }
         }
     }
-
-    val singleDeviceLoginFromDB: LiveData<SingleDeviceLogin?> =
-        authenticationRepository.singleDeviceLoginFromDB.asLiveData()
 
     fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -284,18 +295,6 @@ class MainViewModel(
                 tagMainViewModel,
                 "Single device login listener coroutine status is active? ${singleDeviceLoginListenerJob?.isActive}"
             )
-        }
-    }
-
-    fun saveUserProfile(userProfile: UserProfile) {
-        viewModelScope.launch(Dispatchers.IO) {
-            userProfileRepository.saveUserProfile(userProfile)
-        }
-    }
-
-    fun deleteUserProfile() {
-        viewModelScope.launch(Dispatchers.IO) {
-            userProfileRepository.deleteUserProfile()
         }
     }
 
