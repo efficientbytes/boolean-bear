@@ -7,11 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validatePhoneNumberFormat
 import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.koin.android.ext.android.inject
@@ -23,6 +25,7 @@ class LoginOrSignUpFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: LoginOrSignUpViewModel by inject()
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,8 +39,9 @@ class LoginOrSignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (Firebase.auth.currentUser!=null) Firebase.auth.signOut()
+        if (Firebase.auth.currentUser != null) Firebase.auth.signOut()
         binding.continueButton.setOnClickListener {
+            mainViewModel.signOutUser()
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
                 viewModel.sendOTPToPhoneNumber(input)

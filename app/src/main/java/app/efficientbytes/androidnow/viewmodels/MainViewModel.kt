@@ -308,10 +308,10 @@ class MainViewModel(
         when (event) {
             ON_CREATE -> {
                 val currentUser = auth.currentUser
-                if (currentUser!=null){
+                if (currentUser != null) {
                     getFirebaseUserToken()
+                    listenForAuthStateChanges()
                 }
-                listenForAuthStateChanges()
             }
 
             ON_START -> {
