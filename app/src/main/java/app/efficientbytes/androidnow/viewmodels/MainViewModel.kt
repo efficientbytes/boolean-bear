@@ -58,8 +58,8 @@ class MainViewModel(
         }
     }
 
-    private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean?>> = MutableLiveData(null)
-    val isUserSignedIn: LiveData<DataStatus<Boolean?>> = _isUserSignedIn
+    private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val isUserSignedIn: LiveData<DataStatus<Boolean>> = _isUserSignedIn
     fun signInWithToken(token: SignInToken) {
         viewModelScope.launch(Dispatchers.IO) {
             token.token?.let {
@@ -307,8 +307,11 @@ class MainViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
+                val currentUser = auth.currentUser
+                if (currentUser!=null){
+                    getFirebaseUserToken()
+                }
                 listenForAuthStateChanges()
-                getFirebaseUserToken()
             }
 
             ON_START -> {

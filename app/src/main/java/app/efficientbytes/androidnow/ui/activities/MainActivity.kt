@@ -90,7 +90,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it.let {
                 when (it) {
                     true -> {
-                        Log.i(tagMainActivity, "User sign in")
                         viewModel.getUserProfile()
                         FirebaseAuth.getInstance().currentUser?.let { user ->
                             viewModel.listenToUserProfileChanges(user.uid)
