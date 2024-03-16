@@ -33,6 +33,7 @@ class EditProfileFieldFragment : Fragment() {
     private var emailVerified = false
     private var phoneNumber = ""
     private var selectedProfessionCategoryPosition: Int = 0
+    private var currentProfessionCategoryPosition: Int = 0
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private val viewModel: EditProfileFieldViewModel by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,17 +61,25 @@ class EditProfileFieldFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.GONE
         binding.progressLinearLayout.visibility = View.GONE
         var currentValue = ""
-        val currentProfessionCategories =
-            resources.getStringArray(R.array.array_current_profession_categories)
-        val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.drop_down_item,
-            currentProfessionCategories
-        )
-        binding.currentProfessionAutoCompleteTextView.setText(currentProfessionCategories[0])
-        binding.currentProfessionAutoCompleteTextView.setAdapter(
-            currentProfessionCategoryDropDownAdapter
-        )
+        mainViewModel.professionAdapterList.observe(viewLifecycleOwner) { professionList ->
+            professionList?.let {
+                val currentProfessionCategories = it.map { item -> item.name }
+                val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
+                    requireContext(),
+                    R.layout.drop_down_item,
+                    currentProfessionCategories
+                )
+                val userProfile = SingletonUserData.getInstance()?.profession
+                userProfile?.let {index->
+                    val profession = currentProfessionCategories[index]
+                    binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+                }
+                binding.currentProfessionAutoCompleteTextView.setAdapter(
+                    currentProfessionCategoryDropDownAdapter
+                )
+            }
+        }
+
         mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
@@ -119,9 +128,7 @@ class EditProfileFieldFragment : Fragment() {
                     }
 
                     5 -> {
-                        currentValue = it.profession.orEmpty()
-                        val message = "Your last updated profession was `${it.profession}`"
-                        binding.additionalMessageValueTextView.text = message
+                        currentProfessionCategoryPosition = it.profession
                         binding.saveButton.isEnabled = false
                     }
 
@@ -205,11 +212,12 @@ class EditProfileFieldFragment : Fragment() {
                             this@EditProfileFieldFragment.phoneNumber
 
                         EDIT_PROFILE_FIELD.PROFESSION -> profession =
-                            currentProfessionCategories[selectedProfessionCategoryPosition]
+                            selectedProfessionCategoryPosition
 
                         EDIT_PROFILE_FIELD.UNIVERSITY_NAME -> universityName = input
                         EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> linkedInUsername = input
                         EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> gitHubUsername = input
+
                         EDIT_PROFILE_FIELD.DEFAULT -> {
 
                         }
@@ -262,7 +270,7 @@ class EditProfileFieldFragment : Fragment() {
         }
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
             selectedProfessionCategoryPosition = position
-            if (currentValue != currentProfessionCategories[selectedProfessionCategoryPosition]) binding.saveButton.isEnabled =
+            if (currentProfessionCategoryPosition != selectedProfessionCategoryPosition) binding.saveButton.isEnabled =
                 true
         }
         viewModel.primaryEmailAddressVerificationServerStatus.observe(viewLifecycleOwner) {
