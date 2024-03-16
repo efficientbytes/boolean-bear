@@ -153,10 +153,11 @@
     <color name="black_500">#161515</color>
     <color name="black_400">#161616</color>
     <color name="black_300">#171717</color>
-    <color name="black_200">#181818</color>
     <color name="black_100">#191919</color>
 
+
     <color name="black_1200">#101010</color>  //new set of color ,do not override
+    <color name="black_200">#141414</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
