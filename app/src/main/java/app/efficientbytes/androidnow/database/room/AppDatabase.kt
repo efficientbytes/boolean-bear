@@ -4,12 +4,14 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import app.efficientbytes.androidnow.database.dao.AuthenticationDao
 import app.efficientbytes.androidnow.database.dao.UserProfileDao
+import app.efficientbytes.androidnow.database.dao.UtilityDataDao
 import app.efficientbytes.androidnow.database.models.Dummy
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.models.UserProfile
+import app.efficientbytes.androidnow.services.models.Profession
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class],
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class],
     version = 1,
     exportSchema = false
 )
@@ -17,4 +19,5 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userProfileDa(): UserProfileDao
     abstract fun authenticationDao(): AuthenticationDao
+    abstract fun utilityDao(): UtilityDataDao
 }

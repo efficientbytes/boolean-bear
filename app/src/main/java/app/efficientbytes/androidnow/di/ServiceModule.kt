@@ -10,4 +10,5 @@ val serviceModule = module {
     single { provideVerificationService(get()) }
     single { provideUserProfileService(get()) }
     single { provideAuthenticationService(get()) }
+    single { provideUtilityService(get()) }
 }
