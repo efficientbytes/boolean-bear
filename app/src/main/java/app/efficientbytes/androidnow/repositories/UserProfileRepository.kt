@@ -94,9 +94,6 @@ class UserProfileRepository(
         .flowOn(Dispatchers.IO)
 
     suspend fun saveUserProfile(userProfile: UserProfile) {
-        userProfile.apply {
-            rowId = 1
-        }
         userProfileDao.insertUserProfile(userProfile)
     }
 

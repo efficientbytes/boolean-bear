@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -25,6 +26,8 @@ import app.efficientbytes.androidnow.ui.adapters.GenericAdapter
 import app.efficientbytes.androidnow.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.androidnow.ui.models.CoursesBanner
 import app.efficientbytes.androidnow.viewmodels.CourseViewModel
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -37,6 +40,7 @@ class CoursesFragment : Fragment() {
     private lateinit var rootView: View
     private var coursesFilterIdMapping: HashMap<Int, String>? = null
     private val viewModel: CourseViewModel by inject()
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
     private var sampleList: MutableList<CoursesBanner> = mutableListOf()
     private val handler = Handler(Looper.getMainLooper())
@@ -220,6 +224,10 @@ class CoursesFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            mainViewModel.listenForAuthStateChanges()
+        }
         onInfinitePageChangeCallback(sampleList.size + 2)
         startAutoScroll()
     }
