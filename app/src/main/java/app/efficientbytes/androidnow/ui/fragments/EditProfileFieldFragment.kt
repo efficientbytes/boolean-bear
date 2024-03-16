@@ -270,8 +270,7 @@ class EditProfileFieldFragment : Fragment() {
         }
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
             selectedProfessionCategoryPosition = position
-            if (currentProfessionCategoryPosition != selectedProfessionCategoryPosition) binding.saveButton.isEnabled =
-                true
+            binding.saveButton.isEnabled = currentProfessionCategoryPosition != selectedProfessionCategoryPosition
         }
         viewModel.primaryEmailAddressVerificationServerStatus.observe(viewLifecycleOwner) {
             when (it.status) {
