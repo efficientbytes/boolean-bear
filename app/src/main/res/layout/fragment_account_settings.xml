@@ -80,7 +80,7 @@
                         android:layout_marginVertical="12dp"
                         android:fontFamily="@font/montserrat_medium"
                         android:paddingStart="18dp"
-                        android:text="Anubhav"
+                        tools:text="Anubhav"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="parent"
