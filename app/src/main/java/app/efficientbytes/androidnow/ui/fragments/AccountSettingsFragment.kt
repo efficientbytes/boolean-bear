@@ -1,6 +1,5 @@
 package app.efficientbytes.androidnow.ui.fragments
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +11,6 @@ import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentAccountSettingsBinding
 import app.efficientbytes.androidnow.viewmodels.AccountSettingsViewModel
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -49,27 +47,28 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.loginOrSignUpLabelTextView.setOnClickListener {
+        binding.loginOrSignUpCardView.setOnClickListener {
             dismiss()
             findNavController().navigate(R.id.coursesFragment_to_loginOrSignUpFragment)
         }
-        binding.editProfileLabelTextView.setOnClickListener {
+        binding.accountSettingsCardView.setOnClickListener {
             dismiss()
             findNavController().navigate(R.id.action_coursesFragment_to_editProfileFragment)
         }
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
                 it?.let { userProfile ->
-                    binding.hiUserValueTextView.text = "Hi ${userProfile.firstName}"
+                    binding.firstNameValueTextView.text = "Hi ${userProfile.firstName}"
                 }
             }
         }
-        binding.inviteFriendsLabelTextView.setOnClickListener {
-            inviteFriends()
+        binding.shareAppLinkCardView.setOnClickListener {
+            dismiss()
+            shareAppLink()
         }
     }
 
-    private fun inviteFriends() {
+    private fun shareAppLink() {
         val intent = Intent()
         intent.setAction(Intent.ACTION_SEND)
         intent.setType("text/plain")
@@ -82,11 +81,4 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         startActivity(Intent.createChooser(intent, "Select One"))
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return super.onCreateDialog(savedInstanceState).apply {
-            (this as? BottomSheetDialog)
-                ?.behavior
-                ?.setPeekHeight(800, true)
-        }
-    }
 }
