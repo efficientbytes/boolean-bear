@@ -3,6 +3,7 @@ package app.efficientbytes.androidnow.di
 import app.efficientbytes.androidnow.services.AuthenticationService
 import app.efficientbytes.androidnow.services.CoursesService
 import app.efficientbytes.androidnow.services.UserProfileService
+import app.efficientbytes.androidnow.services.UtilityDataService
 import app.efficientbytes.androidnow.services.VerificationService
 import app.efficientbytes.androidnow.utils.BASE_URL
 import com.squareup.moshi.Moshi
@@ -28,3 +29,6 @@ fun provideUserProfileService(retrofit: Retrofit): UserProfileService =
 
 fun provideAuthenticationService(retrofit: Retrofit): AuthenticationService =
     retrofit.create(AuthenticationService::class.java)
+
+fun provideUtilityService(retrofit: Retrofit): UtilityDataService =
+    retrofit.create(UtilityDataService::class.java)

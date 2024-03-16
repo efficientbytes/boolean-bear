@@ -26,14 +26,14 @@ import kotlinx.coroutines.launch
 class CourseViewModel(private val courseRepository: CourseRepository) : ViewModel(),
     LifecycleEventObserver {
 
+    private val tagCourseViewModel = "COURSE-VIEW-MODEL"
     private val _allShortCourses: MutableLiveData<DataStatus<List<FeedShortsCourse>>> =
         MutableLiveData()
     val allShortCourses: LiveData<DataStatus<List<FeedShortsCourse>>> = _allShortCourses
-
-    private var allCoursesJob : Job? = null
+    private var allCoursesJob: Job? = null
 
     suspend fun pullAllShortCourses(contentType: String) {
-        if (allCoursesJob?.isActive==true){
+        if (allCoursesJob?.isActive == true) {
             allCoursesJob?.cancelAndJoin()
         }
         allCoursesJob = viewModelScope.launch(Dispatchers.IO) {

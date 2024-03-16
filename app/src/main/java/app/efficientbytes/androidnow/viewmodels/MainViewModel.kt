@@ -21,9 +21,11 @@ import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
 import app.efficientbytes.androidnow.repositories.UserProfileRepository
+import app.efficientbytes.androidnow.repositories.UtilityDataRepository
 import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
+import app.efficientbytes.androidnow.services.models.Profession
 import app.efficientbytes.androidnow.services.models.SignInToken
 import app.efficientbytes.androidnow.services.models.UserProfilePayload
 import app.efficientbytes.androidnow.utils.authStateFlow
@@ -44,7 +46,8 @@ import java.net.InetAddress
 class MainViewModel(
     private val application: Application,
     private val authenticationRepository: AuthenticationRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val utilityDataRepository: UtilityDataRepository
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -332,9 +335,33 @@ class MainViewModel(
         }
     }
 
+    val professionAdapterList: LiveData<MutableList<Profession>> =
+        utilityDataRepository.professionAdapterListFromDB.asLiveData()
+
+    private fun getProfessionAdapterList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            utilityDataRepository.getProfessionAdapterList().collect {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+
+                    }
+
+                    DataStatus.Status.Loading -> {
+
+                    }
+
+                    DataStatus.Status.Success -> {
+                        it.data?.let { list -> utilityDataRepository.saveProfessionAdapterList(list) }
+                    }
+                }
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
+                getProfessionAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()

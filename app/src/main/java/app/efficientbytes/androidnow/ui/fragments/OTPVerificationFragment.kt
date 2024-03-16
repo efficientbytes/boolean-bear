@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentOTPVerificationBinding
@@ -27,7 +26,7 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var phoneNumber: String
     private val viewModel: PhoneNumberOTPVerificationViewModel by inject()
-    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val mainViewModel: MainViewModel by inject()
     private var profileUpdated: Boolean? = false
     private var userAccountId: String? = null
     private var singleDeviceLogin: SingleDeviceLogin? = null
@@ -126,9 +125,9 @@ class OTPVerificationFragment : Fragment() {
                     //sign the user with the received sign in token
                     it.data?.let { signInToken ->
                         singleDeviceLogin = signInToken.singleDeviceLogin
-                        mainViewModel.signInWithToken(signInToken)
                         userAccountId = signInToken.userAccountId
                         profileUpdated = signInToken.basicProfileDetailsUpdated
+                        mainViewModel.signInWithToken(signInToken)
                     }
                 }
             }
@@ -154,7 +153,6 @@ class OTPVerificationFragment : Fragment() {
                 DataStatus.Status.Success -> {
                     when (it.data) {
                         true -> {
-                            mainViewModel.listenForAuthStateChanges()
                             binding.verifyButton.isEnabled = false
                             binding.progressBar.visibility = View.VISIBLE
                             binding.progressStatusValueTextView.visibility = View.VISIBLE

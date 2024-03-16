@@ -31,6 +31,7 @@ class CompleteProfileFragment : Fragment() {
     private lateinit var phoneNumber: String
     private lateinit var userAccountId: String
     private var selectedProfessionCategoryPosition: Int = 0
+    private var currentProfessionCategoryPosition: Int = 0
     private val viewModel: CompleteProfileViewModel by inject()
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
@@ -64,6 +65,22 @@ class CompleteProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.phoneNumberTextInputEditText.setText(phoneNumber)
+        mainViewModel.professionAdapterList.observe(viewLifecycleOwner) { professionList ->
+            professionList?.let {
+                val currentProfessionCategories = it.map { item -> item.name }
+                val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
+                    requireContext(),
+                    R.layout.drop_down_item,
+                    currentProfessionCategories
+                )
+                val profession = currentProfessionCategories[currentProfessionCategoryPosition]
+                binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+
+                binding.currentProfessionAutoCompleteTextView.setAdapter(
+                    currentProfessionCategoryDropDownAdapter
+                )
+            }
+        }
         val currentProfessionCategories =
             resources.getStringArray(R.array.array_current_profession_categories)
         val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
@@ -122,7 +139,7 @@ class CompleteProfileFragment : Fragment() {
             val lastName = binding.lastNameTextInputEditText.text.toString().trim()
             val emailAddress =
                 binding.emailTextInputEditText.text.toString().lowercase(Locale.ROOT).trim()
-            val profession = currentProfessionCategories[selectedProfessionCategoryPosition]
+            val profession = selectedProfessionCategoryPosition
             if (validateFormInputFormat(firstName, lastName, emailAddress)) {
                 viewModel.updateUserPrivateProfileBasicDetails(
                     UserProfile(

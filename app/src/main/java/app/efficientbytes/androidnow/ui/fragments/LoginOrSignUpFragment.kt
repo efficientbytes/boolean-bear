@@ -25,8 +25,6 @@ class LoginOrSignUpFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: LoginOrSignUpViewModel by inject()
-    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,9 +37,7 @@ class LoginOrSignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (Firebase.auth.currentUser != null) Firebase.auth.signOut()
         binding.continueButton.setOnClickListener {
-            mainViewModel.signOutUser()
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
                 viewModel.sendOTPToPhoneNumber(input)

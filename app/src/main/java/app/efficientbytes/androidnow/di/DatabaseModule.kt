@@ -8,4 +8,5 @@ val databaseModule = module {
     single { provideRoomDatabase(androidContext()) }
     single { provideUserProfileDao(get()) }
     single { provideAuthenticationDao(get()) }
+    single { provideUtilityDataDao(get()) }
 }
