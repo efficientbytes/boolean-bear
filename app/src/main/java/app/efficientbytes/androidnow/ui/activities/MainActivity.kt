@@ -18,6 +18,7 @@ import androidx.navigation.ui.navigateUp
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ActivityMainBinding
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
+import app.efficientbytes.androidnow.models.SingletonUserData
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.ConnectivityListener
 import app.efficientbytes.androidnow.utils.compareDeviceId
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     it.data?.let { userProfilePayload ->
                         userProfilePayload.userProfile?.let { userProfile ->
                             viewModel.saveUserProfile(userProfile)
+                            SingletonUserData.setInstance(userProfile)
                         }
                     }
                 }

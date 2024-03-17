@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentContactUsBinding
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.play.core.review.ReviewException
@@ -48,6 +50,10 @@ class ContactUsFragment : Fragment() {
                         (task.exception as ReviewException).errorCode
                 }
             }
+        }
+
+        binding.shareFeedbackLabelTextView.setOnClickListener {
+            findNavController().navigate(R.id.contactUsFragment_to_shareFeedbackFragment)
         }
 
     }

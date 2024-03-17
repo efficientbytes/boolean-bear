@@ -11,4 +11,5 @@ val serviceModule = module {
     single { provideUserProfileService(get()) }
     single { provideAuthenticationService(get()) }
     single { provideUtilityService(get()) }
+    single { provideFeedbackNSupportService(get()) }
 }
