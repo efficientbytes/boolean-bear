@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import app.efficientbytes.androidnow.databinding.FragmentShareFeedbackBinding
 import app.efficientbytes.androidnow.models.SingletonUserData
 import app.efficientbytes.androidnow.repositories.models.DataStatus
-import app.efficientbytes.androidnow.ui.models.EDIT_PROFILE_FIELD
 import app.efficientbytes.androidnow.viewmodels.ShareFeedbackViewModel
 import org.koin.android.ext.android.inject
 
