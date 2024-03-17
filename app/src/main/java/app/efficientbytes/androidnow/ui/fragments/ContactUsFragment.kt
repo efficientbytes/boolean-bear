@@ -8,13 +8,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import app.efficientbytes.androidnow.databinding.FragmentContactUsBinding
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.model.ReviewErrorCode
+import org.koin.android.ext.android.inject
 
 class ContactUsFragment : Fragment() {
 
+    private val tagContactUFragment = "Contact-Us-Fragment"
     private lateinit var _binding: FragmentContactUsBinding
     private val binding get() = _binding
     private lateinit var rootView: View
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val reviewManager: ReviewManager by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,6 +30,26 @@ class ContactUsFragment : Fragment() {
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.rateUsLabelTextView.setOnClickListener {
+            val request = reviewManager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val reviewInfo = task.result
+                    val flow = reviewManager.launchReviewFlow(requireActivity(), reviewInfo)
+                    flow.addOnCompleteListener { _ ->
+                    }
+                } else {
+                    @ReviewErrorCode val reviewErrorCode =
+                        (task.exception as ReviewException).errorCode
+                }
+            }
+        }
+
     }
 
 }
