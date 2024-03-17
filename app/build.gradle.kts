@@ -86,5 +86,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.10.3")
     //for server time
     implementation("commons-net:commons-net:3.9.0")
+    //rate us play store
+    implementation("com.google.android.play:review:2.0.1")
+    implementation("com.google.android.play:review-ktx:2.0.1")
 
 }
