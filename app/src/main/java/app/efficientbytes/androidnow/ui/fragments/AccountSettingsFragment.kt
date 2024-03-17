@@ -53,7 +53,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.accountSettingsCardView.setOnClickListener {
             dismiss()
-            findNavController().navigate(R.id.action_coursesFragment_to_editProfileFragment)
+            findNavController().navigate(R.id.coursesFragment_to_editProfileFragment)
         }
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
@@ -65,6 +65,10 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         binding.shareAppLinkCardView.setOnClickListener {
             dismiss()
             shareAppLink()
+        }
+        binding.getInTouchWithUsCardView.setOnClickListener {
+            dismiss()
+            findNavController().navigate(R.id.coursesFragment_to_contactUsFragment)
         }
     }
 

@@ -20,10 +20,15 @@
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_coursesFragment_to_editProfileFragment"
+            android:id="@+id/coursesFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/coursesFragment_to_contactUsFragment"
+            app:destination="@id/contactUsFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -96,4 +101,9 @@
             android:name="index"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/contactUsFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.ContactUsFragment"
+        android:label="Get in touch"
+        tools:layout="@layout/fragment_contact_us" />
 </navigation>
