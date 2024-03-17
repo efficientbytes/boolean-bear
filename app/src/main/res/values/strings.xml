@@ -59,6 +59,12 @@
     <string name="save">Save</string>
     <string name="delete_account">Delete account</string>
     <string name="get_in_touch_with_us">Get in touch with us</string>
+    <string name="feedback_support"><![CDATA[Feedback & support]]></string>
+    <string name="host_app_ingene_workshops">Host app ingene workshops</string>
+    <string name="collaborate">Collaborate</string>
+    <string name="share_feedback">Share feedback</string>
+    <string name="rate_us">Rate us</string>
+    <string name="contact_support">Contact support</string>
 
 
 </resources>
