@@ -65,6 +65,9 @@
     <string name="share_feedback">Share feedback</string>
     <string name="rate_us">Rate us</string>
     <string name="contact_support">Contact support</string>
+    <string name="your_reviews_will_help_us_improve_our_product_and_make_it_user_friendly_for_more_users">Your reviews will help us improve our product and make it user friendly for more users.</string>
+    <string name="share_feedback_dotted">Share feedback...</string>
+    <string name="how_was_your_experience">How was your experience?</string>
 
 
 </resources>

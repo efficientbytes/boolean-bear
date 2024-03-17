@@ -105,5 +105,16 @@
         android:id="@+id/contactUsFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.ContactUsFragment"
         android:label="Get in touch"
-        tools:layout="@layout/fragment_contact_us" />
+        tools:layout="@layout/fragment_contact_us" >
+        <action
+            android:id="@+id/contactUsFragment_to_shareFeedbackFragment"
+            app:destination="@id/shareFeedbackFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/shareFeedbackFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.ShareFeedbackFragment"
+        android:label="Feedback"
+        tools:layout="@layout/fragment_share_feedback" />
 </navigation>
