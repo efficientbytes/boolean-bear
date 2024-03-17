@@ -2,6 +2,7 @@ package app.efficientbytes.androidnow.di
 
 import app.efficientbytes.androidnow.services.AuthenticationService
 import app.efficientbytes.androidnow.services.CoursesService
+import app.efficientbytes.androidnow.services.FeedbackNSupportService
 import app.efficientbytes.androidnow.services.UserProfileService
 import app.efficientbytes.androidnow.services.UtilityDataService
 import app.efficientbytes.androidnow.services.VerificationService
@@ -32,3 +33,6 @@ fun provideAuthenticationService(retrofit: Retrofit): AuthenticationService =
 
 fun provideUtilityService(retrofit: Retrofit): UtilityDataService =
     retrofit.create(UtilityDataService::class.java)
+
+fun provideFeedbackNSupportService(retrofit: Retrofit): FeedbackNSupportService =
+    retrofit.create(FeedbackNSupportService::class.java)

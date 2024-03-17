@@ -2,6 +2,7 @@ package app.efficientbytes.androidnow.di
 
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
 import app.efficientbytes.androidnow.repositories.CourseRepository
+import app.efficientbytes.androidnow.repositories.FeedbackNSupportRepository
 import app.efficientbytes.androidnow.repositories.UserProfileRepository
 import app.efficientbytes.androidnow.repositories.UtilityDataRepository
 import app.efficientbytes.androidnow.repositories.VerificationRepository
@@ -13,4 +14,5 @@ val repositoryModule = module {
     factory { UserProfileRepository(get(), get()) }
     factory { AuthenticationRepository(get(), get()) }
     factory { UtilityDataRepository(get(), get()) }
+    factory { FeedbackNSupportRepository(get()) }
 }
