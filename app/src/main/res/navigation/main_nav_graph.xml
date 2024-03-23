@@ -111,10 +111,42 @@
             app:destination="@id/shareFeedbackFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/contactUsFragment_to_describeIssueFragment"
+            app:destination="@id/describeIssueFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.ShareFeedbackFragment"
         android:label="Feedback"
         tools:layout="@layout/fragment_share_feedback" />
+    <fragment
+        android:id="@+id/describeIssueFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.DescribeIssueFragment"
+        android:label="Report Issue"
+        tools:layout="@layout/fragment_describe_issue" >
+        <action
+            android:id="@+id/describeIssueFragment_to_verifyReporterFragment"
+            app:destination="@id/verifyReporterFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/verifyReporterFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.VerifyReporterFragment"
+        android:label="Report Issue"
+        tools:layout="@layout/fragment_verify_reporter" >
+        <action
+            android:id="@+id/verifyReporterFragment_to_reportSummaryFragment"
+            app:destination="@id/reportSummaryFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/reportSummaryFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.ReportSummaryFragment"
+        android:label="Report Issue"
+        tools:layout="@layout/fragment_report_summary" />
 </navigation>
