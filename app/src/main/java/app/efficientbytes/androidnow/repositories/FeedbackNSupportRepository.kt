@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNSupportService) {
 
     private val gson = Gson()
-    suspend fun uploadFeedback(feedback: Feedback) = flow {
+    suspend fun postFeedback(feedback: Feedback) = flow {
         emit(DataStatus.loading())
         val response = feedbackNSupportService.uploadFeedback(feedback)
         val responseCode = response.code()
