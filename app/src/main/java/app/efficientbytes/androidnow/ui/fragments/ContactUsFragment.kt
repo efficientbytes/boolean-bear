@@ -56,6 +56,10 @@ class ContactUsFragment : Fragment() {
             findNavController().navigate(R.id.contactUsFragment_to_shareFeedbackFragment)
         }
 
+        binding.contactSupportLabelTextView.setOnClickListener{
+            findNavController().navigate(R.id.contactUsFragment_to_describeIssueFragment)
+        }
+
     }
 
 }

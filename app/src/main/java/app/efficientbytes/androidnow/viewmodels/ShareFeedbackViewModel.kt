@@ -22,7 +22,7 @@ class ShareFeedbackViewModel(private val feedbackNSupportRepository: FeedbackNSu
     fun uploadFeedback(feedback: String, userAccountId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.i(tagShareFeedbackViewModel,"In launcher")
-            feedbackNSupportRepository.uploadFeedback(Feedback(feedback, userAccountId, ""))
+            feedbackNSupportRepository.postFeedback(Feedback(feedback, userAccountId, ""))
                 .collect {
                     _feedbackUploadStatus.postValue(it)
                 }
