@@ -75,6 +75,13 @@
     <string name="title">Title</string>
     <string name="describe_the_issue_you_are_facing_as_much_as_possible">Describe the issue you are facing as much as possible.</string>
     <string name="describe_your_issue">Describe your issue...</string>
+    <string name="phone_number_has_been_verified">Phone number has been verified</string>
+    <string name="step_2">Step 2</string>
+    <string name="verify_your_phone_number">Verify your phone number</string>
+    <string name="by_verifying_your_phone_number_you_help_us_maintain_a_secure_and_trustworthy_environment_by_preventing_abuse_and_spamming_of_our_support_feature">By verifying your phone number, you help us maintain a secure and trustworthy environment by preventing abuse and spamming of our support feature.</string>
+    <string name="we_collect_your_phone_number_so_that_we_can_give_you_a_call_back_to_effectively_resolve_the_issue_you_ve_raised">We collect your phone number so that we can give you a call back to effectively resolve the issue you\'ve raised.</string>
+    <string name="your_issue_has_been_submitted">Your issue has been submitted.</string>
+    <string name="go_to_home">Go to home</string>
 
 
 </resources>
