@@ -8,11 +8,12 @@ import app.efficientbytes.androidnow.database.dao.UtilityDataDao
 import app.efficientbytes.androidnow.database.models.Dummy
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.models.UserProfile
+import app.efficientbytes.androidnow.services.models.IssueCategory
 import app.efficientbytes.androidnow.services.models.Profession
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class],
-    version = 1,
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
