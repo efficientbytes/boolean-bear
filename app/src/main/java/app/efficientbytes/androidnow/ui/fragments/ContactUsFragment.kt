@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -13,6 +14,7 @@ import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.model.ReviewErrorCode
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 
 class ContactUsFragment : Fragment() {
@@ -53,10 +55,18 @@ class ContactUsFragment : Fragment() {
         }
 
         binding.shareFeedbackLabelTextView.setOnClickListener {
-            findNavController().navigate(R.id.contactUsFragment_to_shareFeedbackFragment)
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                findNavController().navigate(R.id.contactUsFragment_to_shareFeedbackFragment)
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    "You need to sign in to share your feedback.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
 
-        binding.contactSupportLabelTextView.setOnClickListener{
+        binding.contactSupportLabelTextView.setOnClickListener {
             findNavController().navigate(R.id.contactUsFragment_to_describeIssueFragment)
         }
 
