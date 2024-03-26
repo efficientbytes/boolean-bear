@@ -13,6 +13,7 @@ import app.efficientbytes.androidnow.databinding.FragmentDescribeIssueBinding
 import app.efficientbytes.androidnow.services.models.RequestSupport
 import app.efficientbytes.androidnow.services.models.SingletonRequestSupport
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
+import org.koin.android.ext.android.inject
 
 class DescribeIssueFragment : Fragment() {
 
@@ -20,7 +21,7 @@ class DescribeIssueFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private var selectedIssueCategoryPosition: Int = 0
-    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val mainViewModel: MainViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +46,7 @@ class DescribeIssueFragment : Fragment() {
                 )
                 val defaultOption = issueCategories[0].name
                 binding.selectIssueCategoryAutoCompleteTextView.setText(defaultOption, false)
+                selectedIssueCategoryPosition = 0
                 binding.selectIssueCategoryAutoCompleteTextView.setAdapter(
                     issueCateCategoryDropDownAdapter
                 )
