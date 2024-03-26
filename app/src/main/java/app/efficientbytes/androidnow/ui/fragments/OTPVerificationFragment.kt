@@ -1,6 +1,7 @@
 package app.efficientbytes.androidnow.ui.fragments
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ class OTPVerificationFragment : Fragment() {
     private var profileUpdated: Boolean? = false
     private var userAccountId: String? = null
     private var singleDeviceLogin: SingleDeviceLogin? = null
+    private lateinit var timer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,8 +53,20 @@ class OTPVerificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.resendOtpChip.isEnabled = false
         binding.resendOtpChip.visibility = View.VISIBLE
+        binding.resendOtpChip.isEnabled = false
+        timer = object : CountDownTimer(60000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                binding.resendOtpChip.text =
+                    "Resend OTP by SMS in ${millisUntilFinished / 1000} secs"
+            }
+
+            override fun onFinish() {
+                binding.resendOtpChip.isEnabled = true
+                binding.resendOtpChip.text = "Resend OTP"
+            }
+        }
+        timer.start()
         binding.otpSentToLabelTextView.text = "OTP sent to +91${phoneNumber}"
         binding.otpPinViewLayout.requestFocusOTP()
         binding.otpPinViewLayout.otpListener = object : OTPListener {
@@ -204,7 +218,40 @@ class OTPVerificationFragment : Fragment() {
             findNavController().popBackStack(R.id.coursesFragment, false)
         }
         binding.resendOtpChip.setOnClickListener {
+            viewModel.sendOTPToPhoneNumber(phoneNumber)
         }
+        viewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.resendOtpChip.isEnabled = false
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "${it.message}"
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.resendOtpChip.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Please wait while we resend the OTP..."
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.progressLinearLayout.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.GONE
+                    Toast.makeText(requireContext(), it.data?.message, Toast.LENGTH_LONG).show()
+                    binding.resendOtpChip.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        timer.cancel()
     }
 
 }
