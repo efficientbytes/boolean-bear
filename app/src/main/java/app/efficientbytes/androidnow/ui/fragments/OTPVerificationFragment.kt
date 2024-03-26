@@ -51,29 +51,37 @@ class OTPVerificationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.resendOtpChip.isEnabled = false
+        binding.resendOtpChip.visibility = View.VISIBLE
         binding.otpSentToLabelTextView.text = "OTP sent to +91${phoneNumber}"
-        binding.verifyButton.setOnClickListener {
-            binding.otpPinViewLayout.otp?.apply {
-                if (validateOTPFormat(this)) {
-                    viewModel.verifyPhoneNumberOTP(phoneNumber, this)
-                }
-            }
-        }
+        binding.otpPinViewLayout.requestFocusOTP()
         binding.otpPinViewLayout.otpListener = object : OTPListener {
             override fun onInteractionListener() {
-                binding.otpPinViewLayout.otp?.apply {
-                    if (this.length < 6) binding.verifyButton.isEnabled = false
-                }
+
             }
 
             override fun onOTPComplete(otp: String) {
-                binding.verifyButton.isEnabled = true
+                if (validateOTPFormat(otp)) {
+                    viewModel.verifyPhoneNumberOTP(phoneNumber, otp)
+                }
             }
         }
+
         viewModel.verifyPhoneNumberOTPResponse.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    binding.verifyButton.isEnabled = true
+                    binding.otpPinViewLayout.isEnabled = true
+                    binding.otpPinViewLayout.otpListener = object : OTPListener {
+                        override fun onInteractionListener() {
+
+                        }
+
+                        override fun onOTPComplete(otp: String) {
+                            if (validateOTPFormat(otp)) {
+                                viewModel.verifyPhoneNumberOTP(phoneNumber, otp)
+                            }
+                        }
+                    }
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
@@ -81,7 +89,8 @@ class OTPVerificationFragment : Fragment() {
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.verifyButton.isEnabled = false
+                    binding.otpPinViewLayout.isEnabled = false
+                    binding.otpPinViewLayout.otpListener = null
                     binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
@@ -90,7 +99,7 @@ class OTPVerificationFragment : Fragment() {
                 }
 
                 DataStatus.Status.Success -> {
-                    binding.verifyButton.isEnabled = false
+                    binding.otpPinViewLayout.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.data?.message
@@ -104,7 +113,6 @@ class OTPVerificationFragment : Fragment() {
         mainViewModel.signInToken.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
@@ -112,7 +120,6 @@ class OTPVerificationFragment : Fragment() {
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
@@ -120,7 +127,6 @@ class OTPVerificationFragment : Fragment() {
                 }
 
                 DataStatus.Status.Success -> {
-                    binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     //sign the user with the received sign in token
@@ -136,7 +142,6 @@ class OTPVerificationFragment : Fragment() {
         mainViewModel.isUserSignedIn.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "${it.message}"
@@ -144,7 +149,6 @@ class OTPVerificationFragment : Fragment() {
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.verifyButton.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
@@ -154,7 +158,6 @@ class OTPVerificationFragment : Fragment() {
                 DataStatus.Status.Success -> {
                     when (it.data) {
                         true -> {
-                            binding.verifyButton.isEnabled = false
                             binding.progressBar.visibility = View.VISIBLE
                             binding.progressStatusValueTextView.visibility = View.VISIBLE
                             binding.progressStatusValueTextView.text =
@@ -199,6 +202,8 @@ class OTPVerificationFragment : Fragment() {
         }
         binding.takeMeToHomePageButton.setOnClickListener {
             findNavController().popBackStack(R.id.coursesFragment, false)
+        }
+        binding.resendOtpChip.setOnClickListener {
         }
     }
 
