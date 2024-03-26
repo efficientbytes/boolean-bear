@@ -80,13 +80,13 @@
                         android:layout_marginVertical="12dp"
                         android:fontFamily="@font/montserrat_medium"
                         android:paddingStart="18dp"
-                        tools:text="Anubhav"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/appLogoImageView1"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Anubhav">
 
                     </com.google.android.material.textview.MaterialTextView>
 
@@ -152,15 +152,17 @@
                 android:id="@+id/accountSettingsCardView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="@{(mainViewModel.authState==true) ? View.VISIBLE : View.GONE}"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="100dp"
-                app:layout_constraintBottom_toBottomOf="@id/getInTouchWithUsCardView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/getInTouchWithUsCardView"
-                app:strokeWidth="0dp">
+                app:layout_constraintBottom_toBottomOf="@id/shareAppLinkCardView"
+                app:layout_constraintEnd_toStartOf="@+id/shareAppLinkCardView"
+                app:layout_constraintTop_toTopOf="@id/shareAppLinkCardView"
+                app:strokeWidth="0dp"
+                tools:visibility="visible">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -186,13 +188,12 @@
                 android:id="@+id/shareAppLinkCardView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginStart="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="100dp"
                 app:layout_constraintBottom_toBottomOf="@id/getInTouchWithUsCardView"
-                app:layout_constraintStart_toEndOf="@id/accountSettingsCardView"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/getInTouchWithUsCardView"
                 app:strokeWidth="0dp">
 
@@ -221,14 +222,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="100dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/shareAppLinkCardView"
+                app:layout_constraintEnd_toStartOf="@id/accountSettingsCardView"
+                app:layout_constraintStart_toStartOf="parent"
                 app:strokeWidth="0dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
