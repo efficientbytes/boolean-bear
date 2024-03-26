@@ -82,6 +82,7 @@ class OTPVerificationFragment : Fragment() {
 
                 DataStatus.Status.Loading -> {
                     binding.verifyButton.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
