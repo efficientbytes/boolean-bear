@@ -20,14 +20,21 @@ import androidx.lifecycle.viewModelScope
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.AuthenticationRepository
+import app.efficientbytes.androidnow.repositories.FeedbackNSupportRepository
 import app.efficientbytes.androidnow.repositories.UserProfileRepository
 import app.efficientbytes.androidnow.repositories.UtilityDataRepository
+import app.efficientbytes.androidnow.repositories.VerificationRepository
 import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
+import app.efficientbytes.androidnow.services.models.IssueCategory
 import app.efficientbytes.androidnow.services.models.PhoneNumber
+import app.efficientbytes.androidnow.services.models.PhoneNumberVerificationStatus
 import app.efficientbytes.androidnow.services.models.Profession
+import app.efficientbytes.androidnow.services.models.RequestSupport
+import app.efficientbytes.androidnow.services.models.RequestSupportStatus
 import app.efficientbytes.androidnow.services.models.SignInToken
 import app.efficientbytes.androidnow.services.models.UserProfilePayload
+import app.efficientbytes.androidnow.services.models.VerifyPhoneNumber
 import app.efficientbytes.androidnow.utils.authStateFlow
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -47,7 +54,9 @@ class MainViewModel(
     private val application: Application,
     private val authenticationRepository: AuthenticationRepository,
     private val userProfileRepository: UserProfileRepository,
-    private val utilityDataRepository: UtilityDataRepository
+    private val utilityDataRepository: UtilityDataRepository,
+    private val verificationRepository: VerificationRepository,
+    private val feedbackNSupportRepository: FeedbackNSupportRepository
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -358,10 +367,64 @@ class MainViewModel(
         }
     }
 
+    val issueCategoryAdapterList: LiveData<MutableList<IssueCategory>> =
+        utilityDataRepository.issueCategoryAdapterListFromDB.asLiveData()
+
+    private fun getIssueCategoryAdapterList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            utilityDataRepository.getIssueCategoryAdapterList().collect {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+
+                    }
+
+                    DataStatus.Status.Loading -> {
+
+                    }
+
+                    DataStatus.Status.Success -> {
+                        it.data?.let { list ->
+                            utilityDataRepository.saveIssueCategoryAdapterList(
+                                list
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        MutableLiveData()
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        _sendOTPToPhoneNumberResponse
+
+    fun sendOTPToPhoneNumber(phoneNumber: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            verificationRepository.sendOTPToPhoneNumber(VerifyPhoneNumber(phoneNumber)).collect {
+                _sendOTPToPhoneNumberResponse.postValue(it)
+            }
+        }
+    }
+
+    private val _requestSupportResponse: MutableLiveData<DataStatus<RequestSupportStatus?>> =
+        MutableLiveData()
+    val requestSupportResponse: LiveData<DataStatus<RequestSupportStatus?>> =
+        _requestSupportResponse
+
+    fun requestSupport(requestSupport: RequestSupport) {
+        viewModelScope.launch(Dispatchers.IO) {
+            feedbackNSupportRepository.requestSupport(requestSupport).collect {
+                _requestSupportResponse.postValue(it)
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
                 getProfessionAdapterList()
+                getIssueCategoryAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
