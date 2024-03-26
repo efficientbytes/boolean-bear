@@ -420,6 +420,19 @@ class MainViewModel(
         }
     }
 
+    private val _verifyOtpStatus: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        MutableLiveData()
+    val verifyOtpStatus: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        _verifyOtpStatus
+
+    fun verifyPhoneNumberOTP(verifyPhoneNumber: VerifyPhoneNumber) {
+        viewModelScope.launch(Dispatchers.IO) {
+            verificationRepository.verifyPhoneNumberOTP(verifyPhoneNumber).collect {
+                _verifyOtpStatus.postValue(it)
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
