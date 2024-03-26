@@ -56,6 +56,45 @@
 
         </com.google.android.material.textview.MaterialTextView>
 
+        <LinearLayout
+            android:id="@+id/progressLinearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/reasonForVerificationLabelTextView">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                app:layout_constraintStart_toEndOf="@id/guideline2"
+                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/progressStatusValueTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:visibility="visible"
+                app:fontFamily="@font/montserrat"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toStartOf="@id/guideline3"
+                app:layout_constraintStart_toEndOf="@id/progressBar"
+                app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
+                tools:text="Please wait while we update your profile..." />
+
+        </LinearLayout>
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/otpHasBeenSentLabelTextView"
             android:layout_width="0dp"
@@ -65,7 +104,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/reasonForVerificationLabelTextView"
+            app:layout_constraintTop_toBottomOf="@id/progressLinearLayout"
             tools:text="OTP has been sent to +91123456789" />
 
         <in.aabhasjindal.otptextview.OtpTextView
@@ -97,45 +136,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/otpPinViewLayout"
             tools:text="Resend OTP by SMS in " />
-
-        <LinearLayout
-            android:id="@+id/progressLinearLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:paddingHorizontal="30dp"
-            android:paddingVertical="4dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/resendOtpChip">
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginEnd="12dp"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
-                app:layout_constraintStart_toEndOf="@id/guideline2"
-                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/progressStatusValueTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:visibility="visible"
-                app:fontFamily="@font/montserrat"
-                android:textAlignment="center"
-                app:layout_constraintEnd_toStartOf="@id/guideline3"
-                app:layout_constraintStart_toEndOf="@id/progressBar"
-                app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
-                tools:text="Please wait while we update your profile..." />
-
-        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

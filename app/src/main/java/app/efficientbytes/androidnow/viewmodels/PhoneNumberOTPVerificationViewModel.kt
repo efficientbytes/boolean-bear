@@ -28,4 +28,17 @@ class PhoneNumberOTPVerificationViewModel(private val verificationRepository: Ve
         }
     }
 
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        MutableLiveData()
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+        _sendOTPToPhoneNumberResponse
+
+    fun sendOTPToPhoneNumber(phoneNumber: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            verificationRepository.sendOTPToPhoneNumber(VerifyPhoneNumber(phoneNumber)).collect {
+                _sendOTPToPhoneNumberResponse.postValue(it)
+            }
+        }
+    }
+
 }
