@@ -89,7 +89,7 @@ class VerifyReporterFragment : Fragment() {
                     val singletonRequestSupport = SingletonRequestSupport.getInstance()
                     singletonRequestSupport?.apply {
                         userAccountId = null
-                        completePhoneNumber = it.data?.phoneNumber
+                        completePhoneNumber = "+91".plus(it.data?.phoneNumber)
                     }
                     singletonRequestSupport?.let { requestSupport ->
                         mainViewModel.requestSupport(requestSupport)
