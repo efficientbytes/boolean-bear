@@ -23,7 +23,7 @@
             android:id="@+id/coursesFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/coursesFragment_to_contactUsFragment"
             app:destination="@id/contactUsFragment"
@@ -85,18 +85,18 @@
         android:id="@+id/editProfileFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFragment"
         android:label="Edit Profile"
-        tools:layout="@layout/fragment_edit_profile" >
+        tools:layout="@layout/fragment_edit_profile">
         <action
             android:id="@+id/editProfileFragment_to_editProfileFieldFragment"
             app:destination="@id/editProfileFieldFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFieldFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFieldFragment"
         android:label="Edit"
-        tools:layout="@layout/fragment_edit_profile_field" >
+        tools:layout="@layout/fragment_edit_profile_field">
         <argument
             android:name="index"
             app:argType="integer" />
@@ -105,17 +105,17 @@
         android:id="@+id/contactUsFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.ContactUsFragment"
         android:label="Get in touch"
-        tools:layout="@layout/fragment_contact_us" >
+        tools:layout="@layout/fragment_contact_us">
         <action
             android:id="@+id/contactUsFragment_to_shareFeedbackFragment"
             app:destination="@id/shareFeedbackFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/contactUsFragment_to_describeIssueFragment"
             app:destination="@id/describeIssueFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
@@ -126,27 +126,55 @@
         android:id="@+id/describeIssueFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.DescribeIssueFragment"
         android:label="Report Issue"
-        tools:layout="@layout/fragment_describe_issue" >
+        tools:layout="@layout/fragment_describe_issue">
         <action
-            android:id="@+id/describeIssueFragment_to_verifyReporterFragment"
+            android:id="@+id/describeIssueFragment_to_reporterPhoneNumberFragment"
+            app:destination="@id/reporterPhoneNumberFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/reporterPhoneNumberFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.ReporterPhoneNumberFragment"
+        android:label="Report Issue"
+        tools:layout="@layout/fragment_reporter_phone_number">
+
+        <action
+            android:id="@+id/reporterPhoneNumberFragment_to_reportSubmittedFragment"
+            app:destination="@id/reportSubmittedFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/reporterPhoneNumberFragment_to_verifyReporterFragment"
             app:destination="@id/verifyReporterFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/verifyReporterFragment"
         android:name="app.efficientbytes.androidnow.ui.fragments.VerifyReporterFragment"
         android:label="Report Issue"
-        tools:layout="@layout/fragment_verify_reporter" >
+        tools:layout="@layout/fragment_verify_reporter">
         <action
-            android:id="@+id/verifyReporterFragment_to_reportSummaryFragment"
-            app:destination="@id/reportSummaryFragment"
+            android:id="@+id/verifyReporterFragment_to_reportSubmittedFragment"
+            app:destination="@id/reportSubmittedFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string"
+            app:nullable="false" />
     </fragment>
     <fragment
-        android:id="@+id/reportSummaryFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.ReportSummaryFragment"
+        android:id="@+id/reportSubmittedFragment"
+        android:name="app.efficientbytes.androidnow.ReportSubmittedFragment"
         android:label="Report Issue"
-        tools:layout="@layout/fragment_report_summary" />
+        tools:layout="@layout/fragment_report_submitted">
+        <argument
+            android:name="message"
+            app:argType="string" />
+        <argument
+            android:name="ticketId"
+            app:argType="string" />
+    </fragment>
 </navigation>

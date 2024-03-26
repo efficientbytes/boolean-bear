@@ -4,8 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentDescribeIssueBinding
+import app.efficientbytes.androidnow.services.models.RequestSupport
+import app.efficientbytes.androidnow.services.models.SingletonRequestSupport
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
+import org.koin.android.ext.android.inject
 
 class DescribeIssueFragment : Fragment() {
 
@@ -13,6 +21,7 @@ class DescribeIssueFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private var selectedIssueCategoryPosition: Int = 0
+    private val mainViewModel: MainViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,24 +36,52 @@ class DescribeIssueFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mainViewModel.issueCategoryAdapterList.observe(viewLifecycleOwner) { issueCategories ->
+            issueCategories?.let {
+                val issueCategoryList = it.map { item -> item.name }
+                val issueCateCategoryDropDownAdapter = ArrayAdapter(
+                    requireContext(),
+                    R.layout.drop_down_item,
+                    issueCategoryList
+                )
+                val defaultOption = issueCategories[0].name
+                binding.selectIssueCategoryAutoCompleteTextView.setText(defaultOption, false)
+                selectedIssueCategoryPosition = 0
+                binding.selectIssueCategoryAutoCompleteTextView.setAdapter(
+                    issueCateCategoryDropDownAdapter
+                )
+            }
+        }
+
         binding.continueButton.setOnClickListener {
             val titleInput = binding.issueTitleInputEditText.text.toString().trim()
             val descriptionInput = binding.issueDescriptionInputEditText.text.toString().trim()
 
             if (validateInput(titleInput, descriptionInput)) {
-
+                val requestSupport = RequestSupport(
+                    title = titleInput,
+                    description = descriptionInput,
+                    category = selectedIssueCategoryPosition
+                )
+                SingletonRequestSupport.setInstance(requestSupport)
+                findNavController().navigate(R.id.describeIssueFragment_to_reporterPhoneNumberFragment)
             }
-
         }
 
         binding.selectIssueCategoryAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
             selectedIssueCategoryPosition = position
+            binding.selectIssueCategoryInputLayout.error = null
         }
 
 
     }
 
     private fun validateInput(titleInput: String, descriptionInput: String): Boolean {
+        if (selectedIssueCategoryPosition == 0) {
+            binding.selectIssueCategoryInputLayout.error = "Select category."
+            return false
+        }
+        binding.selectIssueCategoryInputLayout.error = null
         if (titleInput.isBlank()) {
             binding.issueTitleInputLayout.error = "Title is required."
             return false

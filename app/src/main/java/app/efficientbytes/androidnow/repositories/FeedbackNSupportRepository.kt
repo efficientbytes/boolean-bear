@@ -3,6 +3,8 @@ package app.efficientbytes.androidnow.repositories
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.FeedbackNSupportService
 import app.efficientbytes.androidnow.services.models.Feedback
+import app.efficientbytes.androidnow.services.models.RequestSupport
+import app.efficientbytes.androidnow.services.models.RequestSupportStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -31,5 +33,24 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
+
+    suspend fun requestSupport(requestSupport: RequestSupport) = flow {
+        emit(DataStatus.loading())
+        val response = feedbackNSupportService.requestSupport(requestSupport)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                emit(DataStatus.success(response.body()))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: RequestSupportStatus = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    RequestSupportStatus::class.java
+                )
+                emit(DataStatus.failed(errorResponse.message))
+            }
+        }
+    }
 
 }

@@ -7,15 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import app.efficientbytes.androidnow.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.validatePhoneNumberFormat
 import app.efficientbytes.androidnow.viewmodels.LoginOrSignUpViewModel
-import app.efficientbytes.androidnow.viewmodels.MainViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import org.koin.android.ext.android.inject
 
 class LoginOrSignUpFragment : Fragment() {
@@ -66,6 +62,7 @@ class LoginOrSignUpFragment : Fragment() {
 
                 DataStatus.Status.Loading -> {
                     binding.continueButton.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =

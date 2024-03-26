@@ -10,8 +10,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="40dp"
-        android:paddingBottom="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:scrollbarSize="0dp"
         android:scrollbars="vertical"
         tools:context=".ui.fragments.DescribeIssueFragment">
@@ -118,6 +118,8 @@
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="100"
                 app:endIconTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -126,7 +128,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/issueTitleInputEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:maxLength="100">
 
                 </com.google.android.material.textfield.TextInputEditText>
 
@@ -156,6 +159,8 @@
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="500"
                 app:endIconTint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -166,7 +171,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="textMultiLine"
-                    android:lines="8">
+                    android:lines="8"
+                    android:maxLength="500">
 
                 </com.google.android.material.textfield.TextInputEditText>
 
