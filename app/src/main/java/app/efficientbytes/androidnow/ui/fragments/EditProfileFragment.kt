@@ -10,8 +10,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentEditProfileBinding
+import app.efficientbytes.androidnow.utils.CustomAuthStateListener
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.android.ext.android.inject
 
 class EditProfileFragment : Fragment(), View.OnClickListener {
 
@@ -19,6 +21,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val customAuthStateListener: CustomAuthStateListener by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +38,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         val versionName = "version " + getVersionCode()
         binding.appVersionLabelTextView.text = versionName
-        mainViewModel.authState.observe(viewLifecycleOwner) {
+        customAuthStateListener.liveData.observe(viewLifecycleOwner) {
             it?.let { authState ->
                 when (authState) {
                     true -> {
@@ -55,7 +58,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
         binding.professionLabelTextView.setOnClickListener(this)
         binding.linkedInUsernameLabelTextView.setOnClickListener(this)
         binding.githubUsernameLabelTextView.setOnClickListener(this)
-        binding.signOutLabelTextView.setOnClickListener{
+        binding.signOutLabelTextView.setOnClickListener {
             MaterialAlertDialogBuilder(
                 requireContext(),
                 com.google.android.material.R.style.MaterialAlertDialog_Material3
@@ -64,7 +67,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Sign out") { _, _ ->
                     mainViewModel.signOutUser()
-                }.setNegativeButton("cancel",null)
+                }.setNegativeButton("cancel", null)
                 .setCancelable(true)
                 .show()
         }

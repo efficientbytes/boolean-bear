@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="mainViewModel"
-            type="app.efficientbytes.androidnow.viewmodels.MainViewModel" />
+            name="customAuthState"
+            type="app.efficientbytes.androidnow.utils.CustomAuthStateListener" />
 
     </data>
 
@@ -47,7 +47,7 @@
                 android:layout_marginBottom="22dp"
                 android:clickable="false"
                 android:focusable="false"
-                android:visibility="@{(mainViewModel.authState==true) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{(customAuthState.liveData ==true) ? View.VISIBLE : View.GONE}"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="50dp"
                 app:layout_constraintBottom_toTopOf="@id/getInTouchWithUsCardView"
@@ -101,7 +101,7 @@
                 android:layout_marginBottom="22dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:visibility="@{(mainViewModel.authState==true) ? View.GONE : View.VISIBLE}"
+                android:visibility="@{(customAuthState.liveData==true) ? View.GONE : View.VISIBLE}"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="50dp"
                 app:layout_constraintBottom_toTopOf="@id/getInTouchWithUsCardView"
@@ -155,7 +155,7 @@
                 android:layout_marginEnd="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:visibility="@{(mainViewModel.authState==true) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="100dp"
                 app:layout_constraintBottom_toBottomOf="@id/shareAppLinkCardView"

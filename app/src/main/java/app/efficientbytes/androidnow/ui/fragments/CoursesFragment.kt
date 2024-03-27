@@ -21,6 +21,7 @@ import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ChipCoursesFilterBinding
 import app.efficientbytes.androidnow.databinding.FragmentCoursesBinding
 import app.efficientbytes.androidnow.enums.COURSE_CONTENT_TYPE
+import app.efficientbytes.androidnow.repositories.AuthenticationRepository
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.ui.adapters.GenericAdapter
 import app.efficientbytes.androidnow.ui.adapters.InfiniteViewPagerAdapter
@@ -46,6 +47,7 @@ class CoursesFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var currentPage = 1
     private val DELAY_MS: Long = 3000 // Delay in milliseconds
+    private val authenticationRepository: AuthenticationRepository by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -226,7 +228,7 @@ class CoursesFragment : Fragment() {
         super.onStart()
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            mainViewModel.listenForAuthStateChanges()
+            authenticationRepository.listenForAuthStateChanges()
         }
         onInfinitePageChangeCallback(sampleList.size + 2)
         startAutoScroll()
