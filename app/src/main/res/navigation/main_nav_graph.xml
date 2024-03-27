@@ -172,7 +172,7 @@
     </fragment>
     <fragment
         android:id="@+id/reportSubmittedFragment"
-        android:name="app.efficientbytes.androidnow.ReportSubmittedFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.ReportSubmittedFragment"
         android:label="Report Issue"
         tools:layout="@layout/fragment_report_submitted">
         <argument
