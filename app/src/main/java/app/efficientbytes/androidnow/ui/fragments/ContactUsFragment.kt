@@ -33,6 +33,7 @@ class ContactUsFragment : Fragment() {
         _binding = FragmentContactUsBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.mainViewModel = mainViewModel
         return rootView
     }
 
@@ -68,6 +69,10 @@ class ContactUsFragment : Fragment() {
 
         binding.contactSupportLabelTextView.setOnClickListener {
             findNavController().navigate(R.id.contactUsFragment_to_describeIssueFragment)
+        }
+
+        binding.deleteAccountLabelTextView.setOnClickListener {
+            findNavController().navigate(R.id.contactUsFragment_to_deleteUserAccountFragment)
         }
 
     }

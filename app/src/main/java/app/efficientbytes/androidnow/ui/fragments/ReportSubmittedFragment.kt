@@ -1,4 +1,4 @@
-package app.efficientbytes.androidnow
+package app.efficientbytes.androidnow.ui.fragments
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentReportSubmittedBinding
 
 class ReportSubmittedFragment : Fragment() {

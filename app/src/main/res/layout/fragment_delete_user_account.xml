@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:scrollbarSize="0dp"
+        android:scrollbars="vertical"
+        tools:context=".ui.fragments.DeleteUserAccountFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:paddingHorizontal="32dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/titleLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="@string/are_you_sure_you_want_to_delete_your_account"
+                android:textAlignment="center"
+                android:textColor="@color/violet_800"
+                android:textSize="22sp"
+                app:fontFamily="@font/montserrat_medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/captionLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/this_cannot_be_undone"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                app:fontFamily="@font/montserrat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titleLabelTextView">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <LinearLayout
+                android:id="@+id/listLinearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="42dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/captionLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="22dp"
+                    android:drawableStart="@drawable/user_icon"
+                    android:drawablePadding="18dp"
+                    android:text="@string/your_profile_data_will_no_longer_be_accessible"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/montserrat">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="22dp"
+                    android:drawableStart="@drawable/newspaper_icon"
+                    android:drawablePadding="18dp"
+                    android:text="@string/you_will_stop_receiving_personalized_newsletters"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/montserrat">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="22dp"
+                    android:drawableStart="@drawable/medal_icon"
+                    android:drawablePadding="18dp"
+                    android:text="All your earned achievements and event participation activity will be lost."
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/montserrat">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/progressLinearLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/listLinearLayout">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="12dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                    app:layout_constraintStart_toEndOf="@id/guideline2"
+                    app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/progressStatusValueTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:visibility="visible"
+                    app:fontFamily="@font/montserrat"
+                    android:textAlignment="center"
+                    app:layout_constraintEnd_toStartOf="@id/guideline3"
+                    app:layout_constraintStart_toEndOf="@id/progressBar"
+                    app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
+                    tools:text="Please wait while we update your profile..." />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="@string/cancel"
+                app:cornerRadius="6dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progressLinearLayout">
+
+            </com.google.android.material.button.MaterialButton>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteNowButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="28dp"
+                android:text="@string/delete_now"
+                app:backgroundTint="@color/md_theme_error"
+                app:cornerRadius="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/cancelButton"
+                app:layout_constraintTop_toBottomOf="@id/progressLinearLayout">
+
+            </com.google.android.material.button.MaterialButton>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/takeMeToHomePageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/take_me_to_homepage"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="6dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/deleteNowButton">
+
+            </com.google.android.material.button.MaterialButton>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+</layout>

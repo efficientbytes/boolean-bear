@@ -5,6 +5,12 @@
 
     <data>
 
+        <import type="android.view.View" />
+
+        <variable
+            name="mainViewModel"
+            type="app.efficientbytes.androidnow.viewmodels.MainViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -149,6 +155,27 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rateUsLabelTextView">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/deleteAccountLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="@string/delete_account"
+                android:textColor="@color/white_1200"
+                android:visibility="@{(mainViewModel.authState==true) ? View.VISIBLE : View.GONE}"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contactSupportLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
