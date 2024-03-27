@@ -249,6 +249,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
+        viewModel.deleteUserAccountStatus.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+
+                DataStatus.Status.Success -> {
+                    viewModel.signOutUser()
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {

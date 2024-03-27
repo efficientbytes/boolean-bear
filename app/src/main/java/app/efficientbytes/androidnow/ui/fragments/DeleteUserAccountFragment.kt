@@ -8,11 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.DeleteAccountConfirmationBinding
 import app.efficientbytes.androidnow.databinding.FragmentDeleteUserAccountBinding
+import app.efficientbytes.androidnow.models.SingletonUserData
+import app.efficientbytes.androidnow.repositories.models.DataStatus
+import app.efficientbytes.androidnow.services.models.DeleteUserAccount
+import app.efficientbytes.androidnow.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DeleteUserAccountFragment : Fragment() {
 
@@ -20,6 +28,7 @@ class DeleteUserAccountFragment : Fragment() {
     private lateinit var _binding: FragmentDeleteUserAccountBinding
     private val binding get() = _binding
     private lateinit var rootView: View
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,10 +86,43 @@ class DeleteUserAccountFragment : Fragment() {
                         binding.deleteNowButton.isEnabled = false
                         binding.cancelButton.isEnabled = false
                         dialog.dismiss()
+                        val singletonUser = SingletonUserData.getInstance()
+                        singletonUser?.let {
+                            mainViewModel.deleteUserAccount(DeleteUserAccount(it.userAccountId))
+                        }
                     }
                 }
             }
         }
+        mainViewModel.deleteUserAccountStatus.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.message
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Please wait while we process your request."
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.data?.message
+                    lifecycleScope.launch {
+                        delay(1200)
+                        findNavController().popBackStack(R.id.coursesFragment, false)
+                    }
+                }
+            }
+        }
+
     }
 
 }

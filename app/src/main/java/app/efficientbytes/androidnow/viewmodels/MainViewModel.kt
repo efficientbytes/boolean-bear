@@ -26,6 +26,8 @@ import app.efficientbytes.androidnow.repositories.UtilityDataRepository
 import app.efficientbytes.androidnow.repositories.VerificationRepository
 import app.efficientbytes.androidnow.repositories.models.AuthState
 import app.efficientbytes.androidnow.repositories.models.DataStatus
+import app.efficientbytes.androidnow.services.models.DeleteUserAccount
+import app.efficientbytes.androidnow.services.models.DeleteUserAccountStatus
 import app.efficientbytes.androidnow.services.models.IssueCategory
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.PhoneNumberVerificationStatus
@@ -429,6 +431,19 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             verificationRepository.verifyPhoneNumberOTP(verifyPhoneNumber).collect {
                 _verifyOtpStatus.postValue(it)
+            }
+        }
+    }
+
+    private val _deleteUserAccountStatus: MutableLiveData<DataStatus<DeleteUserAccountStatus?>> =
+        MutableLiveData()
+    val deleteUserAccountStatus: LiveData<DataStatus<DeleteUserAccountStatus?>> =
+        _deleteUserAccountStatus
+
+    fun deleteUserAccount(deleteUserAccount: DeleteUserAccount) {
+        viewModelScope.launch(Dispatchers.IO) {
+            authenticationRepository.deleteUserAccount(deleteUserAccount).collect {
+                _deleteUserAccountStatus.postValue(it)
             }
         }
     }

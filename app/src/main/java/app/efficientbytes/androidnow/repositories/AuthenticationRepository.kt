@@ -4,6 +4,8 @@ import app.efficientbytes.androidnow.database.dao.AuthenticationDao
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.AuthenticationService
+import app.efficientbytes.androidnow.services.models.DeleteUserAccount
+import app.efficientbytes.androidnow.services.models.DeleteUserAccountStatus
 import app.efficientbytes.androidnow.services.models.PhoneNumber
 import app.efficientbytes.androidnow.services.models.SignInToken
 import app.efficientbytes.androidnow.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
@@ -92,5 +94,27 @@ class AuthenticationRepository(
         }
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
+
+    suspend fun deleteUserAccount(deleteUserAccount: DeleteUserAccount) = flow {
+        emit(DataStatus.loading())
+        val response = authenticationService.deleteUserAccount(deleteUserAccount)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                emit(DataStatus.success(response.body()))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: DeleteUserAccountStatus = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    DeleteUserAccountStatus::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message}"
+                emit(DataStatus.failed(message))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
 
 }

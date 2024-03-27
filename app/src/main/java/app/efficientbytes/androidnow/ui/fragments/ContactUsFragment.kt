@@ -33,6 +33,7 @@ class ContactUsFragment : Fragment() {
         _binding = FragmentContactUsBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.mainViewModel = mainViewModel
         return rootView
     }
 
