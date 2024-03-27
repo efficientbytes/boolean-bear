@@ -100,6 +100,7 @@ class DeleteUserAccountFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
+                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -121,6 +122,9 @@ class DeleteUserAccountFragment : Fragment() {
                     }
                 }
             }
+        }
+        binding.takeMeToHomePageButton.setOnClickListener {
+            findNavController().popBackStack(R.id.coursesFragment, false)
         }
 
     }
