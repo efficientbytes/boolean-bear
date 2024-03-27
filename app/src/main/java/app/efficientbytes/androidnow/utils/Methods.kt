@@ -1,7 +1,14 @@
 package app.efficientbytes.androidnow.utils
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
+import app.efficientbytes.androidnow.repositories.models.DataStatus
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Currency
@@ -111,4 +118,45 @@ fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
     val date = Date(timestampInMillisecond)
     val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     return dateFormat.format(date)
+}
+
+object UserProfileListener {
+
+    private val _mutableLiveData: MutableLiveData<DataStatus<DocumentSnapshot?>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<DocumentSnapshot?>> = _mutableLiveData
+
+    fun postValue(value: DataStatus<DocumentSnapshot?>) {
+        _mutableLiveData.postValue(value)
+    }
+
+}
+
+object SingleDeviceLoginListener {
+
+    private val _mutableLiveData: MutableLiveData<DataStatus<DocumentSnapshot?>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<DocumentSnapshot?>> = _mutableLiveData
+
+    fun postValue(value: DataStatus<DocumentSnapshot?>) {
+        _mutableLiveData.postValue(value)
+    }
+
+}
+
+object AuthStateCoroutineScope {
+
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    fun getScope() = scope
+}
+
+
+object CustomAuthStateListener {
+
+    private val _mutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val liveData: LiveData<Boolean> = _mutableLiveData
+
+    fun postValue(value: Boolean) {
+        _mutableLiveData.postValue(value)
+    }
+
 }

@@ -19,8 +19,13 @@ import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.ActivityMainBinding
 import app.efficientbytes.androidnow.models.SingleDeviceLogin
 import app.efficientbytes.androidnow.models.SingletonUserData
+import app.efficientbytes.androidnow.repositories.AuthenticationRepository
+import app.efficientbytes.androidnow.repositories.UserProfileRepository
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.utils.ConnectivityListener
+import app.efficientbytes.androidnow.utils.CustomAuthStateListener
+import app.efficientbytes.androidnow.utils.SingleDeviceLoginListener
+import app.efficientbytes.androidnow.utils.UserProfileListener
 import app.efficientbytes.androidnow.utils.compareDeviceId
 import app.efficientbytes.androidnow.utils.formatMillisecondToDateString
 import app.efficientbytes.androidnow.viewmodels.MainViewModel
@@ -29,6 +34,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancelChildren
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.absoluteValue
@@ -54,6 +61,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var networkNotAvailableAtAppLoading: Boolean = false
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var singleDeviceLogin: SingleDeviceLogin? = null
+    private val userProfileListener: UserProfileListener by inject()
+    private val singleDeviceLoginListener: SingleDeviceLoginListener by inject()
+    private val externalScope: CoroutineScope by inject()
+    private val authenticationRepository: AuthenticationRepository by inject()
+    private val userProfileRepository: UserProfileRepository by inject()
+    private val customAuthStateListener: CustomAuthStateListener by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,29 +110,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.authState.observe(this) {
+        customAuthStateListener.liveData.observe(this) {
             it.let {
                 when (it) {
                     true -> {
                         viewModel.getUserProfile()
                         FirebaseAuth.getInstance().currentUser?.let { user ->
-                            viewModel.listenToUserProfileChanges(user.uid)
-                            viewModel.listenToSingleDeviceLoginChanges(user.uid)
                             viewModel.getSingleDeviceLogin(user.uid)
+                            userProfileRepository.listenToUserProfileChange(user.uid)
+                            authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
                         }
                     }
 
                     false -> {
                         viewModel.deleteSingleDeviceLogin()
-                        viewModel.cancelListeningToUserProfileChanges()
-                        viewModel.cancelListeningToSingleDeviceLoginChanges()
+                        externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
                 }
             }
         }
-        viewModel.userProfileLiveDocument.observe(this) {
+        userProfileListener.liveData.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     Log.i(tagMainActivity, "User profile is null")
@@ -191,7 +203,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.singleDeviceLiveDocument.observe(this) {
+        singleDeviceLoginListener.liveData.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
 

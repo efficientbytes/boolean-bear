@@ -2,11 +2,18 @@ package app.efficientbytes.androidnow
 
 import android.app.Application
 import app.efficientbytes.androidnow.di.appModule
+import app.efficientbytes.androidnow.repositories.AuthenticationRepository
+import app.efficientbytes.androidnow.repositories.UserProfileRepository
+import com.google.firebase.auth.FirebaseAuth
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
+
+    private val authenticationRepository: AuthenticationRepository by inject()
+    private val userProfileRepository: UserProfileRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -15,6 +22,12 @@ class MainApplication : Application() {
             androidLogger()
             androidContext(this@MainApplication)
             modules(appModule)
+        }
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            authenticationRepository.listenForAuthStateChanges()
+            authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
+            userProfileRepository.listenToUserProfileChange(currentUser.uid)
         }
 
     }

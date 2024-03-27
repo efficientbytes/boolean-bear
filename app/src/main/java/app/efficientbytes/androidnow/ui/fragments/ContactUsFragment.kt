@@ -6,11 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.androidnow.R
 import app.efficientbytes.androidnow.databinding.FragmentContactUsBinding
-import app.efficientbytes.androidnow.viewmodels.MainViewModel
+import app.efficientbytes.androidnow.utils.CustomAuthStateListener
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.model.ReviewErrorCode
@@ -23,7 +22,7 @@ class ContactUsFragment : Fragment() {
     private lateinit var _binding: FragmentContactUsBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val customAuthStateListener: CustomAuthStateListener by inject()
     private val reviewManager: ReviewManager by inject()
 
     override fun onCreateView(
@@ -33,7 +32,7 @@ class ContactUsFragment : Fragment() {
         _binding = FragmentContactUsBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.mainViewModel = mainViewModel
+        binding.customAuthState = customAuthStateListener
         return rootView
     }
 
