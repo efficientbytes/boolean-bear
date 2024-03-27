@@ -70,6 +70,10 @@ class ContactUsFragment : Fragment() {
             findNavController().navigate(R.id.contactUsFragment_to_describeIssueFragment)
         }
 
+        binding.deleteAccountLabelTextView.setOnClickListener {
+            findNavController().navigate(R.id.contactUsFragment_to_deleteUserAccountFragment)
+        }
+
     }
 
 }

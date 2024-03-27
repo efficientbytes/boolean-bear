@@ -280,7 +280,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/deleteAccountConstraintLayout"
+                android:id="@+id/signOutConstraintLayout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="22dp"
@@ -290,43 +290,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/onlineInformationConstraintLayout">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/deleteAccountLabelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                    android:focusable="true"
-                    android:fontFamily="@font/montserrat"
-                    android:drawableStart="@drawable/delete_icon"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_vertical|start"
-                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="10dp"
-                    android:text="@string/delete_account"
-                    android:textColor="@color/white_1200"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                </com.google.android.material.textview.MaterialTextView>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/signOutConstraintLayout"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/rounded_constraint_layout_background"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/deleteAccountConstraintLayout">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/signOutLabelTextView"

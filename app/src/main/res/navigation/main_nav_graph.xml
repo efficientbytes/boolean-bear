@@ -116,6 +116,11 @@
             app:destination="@id/describeIssueFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/contactUsFragment_to_deleteUserAccountFragment"
+            app:destination="@id/deleteUserAccountFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
@@ -177,4 +182,9 @@
             android:name="ticketId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/deleteUserAccountFragment"
+        android:name="app.efficientbytes.androidnow.ui.fragments.DeleteUserAccountFragment"
+        android:label="Delete Account"
+        tools:layout="@layout/fragment_delete_user_account" />
 </navigation>
