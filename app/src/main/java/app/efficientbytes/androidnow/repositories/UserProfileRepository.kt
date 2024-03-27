@@ -1,24 +1,30 @@
 package app.efficientbytes.androidnow.repositories
 
+import android.util.Log
 import app.efficientbytes.androidnow.database.dao.UserProfileDao
 import app.efficientbytes.androidnow.models.UserProfile
 import app.efficientbytes.androidnow.repositories.models.DataStatus
 import app.efficientbytes.androidnow.services.UserProfileService
 import app.efficientbytes.androidnow.services.models.UserProfilePayload
 import app.efficientbytes.androidnow.utils.USER_PROFILE_DOCUMENT_PATH
+import app.efficientbytes.androidnow.utils.UserProfileListener
 import app.efficientbytes.androidnow.utils.addSnapshotListenerFlow
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class UserProfileRepository(
     private val userProfileService: UserProfileService,
-    private val userProfileDao: UserProfileDao
+    private val userProfileDao: UserProfileDao,
+    private val externalScope: CoroutineScope,
+    private val userProfileListener: UserProfileListener
 ) {
 
     private val tagUserProfileRepository = "User-Profile-Repository"
@@ -101,22 +107,24 @@ class UserProfileRepository(
         userProfileDao.delete()
     }
 
-    suspend fun listenToUserProfileChange(userAccountId: String) = flow {
-        val userProfileSnapshot =
-            Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
-        userProfileSnapshot.addSnapshotListenerFlow().collect {
-            when {
-                it.status == DataStatus.Status.Failed -> {
-                    emit(it)
-                }
+    fun listenToUserProfileChange(userAccountId: String) {
+        externalScope.launch {
+            Log.i(tagUserProfileRepository, "Inside the external scope of user profile rep")
+            val userProfileSnapshot =
+                Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
+            userProfileSnapshot.addSnapshotListenerFlow().collect {
+                when {
+                    it.status == DataStatus.Status.Failed -> {
+                        userProfileListener.postValue(it)
+                    }
 
-                it.status == DataStatus.Status.Success -> {
-                    emit(it)
+                    it.status == DataStatus.Status.Success -> {
+                        userProfileListener.postValue(it)
+                    }
                 }
             }
         }
-    }.catch { emit(DataStatus.failed(it.message.toString())) }
-        .flowOn(Dispatchers.IO)
+    }
 
 
 }
