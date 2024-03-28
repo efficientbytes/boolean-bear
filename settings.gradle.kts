@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android Now"
+rootProject.name = "boolean bear"
 include(":app")
  

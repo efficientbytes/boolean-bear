@@ -9,7 +9,7 @@
 
         <variable
             name="customAuthState"
-            type="app.efficientbytes.androidnow.utils.CustomAuthStateListener" />
+            type="app.efficientbytes.booleanbear.utils.CustomAuthStateListener" />
 
     </data>
 

@@ -9,7 +9,7 @@
 
         <variable
             name="mainViewModel"
-            type="app.efficientbytes.androidnow.viewmodels.MainViewModel" />
+            type="app.efficientbytes.booleanbear.viewmodels.MainViewModel" />
 
     </data>
 

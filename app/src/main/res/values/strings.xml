@@ -1,18 +1,16 @@
 <resources>
-    <string name="app_name">android now</string>
+    <string name="app_name">boolean bear</string>
     <string name="account">Account</string>
     <string name="settings">Settings</string>
     <string name="edit_profile">Edit profile</string>
     <string name="notifications">Notifications</string>
     <string name="share_amp_about"><![CDATA[Share & About]]></string>
-    <string name="about_android_now">About Android Now</string>
     <string name="invite_friends">Invite friends</string>
     <string name="contact_us">Contact us</string>
     <string name="support">Support</string>
     <string name="sign_out">Sign Out</string>
     <string name="it_s_a_pleasure_to_have_you_with_us">It\'s a pleasure to have you with us.</string>
     <string name="login_or_sign_up">Login or Sign Up</string>
-    <string name="android_now">android now</string>
     <string name="login_or_sign_up_to_continue">Login or Sign up to continue</string>
     <string name="enter_your_phone_number">Enter your phone number</string>
     <string name="continue_">Continue</string>
@@ -60,7 +58,7 @@
     <string name="delete_account">Delete account</string>
     <string name="get_in_touch_with_us">Get in touch with us</string>
     <string name="feedback_support"><![CDATA[Feedback & support]]></string>
-    <string name="host_app_ingene_workshops">Host app ingene workshops</string>
+    <string name="host_boolean_bear_workshops">Host boolean bear workshops</string>
     <string name="collaborate">Collaborate</string>
     <string name="share_feedback">Share feedback</string>
     <string name="rate_us">Rate us</string>

@@ -34,7 +34,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_alternates_semibold"
-                android:text="@string/android_now"
+                android:text="@string/app_name"
                 android:textAlignment="center"
                 android:textColor="@color/violet_800"
                 android:textSize="24sp"
