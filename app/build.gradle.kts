@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "app.efficientbytes.androidnow"
+    namespace = "app.efficientbytes.booleanbear"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "app.efficientbytes.androidnow"
+        applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

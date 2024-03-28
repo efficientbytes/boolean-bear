@@ -9,7 +9,7 @@
 
         <variable
             name="course"
-            type="app.efficientbytes.androidnow.models.FeedShortsCourse" />
+            type="app.efficientbytes.booleanbear.models.FeedShortsCourse" />
 
     </data>
 

@@ -6,7 +6,7 @@
     app:startDestination="@id/coursesFragment">
     <fragment
         android:id="@+id/coursesFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.CoursesFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.CoursesFragment"
         android:label="Courses"
         tools:layout="@layout/fragment_courses">
         <action
@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.AccountSettingsFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.AccountSettingsFragment"
         android:label="Account Settings"
         tools:layout="@layout/fragment_account_settings">
         <action
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginOrSignUpFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.LoginOrSignUpFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.LoginOrSignUpFragment"
         android:label="Login or Sign Up"
         tools:layout="@layout/fragment_login_or_sign_up">
         <action
@@ -54,7 +54,7 @@
     </fragment>
     <fragment
         android:id="@+id/OTPVerificationFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.OTPVerificationFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.OTPVerificationFragment"
         android:label="Phone Verification"
         tools:layout="@layout/fragment_o_t_p_verification">
         <action
@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/completeProfileFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.CompleteProfileFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.CompleteProfileFragment"
         android:label="Setup Profile"
         tools:layout="@layout/fragment_complete_profile">
         <argument
@@ -83,7 +83,7 @@
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile">
         <action
@@ -94,7 +94,7 @@
     </fragment>
     <fragment
         android:id="@+id/editProfileFieldFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.EditProfileFieldFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.EditProfileFieldFragment"
         android:label="Edit"
         tools:layout="@layout/fragment_edit_profile_field">
         <argument
@@ -103,7 +103,7 @@
     </fragment>
     <fragment
         android:id="@+id/contactUsFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.ContactUsFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ContactUsFragment"
         android:label="Get in touch"
         tools:layout="@layout/fragment_contact_us">
         <action
@@ -124,12 +124,12 @@
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.ShareFeedbackFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ShareFeedbackFragment"
         android:label="Feedback"
         tools:layout="@layout/fragment_share_feedback" />
     <fragment
         android:id="@+id/describeIssueFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.DescribeIssueFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.DescribeIssueFragment"
         android:label="Report Issue"
         tools:layout="@layout/fragment_describe_issue">
         <action
@@ -140,7 +140,7 @@
     </fragment>
     <fragment
         android:id="@+id/reporterPhoneNumberFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.ReporterPhoneNumberFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ReporterPhoneNumberFragment"
         android:label="Report Issue"
         tools:layout="@layout/fragment_reporter_phone_number">
 
@@ -157,7 +157,7 @@
     </fragment>
     <fragment
         android:id="@+id/verifyReporterFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.VerifyReporterFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.VerifyReporterFragment"
         android:label="Report Issue"
         tools:layout="@layout/fragment_verify_reporter">
         <action
@@ -172,7 +172,7 @@
     </fragment>
     <fragment
         android:id="@+id/reportSubmittedFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.ReportSubmittedFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ReportSubmittedFragment"
         android:label="Report Issue"
         tools:layout="@layout/fragment_report_submitted">
         <argument
@@ -184,7 +184,7 @@
     </fragment>
     <fragment
         android:id="@+id/deleteUserAccountFragment"
-        android:name="app.efficientbytes.androidnow.ui.fragments.DeleteUserAccountFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.DeleteUserAccountFragment"
         android:label="Delete Account"
         tools:layout="@layout/fragment_delete_user_account" />
 </navigation>

@@ -7,7 +7,7 @@
 
         <variable
             name="field"
-            type="app.efficientbytes.androidnow.ui.models.EDIT_PROFILE_FIELD" />
+            type="app.efficientbytes.booleanbear.ui.models.EDIT_PROFILE_FIELD" />
 
         <variable
             name="emailVerified"
@@ -15,7 +15,7 @@
 
         <import type="android.view.View" />
 
-        <import type="app.efficientbytes.androidnow.ui.models.EDIT_PROFILE_FIELD" />
+        <import type="app.efficientbytes.booleanbear.ui.models.EDIT_PROFILE_FIELD" />
 
     </data>
 

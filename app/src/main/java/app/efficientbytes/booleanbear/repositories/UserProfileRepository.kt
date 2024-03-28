@@ -1,0 +1,130 @@
+package app.efficientbytes.booleanbear.repositories
+
+import android.util.Log
+import app.efficientbytes.booleanbear.database.dao.UserProfileDao
+import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.UserProfileService
+import app.efficientbytes.booleanbear.services.models.UserProfilePayload
+import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
+import app.efficientbytes.booleanbear.utils.UserProfileListener
+import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
+
+class UserProfileRepository(
+    private val userProfileService: UserProfileService,
+    private val userProfileDao: UserProfileDao,
+    private val externalScope: CoroutineScope,
+    private val userProfileListener: UserProfileListener
+) {
+
+    private val tagUserProfileRepository = "User-Profile-Repository"
+    val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
+    private val gson = Gson()
+
+    suspend fun getUserProfile(userAccountId: String? = null) = flow {
+        emit(DataStatus.loading())
+        val response = userProfileService.getUserProfile(
+            userAccountId = userAccountId
+        )
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val responseUserProfile = response.body()
+                emit(DataStatus.success(responseUserProfile))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
+        emit(DataStatus.loading())
+        val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val responseUserProfile = response.body()
+                emit(DataStatus.success(responseUserProfile))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
+        emit(DataStatus.loading())
+        val response = userProfileService.updateUserPrivateProfile(userProfile)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val responseUserProfile = response.body()
+                emit(DataStatus.success(responseUserProfile))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: UserProfilePayload = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    UserProfilePayload::class.java
+                )
+                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                emit(DataStatus.failed(message))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    suspend fun saveUserProfile(userProfile: UserProfile) {
+        userProfileDao.insertUserProfile(userProfile)
+    }
+
+    suspend fun deleteUserProfile() {
+        userProfileDao.delete()
+    }
+
+    fun listenToUserProfileChange(userAccountId: String) {
+        externalScope.launch {
+            Log.i(tagUserProfileRepository, "Inside the external scope of user profile rep")
+            val userProfileSnapshot =
+                Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
+            userProfileSnapshot.addSnapshotListenerFlow().collect {
+                when {
+                    it.status == DataStatus.Status.Failed -> {
+                        userProfileListener.postValue(it)
+                    }
+
+                    it.status == DataStatus.Status.Success -> {
+                        userProfileListener.postValue(it)
+                    }
+                }
+            }
+        }
+    }
+
+
+}

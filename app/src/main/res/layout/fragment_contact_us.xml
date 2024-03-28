@@ -9,7 +9,7 @@
 
         <variable
             name="customAuthState"
-            type="app.efficientbytes.androidnow.utils.CustomAuthStateListener" />
+            type="app.efficientbytes.booleanbear.utils.CustomAuthStateListener" />
 
     </data>
 
@@ -57,7 +57,7 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="8dp"
-                android:text="@string/host_app_ingene_workshops"
+                android:text="@string/host_boolean_bear_workshops"
                 android:textAlignment="textStart"
                 android:textColor="@color/white_1200"
                 android:textSize="14sp"
