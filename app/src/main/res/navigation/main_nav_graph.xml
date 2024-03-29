@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/coursesFragment">
+    app:startDestination="@id/homeFragment">
     <fragment
-        android:id="@+id/coursesFragment"
-        android:name="app.efficientbytes.booleanbear.ui.fragments.CoursesFragment"
-        android:label="Courses"
-        tools:layout="@layout/fragment_courses">
+        android:id="@+id/homeFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.HomeFragment"
+        android:label=""
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/coursesFragment_to_accountSettingsFragment"
             app:destination="@id/accountSettingsFragment"
@@ -37,7 +37,7 @@
         tools:layout="@layout/fragment_account_settings">
         <action
             android:id="@+id/accountSettingsFragment_to_coursesFragment"
-            app:destination="@id/coursesFragment"
+            app:destination="@id/homeFragment"
             app:popUpToSaveState="true"
             app:restoreState="true" />
     </fragment>

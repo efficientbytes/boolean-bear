@@ -56,7 +56,7 @@ class ReportSubmittedFragment : Fragment() {
         }
 
         binding.goToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.coursesFragment, false)
+            findNavController().popBackStack(R.id.homeFragment, false)
         }
     }
 

@@ -12,28 +12,26 @@ import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.booleanbear.BR
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.FragmentCoursesBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.database.models.ContentCategory
+import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.ui.adapters.GenericAdapter
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
 import app.efficientbytes.booleanbear.viewmodels.CourseViewModel
-import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 
-class CoursesFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
+class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
 
     private val tagCoursesFragment: String = "View-Byte-Course-Fragment"
-    private lateinit var _binding: FragmentCoursesBinding
+    private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: CourseViewModel by inject()
@@ -49,7 +47,7 @@ class CoursesFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemCl
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCoursesBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         lifecycle.addObserver(viewModel)
@@ -86,7 +84,16 @@ class CoursesFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemCl
         binding.playlistRecyclerView.adapter = homeFragmentChipRecyclerViewAdapter
 
         viewModel.contentCategoriesFromDB.observe(viewLifecycleOwner) {
-            homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0,6))
+            if (it.isNotEmpty()){
+                binding.contentCategoryScrollView.visibility= View.GONE
+                binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
+                binding.playlistRecyclerView.visibility = View.VISIBLE
+                homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0,6))
+            }else{
+                binding.contentCategoryScrollView.visibility= View.VISIBLE
+                binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                binding.playlistRecyclerView.visibility = View.INVISIBLE
+            }
         }
 
         //set contents recycler view

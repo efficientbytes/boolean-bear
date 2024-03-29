@@ -183,7 +183,7 @@ class CompleteProfileFragment : Fragment() {
                             mainViewModel.saveUserProfile(userProfile)
                         }
                     }
-                    findNavController().popBackStack(R.id.coursesFragment, false)
+                    findNavController().popBackStack(R.id.homeFragment, false)
                 }
             }
         }

@@ -118,13 +118,13 @@ class DeleteUserAccountFragment : Fragment() {
                     binding.progressStatusValueTextView.text = it.data?.message
                     lifecycleScope.launch {
                         delay(1200)
-                        findNavController().popBackStack(R.id.coursesFragment, false)
+                        findNavController().popBackStack(R.id.homeFragment, false)
                     }
                 }
             }
         }
         binding.takeMeToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.coursesFragment, false)
+            findNavController().popBackStack(R.id.homeFragment, false)
         }
 
     }
