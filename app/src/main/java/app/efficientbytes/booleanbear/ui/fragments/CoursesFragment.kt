@@ -13,41 +13,37 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.booleanbear.BR
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.ChipCoursesFilterBinding
 import app.efficientbytes.booleanbear.databinding.FragmentCoursesBinding
-import app.efficientbytes.booleanbear.enums.COURSE_CONTENT_TYPE
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.database.models.ContentCategory
 import app.efficientbytes.booleanbear.ui.adapters.GenericAdapter
+import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
 import app.efficientbytes.booleanbear.viewmodels.CourseViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class CoursesFragment : Fragment() {
+class CoursesFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
 
     private val tagCoursesFragment: String = "View-Byte-Course-Fragment"
     private lateinit var _binding: FragmentCoursesBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private var coursesFilterIdMapping: HashMap<Int, String>? = null
     private val viewModel: CourseViewModel by inject()
-    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
     private var sampleList: MutableList<CoursesBanner> = mutableListOf()
     private val handler = Handler(Looper.getMainLooper())
     private var currentPage = 1
     private val DELAY_MS: Long = 3000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
+    private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +53,6 @@ class CoursesFragment : Fragment() {
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         lifecycle.addObserver(viewModel)
-        populateChipGroup()
         return rootView
     }
 
@@ -83,16 +78,18 @@ class CoursesFragment : Fragment() {
                 return false
             }
         }, viewLifecycleOwner)
-        binding.coursesContentTypeFilterChipGroup.setOnCheckedStateChangeListener { group, _ ->
-            val contentType = coursesFilterIdMapping?.get(group.checkedChipId)
-            lifecycleScope.launch(Dispatchers.IO) {
-                contentType?.apply {
-                    viewModel.pullAllShortCourses(
-                        COURSE_CONTENT_TYPE.findContentType(this).getContentType()
-                    )
-                }
-            }
+        //set content category recycler view
+        binding.playlistRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        homeFragmentChipRecyclerViewAdapter =
+            HomeFragmentChipRecyclerViewAdapter(emptyList(), requireContext(), this)
+        binding.playlistRecyclerView.adapter = homeFragmentChipRecyclerViewAdapter
+
+        viewModel.contentCategoriesFromDB.observe(viewLifecycleOwner) {
+            homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0,6))
         }
+
+        //set contents recycler view
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         viewModel.allShortCourses.observe(viewLifecycleOwner) {
             when (it.status) {
@@ -122,22 +119,6 @@ class CoursesFragment : Fragment() {
                     }
                 }
             }
-        }
-    }
-
-    private fun populateChipGroup() {
-        val inflater = LayoutInflater.from(requireContext())
-        val filterList = resources.getStringArray(R.array.array_course_filters)
-        coursesFilterIdMapping = HashMap()
-        var id = 1
-        filterList.forEach {
-            val chipCoursesFilterBinding: ChipCoursesFilterBinding =
-                ChipCoursesFilterBinding.inflate(inflater)
-            chipCoursesFilterBinding.name = it
-            chipCoursesFilterBinding.isChecked = id == 1
-            coursesFilterIdMapping?.set(id, it)
-            chipCoursesFilterBinding.root.id = id++
-            binding.coursesContentTypeFilterChipGroup.addView(chipCoursesFilterBinding.root)
         }
     }
 
@@ -237,6 +218,14 @@ class CoursesFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         handler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onChipItemClick(position: Int, contentCategory: ContentCategory) {
+        //request videos under the specific category
+    }
+
+    override fun onChipLastItemClicked() {
+        //open browse categories fragment
     }
 
 }
