@@ -46,7 +46,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                     }
 
                     false -> {
-                        findNavController().popBackStack(R.id.coursesFragment, false)
+                        findNavController().popBackStack(R.id.homeFragment, false)
                     }
                 }
             }

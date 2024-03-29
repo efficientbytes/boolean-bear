@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
             setOf(
-                R.id.coursesFragment,
+                R.id.homeFragment,
                 R.id.completeProfileFragment,
                 R.id.reportSubmittedFragment
             )
@@ -338,7 +338,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.coursesFragment -> {
+                R.id.homeFragment -> {
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
                     enableToolbarCollapse()

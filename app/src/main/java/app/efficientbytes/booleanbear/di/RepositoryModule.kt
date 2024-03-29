@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.di
 
+import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.CourseRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
@@ -15,4 +16,5 @@ val repositoryModule = module {
     factory { AuthenticationRepository(get(), get(), get(), get(), get(), get()) }
     factory { UtilityDataRepository(get(), get()) }
     factory { FeedbackNSupportRepository(get()) }
+    factory { AssetsRepository(get(), get()) }
 }

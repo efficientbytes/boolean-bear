@@ -13,32 +13,54 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import app.efficientbytes.booleanbear.enums.COURSE_CONTENT_TYPE
+import app.efficientbytes.booleanbear.database.models.ContentCategory
 import app.efficientbytes.booleanbear.models.FeedShortsCourse
+import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.CourseRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 
-class CourseViewModel(private val courseRepository: CourseRepository) : ViewModel(),
+class CourseViewModel(
+    private val courseRepository: CourseRepository,
+    private val assetsRepository: AssetsRepository
+) : ViewModel(),
     LifecycleEventObserver {
 
     private val tagCourseViewModel = "COURSE-VIEW-MODEL"
     private val _allShortCourses: MutableLiveData<DataStatus<List<FeedShortsCourse>>> =
         MutableLiveData()
     val allShortCourses: LiveData<DataStatus<List<FeedShortsCourse>>> = _allShortCourses
-    private var allCoursesJob: Job? = null
 
     suspend fun pullAllShortCourses(contentType: String) {
-        if (allCoursesJob?.isActive == true) {
-            allCoursesJob?.cancelAndJoin()
-        }
-        allCoursesJob = viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             courseRepository.pullShortCourses(contentType).collect {
                 _allShortCourses.postValue(it)
+            }
+        }
+    }
+
+    val contentCategoriesFromDB: LiveData<MutableList<ContentCategory>> =
+        assetsRepository.contentCategoriesFromDB.asLiveData()
+
+    private fun getContentCategories() {
+        viewModelScope.launch(Dispatchers.IO) {
+            assetsRepository.getContentCategories().collect {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+
+                    }
+
+                    DataStatus.Status.Loading -> {
+
+                    }
+
+                    DataStatus.Status.Success -> {
+                        it.data?.let { list -> assetsRepository.saveContentCategories(list.categoryList) }
+                    }
+                }
             }
         }
     }
@@ -46,9 +68,7 @@ class CourseViewModel(private val courseRepository: CourseRepository) : ViewMode
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-                allCoursesJob = viewModelScope.launch {
-                    pullAllShortCourses(COURSE_CONTENT_TYPE.CONCEPT_LEARNING.getContentType())
-                }
+                getContentCategories()
             }
 
             ON_START -> {

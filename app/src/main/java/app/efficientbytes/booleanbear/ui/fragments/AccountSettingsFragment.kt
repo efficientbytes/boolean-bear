@@ -48,11 +48,11 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
 
         binding.loginOrSignUpCardView.setOnClickListener {
             dismiss()
-            findNavController().navigate(R.id.coursesFragment_to_loginOrSignUpFragment)
+            findNavController().navigate(R.id.homeFragment_to_loginOrSignUpFragment)
         }
         binding.accountSettingsCardView.setOnClickListener {
             dismiss()
-            findNavController().navigate(R.id.coursesFragment_to_editProfileFragment)
+            findNavController().navigate(R.id.homeFragment_to_editProfileFragment)
         }
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
@@ -67,7 +67,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         }
         binding.getInTouchWithUsCardView.setOnClickListener {
             dismiss()
-            findNavController().navigate(R.id.coursesFragment_to_contactUsFragment)
+            findNavController().navigate(R.id.homeFragment_to_contactUsFragment)
         }
     }
 

@@ -16,3 +16,5 @@ fun provideUserProfileDao(database: AppDatabase) = database.userProfileDa()
 fun provideAuthenticationDao(database: AppDatabase) = database.authenticationDao()
 
 fun provideUtilityDataDao(database: AppDatabase) = database.utilityDao()
+
+fun provideAssetsDao(database: AppDatabase) = database.assetsDao()

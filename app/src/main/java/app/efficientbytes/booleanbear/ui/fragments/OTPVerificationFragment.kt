@@ -188,7 +188,7 @@ class OTPVerificationFragment : Fragment() {
                                 profileUpdated?.let { profileUpdated ->
                                     if (profileUpdated) {
                                         findNavController().popBackStack(
-                                            R.id.coursesFragment,
+                                            R.id.homeFragment,
                                             false
                                         )
                                     } else {
@@ -215,7 +215,7 @@ class OTPVerificationFragment : Fragment() {
             }
         }
         binding.takeMeToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.coursesFragment, false)
+            findNavController().popBackStack(R.id.homeFragment, false)
         }
         binding.resendOtpChip.setOnClickListener {
             viewModel.sendOTPToPhoneNumber(phoneNumber)

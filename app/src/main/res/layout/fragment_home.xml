@@ -64,30 +64,55 @@
                 android:layout_height="wrap_content">
 
                 <HorizontalScrollView
-                    android:id="@+id/coursesContentTypeHorizontalView"
+                    android:id="@+id/contentCategoryScrollView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
-                    android:scrollIndicators="none"
-                    android:scrollbars="none"
+                    android:visibility="visible"
+                    android:scrollbars="horizontal"
+                    android:scrollbarSize="0dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/coursesContentTypeFilterChipGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="10dp"
-                        app:chipSpacingHorizontal="8dp"
-                        app:selectionRequired="true"
-                        app:singleLine="true"
-                        app:singleSelection="true">
+                        <LinearLayout
+                            android:id="@+id/contentCategoryShimmerLinearLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/md_theme_background"
+                            android:orientation="horizontal">
 
-                    </com.google.android.material.chip.ChipGroup>
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                            <include layout="@layout/shimmer_cell_chip_categories" />
+
+                        </LinearLayout>
 
                 </HorizontalScrollView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/playlistRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="8dp"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    tools:listitem="@layout/cell_chip_categories"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView"
@@ -97,7 +122,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/coursesContentTypeHorizontalView"
+                    app:layout_constraintTop_toBottomOf="@id/playlistRecyclerView"
                     tools:listitem="@layout/recycler_view_item_short_courses">
 
                 </androidx.recyclerview.widget.RecyclerView>
@@ -111,7 +136,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/coursesContentTypeHorizontalView">
+                    app:layout_constraintTop_toBottomOf="@id/playlistRecyclerView">
 
                     <com.facebook.shimmer.ShimmerFrameLayout
                         android:id="@+id/shimmerLayout"

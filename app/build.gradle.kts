@@ -89,5 +89,7 @@ dependencies {
     //rate us play store
     implementation("com.google.android.play:review:2.0.1")
     implementation("com.google.android.play:review-ktx:2.0.1")
+    //recycler view (latest for state restoration)
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
 
 }

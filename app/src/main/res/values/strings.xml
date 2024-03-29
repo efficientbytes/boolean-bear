@@ -91,5 +91,6 @@
     <string name="you_will_stop_receiving_personalized_newsletters">You will stop receiving personalized newsletters.</string>
     <string name="confirm_deletion">Confirm Deletion</string>
     <string name="to_confirm_your_action_type_delete">To confirm your action, type \"DELETE\".</string>
+    <string name="explore_categories">Explore Categories</string>
 
 </resources>
