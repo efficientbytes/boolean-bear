@@ -9,4 +9,5 @@ val databaseModule = module {
     single { provideUserProfileDao(get()) }
     single { provideAuthenticationDao(get()) }
     single { provideUtilityDataDao(get()) }
+    single { provideAssetsDao(get()) }
 }
