@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.di
 
+import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.AuthenticationService
 import app.efficientbytes.booleanbear.services.CoursesService
 import app.efficientbytes.booleanbear.services.FeedbackNSupportService
@@ -36,3 +37,6 @@ fun provideUtilityService(retrofit: Retrofit): UtilityDataService =
 
 fun provideFeedbackNSupportService(retrofit: Retrofit): FeedbackNSupportService =
     retrofit.create(FeedbackNSupportService::class.java)
+
+fun provideAssetsService(retrofit: Retrofit): AssetsService =
+    retrofit.create(AssetsService::class.java)
