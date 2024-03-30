@@ -24,6 +24,7 @@ import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val serviceError: ServiceError by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,19 +83,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setUpLiveDataObserver() {
-        viewModel.userProfile.observe(this) {
+        viewModel.listenToUserProfileFromDB.observe(this) { userProfile ->
+            userProfile?.let {
+                SingletonUserData.setInstance(it)
+            }
+        }
+        userProfileListener.userProfile.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    if (connectivityListener.isInternetAvailable()) {
-                        val snackBar = Snackbar.make(
-                            binding.mainCoordinatorLayout,
-                            "Failed to download latest user profile.",
-                            Snackbar.LENGTH_LONG
-                        )
-                        snackBar.setBackgroundTint(Color.parseColor("#B00020"))
-                        snackBar.setTextColor(Color.parseColor("#FFFFFF"))
-                        snackBar.show()
-                    }
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        it.message.toString(),
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
                 }
 
                 DataStatus.Status.Loading -> {
@@ -101,11 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 DataStatus.Status.Success -> {
-                    it.data?.let { userProfilePayload ->
-                        userProfilePayload.userProfile?.let { userProfile ->
-                            viewModel.saveUserProfile(userProfile)
-                            SingletonUserData.setInstance(userProfile)
-                        }
+                    it.data?.let { userProfile ->
+                        viewModel.saveUserProfile(userProfile)
                     }
                 }
             }
@@ -114,8 +114,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it.let {
                 when (it) {
                     true -> {
-                        viewModel.getUserProfile()
                         FirebaseAuth.getInstance().currentUser?.let { user ->
+                            userProfileRepository.getUserProfile(user.uid)
                             viewModel.getSingleDeviceLogin(user.uid)
                             userProfileRepository.listenToUserProfileChange(user.uid)
                             authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
@@ -131,21 +131,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        userProfileListener.liveData.observe(this) {
+        userProfileListener.userProfileListener.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    Log.i(tagMainActivity, "User profile is null")
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        it.message.toString(),
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
                 }
 
                 DataStatus.Status.Success -> {
                     Log.i(tagMainActivity, "User profile has been modified")
-                    viewModel.getUserProfile()
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    currentUser?.let { user ->
+                        userProfileRepository.getUserProfile(user.uid)
+                    }
                     viewModel.getFirebaseUserToken()
                 }
 
                 DataStatus.Status.Loading -> {
 
                 }
+            }
+        }
+        serviceError.liveData.observe(this) { errorMessage ->
+            errorMessage?.let {
+                val snackBar = Snackbar.make(
+                    binding.mainCoordinatorLayout,
+                    it, Snackbar.LENGTH_LONG
+                )
+                snackBar.show()
             }
         }
         viewModel.singleDeviceLoginFromDB.observe(this) {
@@ -300,7 +317,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         networkNotAvailableAtAppLoading = false
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
-                            viewModel.getUserProfile()
                             viewModel.getSingleDeviceLogin(currentUser.uid)
                         }
                     }

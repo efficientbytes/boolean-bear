@@ -4,6 +4,7 @@ import android.app.Application
 import app.efficientbytes.booleanbear.di.appModule
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
+import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -14,6 +15,7 @@ class MainApplication : Application() {
 
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
+    private val utilityDataRepository: UtilityDataRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -23,6 +25,9 @@ class MainApplication : Application() {
             androidContext(this@MainApplication)
             modules(appModule)
         }
+
+        utilityDataRepository.getProfessionAdapterList()
+        utilityDataRepository.getIssueCategoryAdapterList()
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()

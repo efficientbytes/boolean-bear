@@ -1,11 +1,14 @@
 package app.efficientbytes.booleanbear.utils
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -122,11 +125,18 @@ fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
 
 object UserProfileListener {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<DocumentSnapshot?>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<DocumentSnapshot?>> = _mutableLiveData
+    private val _userProfileListener: MutableLiveData<DataStatus<DocumentSnapshot?>> =
+        MutableLiveData()
+    val userProfileListener: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileListener
+    private val _userProfile: MutableLiveData<DataStatus<UserProfile?>> = MutableLiveData()
+    val userProfile: LiveData<DataStatus<UserProfile?>> = _userProfile
 
-    fun postValue(value: DataStatus<DocumentSnapshot?>) {
-        _mutableLiveData.postValue(value)
+    fun postLatestValue(value: DataStatus<DocumentSnapshot?>) {
+        _userProfileListener.postValue(value)
+    }
+
+    fun postValue(value: DataStatus<UserProfile?>) {
+        _userProfile.postValue(value)
     }
 
 }
@@ -144,11 +154,13 @@ object SingleDeviceLoginListener {
 
 object AuthStateCoroutineScope {
 
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Log.i("Auth Scope", exception.message.toString())
+    }
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
     fun getScope() = scope
 }
-
 
 object CustomAuthStateListener {
 
@@ -159,4 +171,25 @@ object CustomAuthStateListener {
         _mutableLiveData.postValue(value)
     }
 
+}
+
+object ServiceError {
+
+    private val _mutableLiveData: MutableLiveData<String> = MutableLiveData()
+    val liveData: LiveData<String> = _mutableLiveData
+
+    fun postValue(value: String) {
+        _mutableLiveData.postValue(value)
+    }
+
+}
+
+object UtilityCoroutineScope {
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        Log.i("Utility Scope", exception.message.toString())
+    }
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+
+    fun getScope() = scope
 }

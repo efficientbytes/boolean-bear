@@ -97,16 +97,20 @@ class AuthenticationRepository(
             val singleDeviceLoginSnapshot =
                 Firebase.firestore.collection(SINGLE_DEVICE_LOGIN_DOCUMENT_PATH)
                     .document(userAccountId)
-            singleDeviceLoginSnapshot.addSnapshotListenerFlow().collect {
-                when {
-                    it.status == DataStatus.Status.Failed -> {
-                        singleDeviceLoginListener.postValue(it)
-                    }
+            try {
+                singleDeviceLoginSnapshot.addSnapshotListenerFlow().collect {
+                    when {
+                        it.status == DataStatus.Status.Failed -> {
+                            singleDeviceLoginListener.postValue(it)
+                        }
 
-                    it.status == DataStatus.Status.Success -> {
-                        singleDeviceLoginListener.postValue(it)
+                        it.status == DataStatus.Status.Success -> {
+                            singleDeviceLoginListener.postValue(it)
+                        }
                     }
                 }
+            } catch (exception: Exception) {
+                singleDeviceLoginListener.postValue(DataStatus.failed(exception.message.toString()))
             }
         }
     }
@@ -134,10 +138,13 @@ class AuthenticationRepository(
 
     fun listenForAuthStateChanges() {
         authStateCoroutineScope.getScope().launch {
-            val auth = FirebaseAuth.getInstance()
-            auth.authStateFlow().collect { authState ->
-                Log.i(tagAuthenticationRepository, "Auth State is : $authState")
-                customAuthStateListener.postValue(authState is AuthState.Authenticated)
+            try {
+                val auth = FirebaseAuth.getInstance()
+                auth.authStateFlow().collect { authState ->
+                    Log.i(tagAuthenticationRepository, "Auth State is : $authState")
+                    customAuthStateListener.postValue(authState is AuthState.Authenticated)
+                }
+            } catch (exception: Exception) {
             }
         }
     }

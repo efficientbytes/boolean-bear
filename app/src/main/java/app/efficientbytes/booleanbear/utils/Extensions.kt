@@ -48,7 +48,7 @@ fun DocumentReference.addSnapshotListenerFlow(): Flow<DataStatus<DocumentSnapsho
                 trySend(DataStatus.success(snapshot))
             } else {
                 Log.i("Snapshot listener", "Document does not exist")
-                trySend(DataStatus.failed("User profile does not exist"))
+                trySend(DataStatus.failed("Failed to sync user account details..."))
             }
         }
         awaitClose {
