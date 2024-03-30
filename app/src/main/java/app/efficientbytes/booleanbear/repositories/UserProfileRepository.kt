@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class UserProfileRepository(
     private val userProfileService: UserProfileService,
@@ -34,26 +35,30 @@ class UserProfileRepository(
     fun getUserProfile(userAccountId: String) {
         userProfileListener.postLatestValue(DataStatus.loading())
         externalScope.launch {
-            val response = userProfileService.getUserProfile(
-                userAccountId = userAccountId
-            )
-            val responseCode = response.code()
-            when {
-                responseCode == 200 -> {
-                    val responseUserProfile = response.body()
-                    responseUserProfile?.let { userProfilePayload ->
-                        userProfileListener.postValue(DataStatus.success(userProfilePayload.userProfile))
+            val response: Response<UserProfilePayload>
+            try {
+                response = userProfileService.getUserProfile(userAccountId = userAccountId)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val responseUserProfile = response.body()
+                        responseUserProfile?.let { userProfilePayload ->
+                            userProfileListener.postValue(DataStatus.success(userProfilePayload.userProfile))
+                        }
+                    }
+
+                    responseCode >= 400 -> {
+                        val errorResponse: UserProfilePayload = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            UserProfilePayload::class.java
+                        )
+                        val message =
+                            "Error Code $responseCode. ${errorResponse.message.toString()}"
+                        userProfileListener.postValue(DataStatus.failed(message))
                     }
                 }
-
-                responseCode >= 400 -> {
-                    val errorResponse: UserProfilePayload = gson.fromJson(
-                        response.errorBody()!!.string(),
-                        UserProfilePayload::class.java
-                    )
-                    val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
-                    userProfileListener.postValue(DataStatus.failed(message))
-                }
+            } catch (exception: Exception) {
+                userProfileListener.postValue(DataStatus.failed(exception.message.toString()))
             }
         }
     }
@@ -115,16 +120,20 @@ class UserProfileRepository(
             Log.i(tagUserProfileRepository, "Inside the external scope of user profile rep")
             val userProfileSnapshot =
                 Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
-            userProfileSnapshot.addSnapshotListenerFlow().collect {
-                when {
-                    it.status == DataStatus.Status.Failed -> {
-                        userProfileListener.postLatestValue(it)
-                    }
+            try {
+                userProfileSnapshot.addSnapshotListenerFlow().collect {
+                    when {
+                        it.status == DataStatus.Status.Failed -> {
+                            userProfileListener.postLatestValue(it)
+                        }
 
-                    it.status == DataStatus.Status.Success -> {
-                        userProfileListener.postLatestValue(it)
+                        it.status == DataStatus.Status.Success -> {
+                            userProfileListener.postLatestValue(it)
+                        }
                     }
                 }
+            } catch (exception: Exception) {
+                userProfileListener.postLatestValue(DataStatus.failed(exception.message.toString()))
             }
         }
     }

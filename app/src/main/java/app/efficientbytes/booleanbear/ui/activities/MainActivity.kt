@@ -24,6 +24,7 @@ import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val serviceError: ServiceError by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,7 +91,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userProfileListener.userProfile.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        it.message.toString(),
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
                 }
 
                 DataStatus.Status.Loading -> {
@@ -127,7 +134,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userProfileListener.userProfileListener.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    Log.i(tagMainActivity, "User profile is null")
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                        it.message.toString(),
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
                 }
 
                 DataStatus.Status.Success -> {
@@ -142,6 +154,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Loading -> {
 
                 }
+            }
+        }
+        serviceError.liveData.observe(this) { errorMessage ->
+            errorMessage?.let {
+                val snackBar = Snackbar.make(
+                    binding.mainCoordinatorLayout,
+                    it, Snackbar.LENGTH_LONG
+                )
+                snackBar.show()
             }
         }
         viewModel.singleDeviceLoginFromDB.observe(this) {

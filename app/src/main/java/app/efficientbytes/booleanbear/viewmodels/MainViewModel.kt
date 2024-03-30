@@ -34,7 +34,6 @@ import app.efficientbytes.booleanbear.services.models.Profession
 import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
 import app.efficientbytes.booleanbear.services.models.SignInToken
-import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -179,54 +178,8 @@ class MainViewModel(
 
     val professionAdapterList: LiveData<MutableList<Profession>> =
         utilityDataRepository.professionAdapterListFromDB.asLiveData()
-
-    private fun getProfessionAdapterList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            utilityDataRepository.getProfessionAdapterList().collect {
-                when (it.status) {
-                    DataStatus.Status.Failed -> {
-
-                    }
-
-                    DataStatus.Status.Loading -> {
-
-                    }
-
-                    DataStatus.Status.Success -> {
-                        it.data?.let { list -> utilityDataRepository.saveProfessionAdapterList(list) }
-                    }
-                }
-            }
-        }
-    }
-
     val issueCategoryAdapterList: LiveData<MutableList<IssueCategory>> =
         utilityDataRepository.issueCategoryAdapterListFromDB.asLiveData()
-
-    private fun getIssueCategoryAdapterList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            utilityDataRepository.getIssueCategoryAdapterList().collect {
-                when (it.status) {
-                    DataStatus.Status.Failed -> {
-
-                    }
-
-                    DataStatus.Status.Loading -> {
-
-                    }
-
-                    DataStatus.Status.Success -> {
-                        it.data?.let { list ->
-                            utilityDataRepository.saveIssueCategoryAdapterList(
-                                list
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
         MutableLiveData()
     val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
@@ -282,8 +235,6 @@ class MainViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-                getProfessionAdapterList()
-                getIssueCategoryAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
