@@ -355,16 +355,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.homeFragment -> {
+                    binding.toolbarAppImageView.visibility = View.VISIBLE
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
-                    enableToolbarCollapse()
                 }
-
-                R.id.accountSettingsFragment -> {
-                    preventToolbarCollapse()
-                }
-
                 else -> {
+                    binding.toolbarAppImageView.visibility = View.GONE
                     binding.mainToolbar.visibility = View.VISIBLE
                 }
             }
