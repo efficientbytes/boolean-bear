@@ -105,18 +105,6 @@ class MainViewModel(
     }
 
     val listenToUserProfileFromDB = userProfileRepository.userProfile.asLiveData()
-    private val _userProfile: MutableLiveData<DataStatus<UserProfilePayload?>> = MutableLiveData()
-    val userProfile: LiveData<DataStatus<UserProfilePayload?>> = _userProfile
-
-    fun getUserProfile() {
-        viewModelScope.launch(Dispatchers.IO) {
-            auth.currentUser?.let { firebaseUser ->
-                userProfileRepository.getUserProfile(firebaseUser.uid).collect {
-                    _userProfile.postValue(it)
-                }
-            }
-        }
-    }
 
     fun saveUserProfile(userProfile: UserProfile) {
         viewModelScope.launch(Dispatchers.IO) {

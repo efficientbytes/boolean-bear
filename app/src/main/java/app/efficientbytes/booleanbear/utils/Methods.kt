@@ -3,6 +3,7 @@ package app.efficientbytes.booleanbear.utils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.DocumentSnapshot
@@ -122,11 +123,18 @@ fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
 
 object UserProfileListener {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<DocumentSnapshot?>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<DocumentSnapshot?>> = _mutableLiveData
+    private val _userProfileListener: MutableLiveData<DataStatus<DocumentSnapshot?>> =
+        MutableLiveData()
+    val userProfileListener: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileListener
+    private val _userProfile: MutableLiveData<DataStatus<UserProfile?>> = MutableLiveData()
+    val userProfile: LiveData<DataStatus<UserProfile?>> = _userProfile
 
-    fun postValue(value: DataStatus<DocumentSnapshot?>) {
-        _mutableLiveData.postValue(value)
+    fun postLatestValue(value: DataStatus<DocumentSnapshot?>) {
+        _userProfileListener.postValue(value)
+    }
+
+    fun postValue(value: DataStatus<UserProfile?>) {
+        _userProfile.postValue(value)
     }
 
 }
@@ -148,7 +156,6 @@ object AuthStateCoroutineScope {
 
     fun getScope() = scope
 }
-
 
 object CustomAuthStateListener {
 

@@ -31,29 +31,32 @@ class UserProfileRepository(
     val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
     private val gson = Gson()
 
-    suspend fun getUserProfile(userAccountId: String? = null) = flow {
-        emit(DataStatus.loading())
-        val response = userProfileService.getUserProfile(
-            userAccountId = userAccountId
-        )
-        val responseCode = response.code()
-        when {
-            responseCode == 200 -> {
-                val responseUserProfile = response.body()
-                emit(DataStatus.success(responseUserProfile))
-            }
+    fun getUserProfile(userAccountId: String) {
+        userProfileListener.postLatestValue(DataStatus.loading())
+        externalScope.launch {
+            val response = userProfileService.getUserProfile(
+                userAccountId = userAccountId
+            )
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val responseUserProfile = response.body()
+                    responseUserProfile?.let { userProfilePayload ->
+                        userProfileListener.postValue(DataStatus.success(userProfilePayload.userProfile))
+                    }
+                }
 
-            responseCode >= 400 -> {
-                val errorResponse: UserProfilePayload = gson.fromJson(
-                    response.errorBody()!!.string(),
-                    UserProfilePayload::class.java
-                )
-                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
-                emit(DataStatus.failed(message))
+                responseCode >= 400 -> {
+                    val errorResponse: UserProfilePayload = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        UserProfilePayload::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
+                    userProfileListener.postValue(DataStatus.failed(message))
+                }
             }
         }
-    }.catch { emit(DataStatus.failed(it.message.toString())) }
-        .flowOn(Dispatchers.IO)
+    }
 
     suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
         emit(DataStatus.loading())
@@ -115,11 +118,11 @@ class UserProfileRepository(
             userProfileSnapshot.addSnapshotListenerFlow().collect {
                 when {
                     it.status == DataStatus.Status.Failed -> {
-                        userProfileListener.postValue(it)
+                        userProfileListener.postLatestValue(it)
                     }
 
                     it.status == DataStatus.Status.Success -> {
-                        userProfileListener.postValue(it)
+                        userProfileListener.postLatestValue(it)
                     }
                 }
             }
