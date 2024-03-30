@@ -168,6 +168,7 @@ class CompleteProfileFragment : Fragment() {
 
                 DataStatus.Status.Loading -> {
                     binding.submitButton.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = "Updating your profile..."
