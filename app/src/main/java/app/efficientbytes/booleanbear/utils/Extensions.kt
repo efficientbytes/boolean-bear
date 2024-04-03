@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.utils
 
-import android.util.Log
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import com.google.firebase.auth.FirebaseAuth
@@ -14,10 +13,8 @@ fun FirebaseAuth.authStateFlow(): Flow<AuthState> = callbackFlow {
     val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
         val user = firebaseAuth.currentUser
         if (user != null) {
-            Log.i("Extension - Firebase Auth", "Current User is : ${user.uid}")
             trySend(AuthState.Authenticated).isSuccess
         } else {
-            Log.i("Extension - Firebase Auth", "No user is signed in.")
             trySend(AuthState.Unauthenticated).isFailure
         }
     }
@@ -31,24 +28,12 @@ fun DocumentReference.addSnapshotListenerFlow(): Flow<DataStatus<DocumentSnapsho
     callbackFlow {
         val listener = addSnapshotListener { snapshot, exception ->
             if (exception != null) {
-                Log.i(
-                    "Snapshot listener",
-                    "Exception occurred,${exception.localizedMessage}"
-                )
                 trySend(DataStatus.failed(exception.message.toString()))
                 return@addSnapshotListener
             }
 
             if (snapshot != null && snapshot.exists() && !snapshot.metadata.isFromCache) {
-                // The document has data
-                Log.i(
-                    "Snapshot listener",
-                    "User profile updated."
-                )
                 trySend(DataStatus.success(snapshot))
-            } else {
-                Log.i("Snapshot listener", "Document does not exist")
-                trySend(DataStatus.failed("Failed to sync user account details..."))
             }
         }
         awaitClose {

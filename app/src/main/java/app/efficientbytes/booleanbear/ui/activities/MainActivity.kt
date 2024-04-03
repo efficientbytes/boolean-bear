@@ -142,7 +142,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 DataStatus.Status.Success -> {
-                    Log.i(tagMainActivity, "User profile has been modified")
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     currentUser?.let { user ->
                         userProfileRepository.getUserProfile(user.uid)
@@ -250,15 +249,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     val calendar: Calendar = Calendar.getInstance()
                     val now: Long = calendar.timeInMillis
-                    Log.i(
-                        tagMainActivity, "Server time is ${
-                            it.data?.let { it1 ->
-                                formatMillisecondToDateString(
-                                    it1
-                                )
-                            }
-                        }"
-                    )
                     it.data?.let { serverTime ->
                         if ((serverTime - now).absoluteValue > 300000) {
                             MaterialAlertDialogBuilder(

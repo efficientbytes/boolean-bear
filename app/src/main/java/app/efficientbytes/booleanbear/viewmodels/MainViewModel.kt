@@ -96,7 +96,6 @@ class MainViewModel(
             currentUser?.let {
                 it.getIdToken(true)
                     .addOnSuccessListener { result ->
-                        Log.i(tagMainViewModel, "User claims is  ${result.claims}")
                         _firebaseUserToken.postValue(DataStatus.success(result))
                     }
             }
@@ -245,7 +244,6 @@ class MainViewModel(
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     _isUserSignedIn.postValue(DataStatus.success(true))
-                    Log.i(tagMainViewModel, "User profile uid is ${currentUser.uid}")
                 } else {
                     _isUserSignedIn.postValue(DataStatus.success(false))
                 }

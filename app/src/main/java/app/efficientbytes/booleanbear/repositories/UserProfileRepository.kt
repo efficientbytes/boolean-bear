@@ -117,7 +117,6 @@ class UserProfileRepository(
 
     fun listenToUserProfileChange(userAccountId: String) {
         externalScope.launch {
-            Log.i(tagUserProfileRepository, "Inside the external scope of user profile rep")
             val userProfileSnapshot =
                 Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
             try {
