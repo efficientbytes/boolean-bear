@@ -34,5 +34,5 @@ fun provideAuthStateCoroutineScope() = AuthStateCoroutineScope
 fun provideCustomAuthStateListener() = CustomAuthStateListener
 
 fun provideServiceError() = ServiceError
-fun provideUtilityCoroutineScope() = UtilityCoroutineScope
 
+fun provideUtilityCoroutineScope() = UtilityCoroutineScope

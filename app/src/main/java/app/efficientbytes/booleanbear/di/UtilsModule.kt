@@ -6,7 +6,7 @@ import org.koin.dsl.module
 val utilsModule = module {
     single { provideConnectivityListener(androidContext()) }
     single { provideReviewManager(androidContext()) }
-    single { provideIOCoroutineScope() }
+    factory { provideIOCoroutineScope() }
     single { provideUserProfileListener() }
     single { provideSingleDeviceLoginListener() }
     single { provideAuthStateCoroutineScope() }

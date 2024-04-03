@@ -2,7 +2,6 @@ package app.efficientbytes.booleanbear.di
 
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.AuthenticationService
-import app.efficientbytes.booleanbear.services.CoursesService
 import app.efficientbytes.booleanbear.services.FeedbackNSupportService
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.UtilityDataService
@@ -19,9 +18,6 @@ fun provideMoshi(): Moshi = Moshi.Builder().build()
 fun provideRetrofit(baseUrl: String, moshi: Moshi): Retrofit =
     Retrofit.Builder().addConverterFactory(MoshiConverterFactory.create(moshi)).baseUrl(baseUrl)
         .build()
-
-fun provideCoursesService(retrofit: Retrofit): CoursesService =
-    retrofit.create(CoursesService::class.java)
 
 fun provideVerificationService(retrofit: Retrofit): VerificationService =
     retrofit.create(VerificationService::class.java)
