@@ -6,20 +6,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import app.efficientbytes.booleanbear.R
+import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.databinding.CellChipCategoriesBinding
 import app.efficientbytes.booleanbear.databinding.CellChipCategoriesFooterBinding
-import app.efficientbytes.booleanbear.database.models.ContentCategory
 
 class HomeFragmentChipRecyclerViewAdapter(
-    private var itemList: List<ContentCategory>,
+    private var itemList: List<ShuffledCategory>,
     private var context: Context,
     private val itemClickListener: OnItemClickListener
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var checkedPosition = 0
-
-    fun setContentCategories(itemList: List<ContentCategory>) {
+    var checkedPosition = 0
+    fun setContentCategories(itemList: List<ShuffledCategory>) {
         this.itemList = emptyList()
         this.itemList = itemList
         notifyDataSetChanged()
@@ -52,7 +51,7 @@ class HomeFragmentChipRecyclerViewAdapter(
     inner class ItemViewHolder(private val binding: CellChipCategoriesBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ContentCategory) {
+        fun bind(item: ShuffledCategory) {
             if (checkedPosition != -1) {
                 if (checkedPosition == bindingAdapterPosition) {
                     binding.chipCardView.strokeWidth = 0
@@ -60,7 +59,8 @@ class HomeFragmentChipRecyclerViewAdapter(
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.white))
                 } else {
                     binding.chipCardView.strokeWidth = 2
-                    binding.chipCardView.strokeColor = context.getColor(R.color.md_theme_surfaceVariant)
+                    binding.chipCardView.strokeColor =
+                        context.getColor(R.color.md_theme_surfaceVariant)
                     binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
                 }
@@ -92,7 +92,7 @@ class HomeFragmentChipRecyclerViewAdapter(
 
     interface OnItemClickListener {
 
-        fun onChipItemClick(position: Int, contentCategory: ContentCategory)
+        fun onChipItemClick(position: Int, shuffledCategory: ShuffledCategory)
         fun onChipLastItemClicked()
     }
 
