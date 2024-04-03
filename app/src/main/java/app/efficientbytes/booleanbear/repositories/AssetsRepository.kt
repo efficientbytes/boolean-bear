@@ -6,7 +6,7 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
 import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
-import app.efficientbytes.booleanbear.services.models.ShuffledContentIds
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
 import com.google.gson.Gson
@@ -82,9 +82,9 @@ class AssetsRepository(
             }
 
             responseCode >= 400 -> {
-                val errorResponse: ShuffledContentIds = gson.fromJson(
+                val errorResponse: ShuffledCategoryContentIds = gson.fromJson(
                     response.errorBody()!!.string(),
-                    ShuffledContentIds::class.java
+                    ShuffledCategoryContentIds::class.java
                 )
                 emit(DataStatus.failed(errorResponse.message))
             }

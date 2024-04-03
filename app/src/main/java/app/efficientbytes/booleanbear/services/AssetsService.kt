@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
-import app.efficientbytes.booleanbear.services.models.ShuffledContentIds
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
 import retrofit2.Response
 import retrofit2.http.GET
@@ -18,7 +18,7 @@ interface AssetsService {
     @GET("categories/shuffled/{categoryId}")
     suspend fun getContentIdsUnderShuffledCategoryForCategoryId(
         @Path("categoryId") categoryId: String
-    ): Response<ShuffledContentIds>
+    ): Response<ShuffledCategoryContentIds>
 
     @GET("contents/{contentId}")
     suspend fun getYoutubeTypeContentForContentId(
