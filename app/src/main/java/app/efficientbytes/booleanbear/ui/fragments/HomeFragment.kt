@@ -31,7 +31,6 @@ import org.koin.android.ext.android.inject
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
 
-    private val tagCoursesFragment: String = "Home-Fragment"
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
@@ -76,7 +75,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         val accountSettingsFragment = AccountSettingsFragment()
                         accountSettingsFragment.show(
                             parentFragmentManager,
-                            AccountSettingsFragment.tagAccountSettings
+                            AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
                         )
                         return true
                     }

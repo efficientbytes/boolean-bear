@@ -25,7 +25,6 @@ class AssetsRepository(
     private val externalScope: CoroutineScope
 ) {
 
-    private val tagAssetsRepository = "Assets-Repository"
     private val gson = Gson()
     val categoriesFromDB: Flow<MutableList<ShuffledCategory>> =
         assetsDao.getShuffledCategories()

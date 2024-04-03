@@ -18,7 +18,6 @@ import org.koin.android.ext.android.inject
 
 class ContactUsFragment : Fragment() {
 
-    private val tagContactUFragment = "Contact-Us-Fragment"
     private lateinit var _binding: FragmentContactUsBinding
     private val binding get() = _binding
     private lateinit var rootView: View

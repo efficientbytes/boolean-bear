@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class ShareFeedbackViewModel(private val feedbackNSupportRepository: FeedbackNSupportRepository) :
     ViewModel() {
 
-    private val tagShareFeedbackViewModel = "Share-feedback-view-model"
     private val _feedbackUploadStatus: MutableLiveData<DataStatus<Feedback?>> =
         MutableLiveData()
     val feedbackUploadStatus: LiveData<DataStatus<Feedback?>> = _feedbackUploadStatus

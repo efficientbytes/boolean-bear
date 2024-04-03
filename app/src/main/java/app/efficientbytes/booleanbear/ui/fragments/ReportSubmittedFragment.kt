@@ -15,7 +15,6 @@ import app.efficientbytes.booleanbear.databinding.FragmentReportSubmittedBinding
 
 class ReportSubmittedFragment : Fragment() {
 
-    private val tagEditProfileFieldFragment = "Report-Submitted-Fragment"
     private lateinit var _binding: FragmentReportSubmittedBinding
     private val binding get() = _binding
     private lateinit var rootView: View

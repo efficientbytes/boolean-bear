@@ -24,7 +24,6 @@ import java.util.Locale
 
 class CompleteProfileFragment : Fragment() {
 
-    private val tagCompleteProfileFragment: String = "Complete-Profile-Fragment"
     private lateinit var _binding: FragmentCompleteProfileBinding
     private val binding get() = _binding
     private lateinit var rootView: View

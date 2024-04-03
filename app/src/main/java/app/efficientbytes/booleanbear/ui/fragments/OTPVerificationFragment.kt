@@ -21,7 +21,6 @@ import org.koin.android.ext.android.inject
 
 class OTPVerificationFragment : Fragment() {
 
-    private val tagOTPVerification: String = "OTP-Verification-Fragment"
     private lateinit var _binding: FragmentOTPVerificationBinding
     private val binding get() = _binding
     private lateinit var rootView: View

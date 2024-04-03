@@ -20,7 +20,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
 
     companion object {
 
-        val tagAccountSettings: String = "Account-Settings-Fragment"
+        const val ACCOUNT_SETTINGS_FRAGMENT: String = "frag-account-settings"
     }
 
     private lateinit var _binding: FragmentAccountSettingsBinding

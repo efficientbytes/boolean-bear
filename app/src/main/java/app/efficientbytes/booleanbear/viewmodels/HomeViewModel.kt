@@ -33,7 +33,6 @@ class HomeViewModel(
 ) : ViewModel(),
     LifecycleEventObserver {
 
-    private val tagCourseViewModel = "Home-ViewModel"
     val contentCategoriesFromDB: LiveData<MutableList<ShuffledCategory>> =
         assetsRepository.categoriesFromDB.asLiveData()
 

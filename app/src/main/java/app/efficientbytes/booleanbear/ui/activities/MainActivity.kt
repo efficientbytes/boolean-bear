@@ -42,7 +42,6 @@ import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val tagMainActivity: String = "Main-Activity"
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy {
         findNavController(R.id.fragmentContainer)

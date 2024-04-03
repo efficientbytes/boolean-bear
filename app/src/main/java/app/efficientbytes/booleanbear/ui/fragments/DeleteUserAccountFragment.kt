@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 
 class DeleteUserAccountFragment : Fragment() {
 
-    private val tagEditProfileFieldFragment = "Delete-User-Account-Fragment"
     private lateinit var _binding: FragmentDeleteUserAccountBinding
     private val binding get() = _binding
     private lateinit var rootView: View

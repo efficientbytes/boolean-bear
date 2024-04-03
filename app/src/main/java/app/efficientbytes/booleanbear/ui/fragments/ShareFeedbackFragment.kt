@@ -16,7 +16,6 @@ import org.koin.android.ext.android.inject
 
 class ShareFeedbackFragment : Fragment() {
 
-    private val tagShareFeedbackFragment = "Share-feedback-fragment"
     private lateinit var _binding: FragmentShareFeedbackBinding
     private val binding get() = _binding
     private lateinit var rootView: View

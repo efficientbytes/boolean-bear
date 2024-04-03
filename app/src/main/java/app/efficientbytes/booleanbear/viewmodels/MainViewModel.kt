@@ -56,7 +56,6 @@ class MainViewModel(
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
-    private val tagMainViewModel: String = "Main View Model"
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }

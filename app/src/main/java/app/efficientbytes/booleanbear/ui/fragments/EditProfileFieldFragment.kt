@@ -25,7 +25,6 @@ import org.koin.android.ext.android.inject
 
 class EditProfileFieldFragment : Fragment() {
 
-    private val tagEditProfileFieldFragment = "Edit-Profile-Field"
     private lateinit var _binding: FragmentEditProfileFieldBinding
     private val binding get() = _binding
     private lateinit var rootView: View

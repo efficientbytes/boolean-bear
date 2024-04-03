@@ -36,7 +36,6 @@ class AuthenticationRepository(
     private val customAuthStateListener: CustomAuthStateListener
 ) {
 
-    private val tagAuthenticationRepository = "Authentication Repository"
     private val gson = Gson()
     suspend fun getSignInToken(phoneNumber: PhoneNumber) = flow {
         emit(DataStatus.loading())
