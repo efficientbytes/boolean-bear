@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.ui.bindingadapters
 
+import android.util.Log
 import androidx.databinding.BindingAdapter
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.utils.getTimeAgo
