@@ -18,7 +18,7 @@ import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.ShuffledContentIds
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
 import kotlinx.coroutines.CoroutineScope
@@ -66,9 +66,9 @@ class HomeViewModel(
         }
     }
 
-    private val _shuffledContentIds: MutableLiveData<DataStatus<ShuffledContentIds?>> =
+    private val _shuffledCategoryContentIds: MutableLiveData<DataStatus<ShuffledCategoryContentIds?>> =
         MutableLiveData()
-    val shuffledContentIds: LiveData<DataStatus<ShuffledContentIds?>> = _shuffledContentIds
+    val shuffledCategoryContentIds: LiveData<DataStatus<ShuffledCategoryContentIds?>> = _shuffledCategoryContentIds
     private var contentIdListJob: Job? = null
     private var youtubeContentViewJob: Job? = null
 
@@ -81,7 +81,7 @@ class HomeViewModel(
         }
         contentIdListJob = externalScope.launch {
             assetsRepository.getContentIdsUnderShuffledCategoryForCategoryId(categoryId).collect {
-                _shuffledContentIds.postValue(it)
+                _shuffledCategoryContentIds.postValue(it)
             }
         }
     }
