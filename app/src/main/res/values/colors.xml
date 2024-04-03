@@ -147,35 +147,37 @@
     <color name="black_1100">#0f0e0d</color>
     <color name="black_1000">#110f0e</color>
     <color name="black_900">#121010</color>
-    <color name="black_800">#131211</color>
     <color name="black_700">#141312</color>
     <color name="black_600">#151414</color>
     <color name="black_500">#161515</color>
-    <color name="black_400">#161616</color>
+
     <color name="black_300">#171717</color>
     <color name="black_100">#191919</color>
 
 
-    <color name="black_1200">#101010</color>  //new set of color ,do not override
+    <color name="black_1200">#101010</color>
+    //new set of color ,do not override
     <color name="black_200">#141414</color>
+    <color name="black_800">#121111</color>
+    <color name="black_400">#272727</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
-    <color name ="violet_1500">#a23eef</color>
-    <color name ="violet_1400">#a24df3</color>
-    <color name ="violet_1300">#a25bf6</color>
-    <color name ="violet_1200">#a367f9</color>
-    <color name ="violet_1100">#a572fc</color>
-    <color name ="violet_1000">#a67dfe</color>
-    <color name ="violet_900">#a987ff</color>
-    <color name ="violet_800">#ac90ff</color>
-    <color name ="violet_700">#af9aff</color>
-    <color name ="violet_600">#b3a3ff</color>
-    <color name ="violet_500">#b8acff</color>
-    <color name ="violet_400">#bdb5ff</color>
-    <color name ="violet_300">#c2beff</color>
-    <color name ="violet_200">#c8c7ff</color>
-    <color name ="violet_100">#cfcfff</color>
+    <color name="violet_1500">#a23eef</color>
+    <color name="violet_1400">#a24df3</color>
+    <color name="violet_1300">#a25bf6</color>
+    <color name="violet_1200">#a367f9</color>
+    <color name="violet_1100">#a572fc</color>
+    <color name="violet_1000">#a67dfe</color>
+    <color name="violet_900">#a987ff</color>
+    <color name="violet_800">#ac90ff</color>
+    <color name="violet_700">#af9aff</color>
+    <color name="violet_600">#b3a3ff</color>
+    <color name="violet_500">#b8acff</color>
+    <color name="violet_400">#bdb5ff</color>
+    <color name="violet_300">#c2beff</color>
+    <color name="violet_200">#c8c7ff</color>
+    <color name="violet_100">#cfcfff</color>
 
     <color name="white_1500">#ffffff</color>
     <color name="white_1400">#f6f6f6</color>
@@ -193,13 +195,13 @@
     <color name="white_200">#939393</color>
     <color name="white_100">#8b8b8b</color>
 
-    <color name="text_dark_transparent_background">#B90E0E0E</color>
-    <color name ="violet_1500_alpha">#22E5C5FF</color>
+    <color name="text_dark_transparent_background_100">#B90E0E0E</color>
+    <color name="violet_1500_alpha">#22E5C5FF</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/white</color>
 
     <color name="cell_chip_playlist_color">@color/md_theme_surfaceContainerLowest</color>
     <color name="cell_chip_playlist_checked_color">@color/md_theme_primaryContainer</color>
-
+    <color name="text_dark_transparent_background_200">#B90E0E0E</color>
 
 
 </resources>
