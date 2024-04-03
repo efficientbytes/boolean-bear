@@ -156,7 +156,7 @@ object SingleDeviceLoginListener {
 object AuthStateCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i("Auth Scope", exception.message.toString())
+        Log.i(AUTH_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
     }
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
@@ -188,7 +188,7 @@ object ServiceError {
 object UtilityCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i("Utility Scope", exception.message.toString())
+        Log.i(UTILITY_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
     }
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
