@@ -16,25 +16,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.booleanbear.BR
 import app.efficientbytes.booleanbear.R
+import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.database.models.ContentCategory
-import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
+import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.ui.adapters.GenericAdapter
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
-import app.efficientbytes.booleanbear.viewmodels.CourseViewModel
+import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
 
-    private val tagCoursesFragment: String = "View-Byte-Course-Fragment"
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: CourseViewModel by inject()
+    private val viewModel: HomeViewModel by inject()
     private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
     private var sampleList: MutableList<CoursesBanner> = mutableListOf()
     private val handler = Handler(Looper.getMainLooper())
@@ -42,6 +42,13 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val DELAY_MS: Long = 3000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
+    private lateinit var youtubeViewTypeRecyclerAdapter: GenericAdapter<YoutubeContentView>
+
+    companion object {
+
+        var selectedCategoryId = ""
+        var selectedCategoryPosition = -1
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +75,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         val accountSettingsFragment = AccountSettingsFragment()
                         accountSettingsFragment.show(
                             parentFragmentManager,
-                            AccountSettingsFragment.tagAccountSettings
+                            AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
                         )
                         return true
                     }
@@ -77,37 +84,61 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             }
         }, viewLifecycleOwner)
         //set content category recycler view
-        binding.playlistRecyclerView.layoutManager =
+        binding.categoriesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         homeFragmentChipRecyclerViewAdapter =
             HomeFragmentChipRecyclerViewAdapter(emptyList(), requireContext(), this)
-        binding.playlistRecyclerView.adapter = homeFragmentChipRecyclerViewAdapter
+        binding.categoriesRecyclerView.adapter = homeFragmentChipRecyclerViewAdapter
 
         viewModel.contentCategoriesFromDB.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()){
-                binding.contentCategoryScrollView.visibility= View.GONE
+            if (it.isNotEmpty()) {
+                binding.contentCategoryScrollView.visibility = View.GONE
                 binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
-                binding.playlistRecyclerView.visibility = View.VISIBLE
-                homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0,6))
-            }else{
-                binding.contentCategoryScrollView.visibility= View.VISIBLE
+                binding.categoriesRecyclerView.visibility = View.VISIBLE
+                homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0, 6))
+            } else {
+                binding.contentCategoryScrollView.visibility = View.VISIBLE
                 binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                binding.playlistRecyclerView.visibility = View.INVISIBLE
+                binding.categoriesRecyclerView.visibility = View.INVISIBLE
             }
         }
-
         //set contents recycler view
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.allShortCourses.observe(viewLifecycleOwner) {
+        binding.contentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        viewModel.shuffledCategoryContentIds.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayout.visibility = View.GONE
-                    binding.recyclerView.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.GONE
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.recyclerView.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
+                    binding.shimmerLayout.visibility = View.VISIBLE
+                    binding.shimmerLayout.startShimmer()
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { shuffledContentIds ->
+                        viewModel.getYoutubeContentViewForListOf(shuffledContentIds.contentIds)
+                    }
+                }
+            }
+        }
+
+        viewModel.youtubeContentViewList.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayout.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
                     binding.shimmerLayout.visibility = View.VISIBLE
                     binding.shimmerLayout.startShimmer()
@@ -116,17 +147,20 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 DataStatus.Status.Success -> {
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.recyclerView.visibility = View.VISIBLE
-                    it.data?.apply {
-                        binding.recyclerView.adapter = GenericAdapter(
-                            this,
-                            R.layout.recycler_view_item_short_courses,
-                            BR.course
+                    binding.shimmerLayout.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.VISIBLE
+                    it.data?.let { list ->
+                        youtubeViewTypeRecyclerAdapter = GenericAdapter(
+                            list,
+                            R.layout.recycler_view_item_youtube_content_view,
+                            BR.content
                         )
                     }
+                    binding.contentsRecyclerView.adapter = youtubeViewTypeRecyclerAdapter
                 }
             }
         }
+
     }
 
     private fun getSampleData() {
@@ -227,12 +261,22 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         handler.removeCallbacksAndMessages(null)
     }
 
-    override fun onChipItemClick(position: Int, contentCategory: ContentCategory) {
-        //request videos under the specific category
+    override fun onChipItemClick(position: Int, shuffledCategory: ShuffledCategory) {
+        selectedCategoryPosition = position
+        selectedCategoryId = shuffledCategory.id
+        viewModel.getShuffledContentIdsFor(selectedCategoryId)
     }
 
     override fun onChipLastItemClicked() {
         //open browse categories fragment
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (selectedCategoryPosition != -1 && selectedCategoryId.isNotBlank()) {
+            homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedCategoryPosition
+            homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedCategoryPosition)
+        }
     }
 
 }

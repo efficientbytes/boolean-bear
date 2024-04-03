@@ -69,61 +69,61 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
-                    android:visibility="visible"
-                    android:scrollbars="horizontal"
                     android:scrollbarSize="0dp"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                        <LinearLayout
-                            android:id="@+id/contentCategoryShimmerLinearLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/md_theme_background"
-                            android:orientation="horizontal">
+                    <LinearLayout
+                        android:id="@+id/contentCategoryShimmerLinearLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/md_theme_background"
+                        android:orientation="horizontal">
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                            <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        </LinearLayout>
+                    </LinearLayout>
 
                 </HorizontalScrollView>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/playlistRecyclerView"
+                    android:id="@+id/categoriesRecyclerView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="8dp"
-                    android:orientation="horizontal"
                     android:visibility="invisible"
-                    tools:listitem="@layout/cell_chip_categories"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/recycler_view_item_chip_category_view">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView"
+                    android:id="@+id/contentsRecyclerView"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/playlistRecyclerView"
-                    tools:listitem="@layout/recycler_view_item_short_courses">
+                    app:layout_constraintTop_toBottomOf="@id/categoriesRecyclerView"
+                    tools:listitem="@layout/recycler_view_item_youtube_content_view">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
@@ -136,7 +136,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/playlistRecyclerView">
+                    app:layout_constraintTop_toBottomOf="@id/categoriesRecyclerView">
 
                     <com.facebook.shimmer.ShimmerFrameLayout
                         android:id="@+id/shimmerLayout"
@@ -150,17 +150,17 @@
                             android:background="@color/md_theme_background"
                             android:orientation="vertical">
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_short_courses" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
                         </LinearLayout>
 

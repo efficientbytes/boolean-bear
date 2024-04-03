@@ -4,20 +4,20 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import app.efficientbytes.booleanbear.database.models.ContentCategory
-import app.efficientbytes.booleanbear.utils.CONTENT_CATEGORY_TABLE
+import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AssetsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertContentCategories(contentCategories: List<ContentCategory>)
+    suspend fun insertShuffledCategories(contentCategories: List<ShuffledCategory>)
 
-    @Query("DELETE FROM $CONTENT_CATEGORY_TABLE ")
-    suspend fun deleteContentCategories()
+    @Query("DELETE FROM $SHUFFLED_CATEGORY_TABLE ")
+    suspend fun deleteShuffledCategories()
 
-    @Query("SELECT * FROM $CONTENT_CATEGORY_TABLE ORDER BY `index`")
-    fun getContentCategories(): Flow<MutableList<ContentCategory>>
+    @Query("SELECT * FROM $SHUFFLED_CATEGORY_TABLE ORDER BY `index`")
+    fun getShuffledCategories(): Flow<MutableList<ShuffledCategory>>
 
 }

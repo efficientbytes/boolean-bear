@@ -20,7 +20,6 @@ class EditProfileFieldViewModel(
 ) :
     ViewModel() {
 
-    private val tagEditProfileFieldViewModel: String = "Edit-Profile-Field-View-Model"
     private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfilePayload?>> =
         MutableLiveData()
     val userProfileServerResponse: LiveData<DataStatus<UserProfilePayload?>> =

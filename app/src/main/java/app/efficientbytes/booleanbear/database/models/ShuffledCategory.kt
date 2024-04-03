@@ -2,10 +2,10 @@ package app.efficientbytes.booleanbear.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.CONTENT_CATEGORY_TABLE
+import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
 
-@Entity(tableName = CONTENT_CATEGORY_TABLE)
-data class ContentCategory(
+@Entity(tableName = SHUFFLED_CATEGORY_TABLE)
+data class ShuffledCategory(
     @PrimaryKey(autoGenerate = false)
     val id: String,
     val index : Int,

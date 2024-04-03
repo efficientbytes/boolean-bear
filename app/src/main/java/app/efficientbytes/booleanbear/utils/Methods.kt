@@ -31,8 +31,9 @@ fun formatPriceToINR(price: Int): String {
 }
 
 fun getTimeAgo(timestamp: Long): String {
+    val inputInMillis = timestamp*1000
     val currentTime = System.currentTimeMillis()
-    val timeDifference = currentTime - timestamp
+    val timeDifference = currentTime - inputInMillis
     val secondsInMilli: Long = 1000
     val minutesInMilli = secondsInMilli * 60
     val hoursInMilli = minutesInMilli * 60
@@ -155,7 +156,7 @@ object SingleDeviceLoginListener {
 object AuthStateCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i("Auth Scope", exception.message.toString())
+        Log.i(AUTH_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
     }
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
@@ -187,7 +188,7 @@ object ServiceError {
 object UtilityCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i("Utility Scope", exception.message.toString())
+        Log.i(UTILITY_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
     }
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 

@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class CompleteProfileViewModel(private val userProfileRepository: UserProfileRepository) :
     ViewModel() {
 
-    private val tagCompleteProfileViewModel: String = "Complete-Profile-View-Model"
     private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfilePayload?>> =
         MutableLiveData()
     val userProfileServerResponse: LiveData<DataStatus<UserProfilePayload?>> =

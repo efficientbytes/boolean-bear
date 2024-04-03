@@ -58,7 +58,6 @@ class ConnectivityListener(context: Context) :
                 connectivityManager?.unregisterNetworkCallback(connectivityManagerCallback())
                 networkConnectionCallback = null
             }catch (e : Exception){
-                Log.i("Connectivity Listener","Error is ${e.message}")
             }
         }
     }

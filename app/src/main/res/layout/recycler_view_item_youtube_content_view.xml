@@ -8,36 +8,44 @@
         <import type="android.view.View" />
 
         <variable
-            name="course"
-            type="app.efficientbytes.booleanbear.models.FeedShortsCourse" />
+            name="onClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="content"
+            type="app.efficientbytes.booleanbear.services.models.YoutubeContentView" />
+
 
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/courseCardView"
+        android:id="@+id/contentCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="3dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="@color/md_theme_background"
+        android:onClick="@{onClick}"
+        app:cardBackgroundColor="@color/black"
         app:cardCornerRadius="0dp"
         app:strokeWidth="0dp">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/TextRippleColorOnBlack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/black"
             android:paddingTop="4dp"
             android:paddingBottom="12dp">
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/thumbnailImage"
-                load_image_from_url="@{course.listViewThumbnail}"
+                android:id="@+id/thumbnailImageView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:scaleType="fitXY"
-                app:layout_constraintDimensionRatio="17:9"
+                app:load_image_from_url="@{content.thumbnail}"
+                app:layout_constraintDimensionRatio="16:9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -56,78 +64,75 @@
                 android:focusable="false"
                 app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="4dp"
-                app:layout_constraintBottom_toBottomOf="@id/thumbnailImage"
-                app:layout_constraintEnd_toEndOf="@id/thumbnailImage"
+                app:layout_constraintBottom_toBottomOf="@id/thumbnailImageView"
+                app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
                 app:strokeWidth="0dp">
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/runTimeTxt"
-                    app:seconds_to_minutes="@{course.runTime}"
+                    android:id="@+id/runTimeValueTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/text_dark_transparent_background"
+                    android:background="@color/text_dark_transparent_background_200"
+                    app:seconds_to_minutes="@{content.runTime}"
+                    android:fontFamily="@font/montserrat"
                     android:paddingStart="8dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    app:fontFamily="@font/montserrat"
-                    android:textColor="@color/white"
                     android:textSize="10sp"
                     tools:text="06:45" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/titleTxt"
+                android:id="@+id/titleValueTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
                 android:maxLines="2"
-                android:text="@{course.title}"
+                android:text="@{content.title}"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                app:fontFamily="@font/montserrat_medium"
-                app:layout_constraintEnd_toEndOf="@id/thumbnailImage"
-                app:layout_constraintStart_toStartOf="@id/thumbnailImage"
-                app:layout_constraintTop_toBottomOf="@id/thumbnailImage"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
+                app:layout_constraintStart_toStartOf="@id/thumbnailImageView"
+                app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
                 tools:text="Level Up With C++ jfi 5gjj5tg 4tgu 4g h oh5">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/instructorNameTxt"
+                android:id="@+id/instructorNameValueTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
                 android:maxLines="2"
-                android:text="@{course.instructorName}"
-                android:textColor="@color/white"
+                android:text="@{content.instructorName}"
                 android:textSize="10sp"
-                app:fontFamily="@font/montserrat"
-                app:layout_constraintStart_toStartOf="@id/titleTxt"
-                app:layout_constraintTop_toBottomOf="@id/titleTxt"
+                app:layout_constraintStart_toStartOf="@id/titleValueTextView"
+                app:layout_constraintTop_toBottomOf="@id/titleValueTextView"
                 tools:text="Anubhav.P.S">
 
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/uploadedOn"
-                app:uploaded_on="@{course.uploadedOn}"
+                android:id="@+id/uploadedOnValueTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:fontFamily="@font/montserrat"
                 android:maxLines="2"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
-                android:textColor="@color/white"
                 android:textSize="10sp"
-                app:fontFamily="@font/montserrat"
-                app:layout_constraintBottom_toBottomOf="@id/instructorNameTxt"
-                app:layout_constraintEnd_toEndOf="@id/titleTxt"
-                app:layout_constraintTop_toTopOf="@id/instructorNameTxt"
+                app:uploaded_on="@{content.createdOn}"
+                app:layout_constraintBottom_toBottomOf="@id/instructorNameValueTextView"
+                app:layout_constraintEnd_toEndOf="@id/titleValueTextView"
+                app:layout_constraintTop_toTopOf="@id/instructorNameValueTextView"
                 tools:text="1 day ago">
 
             </com.google.android.material.textview.MaterialTextView>

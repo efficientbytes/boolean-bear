@@ -16,7 +16,6 @@ import org.koin.android.ext.android.inject
 
 class ShareFeedbackFragment : Fragment() {
 
-    private val tagShareFeedbackFragment = "Share-feedback-fragment"
     private lateinit var _binding: FragmentShareFeedbackBinding
     private val binding get() = _binding
     private lateinit var rootView: View
@@ -35,12 +34,10 @@ class ShareFeedbackFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.submitButton.setOnClickListener {
-            Log.i(tagShareFeedbackFragment, "In click out")
             val input = binding.feedbackTextInputEditText.text.toString().trim()
             if (validateInput(input)) {
                 val userAccountId = SingletonUserData.getInstance()?.userAccountId
                 if (userAccountId != null) {
-                    Log.i(tagShareFeedbackFragment, "In click")
                     viewModel.uploadFeedback(input, userAccountId)
                 }
             }

@@ -16,7 +16,6 @@ import org.koin.android.ext.android.inject
 
 class LoginOrSignUpFragment : Fragment() {
 
-    private val tagLoginOrSignUpFragment: String = "Login-Sign-Up-Fragment"
     private lateinit var _binding: FragmentLoginOrSignUpBinding
     private val binding get() = _binding
     private lateinit var rootView: View

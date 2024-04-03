@@ -6,20 +6,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.CellChipCategoriesBinding
-import app.efficientbytes.booleanbear.databinding.CellChipCategoriesFooterBinding
-import app.efficientbytes.booleanbear.database.models.ContentCategory
+import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryFooterViewBinding
+import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryViewBinding
 
 class HomeFragmentChipRecyclerViewAdapter(
-    private var itemList: List<ContentCategory>,
+    private var itemList: List<ShuffledCategory>,
     private var context: Context,
     private val itemClickListener: OnItemClickListener
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var checkedPosition = 0
-
-    fun setContentCategories(itemList: List<ContentCategory>) {
+    var checkedPosition = 0
+    fun setContentCategories(itemList: List<ShuffledCategory>) {
         this.itemList = emptyList()
         this.itemList = itemList
         notifyDataSetChanged()
@@ -29,10 +28,11 @@ class HomeFragmentChipRecyclerViewAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: ViewBinding
         if (viewType == TYPE_ITEM) {
-            binding = CellChipCategoriesBinding.inflate(layoutInflater, parent, false)
+            binding = RecyclerViewItemChipCategoryViewBinding.inflate(layoutInflater, parent, false)
             return ItemViewHolder(binding)
         } else if (viewType == TYPE_FOOTER) {
-            binding = CellChipCategoriesFooterBinding.inflate(layoutInflater, parent, false)
+            binding =
+                RecyclerViewItemChipCategoryFooterViewBinding.inflate(layoutInflater, parent, false)
             return FooterViewHolder(binding)
         }
         throw RuntimeException("There is no type that matches the type $viewType. Make sure you are using view types correctly!")
@@ -49,10 +49,10 @@ class HomeFragmentChipRecyclerViewAdapter(
         return itemList.size + 1
     }
 
-    inner class ItemViewHolder(private val binding: CellChipCategoriesBinding) :
+    inner class ItemViewHolder(private val binding: RecyclerViewItemChipCategoryViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ContentCategory) {
+        fun bind(item: ShuffledCategory) {
             if (checkedPosition != -1) {
                 if (checkedPosition == bindingAdapterPosition) {
                     binding.chipCardView.strokeWidth = 0
@@ -60,7 +60,8 @@ class HomeFragmentChipRecyclerViewAdapter(
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.white))
                 } else {
                     binding.chipCardView.strokeWidth = 2
-                    binding.chipCardView.strokeColor = context.getColor(R.color.md_theme_surfaceVariant)
+                    binding.chipCardView.strokeColor =
+                        context.getColor(R.color.md_theme_surfaceVariant)
                     binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
                 }
@@ -79,7 +80,7 @@ class HomeFragmentChipRecyclerViewAdapter(
         }
     }
 
-    inner class FooterViewHolder(private val binding: CellChipCategoriesFooterBinding) :
+    inner class FooterViewHolder(private val binding: RecyclerViewItemChipCategoryFooterViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {
@@ -92,7 +93,7 @@ class HomeFragmentChipRecyclerViewAdapter(
 
     interface OnItemClickListener {
 
-        fun onChipItemClick(position: Int, contentCategory: ContentCategory)
+        fun onChipItemClick(position: Int, shuffledCategory: ShuffledCategory)
         fun onChipLastItemClicked()
     }
 

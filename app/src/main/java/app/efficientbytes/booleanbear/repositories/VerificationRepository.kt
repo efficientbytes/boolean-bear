@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.flowOn
 
 class VerificationRepository(private val verificationService: VerificationService) {
 
-    private val tagVerificationRepository = "Verification Repository"
     private val gson = Gson()
     suspend fun sendOTPToPhoneNumber(verifyPhoneNumber: VerifyPhoneNumber) = flow {
         emit(DataStatus.loading())

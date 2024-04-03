@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.repositories
 
-import android.util.Log
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.repositories.models.AuthState
@@ -37,7 +36,6 @@ class AuthenticationRepository(
     private val customAuthStateListener: CustomAuthStateListener
 ) {
 
-    private val tagAuthenticationRepository = "Authentication Repository"
     private val gson = Gson()
     suspend fun getSignInToken(phoneNumber: PhoneNumber) = flow {
         emit(DataStatus.loading())
@@ -93,7 +91,6 @@ class AuthenticationRepository(
 
     fun listenToSingleDeviceLoginChange(userAccountId: String) {
         externalScope.launch {
-            Log.i(tagAuthenticationRepository, "Inside the external scope of auth rep")
             val singleDeviceLoginSnapshot =
                 Firebase.firestore.collection(SINGLE_DEVICE_LOGIN_DOCUMENT_PATH)
                     .document(userAccountId)
@@ -141,7 +138,6 @@ class AuthenticationRepository(
             try {
                 val auth = FirebaseAuth.getInstance()
                 auth.authStateFlow().collect { authState ->
-                    Log.i(tagAuthenticationRepository, "Auth State is : $authState")
                     customAuthStateListener.postValue(authState is AuthState.Authenticated)
                 }
             } catch (exception: Exception) {

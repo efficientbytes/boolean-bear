@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.ui.activities
 
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Bundle
@@ -8,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
@@ -30,7 +30,6 @@ import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
 import app.efficientbytes.booleanbear.utils.formatMillisecondToDateString
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -43,7 +42,6 @@ import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val tagMainActivity: String = "Main-Activity"
     private lateinit var binding: ActivityMainBinding
     private val navController by lazy {
         findNavController(R.id.fragmentContainer)
@@ -143,7 +141,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 DataStatus.Status.Success -> {
-                    Log.i(tagMainActivity, "User profile has been modified")
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     currentUser?.let { user ->
                         userProfileRepository.getUserProfile(user.uid)
@@ -251,15 +248,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     val calendar: Calendar = Calendar.getInstance()
                     val now: Long = calendar.timeInMillis
-                    Log.i(
-                        tagMainActivity, "Server time is ${
-                            it.data?.let { it1 ->
-                                formatMillisecondToDateString(
-                                    it1
-                                )
-                            }
-                        }"
-                    )
                     it.data?.let { serverTime ->
                         if ((serverTime - now).absoluteValue > 300000) {
                             MaterialAlertDialogBuilder(
@@ -353,18 +341,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupNavigation() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR;
             when (destination.id) {
                 R.id.homeFragment -> {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    binding.toolbarAppImageView.visibility = View.VISIBLE
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
-                    enableToolbarCollapse()
-                }
-
-                R.id.accountSettingsFragment -> {
-                    preventToolbarCollapse()
                 }
 
                 else -> {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    binding.toolbarAppImageView.visibility = View.GONE
                     binding.mainToolbar.visibility = View.VISIBLE
                 }
             }
@@ -377,31 +365,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return true
-    }
-
-    private fun preventToolbarCollapse() {
-        val behaviour = getAppBarBehaviour()
-        behaviour.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                return false
-            }
-        })
-    }
-
-    private fun enableToolbarCollapse() {
-        val behaviour = getAppBarBehaviour()
-        behaviour.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                return true
-            }
-        })
-    }
-
-    private fun getAppBarBehaviour(): AppBarLayout.Behavior {
-        val params = binding.mainAppBar.layoutParams as CoordinatorLayout.LayoutParams
-        if (params.behavior == null)
-            params.behavior = AppBarLayout.Behavior()
-        return params.behavior as AppBarLayout.Behavior
     }
 
     override fun onResume() {
