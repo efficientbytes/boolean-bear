@@ -12,7 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.DeleteAccountConfirmationBinding
+import app.efficientbytes.booleanbear.databinding.DialogDeleteAccountConfirmationBinding
 import app.efficientbytes.booleanbear.databinding.FragmentDeleteUserAccountBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -50,8 +50,8 @@ class DeleteUserAccountFragment : Fragment() {
             val materialAlertDialogBuilder: MaterialAlertDialogBuilder =
                 MaterialAlertDialogBuilder(requireContext())
             val layoutInflater = LayoutInflater.from(requireContext())
-            val dialogBinding: DeleteAccountConfirmationBinding =
-                DeleteAccountConfirmationBinding.inflate(layoutInflater, null, false)
+            val dialogBinding: DialogDeleteAccountConfirmationBinding =
+                DialogDeleteAccountConfirmationBinding.inflate(layoutInflater, null, false)
             dialogBinding.deleteInputEditText.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 

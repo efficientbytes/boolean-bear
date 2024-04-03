@@ -83,17 +83,17 @@
                         android:background="@color/md_theme_background"
                         android:orientation="horizontal">
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
-                        <include layout="@layout/shimmer_cell_chip_categories" />
+                        <include layout="@layout/shimmer_view_item_chip_category_view" />
 
                     </LinearLayout>
 
@@ -110,7 +110,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/cell_chip_categories">
+                    tools:listitem="@layout/recycler_view_item_chip_category_view">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
@@ -150,17 +150,17 @@
                             android:background="@color/md_theme_background"
                             android:orientation="vertical">
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
-                            <include layout="@layout/shimmer_view_item_content_view_type_1" />
+                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
 
                         </LinearLayout>
 

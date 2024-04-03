@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
-import app.efficientbytes.booleanbear.databinding.CellChipCategoriesBinding
-import app.efficientbytes.booleanbear.databinding.CellChipCategoriesFooterBinding
+import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryFooterViewBinding
+import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryViewBinding
 
 class HomeFragmentChipRecyclerViewAdapter(
     private var itemList: List<ShuffledCategory>,
@@ -28,10 +28,11 @@ class HomeFragmentChipRecyclerViewAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: ViewBinding
         if (viewType == TYPE_ITEM) {
-            binding = CellChipCategoriesBinding.inflate(layoutInflater, parent, false)
+            binding = RecyclerViewItemChipCategoryViewBinding.inflate(layoutInflater, parent, false)
             return ItemViewHolder(binding)
         } else if (viewType == TYPE_FOOTER) {
-            binding = CellChipCategoriesFooterBinding.inflate(layoutInflater, parent, false)
+            binding =
+                RecyclerViewItemChipCategoryFooterViewBinding.inflate(layoutInflater, parent, false)
             return FooterViewHolder(binding)
         }
         throw RuntimeException("There is no type that matches the type $viewType. Make sure you are using view types correctly!")
@@ -48,7 +49,7 @@ class HomeFragmentChipRecyclerViewAdapter(
         return itemList.size + 1
     }
 
-    inner class ItemViewHolder(private val binding: CellChipCategoriesBinding) :
+    inner class ItemViewHolder(private val binding: RecyclerViewItemChipCategoryViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ShuffledCategory) {
@@ -79,7 +80,7 @@ class HomeFragmentChipRecyclerViewAdapter(
         }
     }
 
-    inner class FooterViewHolder(private val binding: CellChipCategoriesFooterBinding) :
+    inner class FooterViewHolder(private val binding: RecyclerViewItemChipCategoryFooterViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {
