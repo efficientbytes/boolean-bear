@@ -67,7 +67,7 @@ class HomeFragmentChipRecyclerViewAdapter(
                 }
                 binding.titleValueTextView.text = item.title
                 binding.chipCardView.setOnClickListener {
-                    itemClickListener.onChipItemClick(bindingAdapterPosition, item)
+                    itemClickListener.onChipItemClicked(bindingAdapterPosition, item)
                     binding.chipCardView.strokeWidth = 0
                     binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_checked_color))
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.white))
@@ -93,7 +93,7 @@ class HomeFragmentChipRecyclerViewAdapter(
 
     interface OnItemClickListener {
 
-        fun onChipItemClick(position: Int, shuffledCategory: ShuffledCategory)
+        fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory)
         fun onChipLastItemClicked()
     }
 

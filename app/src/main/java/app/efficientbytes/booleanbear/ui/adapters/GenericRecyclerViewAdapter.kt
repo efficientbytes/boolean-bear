@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.ui.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
@@ -30,20 +31,17 @@ class GenericAdapter<T>(
     }
 
     inner class ViewHolder(private val binding: ViewDataBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        init {
-            itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(position)
-                }
-            }
-        }
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
         fun bind(item: T) {
             binding.setVariable(variableId, item)
+            binding.root.setOnClickListener(this)
             binding.executePendingBindings()
+        }
+
+        override fun onClick(p0: View?) {
+            val position = adapterPosition
+            listener?.onItemClick(position)
         }
     }
 
@@ -57,7 +55,4 @@ class GenericAdapter<T>(
         this.listener = listener
     }
 
-    private fun onItemClick(position: Int) {
-        listener?.onItemClick(position)
-    }
 }

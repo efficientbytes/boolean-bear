@@ -31,7 +31,7 @@ fun formatPriceToINR(price: Int): String {
 }
 
 fun getTimeAgo(timestamp: Long): String {
-    val inputInMillis = timestamp*1000
+    val inputInMillis = timestamp * 1000
     val currentTime = System.currentTimeMillis()
     val timeDifference = currentTime - inputInMillis
     val secondsInMilli: Long = 1000

@@ -12,24 +12,25 @@ import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import app.efficientbytes.booleanbear.BR
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
-import app.efficientbytes.booleanbear.ui.adapters.GenericAdapter
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
+import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 
-class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener {
+class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
+    YoutubeContentViewRecyclerViewAdapter.OnItemClickListener {
 
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
@@ -42,7 +43,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val DELAY_MS: Long = 3000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
-    private lateinit var youtubeViewTypeRecyclerAdapter: GenericAdapter<YoutubeContentView>
+    private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
 
     companion object {
 
@@ -150,13 +151,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.shimmerLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
-                        youtubeViewTypeRecyclerAdapter = GenericAdapter(
-                            list,
-                            R.layout.recycler_view_item_youtube_content_view,
-                            BR.content
-                        )
+                        youtubeContentViewRecyclerViewAdapter =
+                            YoutubeContentViewRecyclerViewAdapter(
+                                list,
+                                requireContext(),
+                                this@HomeFragment
+                            )
                     }
-                    binding.contentsRecyclerView.adapter = youtubeViewTypeRecyclerAdapter
+                    binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }
             }
         }
@@ -261,14 +263,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         handler.removeCallbacksAndMessages(null)
     }
 
-    override fun onChipItemClick(position: Int, shuffledCategory: ShuffledCategory) {
+    override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
         selectedCategoryPosition = position
         selectedCategoryId = shuffledCategory.id
-        viewModel.getShuffledContentIdsFor(selectedCategoryId)
+        //viewModel.getShuffledContentIdsFor(selectedCategoryId)
     }
 
     override fun onChipLastItemClicked() {
-        //open browse categories fragment
+
     }
 
     override fun onResume() {
@@ -277,6 +279,15 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedCategoryPosition
             homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedCategoryPosition)
         }
+    }
+
+    override fun onYoutubeContentViewItemClicked(
+        position: Int,
+        youtubeContentView: YoutubeContentView
+    ) {
+        val directions =
+            HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(youtubeContentView.contentId)
+        findNavController().navigate(directions)
     }
 
 }
