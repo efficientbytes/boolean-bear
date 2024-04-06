@@ -29,6 +29,9 @@
             app:destination="@id/contactUsFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/homeFragment_to_shuffledContentPlayerFragment"
+            app:destination="@id/shuffledContentPlayerFragment" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -187,4 +190,12 @@
         android:name="app.efficientbytes.booleanbear.ui.fragments.DeleteUserAccountFragment"
         android:label="Delete Account"
         tools:layout="@layout/fragment_delete_user_account" />
+    <fragment
+        android:id="@+id/shuffledContentPlayerFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ShuffledContentPlayerFragment"
+        android:label="" >
+        <argument
+            android:name="contentId"
+            app:argType="string" />
+    </fragment>
 </navigation>

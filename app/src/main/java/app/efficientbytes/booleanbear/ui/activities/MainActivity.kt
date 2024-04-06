@@ -4,9 +4,9 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -28,7 +28,6 @@ import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
-import app.efficientbytes.booleanbear.utils.formatMillisecondToDateString
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -341,16 +340,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupNavigation() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR;
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
             when (destination.id) {
                 R.id.homeFragment -> {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     binding.toolbarAppImageView.visibility = View.VISIBLE
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
                 }
 
+                R.id.shuffledContentPlayerFragment -> {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+                    binding.toolbarAppImageView.visibility = View.GONE
+                    binding.mainToolbar.visibility = View.GONE
+                }
+
                 else -> {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     binding.toolbarAppImageView.visibility = View.GONE
                     binding.mainToolbar.visibility = View.VISIBLE

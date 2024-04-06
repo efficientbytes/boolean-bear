@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#98000000">
+
+        <ImageButton
+            android:id="@+id/playerCancelAndGoBackImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="22dp"
+            android:layout_marginTop="22dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/play_cancel_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ImageButton>
+
+        <LinearLayout
+            android:id="@+id/playerQualityMenuLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="@id/playerCancelAndGoBackImageButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/playerCancelAndGoBackImageButton">
+
+            <ImageButton
+                android:id="@+id/exo_track_selection_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:src="@drawable/player_quality_icon"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Quality">
+
+            </ImageButton>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/playerPortraitQualityValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:text="720p"
+                android:textSize="12sp"
+                android:textColor="@color/white_600">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <ImageButton
+                android:id="@+id/playerPortraitChooseSpeedImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:padding="10dp"
+                android:src="@drawable/player_speed_icon"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Speed">
+
+            </ImageButton>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/playerPortraitSpeedValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:text="1x"
+                android:textSize="12sp"
+                android:textColor="@color/white_600">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </LinearLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/playerTitleValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:fontFamily="@font/montserrat"
+            app:layout_constraintBottom_toBottomOf="@id/playerCancelAndGoBackImageButton"
+            app:layout_constraintEnd_toStartOf="@id/playerQualityMenuLinearLayout"
+            app:layout_constraintStart_toEndOf="@id/playerCancelAndGoBackImageButton"
+            app:layout_constraintTop_toTopOf="@id/playerCancelAndGoBackImageButton">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:clipToPadding="false"
+            android:gravity="center"
+            android:layoutDirection="ltr"
+            android:orientation="horizontal"
+            android:padding="@dimen/exo_styled_controls_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/exo_rew"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="42dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/rewind_video_icon" />
+
+            <ImageButton
+                android:id="@id/exo_play_pause"
+                style="@style/ExoStyledControls.Button.Center.PlayPause" />
+
+            <ImageButton
+                android:id="@+id/exo_ffwd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="42dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/forward_video_icon" />
+
+        </LinearLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/playerInstructorNameValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/player_instructor_name_text_background"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:paddingVertical="12dp"
+            tools:text="Anubhav.P.S"
+            android:fontFamily="@font/montserrat"
+            android:textColor="@color/white"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/durationLinearLayout">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <LinearLayout
+            android:id="@+id/durationLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toTopOf="@id/exo_progress"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:fontFamily="@font/montserrat"
+                tools:text="4:23">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/durationDividerLabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:paddingHorizontal="2dp"
+                android:text="@string/exo_player_duration_separator"
+                android:textColor="@color/white_700"
+                android:textSize="14sp"
+                app:fontFamily="@font/montserrat_medium">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/white_500"
+                android:textSize="12sp"
+                app:fontFamily="@font/montserrat"
+                tools:text="5:33">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/playerFullScreenImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/full_screen_player_icon"
+            app:layout_constraintBottom_toTopOf="@id/exo_progress"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        </ImageButton>
+
+        <androidx.media3.ui.DefaultTimeBar
+            android:id="@+id/exo_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:bar_height="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:played_color="@color/violet_800">
+
+        </androidx.media3.ui.DefaultTimeBar>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -91,5 +91,11 @@ dependencies {
     implementation("com.google.android.play:review-ktx:2.0.1")
     //recycler view (latest for state restoration)
     implementation ("androidx.recyclerview:recyclerview:1.3.2")
+    //media 3 implementation
+    implementation("androidx.media3:media3-exoplayer:1.3.0")
+    implementation("androidx.media3:media3-ui:1.3.0")
+    implementation("androidx.media3:media3-exoplayer-hls:1.3.0")
+    //gif loader
+    implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.28")
 
 }
