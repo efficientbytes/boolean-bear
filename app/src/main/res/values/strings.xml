@@ -92,5 +92,11 @@
     <string name="confirm_deletion">Confirm Deletion</string>
     <string name="to_confirm_your_action_type_delete">To confirm your action, type \"DELETE\".</string>
     <string name="explore_categories">Explore Categories</string>
+    <string name="exo_track_resolution_pixel"><xliff:g id="height" example="768">%1$dp</xliff:g></string>
+    <string name="exo_player_duration_separator">/</string>
+    <string name="network_error">Network Error</string>
+    <string name="unable_to_connect_to_boolean_bear_there_could_be_a_problem_with_your_network_connection">Unable to connect to boolean bear. There could be a problem with your network connection.</string>
+    <string name="retry">Retry</string>
+    <string name="share">Share</string>
 
 </resources>
