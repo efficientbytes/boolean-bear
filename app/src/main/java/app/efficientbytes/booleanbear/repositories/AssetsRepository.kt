@@ -5,6 +5,8 @@ import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
+import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
@@ -91,6 +93,29 @@ class AssetsRepository(
     }.catch { emit(DataStatus.failed(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
+    suspend fun getYoutubeTypeContentViewForContentId(contentId: String) = flow {
+        emit(DataStatus.loading())
+        val response = assetsService.getYoutubeTypeContentForContentId(contentId)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val youtubeContentViewStatus = response.body()
+                if (youtubeContentViewStatus?.youtubeContentView != null) {
+                    emit(DataStatus.success(youtubeContentViewStatus.youtubeContentView))
+                }
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: YoutubeContentViewStatus = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    YoutubeContentViewStatus::class.java
+                )
+                emit(DataStatus.failed(errorResponse.message.toString()))
+            }
+        }
+    }.catch { emit(DataStatus.failed(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
     suspend fun getYoutubeTypeContentForListOf(contentIds: List<String>): List<YoutubeContentView> {
         val list = mutableListOf<YoutubeContentView>()
         val jobs = contentIds.map { id ->
@@ -120,5 +145,49 @@ class AssetsRepository(
         jobs.joinAll()
         return list
     }
+
+    suspend fun getPlayUrl(contentId: String) = flow {
+        emit(DataStatus.loading())
+        val response = assetsService.getPlayUrl(contentId)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val playUrl = response.body()
+                emit(DataStatus.success(playUrl))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: PlayUrl = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    PlayUrl::class.java
+                )
+                emit(DataStatus.failed(errorResponse.message.toString()))
+            }
+        }
+    }.catch {
+        emit(DataStatus.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getPlayDetails(contentId: String) = flow {
+        emit(DataStatus.loading())
+        val response = assetsService.getPlayDetails(contentId)
+        val responseCode = response.code()
+        when {
+            responseCode == 200 -> {
+                val playDetails = response.body()
+                emit(DataStatus.success(playDetails))
+            }
+
+            responseCode >= 400 -> {
+                val errorResponse: PlayDetails = gson.fromJson(
+                    response.errorBody()!!.string(),
+                    PlayDetails::class.java
+                )
+                emit(DataStatus.failed(errorResponse.message.toString()))
+            }
+        }
+    }.catch {
+        emit(DataStatus.failed(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
 
 }

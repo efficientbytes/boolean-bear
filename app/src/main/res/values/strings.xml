@@ -97,5 +97,7 @@
     <string name="unable_to_connect_to_boolean_bear_there_could_be_a_problem_with_your_network_connection">Unable to connect to boolean bear. There could be a problem with your network connection.</string>
     <string name="retry">Retry</string>
     <string name="share">Share</string>
+    <string name="full_description">+ Full Description</string>
+    <string name="up_next">Up Next</string>
 
 </resources>

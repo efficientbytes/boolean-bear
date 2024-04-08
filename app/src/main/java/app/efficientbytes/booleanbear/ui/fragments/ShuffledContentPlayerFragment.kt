@@ -1,6 +1,6 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
-import android.app.Dialog
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
@@ -33,33 +33,42 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerBinding
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
 import com.google.android.material.textview.MaterialTextView
+import org.koin.android.ext.android.inject
 import pl.droidsonroids.gif.AnimationListener
 import pl.droidsonroids.gif.GifDrawable
 import java.net.UnknownHostException
 
 class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
-    private val TAG = this.javaClass.simpleName
     private lateinit var _binding: FragmentShuffledContentPlayerBinding
     private val binding get() = _binding
-    private lateinit var rootView: View
+
+    //exo player
     private var player: ExoPlayer? = null
     private var playWhenReady = true
     private var mediaItemIndex = 0
     private var playbackPosition = 0L
-    private var isFullScreen = false
+    private val playbackStateListener: Player.Listener = playbackStateListener()
+    private lateinit var trackSelector: DefaultTrackSelector
+    private var mediaItem: MediaItem? = null
+
+    //all view late init
+    private lateinit var rootView: View
     private lateinit var playerTitleText: MaterialTextView
     private lateinit var playerInstructorNameText: MaterialTextView
-    private var trackDialog: Dialog? = null
-    private lateinit var trackSelector: DefaultTrackSelector
-    private val playbackStateListener: Player.Listener = playbackStateListener()
-    private var isFailed = false
     private lateinit var playerQualityMenu: LinearLayout
     private lateinit var fullScreenButton: ImageButton
     private lateinit var gifDrawable: GifDrawable
     private lateinit var contentId: String
-    private var mediaItem: MediaItem? = null
+
+    //flags
+    private var isFullScreen = false
+    private var isPlayingSuggested = false
+    private val viewModel: ShuffledContentPlayerViewModel by inject()
+    private var nextSuggestedContentId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,22 +85,127 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     ): View {
         _binding = FragmentShuffledContentPlayerBinding.inflate(inflater, container, false)
         rootView = binding.root
+        lifecycle.addObserver(viewModel)
         return rootView
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
         gifDrawable.addAnimationListener(this@ShuffledContentPlayerFragment)
-
-        binding.shimmerTopContentShimmerLayout.visibility = View.VISIBLE
-        binding.shimmerTopContentShimmerLayout.startShimmer()
-        binding.shimmerSponsorShimmerLayout.visibility = View.VISIBLE
-        binding.shimmerSponsorShimmerLayout.startShimmer()
-
+        playerTitleText = rootView.findViewById(R.id.playerTitleValueTextView)
+        playerInstructorNameText = rootView.findViewById(R.id.playerInstructorNameValueTextView)
+        playerQualityMenu = rootView.findViewById(R.id.playerQualityMenuLinearLayout)
+        val closeButton = rootView.findViewById<ImageButton>(R.id.playerCancelAndGoBackImageButton)
+        val playerQualityButton = rootView.findViewById<ImageButton>(R.id.exo_track_selection_view)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
+
+        viewModel.getPlayUrl(contentId)
+        viewModel.getPlayDetails(contentId)
+
+        viewModel.playUrl.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    Log.i("Shuffled Fragment", "Error is ${it.message}")
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.noNetworkLinearLayout.visibility = View.GONE
+                    binding.booleanBearLoadingGif.visibility = View.VISIBLE
+                    gifDrawable.start()
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { playUrl ->
+                        mediaItem = playUrl.playUrl?.let { url -> MediaItem.fromUri(url) }
+                        initializePlayer()
+                    }
+                }
+            }
+        }
+
+        viewModel.playDetails.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.contentDetailsConstraintLayout.visibility = View.GONE
+                    binding.suggestedContentCardView.visibility = View.GONE
+
+                    binding.shimmerContentDetails.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+
+                    binding.shimmerContentDetails.stopShimmer()
+                    binding.shimmerSuggestedContent.stopShimmer()
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.contentDetailsConstraintLayout.visibility = View.GONE
+                    binding.suggestedContentCardView.visibility = View.GONE
+
+                    binding.shimmerContentDetails.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+
+                    binding.shimmerContentDetails.startShimmer()
+                    binding.shimmerSuggestedContent.startShimmer()
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.shimmerContentDetails.visibility = View.GONE
+                    binding.contentDetailsConstraintLayout.visibility = View.VISIBLE
+                    binding.shimmerContentDetails.stopShimmer()
+
+                    it.data?.let { playDetails ->
+                        playDetails.nextSuggestion?.let { suggestedContentId ->
+                            nextSuggestedContentId = suggestedContentId
+                            viewModel.getSuggestedContent(suggestedContentId)
+                        }
+                        if (playDetails.nextSuggestion == null) {
+                            binding.shimmerSuggestedContent.stopShimmer()
+                            binding.shimmerSuggestedContent.visibility = View.GONE
+                            binding.suggestedContentCardView.visibility = View.GONE
+                            nextSuggestedContentId = null
+                        }
+                        binding.playDetails = playDetails
+                        playerTitleText.text = playDetails.title
+                        val instructorFullName = if (playDetails.instructorLastName == null) {
+                            playDetails.instructorFirstName
+                        } else {
+                            playDetails.instructorFirstName + " " + playDetails.instructorLastName
+                        }
+                        playerInstructorNameText.text = instructorFullName
+                    }
+                }
+            }
+        }
+
+        viewModel.suggestedContent.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.shimmerSuggestedContent.stopShimmer()
+                    binding.shimmerSuggestedContent.visibility = View.GONE
+                    binding.suggestedContentCardView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.suggestedContentCardView.visibility = View.GONE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.startShimmer()
+                }
+
+                DataStatus.Status.Success -> {
+                    val suggestedContent = it.data
+                    suggestedContent?.let { youtubeContentView ->
+                        binding.shimmerSuggestedContent.stopShimmer()
+                        binding.shimmerSuggestedContent.visibility = View.GONE
+                        binding.suggestedContentCardView.visibility = View.VISIBLE
+                        binding.suggestedContentDetails = youtubeContentView
+                    }
+                }
+            }
+        }
+
         fullScreenButton.setOnClickListener {
             if (isFullScreen) {  // tapped on minimize button
                 requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -114,18 +228,9 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
-        val closeButton = rootView.findViewById<ImageButton>(R.id.playerCancelAndGoBackImageButton)
         closeButton.setOnClickListener {
             findNavController().popBackStack()
         }
-
-        playerTitleText = rootView.findViewById(R.id.playerTitleValueTextView)
-        playerTitleText.text = "What are kotlin scope functions"
-
-        playerInstructorNameText = rootView.findViewById(R.id.playerInstructorNameValueTextView)
-        playerInstructorNameText.text = "Anubhav.P.S"
-
-        playerQualityMenu = rootView.findViewById(R.id.playerQualityMenuLinearLayout)
 
         if (isFullScreen) {
             playerTitleText.visibility = View.VISIBLE
@@ -135,12 +240,22 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             playerInstructorNameText.visibility = View.GONE
         }
 
-        val playerQualityButton = rootView.findViewById<ImageButton>(R.id.exo_track_selection_view)
         playerQualityButton.setOnClickListener {
         }
 
         binding.retryButton.setOnClickListener {
             initializePlayer()
+        }
+
+        binding.suggestedContentCardView.setOnClickListener {
+            nextSuggestedContentId?.let { contentId ->
+                clearStartPosition()
+                isPlayingSuggested = true
+                binding.videoPlayer.hideController()
+                playerQualityMenu.visibility = View.GONE
+                viewModel.getPlayUrl(contentId)
+                viewModel.getPlayDetails(contentId)
+            }
         }
     }
 
@@ -150,13 +265,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         trackSelector.setParameters(
             trackSelector.buildUponParameters().setAllowVideoMixedMimeTypeAdaptiveness(true)
         )
-
-        val mediaItem = if (!isFailed) {
-            MediaItem.fromUri("https://vz-5f0cfb49-882.b-cdn.net/bcdn_token=yyCAHHrsV933mGpfg8S1q-JvKn2uPw2SBYYwGa-CzS8&token_countries=IN&token_path=%2F150c236a-b9e0-4239-9cb4-8dfdedda46cd%2F&expires=1712336901/150c236a-b9e0-4239-9cb4-8dfdedda46cd/playlist.m3u8")
-        } else {
-            MediaItem.fromUri("https://vz-5f0cfb49-882.b-cdn.net/bcdn_token=PxJhK2GYX-eGURXi-tEA7T8Z4SN7_kUyv_HV06bPJt8&token_countries=IN&token_path=%2F150c236a-b9e0-4239-9cb4-8dfdedda46cd%2F&expires=1712400667/150c236a-b9e0-4239-9cb4-8dfdedda46cd/playlist.m3u8")
-        }
-
         if (player == null) {
             val loadControl = DefaultLoadControl()
             player = ExoPlayer.Builder(requireContext())
@@ -164,79 +272,35 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 .setTrackSelector(trackSelector)
                 .build()
                 .also { exoPlayer ->
-                    exoPlayer.playWhenReady = playWhenReady
+                    exoPlayer.playWhenReady = if (isPlayingSuggested) {
+                        isPlayingSuggested = false
+                        true
+                    } else {
+                        playWhenReady
+                    }
                     exoPlayer.addListener(playbackStateListener)
                     binding.videoPlayer.player = exoPlayer
                     binding.videoPlayer.keepScreenOn = true
                 }
+        }
+        if (isPlayingSuggested) {
+            isPlayingSuggested = false
+            player!!.playWhenReady = true
         }
         val haveStartPosition = mediaItemIndex != C.INDEX_UNSET
         if (haveStartPosition) {
             player!!.seekTo(mediaItemIndex, playbackPosition)
         }
         val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
-        val mediaSource =
-            HlsMediaSource.Factory(defaultHttpDataSourceFactory).createMediaSource(mediaItem)
-        player!!.setMediaSource(mediaSource,  /* resetPosition= */!haveStartPosition)
-        player!!.prepare()
+        mediaItem?.let {
+            HlsMediaSource.Factory(defaultHttpDataSourceFactory).createMediaSource(
+                it
+            )
+        }?.also {
+            player!!.setMediaSource(it,  /* resetPosition= */!haveStartPosition)
+            player!!.prepare()
+        }
         return
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onStart() {
-        super.onStart()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT > 23) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onResume() {
-        super.onResume()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
-        }
-    }
-
-    private fun hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-        WindowInsetsControllerCompat(
-            requireActivity().window,
-            binding.videoPlayer
-        ).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onPause() {
-        super.onPause()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT <= 23) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onStop() {
-        super.onStop()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT > 23) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
-        }
     }
 
     private fun releasePlayer() {
@@ -261,54 +325,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         playWhenReady = true
         mediaItemIndex = C.INDEX_UNSET
         playbackPosition = C.TIME_UNSET
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        Log.i(TAG, "Screen orientation value is ${newConfig.orientation}")
-        when {
-            newConfig.orientation == 2 -> {
-                //landscape mode
-                binding.contentConstraintLayout.visibility = View.GONE
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(binding.parentConstraintLayout)
-                constraintSet.clear(binding.contentConstraintLayout.id, ConstraintSet.TOP)
-                constraintSet.applyTo(binding.parentConstraintLayout)
-                isFullScreen = true
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.portrait_player_icon
-                    )
-                )
-                playerTitleText.visibility = View.VISIBLE
-                playerInstructorNameText.visibility = View.VISIBLE
-            }
-
-            newConfig.orientation == 1 -> {
-                //portrait mode
-                binding.contentConstraintLayout.visibility = View.VISIBLE
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(binding.parentConstraintLayout)
-                constraintSet.connect(
-                    binding.contentConstraintLayout.id,
-                    ConstraintSet.TOP,
-                    binding.guideline1.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.applyTo(binding.parentConstraintLayout)
-                isFullScreen = false
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.full_screen_player_icon
-                    )
-                )
-                playerTitleText.visibility = View.GONE
-                playerInstructorNameText.visibility = View.GONE
-            }
-        }
-
     }
 
     private fun playbackStateListener() = object : Player.Listener {
@@ -341,6 +357,13 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 ExoPlayer.STATE_ENDED -> {
                     binding.videoPlayer.showController()
                     playerQualityMenu.visibility = View.GONE
+                    nextSuggestedContentId?.let { contentId ->
+                        binding.videoPlayer.hideController()
+                        clearStartPosition()
+                        isPlayingSuggested = true
+                        viewModel.getPlayUrl(contentId)
+                        viewModel.getPlayDetails(contentId)
+                    }
                     gifDrawable.stop()
                     binding.booleanBearLoadingGif.visibility = View.GONE
                 }
@@ -358,15 +381,13 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             val cause = error.cause
             updateStartPosition()
             if (cause is HttpDataSource.HttpDataSourceException) {
-                val httpError = cause
-                if (httpError is HttpDataSource.InvalidResponseCodeException) {
-                    if (httpError.responseCode == 403) {
-                        isFailed = true
-                        initializePlayer()
+                if (cause is HttpDataSource.InvalidResponseCodeException) {
+                    if (cause.responseCode == 403) {
+                        viewModel.getPlayUrl(contentId)
                     }
 
                 } else {
-                    if (httpError.cause is UnknownHostException) {
+                    if (cause.cause is UnknownHostException) {
                         gifDrawable.stop()
                         binding.booleanBearLoadingGif.visibility = View.GONE
                         binding.noNetworkLinearLayout.visibility = View.VISIBLE
@@ -376,7 +397,111 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
     }
 
+    @OptIn(UnstableApi::class)
+    override fun onStart() {
+        super.onStart()
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT > 23) {
+            initializePlayer()
+            binding.videoPlayer.onResume()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onResume() {
+        super.onResume()
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if ((Util.SDK_INT <= 23 || player == null)) {
+            initializePlayer()
+            binding.videoPlayer.onResume()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onPause() {
+        super.onPause()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT <= 23) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onStop() {
+        super.onStop()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT > 23) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        when {
+            newConfig.orientation == 2 -> {
+                //landscape mode
+                binding.nonVideoParentConstraintLayout.visibility = View.GONE
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(binding.parentConstraintLayout)
+                constraintSet.clear(binding.nonVideoParentConstraintLayout.id, ConstraintSet.TOP)
+                constraintSet.applyTo(binding.parentConstraintLayout)
+                isFullScreen = true
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.portrait_player_icon
+                    )
+                )
+                playerTitleText.visibility = View.VISIBLE
+                playerInstructorNameText.visibility = View.VISIBLE
+            }
+
+            newConfig.orientation == 1 -> {
+                //portrait mode
+                binding.nonVideoParentConstraintLayout.visibility = View.VISIBLE
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(binding.parentConstraintLayout)
+                constraintSet.connect(
+                    binding.nonVideoParentConstraintLayout.id,
+                    ConstraintSet.TOP,
+                    binding.guideline1.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.applyTo(binding.parentConstraintLayout)
+                isFullScreen = false
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.full_screen_player_icon
+                    )
+                )
+                playerTitleText.visibility = View.GONE
+                playerInstructorNameText.visibility = View.GONE
+            }
+        }
+
+    }
+
     override fun onAnimationCompleted(loopNumber: Int) {
         gifDrawable.reset()
+    }
+
+    private fun hideSystemUi() {
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
+        WindowInsetsControllerCompat(
+            requireActivity().window,
+            binding.videoPlayer
+        ).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 }

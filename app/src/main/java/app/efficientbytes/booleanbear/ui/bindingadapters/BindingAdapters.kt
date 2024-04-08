@@ -1,12 +1,12 @@
 package app.efficientbytes.booleanbear.ui.bindingadapters
 
-import android.util.Log
 import androidx.databinding.BindingAdapter
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.utils.getTimeAgo
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.coroutines.runBlocking
 
 @BindingAdapter("load_image_from_url")
 fun ShapeableImageView.loadImageFromUrl(imageUrl: String? = null) {
@@ -31,4 +31,23 @@ fun MaterialTextView.secondsToMinutes(seconds: Long) {
     } else {
         String.format("%02d:%02d", minutes, remainingSeconds)
     }
+}
+
+@BindingAdapter("language")
+fun MaterialTextView.language(language: String?=null) {
+    this.text = when (language) {
+        "EN" -> "English"
+        "HI" -> "Hindi"
+        else -> "N/A"
+    }
+}
+
+@BindingAdapter("runTime")
+fun MaterialTextView.runTime(runTime: Long?=null) {
+    val message : Long = if (runTime!=null){
+        runTime/60
+    } else {
+         0L
+    }
+   this.text = "$message mins"
 }

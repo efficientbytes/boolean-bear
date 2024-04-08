@@ -1,6 +1,8 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
+import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
 import retrofit2.Response
@@ -25,5 +27,15 @@ interface AssetsService {
         @Path("contentId") contentId: String,
         @Query(value = "viewType") viewType: String = "YOUTUBE"
     ): Response<YoutubeContentViewStatus>
+
+    @GET("contents/{contentId}/play-link")
+    suspend fun getPlayUrl(
+        @Path("contentId") contentId: String,
+    ): Response<PlayUrl>
+
+    @GET("contents/{contentId}/play-details")
+    suspend fun getPlayDetails(
+        @Path("contentId") contentId: String,
+    ): Response<PlayDetails>
 
 }

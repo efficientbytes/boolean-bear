@@ -5,6 +5,14 @@
 
     <data>
 
+        <variable
+            name="playDetails"
+            type="app.efficientbytes.booleanbear.services.models.PlayDetails" />
+
+        <variable
+            name="suggestedContentDetails"
+            type="app.efficientbytes.booleanbear.services.models.YoutubeContentView" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,6 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:resize_mode="zoom"
+            android:visibility="visible"
             app:show_buffering="never"
             app:show_shuffle_button="false"
             app:show_subtitle_button="false"
@@ -102,7 +111,7 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/contentConstraintLayout"
+            android:id="@+id/nonVideoParentConstraintLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/black"
@@ -113,86 +122,74 @@
             app:layout_constraintTop_toBottomOf="@id/guideline1">
 
             <androidx.core.widget.NestedScrollView
+                android:id="@+id/nonVideoParentNestedScrollView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@color/black">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmerTopContentShimmerLayout"
+                        android:id="@+id/shimmerContentDetails"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/shimmerTopContentConstraintLayout"
+                            android:id="@+id/contentDetailsParentConstraintLayoutShimmer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="10dp"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="14dp"
                             android:paddingBottom="8dp">
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/shimmerContentTitleValueTextView"
+                            <View
+                                android:id="@+id/layer1Shimmer"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_height="38dp"
                                 android:background="@color/black_400"
-                                android:lines="2"
-                                android:paddingVertical="4dp"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent">
+                                app:layout_constraintTop_toTopOf="parent"/>
 
-                            </com.google.android.material.textview.MaterialTextView>
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/shimmerContentShortDetailValueTextView"
-                                android:layout_width="200dp"
+                            <View
+                                android:id="@+id/layer2Shimmer"
+                                android:layout_width="180dp"
                                 android:layout_height="24dp"
-                                android:layout_marginTop="12dp"
+                                android:layout_marginTop="8dp"
                                 android:background="@color/black_400"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/shimmerContentTitleValueTextView">
+                                app:layout_constraintTop_toBottomOf="@id/layer1Shimmer"/>
 
-                            </com.google.android.material.textview.MaterialTextView>
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/shimmerShareContentLabelTextView"
+                            <View
+                                android:id="@+id/layer3Shimmer"
                                 android:layout_width="80dp"
                                 android:layout_height="24dp"
                                 android:background="@color/black_400"
-                                android:drawablePadding="10dp"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="4dp"
-                                android:textSize="11sp"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="@id/shimmerContentShortDetailValueTextView">
+                                app:layout_constraintTop_toTopOf="@id/layer2Shimmer"/>
 
-                            </com.google.android.material.textview.MaterialTextView>
-
-                            <com.google.android.material.textview.MaterialTextView
+                            <View
+                                android:id="@+id/layer4Shimmer"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="12dp"
+                                android:layout_height="64dp"
+                                android:layout_marginTop="8dp"
                                 android:background="@color/black_400"
-                                android:lines="4"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/shimmerContentShortDetailValueTextView">
-
-                            </com.google.android.material.textview.MaterialTextView>
+                                app:layout_constraintTop_toBottomOf="@id/layer2Shimmer"/>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </com.facebook.shimmer.ShimmerFrameLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/topContentConstraintLayout"
+                        android:id="@+id/contentDetailsConstraintLayout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -209,11 +206,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_marginTop="14dp"
                             android:layout_marginEnd="8dp"
                             android:ellipsize="end"
                             android:fontFamily="@font/montserrat_medium"
                             android:maxLines="2"
+                            android:text="@{playDetails.title}"
                             android:textColor="@color/white"
                             android:textSize="18sp"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -235,6 +233,7 @@
                             app:layout_constraintTop_toBottomOf="@id/contentTitleValueTextView">
 
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/contentDurationValueTextView"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:background="@color/black"
@@ -243,11 +242,15 @@
                                 android:paddingEnd="8dp"
                                 android:textColor="@color/white_1000"
                                 android:textSize="11sp"
-                                tools:text="12 min">
+                                app:runTime="@{playDetails.runTime}"
+                                tools:text="12 min"
+                                tools:ignore="RtlSymmetry">
 
                             </com.google.android.material.textview.MaterialTextView>
 
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/contentLanguageValueTextView"
+                                language="@{playDetails.language}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="1dp"
@@ -262,6 +265,7 @@
                             </com.google.android.material.textview.MaterialTextView>
 
                             <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/contentCreatedOnValueTextView"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="1dp"
@@ -271,6 +275,7 @@
                                 android:paddingVertical="4dp"
                                 android:textColor="@color/white_1000"
                                 android:textSize="11sp"
+                                app:uploaded_on="@{playDetails.createdOn}"
                                 tools:text="2 months ago">
 
                             </com.google.android.material.textview.MaterialTextView>
@@ -301,8 +306,10 @@
                         </com.google.android.material.textview.MaterialTextView>
 
                         <LinearLayout
+                            android:id="@+id/descriptionLinearLayout"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:clickable="true"
                             android:focusable="true"
                             android:foreground="?android:selectableItemBackground"
@@ -319,7 +326,8 @@
                                 android:ellipsize="end"
                                 android:maxLines="3"
                                 android:paddingHorizontal="10dp"
-                                android:paddingVertical="8dp"
+                                android:paddingVertical="4dp"
+                                android:text="@{playDetails.description}"
                                 android:textSize="13sp"
                                 app:fontFamily="@font/montserrat_light"
                                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.">
@@ -327,14 +335,14 @@
                             </com.google.android.material.textview.MaterialTextView>
 
                             <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/moreTxt"
+                                android:id="@+id/fullDescriptionLabelTextView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/montserrat_medium"
                                 android:gravity="end"
                                 android:paddingHorizontal="10dp"
                                 android:paddingBottom="4dp"
-                                android:text="+ Full Description"
+                                android:text="@string/full_description"
                                 android:textColor="@color/white"
                                 android:textSize="11sp">
 
@@ -345,44 +353,160 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmerSponsorShimmerLayout"
+                        android:id="@+id/shimmerSuggestedContent"
                         android:layout_width="0dp"
+                        android:visibility="gone"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="4dp"
-                        android:visibility="visible"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/barrier2">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/suggestedContentParentConstraintLayoutShimmer"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="8dp"
+                            android:background="@color/black"
+                            android:paddingHorizontal="2dp"
+                            android:paddingVertical="10dp">
 
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/shimmerSponsorValueTextView"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/layer5Shimmer"
+                                android:layout_width="110dp"
+                                android:layout_height="0dp"
                                 android:background="@color/black_400"
-                                android:lines="14"
-                                android:paddingVertical="4dp"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintDimensionRatio="4:3"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent">
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:shapeAppearanceOverlay="@style/RoundedSquare">
 
-                            </com.google.android.material.textview.MaterialTextView>
+                            </com.google.android.material.imageview.ShapeableImageView>
 
+                            <View
+                                android:id="@+id/layer6Shimmer"
+                                android:layout_width="100dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@color/black_400"
+                                app:layout_constraintStart_toEndOf="@id/layer5Shimmer"
+                                app:layout_constraintTop_toTopOf="@id/layer5Shimmer">
+
+                            </View>
+
+                            <View
+                                android:id="@+id/layer7Shimmer"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@color/black_400"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/layer5Shimmer"
+                                app:layout_constraintTop_toBottomOf="@id/layer6Shimmer">
+
+                            </View>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </com.facebook.shimmer.ShimmerFrameLayout>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/suggestedContentCardView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_marginVertical="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/black_1200"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/barrier2"
+                        app:strokeWidth="0dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="10dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/suggestionContentThumbnailImageView"
+                                android:layout_width="110dp"
+                                android:layout_height="0dp"
+                                android:background="@color/black_1500"
+                                android:scaleType="fitXY"
+                                android:paddingStart="1dp"
+                                load_image_from_url="@{suggestedContentDetails.thumbnail}"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintDimensionRatio="4:3"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:shapeAppearanceOverlay="@style/RoundedSquare"
+                                tools:ignore="RtlSymmetry">
+
+                            </com.google.android.material.imageview.ShapeableImageView>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/upNextLabelTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginTop="8dp"
+                                android:fontFamily="@font/montserrat_medium"
+                                android:textColor="@color/violet_800"
+                                android:textSize="14sp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/suggestionContentThumbnailImageView"
+                                app:layout_constraintTop_toTopOf="@id/suggestionContentThumbnailImageView"
+                                android:text="@string/up_next">
+
+                            </com.google.android.material.textview.MaterialTextView>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/suggestedTitleValueTextView"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginTop="4dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/montserrat"
+                                android:lines="2"
+                                android:maxLines="2"
+                                android:paddingEnd="20dp"
+                                android:text="@{suggestedContentDetails.title}"
+                                android:textColor="@color/white_1000"
+                                android:textSize="13sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/suggestionContentThumbnailImageView"
+                                app:layout_constraintTop_toBottomOf="@id/upNextLabelTextView"
+                                tools:text="Why Kotlin is better than Javaorss?"
+                                tools:ignore="RtlSymmetry">
+
+                            </com.google.android.material.textview.MaterialTextView>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                     <androidx.constraintlayout.widget.Barrier
                         android:id="@+id/barrier2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:barrierDirection="bottom"
-                        app:constraint_referenced_ids="shimmerTopContentShimmerLayout,topContentConstraintLayout" />
+                        app:constraint_referenced_ids="shimmerContentDetails,contentDetailsConstraintLayout" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/barrier3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="shimmerSuggestedContent,suggestedContentCardView" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -402,7 +526,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="top"
-            app:constraint_referenced_ids="contentConstraintLayout" />
+            app:constraint_referenced_ids="nonVideoParentConstraintLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
