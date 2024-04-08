@@ -303,63 +303,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         return
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onStart() {
-        super.onStart()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT > 23) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onResume() {
-        super.onResume()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
-        }
-    }
-
-    private fun hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-        WindowInsetsControllerCompat(
-            requireActivity().window,
-            binding.videoPlayer
-        ).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onPause() {
-        super.onPause()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT <= 23) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
-        }
-    }
-
-    @OptIn(UnstableApi::class)
-    override fun onStop() {
-        super.onStop()
-        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT > 23) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
-        }
-    }
-
     private fun releasePlayer() {
         player?.let { exoPlayer ->
             updateStartPosition()
@@ -382,53 +325,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         playWhenReady = true
         mediaItemIndex = C.INDEX_UNSET
         playbackPosition = C.TIME_UNSET
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        when {
-            newConfig.orientation == 2 -> {
-                //landscape mode
-                binding.nonVideoParentConstraintLayout.visibility = View.GONE
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(binding.parentConstraintLayout)
-                constraintSet.clear(binding.nonVideoParentConstraintLayout.id, ConstraintSet.TOP)
-                constraintSet.applyTo(binding.parentConstraintLayout)
-                isFullScreen = true
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.portrait_player_icon
-                    )
-                )
-                playerTitleText.visibility = View.VISIBLE
-                playerInstructorNameText.visibility = View.VISIBLE
-            }
-
-            newConfig.orientation == 1 -> {
-                //portrait mode
-                binding.nonVideoParentConstraintLayout.visibility = View.VISIBLE
-                val constraintSet = ConstraintSet()
-                constraintSet.clone(binding.parentConstraintLayout)
-                constraintSet.connect(
-                    binding.nonVideoParentConstraintLayout.id,
-                    ConstraintSet.TOP,
-                    binding.guideline1.id,
-                    ConstraintSet.BOTTOM
-                )
-                constraintSet.applyTo(binding.parentConstraintLayout)
-                isFullScreen = false
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.full_screen_player_icon
-                    )
-                )
-                playerTitleText.visibility = View.GONE
-                playerInstructorNameText.visibility = View.GONE
-            }
-        }
-
     }
 
     private fun playbackStateListener() = object : Player.Listener {
@@ -501,7 +397,111 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
     }
 
+    @OptIn(UnstableApi::class)
+    override fun onStart() {
+        super.onStart()
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT > 23) {
+            initializePlayer()
+            binding.videoPlayer.onResume()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onResume() {
+        super.onResume()
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if ((Util.SDK_INT <= 23 || player == null)) {
+            initializePlayer()
+            binding.videoPlayer.onResume()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onPause() {
+        super.onPause()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT <= 23) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
+        }
+    }
+
+    @OptIn(UnstableApi::class)
+    override fun onStop() {
+        super.onStop()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Util.SDK_INT > 23) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        when {
+            newConfig.orientation == 2 -> {
+                //landscape mode
+                binding.nonVideoParentConstraintLayout.visibility = View.GONE
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(binding.parentConstraintLayout)
+                constraintSet.clear(binding.nonVideoParentConstraintLayout.id, ConstraintSet.TOP)
+                constraintSet.applyTo(binding.parentConstraintLayout)
+                isFullScreen = true
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.portrait_player_icon
+                    )
+                )
+                playerTitleText.visibility = View.VISIBLE
+                playerInstructorNameText.visibility = View.VISIBLE
+            }
+
+            newConfig.orientation == 1 -> {
+                //portrait mode
+                binding.nonVideoParentConstraintLayout.visibility = View.VISIBLE
+                val constraintSet = ConstraintSet()
+                constraintSet.clone(binding.parentConstraintLayout)
+                constraintSet.connect(
+                    binding.nonVideoParentConstraintLayout.id,
+                    ConstraintSet.TOP,
+                    binding.guideline1.id,
+                    ConstraintSet.BOTTOM
+                )
+                constraintSet.applyTo(binding.parentConstraintLayout)
+                isFullScreen = false
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.full_screen_player_icon
+                    )
+                )
+                playerTitleText.visibility = View.GONE
+                playerInstructorNameText.visibility = View.GONE
+            }
+        }
+
+    }
+
     override fun onAnimationCompleted(loopNumber: Int) {
         gifDrawable.reset()
+    }
+
+    private fun hideSystemUi() {
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
+        WindowInsetsControllerCompat(
+            requireActivity().window,
+            binding.videoPlayer
+        ).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 }
