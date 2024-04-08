@@ -12,4 +12,5 @@ val serviceModule = module {
     single { provideUtilityService(get()) }
     single { provideFeedbackNSupportService(get()) }
     single { provideAssetsService(get()) }
+    single { provideStatisticsService(get()) }
 }

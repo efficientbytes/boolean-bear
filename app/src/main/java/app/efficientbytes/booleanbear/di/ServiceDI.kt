@@ -3,6 +3,7 @@ package app.efficientbytes.booleanbear.di
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.AuthenticationService
 import app.efficientbytes.booleanbear.services.FeedbackNSupportService
+import app.efficientbytes.booleanbear.services.StatisticsService
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.VerificationService
@@ -36,3 +37,6 @@ fun provideFeedbackNSupportService(retrofit: Retrofit): FeedbackNSupportService 
 
 fun provideAssetsService(retrofit: Retrofit): AssetsService =
     retrofit.create(AssetsService::class.java)
+
+fun provideStatisticsService(retrofit: Retrofit): StatisticsService =
+    retrofit.create(StatisticsService::class.java)
