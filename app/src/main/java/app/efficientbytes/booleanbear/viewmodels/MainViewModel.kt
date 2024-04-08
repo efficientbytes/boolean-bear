@@ -21,6 +21,7 @@ import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
+import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
@@ -52,7 +53,8 @@ class MainViewModel(
     private val userProfileRepository: UserProfileRepository,
     private val utilityDataRepository: UtilityDataRepository,
     private val verificationRepository: VerificationRepository,
-    private val feedbackNSupportRepository: FeedbackNSupportRepository
+    private val feedbackNSupportRepository: FeedbackNSupportRepository,
+    private val statisticsRepository: StatisticsRepository
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -146,6 +148,8 @@ class MainViewModel(
 
     fun signOutUser() {
         if (auth.currentUser != null) {
+            statisticsRepository.noteDownScreenClosingTime()
+            statisticsRepository.uploadPendingScreenTiming()
             auth.signOut()
         }
     }
@@ -249,10 +253,12 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
+                statisticsRepository.noteDownScreenOpeningTime()
                 fetchServerTime()
             }
 
             ON_PAUSE -> {
+                statisticsRepository.noteDownScreenClosingTime()
             }
 
             ON_STOP -> {
