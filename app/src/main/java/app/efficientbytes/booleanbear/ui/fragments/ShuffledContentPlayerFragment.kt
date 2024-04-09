@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,7 +108,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         viewModel.playUrl.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    Log.i("Shuffled Fragment", "Error is ${it.message}")
+
                 }
 
                 DataStatus.Status.Loading -> {

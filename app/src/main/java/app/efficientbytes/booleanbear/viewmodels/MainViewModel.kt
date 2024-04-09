@@ -1,7 +1,6 @@
 package app.efficientbytes.booleanbear.viewmodels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
@@ -149,7 +148,7 @@ class MainViewModel(
     fun signOutUser() {
         if (auth.currentUser != null) {
             statisticsRepository.noteDownScreenClosingTime()
-            statisticsRepository.uploadPendingScreenTiming()
+            statisticsRepository.forceUploadPendingScreenTiming()
             auth.signOut()
         }
     }

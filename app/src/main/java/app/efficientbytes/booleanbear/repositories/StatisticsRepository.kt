@@ -50,18 +50,43 @@ class StatisticsRepository(
     }
 
     fun uploadPendingScreenTiming() {
-        if (FirebaseAuth.getInstance().currentUser == null) return
+        val userAccountId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         externalScope.launch {
             val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
             if (!isEmpty) {
                 val currentDate = getServerTime() ?: return@launch
+                val today = currentDate.let {
+                    val today = getTodayDateComponent(it)
+                    today
+                }
                 val list =
-                    statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(currentDate)
-                val response = statisticsService.uploadScreenTimings(list)
-                val responseCode = response.code()
-                when {
-                    responseCode == 200 -> {
-                        statisticsDao.deleteScreenTimingForAllDayExceptFor(currentDate)
+                    statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(today.time)
+                if (list.isNotEmpty()) {
+                    val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                    val responseCode = response.code()
+                    when {
+                        responseCode == 200 -> {
+                            statisticsDao.deleteScreenTimingForAllDayExceptFor(currentDate)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun forceUploadPendingScreenTiming() {
+        val userAccountId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        externalScope.launch {
+            val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
+            if (!isEmpty) {
+                val list = statisticsDao.getTotalScreenTimePerDayBasisForAllDay()
+                if (list.isNotEmpty()) {
+                    val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                    val responseCode = response.code()
+                    when {
+                        responseCode == 200 -> {
+                            statisticsDao.deleteScreenTimingForAllDay()
+                        }
                     }
                 }
             }
@@ -70,11 +95,11 @@ class StatisticsRepository(
 
     fun deleteUserScreenTime() {
         externalScope.launch {
-            statisticsDao.deleteScreenTimeForAllDay()
+            statisticsDao.deleteScreenTimingForAllDay()
         }
     }
 
-    suspend fun getServerTime(): Long? {
+    private suspend fun getServerTime(): Long? {
         val result = externalScope.async {
             val timeServer = "time.google.com"
             val client = NTPUDPClient()

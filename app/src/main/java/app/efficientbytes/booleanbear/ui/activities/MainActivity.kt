@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
     private val serviceError: ServiceError by inject()
-    private val statisticsRepository : StatisticsRepository by inject()
+    private val statisticsRepository: StatisticsRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +126,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
+                        statisticsRepository.deleteUserScreenTime()
                     }
                 }
             }
@@ -390,4 +391,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onPause()
         networkNotAvailableAtAppLoading = false
     }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        statisticsRepository.noteDownScreenClosingTime()
+    }
+
 }
