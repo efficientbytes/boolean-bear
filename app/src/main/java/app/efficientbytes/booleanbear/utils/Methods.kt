@@ -1,7 +1,9 @@
 package app.efficientbytes.booleanbear.utils
 
+import android.content.Context
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +16,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import okhttp3.Interceptor
+import okhttp3.Request
+import okhttp3.Response
+import java.io.IOException
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Currency
@@ -205,4 +211,37 @@ fun getTodayDateComponent(milliseconds: Long): Date {
     calendar.set(Calendar.SECOND, 0)
     calendar.set(Calendar.MILLISECOND, 0)
     return calendar.time
+}
+
+class CustomInterceptor(context: Context) : Interceptor {
+
+    private val mContext: Context
+
+    init {
+        mContext = context
+    }
+
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        if (!isConnected) {
+            throw NoInternetException()
+        }
+        val builder: Request.Builder = chain.request().newBuilder()
+        return chain.proceed(builder.build())
+    }
+
+    private val isConnected: Boolean
+        get() {
+            val connectivityManager =
+                mContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val netInfo = connectivityManager.activeNetworkInfo
+            return netInfo != null && netInfo.isAvailable && netInfo.isConnected
+        }
+}
+
+class NoInternetException : IOException() {
+
+    override val message: String
+        get() = "No Internet Connection."
+
 }
