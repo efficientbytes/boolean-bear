@@ -20,6 +20,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.net.UnknownHostException
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Currency
@@ -226,8 +227,16 @@ class CustomInterceptor(context: Context) : Interceptor {
         if (!isConnected) {
             throw NoInternetException()
         }
-        val builder: Request.Builder = chain.request().newBuilder()
-        return chain.proceed(builder.build())
+        try {
+            val builder: Request.Builder = chain.request().newBuilder()
+            return chain.proceed(builder.build())
+        } catch (exception: IOException) {
+            if (exception is UnknownHostException) {
+                throw NoInternetException()
+            } else {
+                throw exception
+            }
+        }
     }
 
     private val isConnected: Boolean

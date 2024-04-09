@@ -60,6 +60,22 @@ class HomeViewModel(
                             assetsRepository.saveShuffledCategories(list.categoryList)
                         }
                     }
+
+                    DataStatus.Status.EmptyResult -> {
+
+                    }
+                    DataStatus.Status.NoInternet -> {
+
+                    }
+                    DataStatus.Status.TimeOut -> {
+
+                    }
+                    DataStatus.Status.UnAuthorized -> {
+
+                    }
+                    DataStatus.Status.UnKnownException -> {
+
+                    }
                 }
             }
         }

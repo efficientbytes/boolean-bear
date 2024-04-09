@@ -4,11 +4,14 @@ import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.Profession
+import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.UtilityCoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 class UtilityDataRepository(
     private val externalScope: UtilityCoroutineScope,
@@ -22,9 +25,8 @@ class UtilityDataRepository(
 
     fun getProfessionAdapterList() {
         externalScope.getScope().launch {
-            val response: Response<List<Profession>>
             try {
-                response = utilityDataService.getProfessionAdapterList()
+                val response = utilityDataService.getProfessionAdapterList()
                 val responseCode = response.code()
                 when {
                     responseCode == 200 -> {
@@ -39,7 +41,11 @@ class UtilityDataRepository(
                         serviceError.postValue(response.message().toString())
                     }
                 }
-            } catch (exception: Exception) {
+            } catch (noInternet: NoInternetException) {
+                serviceError.postValue("No Internet Connection")
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                serviceError.postValue("TimeOut")
+            } catch (exception: IOException) {
                 serviceError.postValue(exception.message.toString())
             }
         }
@@ -81,7 +87,11 @@ class UtilityDataRepository(
                         serviceError.postValue(response.message().toString())
                     }
                 }
-            } catch (exception: Exception) {
+            } catch (noInternet: NoInternetException) {
+                serviceError.postValue("No Internet Connection")
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                serviceError.postValue("TimeOut")
+            } catch (exception: IOException) {
                 serviceError.postValue(exception.message.toString())
             }
         }

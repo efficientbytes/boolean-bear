@@ -120,6 +120,16 @@ class DeleteUserAccountFragment : Fragment() {
                         findNavController().popBackStack(R.id.homeFragment, false)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         binding.takeMeToHomePageButton.setOnClickListener {

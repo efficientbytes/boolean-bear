@@ -82,6 +82,12 @@ class LoginOrSignUpFragment : Fragment() {
                         rootView.findNavController().navigate(directions)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.UnAuthorized -> {}
+                DataStatus.Status.UnKnownException -> {}
             }
         }
     }

@@ -9,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -126,6 +127,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         viewModel.getYoutubeContentViewForListOf(shuffledContentIds.contentIds)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    Toast.makeText(requireContext(),"No Internet",Toast.LENGTH_LONG).show()
+                }
+                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.UnAuthorized -> {}
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -160,6 +169,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     }
                     binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    Toast.makeText(requireContext(),"No Internet",Toast.LENGTH_LONG).show()
+                }
+                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.UnAuthorized -> {}
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 

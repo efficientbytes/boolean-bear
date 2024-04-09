@@ -123,6 +123,16 @@ class OTPVerificationFragment : Fragment() {
                         mainViewModel.getSignInToken(PhoneNumber(phoneNumber, "+91"))
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         mainViewModel.signInToken.observe(viewLifecycleOwner) {
@@ -152,6 +162,16 @@ class OTPVerificationFragment : Fragment() {
                         mainViewModel.signInWithToken(signInToken)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         mainViewModel.isUserSignedIn.observe(viewLifecycleOwner) {
@@ -214,6 +234,16 @@ class OTPVerificationFragment : Fragment() {
                         }
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         binding.takeMeToHomePageButton.setOnClickListener {
@@ -247,6 +277,16 @@ class OTPVerificationFragment : Fragment() {
                     Toast.makeText(requireContext(), it.data?.message, Toast.LENGTH_LONG).show()
                     binding.resendOtpChip.visibility = View.GONE
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
     }
