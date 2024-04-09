@@ -3,7 +3,6 @@ package app.efficientbytes.booleanbear.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,6 +69,16 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.text = message
                     binding.submitButton.isEnabled = true
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         binding.feedbackTextInputEditText.addTextChangedListener(object : TextWatcher {

@@ -1,11 +1,14 @@
 package app.efficientbytes.booleanbear.di
 
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val serviceModule = module {
     single { baseUrl }
     single { provideMoshi() }
-    single { provideRetrofit(get(), get()) }
+    single { provideCustomInterceptor(androidContext()) }
+    single { provideOkHttpClient(get()) }
+    single { provideRetrofit(get(), get(), get()) }
     single { provideVerificationService(get()) }
     single { provideUserProfileService(get()) }
     single { provideAuthenticationService(get()) }

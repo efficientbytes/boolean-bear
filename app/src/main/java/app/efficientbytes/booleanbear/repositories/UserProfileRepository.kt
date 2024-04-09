@@ -1,11 +1,11 @@
 package app.efficientbytes.booleanbear.repositories
 
-import android.util.Log
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
+import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
@@ -19,7 +19,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import retrofit2.Response
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class UserProfileRepository(
     private val userProfileService: UserProfileService,
@@ -34,9 +36,8 @@ class UserProfileRepository(
     fun getUserProfile(userAccountId: String) {
         userProfileListener.postLatestValue(DataStatus.loading())
         externalScope.launch {
-            val response: Response<UserProfilePayload>
             try {
-                response = userProfileService.getUserProfile(userAccountId = userAccountId)
+                val response = userProfileService.getUserProfile(userAccountId = userAccountId)
                 val responseCode = response.code()
                 when {
                     responseCode == 200 -> {
@@ -56,54 +57,84 @@ class UserProfileRepository(
                         userProfileListener.postValue(DataStatus.failed(message))
                     }
                 }
-            } catch (exception: Exception) {
-                userProfileListener.postValue(DataStatus.failed(exception.message.toString()))
+            } catch (noInternet: NoInternetException) {
+                userProfileListener.postValue(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                userProfileListener.postValue(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                userProfileListener.postValue(DataStatus.unknownException(exception.message.toString()))
             }
         }
     }
 
     suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
-        emit(DataStatus.loading())
-        val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
-        val responseCode = response.code()
-        when {
-            responseCode == 200 -> {
-                val responseUserProfile = response.body()
-                emit(DataStatus.success(responseUserProfile))
-            }
+        externalScope.launch {
+            try {
+                emit(DataStatus.loading<UserProfilePayload>())
+                val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val responseUserProfile = response.body()
+                        emit(DataStatus.success(responseUserProfile))
+                    }
 
-            responseCode >= 400 -> {
-                val errorResponse: UserProfilePayload = gson.fromJson(
-                    response.errorBody()!!.string(),
-                    UserProfilePayload::class.java
-                )
-                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
-                emit(DataStatus.failed(message))
+                    responseCode >= 400 -> {
+                        val errorResponse: UserProfilePayload = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            UserProfilePayload::class.java
+                        )
+                        val message =
+                            "Error Code $responseCode. ${errorResponse.message.toString()}"
+                        emit(DataStatus.failed<UserProfilePayload>(message))
+                    }
+                }
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet<UserProfilePayload>())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut<UserProfilePayload>())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
             }
         }
-    }.catch { emit(DataStatus.failed(it.message.toString())) }
+    }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
-        emit(DataStatus.loading())
-        val response = userProfileService.updateUserPrivateProfile(userProfile)
-        val responseCode = response.code()
-        when {
-            responseCode == 200 -> {
-                val responseUserProfile = response.body()
-                emit(DataStatus.success(responseUserProfile))
-            }
+        externalScope.launch {
+            try {
+                emit(DataStatus.loading())
+                val response = userProfileService.updateUserPrivateProfile(userProfile)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val responseUserProfile = response.body()
+                        if (responseUserProfile != null) emit(
+                            DataStatus.success<UserProfilePayload>(
+                                responseUserProfile
+                            )
+                        )
+                    }
 
-            responseCode >= 400 -> {
-                val errorResponse: UserProfilePayload = gson.fromJson(
-                    response.errorBody()!!.string(),
-                    UserProfilePayload::class.java
-                )
-                val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
-                emit(DataStatus.failed(message))
+                    responseCode >= 400 -> {
+                        val errorResponse: UserProfilePayload = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            UserProfilePayload::class.java
+                        )
+                        val message =
+                            "Error Code $responseCode. ${errorResponse.message.toString()}"
+                        emit(DataStatus.failed<UserProfilePayload>(message))
+                    }
+                }
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet<UserProfilePayload>())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut<UserProfilePayload>())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
             }
         }
-    }.catch { emit(DataStatus.failed(it.message.toString())) }
+    }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun saveUserProfile(userProfile: UserProfile) {
@@ -130,8 +161,16 @@ class UserProfileRepository(
                         }
                     }
                 }
-            } catch (exception: Exception) {
-                userProfileListener.postLatestValue(DataStatus.failed(exception.message.toString()))
+            } catch (noInternet: NoInternetException) {
+                userProfileListener.postLatestValue(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                userProfileListener.postLatestValue(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                if (exception is UnknownHostException) {
+                    userProfileListener.postLatestValue(DataStatus.noInternet())
+                } else {
+                    userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
+                }
             }
         }
     }

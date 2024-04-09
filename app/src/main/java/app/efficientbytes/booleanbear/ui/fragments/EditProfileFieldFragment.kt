@@ -69,7 +69,7 @@ class EditProfileFieldFragment : Fragment() {
                     currentProfessionCategories
                 )
                 val userProfile = SingletonUserData.getInstance()?.profession
-                userProfile?.let {index->
+                userProfile?.let { index ->
                     val profession = currentProfessionCategories[index]
                     binding.currentProfessionAutoCompleteTextView.setText(profession, true)
                 }
@@ -97,6 +97,16 @@ class EditProfileFieldFragment : Fragment() {
                         binding.emailVerified = this@EditProfileFieldFragment.emailVerified
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         mainViewModel.listenToUserProfileFromDB.observe(viewLifecycleOwner) { userProfile ->
@@ -265,11 +275,22 @@ class EditProfileFieldFragment : Fragment() {
                     binding.progressStatusValueTextView.text = "Profile has been updated."
                     binding.saveButton.isEnabled = false
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
             selectedProfessionCategoryPosition = position
-            binding.saveButton.isEnabled = currentProfessionCategoryPosition != selectedProfessionCategoryPosition
+            binding.saveButton.isEnabled =
+                currentProfessionCategoryPosition != selectedProfessionCategoryPosition
         }
         viewModel.primaryEmailAddressVerificationServerStatus.observe(viewLifecycleOwner) {
             when (it.status) {
@@ -307,6 +328,16 @@ class EditProfileFieldFragment : Fragment() {
                         }.setCancelable(false)
                         .show()
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 

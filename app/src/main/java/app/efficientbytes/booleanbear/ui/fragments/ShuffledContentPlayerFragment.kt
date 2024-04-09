@@ -68,6 +68,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var isPlayingSuggested = false
     private val viewModel: ShuffledContentPlayerViewModel by inject()
     private var nextSuggestedContentId: String? = null
+    private var noInternet = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +124,21 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         initializePlayer()
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {
+                    noInternet = true
+                    gifDrawable.stop()
+                    binding.booleanBearLoadingGif.visibility = View.GONE
+                    binding.noNetworkLinearLayout.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -176,6 +192,18 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         playerInstructorNameText.text = instructorFullName
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {
+
+                }
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -202,6 +230,16 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         binding.suggestedContentDetails = youtubeContentView
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -243,7 +281,13 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
 
         binding.retryButton.setOnClickListener {
-            initializePlayer()
+            if (noInternet) {
+                noInternet = false
+                viewModel.getPlayUrl(contentId)
+                viewModel.getPlayDetails(contentId)
+            } else {
+                initializePlayer()
+            }
         }
 
         binding.suggestedContentCardView.setOnClickListener {

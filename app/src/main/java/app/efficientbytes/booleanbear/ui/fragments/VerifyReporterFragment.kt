@@ -111,6 +111,16 @@ class VerifyReporterFragment : Fragment() {
                         mainViewModel.requestSupport(requestSupport)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -144,6 +154,16 @@ class VerifyReporterFragment : Fragment() {
                         findNavController().navigate(direction)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         binding.resendOtpChip.setOnClickListener {
@@ -174,6 +194,16 @@ class VerifyReporterFragment : Fragment() {
                     Toast.makeText(requireContext(), it.data?.message, Toast.LENGTH_LONG).show()
                     binding.resendOtpChip.visibility = View.GONE
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 

@@ -115,6 +115,16 @@ class ReporterPhoneNumberFragment : Fragment() {
                         rootView.findNavController().navigate(directions)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 
@@ -150,6 +160,16 @@ class ReporterPhoneNumberFragment : Fragment() {
                         findNavController().navigate(direction)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
 

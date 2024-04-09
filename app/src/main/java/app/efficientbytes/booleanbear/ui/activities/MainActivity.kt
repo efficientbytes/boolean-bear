@@ -107,6 +107,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.saveUserProfile(userProfile)
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         customAuthStateListener.liveData.observe(this) {
@@ -153,6 +163,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Loading -> {
 
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {
+                    val snackBar = Snackbar.make(
+                        binding.mainCoordinatorLayout,
+                       "No Internet Connection",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
+                }
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         serviceError.liveData.observe(this) { errorMessage ->
@@ -217,6 +244,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         singleDeviceLoginListener.liveData.observe(this) {
@@ -235,6 +272,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Loading -> {
 
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         viewModel.serverTime.observe(this) {
@@ -266,6 +313,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     }
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
         viewModel.deleteUserAccountStatus.observe(this) {
@@ -281,6 +338,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     viewModel.signOutUser()
                 }
+
+                DataStatus.Status.EmptyResult -> {}
+
+                DataStatus.Status.NoInternet -> {}
+
+                DataStatus.Status.TimeOut -> {}
+
+                DataStatus.Status.UnAuthorized -> {}
+
+                DataStatus.Status.UnKnownException -> {}
             }
         }
     }

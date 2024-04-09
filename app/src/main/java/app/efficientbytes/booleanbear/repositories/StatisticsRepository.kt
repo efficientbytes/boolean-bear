@@ -5,6 +5,7 @@ import android.icu.util.TimeZone
 import app.efficientbytes.booleanbear.database.dao.StatisticsDao
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.services.StatisticsService
+import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.getTodayDateComponent
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +13,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
+import java.io.IOException
 import java.net.InetAddress
+import java.net.SocketTimeoutException
 import java.util.Date
 import java.util.Locale
 
@@ -52,44 +55,54 @@ class StatisticsRepository(
     fun uploadPendingScreenTiming() {
         val userAccountId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         externalScope.launch {
-            val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
-            if (!isEmpty) {
-                val currentDate = getServerTime() ?: return@launch
-                val today = currentDate.let {
-                    val today = getTodayDateComponent(it)
-                    today
-                }
-                val list =
-                    statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(today.time)
-                if (list.isNotEmpty()) {
-                    val response = statisticsService.uploadScreenTimings(userAccountId, list)
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            statisticsDao.deleteScreenTimingForAllDayExceptFor(currentDate)
+            try {
+                val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
+                if (!isEmpty) {
+                    val currentDate = getServerTime() ?: return@launch
+                    val today = currentDate.let {
+                        val today = getTodayDateComponent(it)
+                        today
+                    }
+                    val list =
+                        statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(today.time)
+                    if (list.isNotEmpty()) {
+                        val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                        val responseCode = response.code()
+                        when {
+                            responseCode == 200 -> {
+                                statisticsDao.deleteScreenTimingForAllDayExceptFor(currentDate)
+                            }
                         }
                     }
                 }
+            } catch (noInternet: NoInternetException) {
+            } catch (socketTimeOutException: SocketTimeoutException) {
+            } catch (exception: IOException) {
             }
         }
     }
 
     fun forceUploadPendingScreenTiming() {
         val userAccountId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        externalScope.launch {
-            val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
-            if (!isEmpty) {
-                val list = statisticsDao.getTotalScreenTimePerDayBasisForAllDay()
-                if (list.isNotEmpty()) {
-                    val response = statisticsService.uploadScreenTimings(userAccountId, list)
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            statisticsDao.deleteScreenTimingForAllDay()
+        try {
+            externalScope.launch {
+                val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
+                if (!isEmpty) {
+                    val list = statisticsDao.getTotalScreenTimePerDayBasisForAllDay()
+                    if (list.isNotEmpty()) {
+                        val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                        val responseCode = response.code()
+                        when {
+                            responseCode == 200 -> {
+                                statisticsDao.deleteScreenTimingForAllDay()
+                            }
                         }
                     }
                 }
             }
+        } catch (noInternet: NoInternetException) {
+        } catch (socketTimeOutException: SocketTimeoutException) {
+        } catch (exception: IOException) {
         }
     }
 
