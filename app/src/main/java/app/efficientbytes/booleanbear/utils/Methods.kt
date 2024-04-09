@@ -1,5 +1,7 @@
 package app.efficientbytes.booleanbear.utils
 
+import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -193,4 +195,14 @@ object UtilityCoroutineScope {
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
     fun getScope() = scope
+}
+
+fun getTodayDateComponent(milliseconds: Long): Date {
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    calendar.timeInMillis = milliseconds
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.time
 }

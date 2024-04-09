@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentOTPVerificationBinding
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.utils.validateOTPFormat
@@ -31,6 +32,7 @@ class OTPVerificationFragment : Fragment() {
     private var userAccountId: String? = null
     private var singleDeviceLogin: SingleDeviceLogin? = null
     private lateinit var timer: CountDownTimer
+    private val statisticsRepository: StatisticsRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,6 +185,7 @@ class OTPVerificationFragment : Fragment() {
                                 "Signed in successfully.",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            statisticsRepository.noteDownScreenOpeningTime()
                             userAccountId?.let { userAccountId ->
                                 profileUpdated?.let { profileUpdated ->
                                     if (profileUpdated) {
