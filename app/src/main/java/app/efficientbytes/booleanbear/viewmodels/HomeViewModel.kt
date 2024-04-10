@@ -18,6 +18,7 @@ import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
@@ -35,10 +36,14 @@ class HomeViewModel(
 
     val contentCategoriesFromDB: LiveData<MutableList<ShuffledCategory>> =
         assetsRepository.categoriesFromDB.asLiveData()
+    private val _categories: MutableLiveData<DataStatus<ContentCategoriesStatus>> =
+        MutableLiveData()
+    val categories: LiveData<DataStatus<ContentCategoriesStatus>> = _categories
 
-    private fun getCategories() {
+    fun getCategories() {
         externalScope.launch(Dispatchers.IO) {
             assetsRepository.getShuffledCategories().collect {
+                _categories.postValue(it)
                 when (it.status) {
                     DataStatus.Status.Failed -> {
 
@@ -64,15 +69,19 @@ class HomeViewModel(
                     DataStatus.Status.EmptyResult -> {
 
                     }
-                    DataStatus.Status.NoInternet -> {
 
+                    DataStatus.Status.NoInternet -> {
+                        HomeFragment.loadingCategoriesFailed = true
                     }
+
                     DataStatus.Status.TimeOut -> {
 
                     }
+
                     DataStatus.Status.UnAuthorized -> {
 
                     }
+
                     DataStatus.Status.UnKnownException -> {
 
                     }
@@ -83,7 +92,8 @@ class HomeViewModel(
 
     private val _shuffledCategoryContentIds: MutableLiveData<DataStatus<ShuffledCategoryContentIds?>> =
         MutableLiveData()
-    val shuffledCategoryContentIds: LiveData<DataStatus<ShuffledCategoryContentIds?>> = _shuffledCategoryContentIds
+    val shuffledCategoryContentIds: LiveData<DataStatus<ShuffledCategoryContentIds?>> =
+        _shuffledCategoryContentIds
     private var contentIdListJob: Job? = null
     private var youtubeContentViewJob: Job? = null
 
@@ -111,7 +121,7 @@ class HomeViewModel(
             _youtubeContentViewList.postValue(DataStatus.loading())
             val result = assetsRepository.getYoutubeTypeContentForListOf(list)
             if (result.isEmpty()) {
-                _youtubeContentViewList.postValue(DataStatus.failed("No search results"))
+                _youtubeContentViewList.postValue(DataStatus.emptyResult())
             } else {
                 _youtubeContentViewList.postValue(DataStatus.success(result))
             }
