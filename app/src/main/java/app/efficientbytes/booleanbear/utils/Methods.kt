@@ -135,14 +135,14 @@ fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
 
 object UserProfileListener {
 
-    private val _userProfileListener: MutableLiveData<DataStatus<DocumentSnapshot?>> =
+    private val _userProfileLiveListener: MutableLiveData<DataStatus<DocumentSnapshot?>> =
         MutableLiveData()
-    val userProfileListener: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileListener
+    val userProfileLiveListener: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileLiveListener
     private val _userProfile: MutableLiveData<DataStatus<UserProfile?>> = MutableLiveData()
     val userProfile: LiveData<DataStatus<UserProfile?>> = _userProfile
 
     fun postLatestValue(value: DataStatus<DocumentSnapshot?>) {
-        _userProfileListener.postValue(value)
+        _userProfileLiveListener.postValue(value)
     }
 
     fun postValue(value: DataStatus<UserProfile?>) {
