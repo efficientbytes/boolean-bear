@@ -26,7 +26,6 @@ import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
-import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -69,7 +68,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
-    private val serviceError: ServiceError by inject()
     private val statisticsRepository: StatisticsRepository by inject()
     private var userProfileFailedToLoad = false
     private var singleDeviceLoginFailedToLoad = false
@@ -272,7 +270,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 com.google.android.material.R.style.MaterialAlertDialog_Material3
                             )
                                 .setTitle("Time Not Synced")
-                                .setMessage("Please synchronize your device's time to continue using the app.")
+                                .setMessage("Your device time is not in sync. Please synchronize your device's time to continue using the app.")
                                 .setPositiveButton("ok") { _, _ ->
                                     viewModel.fetchServerTime()
                                 }
@@ -280,6 +278,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 .show()
                         }
                     }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    serverTimeFailedToLoad = true
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    serverTimeFailedToLoad = true
                 }
 
                 else -> {
@@ -370,6 +376,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             issueCategoriesFailedToLoad = false
                             viewModel.getIssueCategoriesAdapterList()
                         }
+                        if (serverTimeFailedToLoad) {
+                            serverTimeFailedToLoad = false
+                            viewModel.fetchServerTime()
+                        }
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)
                             if (userProfileFailedToLoad) {
@@ -399,6 +409,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         if (issueCategoriesFailedToLoad) {
                             issueCategoriesFailedToLoad = false
                             viewModel.getIssueCategoriesAdapterList()
+                        }
+                        if (serverTimeFailedToLoad) {
+                            serverTimeFailedToLoad = false
+                            viewModel.fetchServerTime()
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
