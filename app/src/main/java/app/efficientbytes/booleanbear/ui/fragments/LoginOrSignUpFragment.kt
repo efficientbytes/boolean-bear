@@ -86,8 +86,9 @@ class LoginOrSignUpFragment : Fragment() {
                 DataStatus.Status.EmptyResult -> {}
                 DataStatus.Status.NoInternet -> {}
                 DataStatus.Status.TimeOut -> {}
-                DataStatus.Status.UnAuthorized -> {}
-                DataStatus.Status.UnKnownException -> {}
+                else->{
+
+                }
             }
         }
     }

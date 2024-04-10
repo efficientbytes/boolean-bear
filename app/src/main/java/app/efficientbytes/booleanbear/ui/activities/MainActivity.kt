@@ -169,15 +169,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        serviceError.liveData.observe(this) { errorMessage ->
-            errorMessage?.let {
-                val snackBar = Snackbar.make(
-                    binding.mainCoordinatorLayout,
-                    it, Snackbar.LENGTH_LONG
-                )
-                snackBar.show()
-            }
-        }
         viewModel.singleDeviceLoginFromDB.observe(this) {
             val currentUser = FirebaseAuth.getInstance().currentUser
             this.singleDeviceLogin = it
