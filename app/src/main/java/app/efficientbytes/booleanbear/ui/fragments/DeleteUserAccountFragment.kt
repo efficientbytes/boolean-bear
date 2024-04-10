@@ -121,15 +121,24 @@ class DeleteUserAccountFragment : Fragment() {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "No Internet Connection."
+                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Deleting account is taking unusually long time. Please try again after some time."
+                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         binding.takeMeToHomePageButton.setOnClickListener {
