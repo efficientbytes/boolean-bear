@@ -278,15 +278,27 @@ class OTPVerificationFragment : Fragment() {
                     binding.resendOtpChip.visibility = View.GONE
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.resendOtpChip.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "No Internet Connection"
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.resendOtpChip.isEnabled = false
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "The process is taking unusually long time. Please try again"
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
     }

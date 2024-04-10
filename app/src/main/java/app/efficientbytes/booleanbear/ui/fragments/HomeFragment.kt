@@ -155,11 +155,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.noInternetLinearLayout.visibility = View.VISIBLE
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
 
@@ -215,11 +213,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.noInternetLinearLayout.visibility = View.VISIBLE
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
 

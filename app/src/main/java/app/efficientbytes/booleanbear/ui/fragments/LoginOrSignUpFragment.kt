@@ -83,11 +83,27 @@ class LoginOrSignUpFragment : Fragment() {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-                DataStatus.Status.NoInternet -> {}
-                DataStatus.Status.TimeOut -> {}
-                DataStatus.Status.UnAuthorized -> {}
-                DataStatus.Status.UnKnownException -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.continueButton.isEnabled = true
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "No Internet Connection"
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    binding.continueButton.isEnabled = true
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "The process is taking unusually long time. Please try again"
+                }
+
+                else -> {
+
+                }
             }
         }
     }

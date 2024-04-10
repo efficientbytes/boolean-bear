@@ -8,7 +8,6 @@ import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
-import app.efficientbytes.booleanbear.utils.UtilityCoroutineScope
 import com.google.android.play.core.review.ReviewManagerFactory
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -34,5 +33,3 @@ fun provideAuthStateCoroutineScope() = AuthStateCoroutineScope
 fun provideCustomAuthStateListener() = CustomAuthStateListener
 
 fun provideServiceError() = ServiceError
-
-fun provideUtilityCoroutineScope() = UtilityCoroutineScope

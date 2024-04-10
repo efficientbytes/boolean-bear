@@ -39,12 +39,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
 import java.net.InetAddress
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class MainViewModel(
     private val application: Application,
@@ -53,7 +55,8 @@ class MainViewModel(
     private val utilityDataRepository: UtilityDataRepository,
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
-    private val statisticsRepository: StatisticsRepository
+    private val statisticsRepository: StatisticsRepository,
+    private val externalScope: CoroutineScope
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -157,29 +160,61 @@ class MainViewModel(
         MutableLiveData<DataStatus<Long?>>()
     val serverTime: LiveData<DataStatus<Long?>> = _serverTime
     fun fetchServerTime() {
-        _serverTime.postValue(DataStatus.loading())
-        viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.IO) {
-                val timeServer = "time.google.com"
-                val client = NTPUDPClient()
-                client.defaultTimeout = 10_000
-                try {
-                    val inetAddress = InetAddress.getByName(timeServer)
-                    val timeInfo: TimeInfo = client.getTime(inetAddress)
-                    val time = timeInfo.message.receiveTimeStamp.time
-                    _serverTime.postValue(DataStatus.success(time))
-                } catch (e: Exception) {
-                    _serverTime.postValue(DataStatus.failed(e.message.toString()))
-                } finally {
-                    client.close()
+        externalScope.launch(Dispatchers.IO) {
+            _serverTime.postValue(DataStatus.loading())
+            val timeServer = "time.google.com"
+            val client = NTPUDPClient()
+            client.defaultTimeout = 10_000
+            try {
+                val inetAddress = InetAddress.getByName(timeServer)
+                val timeInfo: TimeInfo = client.getTime(inetAddress)
+                val time = timeInfo.message.receiveTimeStamp.time
+                _serverTime.postValue(DataStatus.success(time))
+            } catch (e: Exception) {
+                when {
+                    e is UnknownHostException -> {
+                        _serverTime.postValue(DataStatus.noInternet())
+                    }
+
+                    e is SocketTimeoutException -> {
+                        _serverTime.postValue(DataStatus.timeOut())
+                    }
+
+                    else -> {
+                        _serverTime.postValue(DataStatus.unknownException(e.message.toString()))
+                    }
                 }
+            } finally {
+                client.close()
             }
         }
     }
 
-    val professionAdapterList: LiveData<MutableList<Profession>> =
+    val professionAdapterListFromDB: LiveData<MutableList<Profession>> =
         utilityDataRepository.professionAdapterListFromDB.asLiveData()
-    val issueCategoryAdapterList: LiveData<MutableList<IssueCategory>> =
+    private val _professionalAdapterList: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val professionalAdapterList: LiveData<DataStatus<Boolean>> = _professionalAdapterList
+
+    fun getProfessionalAdapterList() {
+        externalScope.launch {
+            utilityDataRepository.getProfessionAdapterList().collect {
+                _professionalAdapterList.postValue(it)
+            }
+        }
+    }
+
+    private val _issueCategoriesAdapter: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val issueCategoriesAdapter: LiveData<DataStatus<Boolean>> = _issueCategoriesAdapter
+
+    fun getIssueCategoriesAdapterList() {
+        externalScope.launch {
+            utilityDataRepository.getIssueCategoryAdapterList().collect {
+                _issueCategoriesAdapter.postValue(it)
+            }
+        }
+    }
+
+    val issueCategoryAdapterListFromDB: LiveData<MutableList<IssueCategory>> =
         utilityDataRepository.issueCategoryAdapterListFromDB.asLiveData()
     private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
         MutableLiveData()
@@ -236,6 +271,8 @@ class MainViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
+                getProfessionalAdapterList()
+                getIssueCategoriesAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()

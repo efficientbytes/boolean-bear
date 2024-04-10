@@ -22,10 +22,10 @@ import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
+import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
-import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -68,8 +68,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
-    private val serviceError: ServiceError by inject()
     private val statisticsRepository: StatisticsRepository by inject()
+    private var userProfileFailedToLoad = false
+    private var singleDeviceLoginFailedToLoad = false
+    private var serverTimeFailedToLoad = false
+    private var accountDeletionFailed = false
+    private val utilityDataRepository: UtilityDataRepository by inject()
+    private var professionalAdapterFailedToLoad = false
+    private var issueCategoriesFailedToLoad = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,27 +106,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     snackBar.show()
                 }
 
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     it.data?.let { userProfile ->
                         viewModel.saveUserProfile(userProfile)
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-
                 DataStatus.Status.NoInternet -> {
-
+                    userProfileFailedToLoad = true
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.TimeOut -> {
+                    userProfileFailedToLoad = true
+                }
 
-                DataStatus.Status.UnAuthorized -> {}
+                else -> {
 
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         customAuthStateListener.liveData.observe(this) {
@@ -164,30 +166,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.getFirebaseUserToken()
                 }
 
-                DataStatus.Status.Loading -> {
+                else -> {
 
                 }
-
-                DataStatus.Status.EmptyResult -> {}
-
-                DataStatus.Status.NoInternet -> {
-
-                }
-
-                DataStatus.Status.TimeOut -> {}
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
-            }
-        }
-        serviceError.liveData.observe(this) { errorMessage ->
-            errorMessage?.let {
-                val snackBar = Snackbar.make(
-                    binding.mainCoordinatorLayout,
-                    it, Snackbar.LENGTH_LONG
-                )
-                snackBar.show()
             }
         }
         viewModel.singleDeviceLoginFromDB.observe(this) {
@@ -210,15 +191,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewModel.singleDeviceLoginFromServer.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    /*//failed to fetch try again
-                    FirebaseAuth.getInstance().currentUser?.let { user ->
-                        viewModel.getSingleDeviceLogin(user.uid)
-                    }*/
-
-                }
-
-                DataStatus.Status.Loading -> {
-
+                    singleDeviceLoginFailedToLoad = true
                 }
 
                 DataStatus.Status.Success -> {
@@ -244,15 +217,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    singleDeviceLoginFailedToLoad = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    singleDeviceLoginFailedToLoad = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         singleDeviceLoginListener.liveData.observe(this) {
@@ -285,14 +260,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         viewModel.serverTime.observe(this) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     val calendar: Calendar = Calendar.getInstance()
                     val now: Long = calendar.timeInMillis
@@ -303,7 +270,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 com.google.android.material.R.style.MaterialAlertDialog_Material3
                             )
                                 .setTitle("Time Not Synced")
-                                .setMessage("Please synchronize your device's time to continue using the app.")
+                                .setMessage("Your device time is not in sync. Please synchronize your device's time to continue using the app.")
                                 .setPositiveButton("ok") { _, _ ->
                                     viewModel.fetchServerTime()
                                 }
@@ -313,42 +280,71 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    serverTimeFailedToLoad = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    serverTimeFailedToLoad = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         viewModel.deleteUserAccountStatus.observe(this) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     viewModel.signOutUser()
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    accountDeletionFailed = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    accountDeletionFailed = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
+
+        viewModel.professionalAdapterList.observe(this) {
+            when (it.status) {
+                DataStatus.Status.TimeOut -> {
+                    professionalAdapterFailedToLoad = true
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    professionalAdapterFailedToLoad = true
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
+        viewModel.issueCategoriesAdapter.observe(this) {
+            when (it.status) {
+                DataStatus.Status.TimeOut -> {
+                    issueCategoriesFailedToLoad = true
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    issueCategoriesFailedToLoad = true
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
         binding.retryButton.setOnClickListener {
             if (connectivityListener.isInternetAvailable()) {
                 binding.noInternetConstraintLayout.visibility = View.GONE
@@ -372,12 +368,52 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             binding.internetIsBackLabelTextView.visibility = View.GONE
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (professionalAdapterFailedToLoad) {
+                            professionalAdapterFailedToLoad = false
+                            viewModel.getProfessionalAdapterList()
+                        }
+                        if (issueCategoriesFailedToLoad) {
+                            issueCategoriesFailedToLoad = false
+                            viewModel.getIssueCategoriesAdapterList()
+                        }
+                        if (serverTimeFailedToLoad) {
+                            serverTimeFailedToLoad = false
+                            viewModel.fetchServerTime()
+                        }
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)
+                            if (userProfileFailedToLoad) {
+                                userProfileFailedToLoad = false
+                                userProfileRepository.getUserProfile(
+                                    currentUser.uid
+                                )
+                            }
+                            if (singleDeviceLoginFailedToLoad) {
+                                singleDeviceLoginFailedToLoad = false
+                                viewModel.getSingleDeviceLogin(
+                                    currentUser.uid
+                                )
+                            }
+                            if (accountDeletionFailed) {
+                                accountDeletionFailed = false
+                                viewModel.signOutUser()
+                            }
                         }
                     }
                     if (networkNotAvailableAtAppLoading) {
                         networkNotAvailableAtAppLoading = false
+                        if (professionalAdapterFailedToLoad) {
+                            professionalAdapterFailedToLoad = false
+                            viewModel.getProfessionalAdapterList()
+                        }
+                        if (issueCategoriesFailedToLoad) {
+                            issueCategoriesFailedToLoad = false
+                            viewModel.getIssueCategoriesAdapterList()
+                        }
+                        if (serverTimeFailedToLoad) {
+                            serverTimeFailedToLoad = false
+                            viewModel.fetchServerTime()
+                        }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)

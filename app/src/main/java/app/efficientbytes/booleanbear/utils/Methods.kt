@@ -194,16 +194,6 @@ object ServiceError {
 
 }
 
-object UtilityCoroutineScope {
-
-    private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i(UTILITY_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
-    }
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
-
-    fun getScope() = scope
-}
-
 fun getTodayDateComponent(milliseconds: Long): Date {
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     calendar.timeInMillis = milliseconds
