@@ -33,6 +33,7 @@ import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
 import com.google.android.material.textview.MaterialTextView
 import org.koin.android.ext.android.inject
@@ -70,6 +71,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
 
+    private val connectivityListener: ConnectivityListener by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
@@ -103,8 +106,15 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         val playerQualityButton = rootView.findViewById<ImageButton>(R.id.exo_track_selection_view)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
 
-        viewModel.getPlayUrl(contentId)
-        viewModel.getPlayDetails(contentId)
+        if (!connectivityListener.isInternetAvailable()){
+            binding.parentConstraintLayout.visibility = View.GONE
+            binding.noInternetLinearLayout.visibility = View.VISIBLE
+        }else{
+            binding.noInternetLinearLayout.visibility = View.GONE
+            binding.parentConstraintLayout.visibility = View.VISIBLE
+            viewModel.getPlayUrl(contentId)
+            viewModel.getPlayDetails(contentId)
+        }
 
         viewModel.playUrl.observe(viewLifecycleOwner) {
             when (it.status) {
@@ -296,6 +306,15 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 isPlayingSuggested = true
                 binding.videoPlayer.hideController()
                 playerQualityMenu.visibility = View.GONE
+                viewModel.getPlayUrl(contentId)
+                viewModel.getPlayDetails(contentId)
+            }
+        }
+
+        binding.retryAfterNoInternetButton.setOnClickListener {
+            if (connectivityListener.isInternetAvailable()){
+                binding.noInternetLinearLayout.visibility = View.GONE
+                binding.parentConstraintLayout.visibility = View.VISIBLE
                 viewModel.getPlayUrl(contentId)
                 viewModel.getPlayDetails(contentId)
             }
