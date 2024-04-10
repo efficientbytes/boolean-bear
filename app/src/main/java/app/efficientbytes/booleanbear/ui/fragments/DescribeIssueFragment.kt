@@ -35,7 +35,7 @@ class DescribeIssueFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.issueCategoryAdapterList.observe(viewLifecycleOwner) { issueCategories ->
+        mainViewModel.issueCategoryAdapterListFromDB.observe(viewLifecycleOwner) { issueCategories ->
             issueCategories?.let {
                 val issueCategoryList = it.map { item -> item.name }
                 val issueCateCategoryDropDownAdapter = ArrayAdapter(

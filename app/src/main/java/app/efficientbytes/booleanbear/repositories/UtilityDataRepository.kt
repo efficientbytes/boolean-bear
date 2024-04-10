@@ -1,21 +1,23 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.Profession
 import app.efficientbytes.booleanbear.utils.NoInternetException
-import app.efficientbytes.booleanbear.utils.ServiceError
-import app.efficientbytes.booleanbear.utils.UtilityCoroutineScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 
 class UtilityDataRepository(
-    private val externalScope: UtilityCoroutineScope,
-    private val serviceError: ServiceError,
+    private val externalScope: CoroutineScope,
     private val utilityDataService: UtilityDataService,
     private val utilityDataDao: UtilityDataDao,
 ) {
@@ -23,42 +25,42 @@ class UtilityDataRepository(
     val professionAdapterListFromDB: Flow<MutableList<Profession>> =
         utilityDataDao.getProfessionAdapterList()
 
-    fun getProfessionAdapterList() {
-        externalScope.getScope().launch {
-            try {
-                val response = utilityDataService.getProfessionAdapterList()
-                val responseCode = response.code()
-                when {
-                    responseCode == 200 -> {
-                        val professionList = response.body() ?: emptyList()
-                        if (professionList.isNotEmpty()) {
-                            deleteProfessions()
-                            saveProfessionAdapterList(professionList)
-                        }
-                    }
-
-                    responseCode >= 400 -> {
-                        serviceError.postValue(response.message().toString())
+    suspend fun getProfessionAdapterList() = flow {
+        try {
+            emit(DataStatus.loading())
+            val response = utilityDataService.getProfessionAdapterList()
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val professionList = response.body() ?: emptyList()
+                    if (professionList.isNotEmpty()) {
+                        deleteProfessions()
+                        saveProfessionAdapterList(professionList)
+                        emit(DataStatus.success<Boolean>(true))
                     }
                 }
-            } catch (noInternet: NoInternetException) {
-                //serviceError.postValue("No Internet Connection")
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                //serviceError.postValue("TimeOut")
-            } catch (exception: IOException) {
-                serviceError.postValue(exception.message.toString())
+
+                responseCode >= 400 -> {
+                    emit(DataStatus.failed<Boolean>(""))
+                }
             }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<Boolean>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<Boolean>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<Boolean>(exception.message.toString()))
         }
-    }
+    }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
     private fun saveProfessionAdapterList(professionAdapterList: List<Profession>) {
-        externalScope.getScope().launch {
+        externalScope.launch {
             utilityDataDao.insertProfessionAdapterList(professionAdapterList)
         }
     }
 
     private fun deleteProfessions() {
-        externalScope.getScope().launch {
+        externalScope.launch {
             utilityDataDao.deleteProfessionAdapterList()
         }
     }
@@ -66,45 +68,45 @@ class UtilityDataRepository(
     val issueCategoryAdapterListFromDB: Flow<MutableList<IssueCategory>> =
         utilityDataDao.getIssueCategoryAdapterList()
 
-    fun getIssueCategoryAdapterList() {
-        externalScope.getScope().launch {
-            val response: Response<List<IssueCategory>>
-            try {
-                response = utilityDataService.getIssueCategoryAdapterList()
-                val responseCode = response.code()
-                when {
-                    responseCode == 200 -> {
-                        val issueCategoryList = response.body() ?: emptyList()
-                        if (issueCategoryList.isNotEmpty()) {
-                            deleteIssueCategories()
-                            saveIssueCategoryAdapterList(
-                                issueCategoryList
-                            )
-                        }
-                    }
-
-                    responseCode >= 400 -> {
-                        serviceError.postValue(response.message().toString())
+    suspend fun getIssueCategoryAdapterList() = flow {
+        try {
+            emit(DataStatus.loading<Boolean>())
+            val response = utilityDataService.getIssueCategoryAdapterList()
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val issueCategoryList = response.body() ?: emptyList()
+                    if (issueCategoryList.isNotEmpty()) {
+                        deleteIssueCategories()
+                        saveIssueCategoryAdapterList(
+                            issueCategoryList
+                        )
+                        emit(DataStatus.success<Boolean>(true))
                     }
                 }
-            } catch (noInternet: NoInternetException) {
-                //serviceError.postValue("No Internet Connection")
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                //serviceError.postValue("TimeOut")
-            } catch (exception: IOException) {
-                serviceError.postValue(exception.message.toString())
+
+                responseCode >= 400 -> {
+                    emit(DataStatus.failed<Boolean>(""))
+                }
             }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<Boolean>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<Boolean>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<Boolean>(exception.message.toString()))
         }
-    }
+    }.catch { t -> emit(DataStatus.unknownException<Boolean>(t.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
     private fun saveIssueCategoryAdapterList(issueCategoryAdapterList: List<IssueCategory>) {
-        externalScope.getScope().launch {
+        externalScope.launch {
             utilityDataDao.insertIssueCategoryAdapterList(issueCategoryAdapterList)
         }
     }
 
     private fun deleteIssueCategories() {
-        externalScope.getScope().launch {
+        externalScope.launch {
             utilityDataDao.deleteIssueCategoryAdapterList()
         }
     }

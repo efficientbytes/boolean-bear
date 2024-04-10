@@ -18,7 +18,11 @@ val viewModelModule = module {
     viewModel { LoginOrSignUpViewModel(get()) }
     viewModel { PhoneNumberOTPVerificationViewModel(get()) }
     viewModel { CompleteProfileViewModel(get()) }
-    viewModel { MainViewModel(androidApplication(), get(), get(), get(), get(), get(), get()) }
+    viewModel {
+        MainViewModel(
+            androidApplication(), get(), get(), get(), get(), get(), get(), get()
+        )
+    }
     viewModel { AccountSettingsViewModel(get()) }
     viewModel { EditProfileFieldViewModel(get(), get()) }
     viewModel { ShareFeedbackViewModel(get()) }

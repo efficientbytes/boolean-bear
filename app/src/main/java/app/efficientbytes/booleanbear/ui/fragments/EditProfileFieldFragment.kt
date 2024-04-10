@@ -60,7 +60,7 @@ class EditProfileFieldFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.GONE
         binding.progressLinearLayout.visibility = View.GONE
         var currentValue = ""
-        mainViewModel.professionAdapterList.observe(viewLifecycleOwner) { professionList ->
+        mainViewModel.professionAdapterListFromDB.observe(viewLifecycleOwner) { professionList ->
             professionList?.let {
                 val currentProfessionCategories = it.map { item -> item.name }
                 val currentProfessionCategoryDropDownAdapter = ArrayAdapter(

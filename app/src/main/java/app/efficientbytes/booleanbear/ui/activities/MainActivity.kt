@@ -22,6 +22,7 @@ import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
+import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
@@ -74,6 +75,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var singleDeviceLoginFailedToLoad = false
     private var serverTimeFailedToLoad = false
     private var accountDeletionFailed = false
+    private val utilityDataRepository: UtilityDataRepository by inject()
+    private var professionalAdapterFailedToLoad = false
+    private var issueCategoriesFailedToLoad = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -302,6 +306,39 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
+
+        viewModel.professionalAdapterList.observe(this) {
+            when (it.status) {
+                DataStatus.Status.TimeOut -> {
+                    professionalAdapterFailedToLoad = true
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    professionalAdapterFailedToLoad = true
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
+        viewModel.issueCategoriesAdapter.observe(this) {
+            when (it.status) {
+                DataStatus.Status.TimeOut -> {
+                    issueCategoriesFailedToLoad = true
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    issueCategoriesFailedToLoad = true
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
         binding.retryButton.setOnClickListener {
             if (connectivityListener.isInternetAvailable()) {
                 binding.noInternetConstraintLayout.visibility = View.GONE
@@ -325,6 +362,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             binding.internetIsBackLabelTextView.visibility = View.GONE
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (professionalAdapterFailedToLoad) {
+                            professionalAdapterFailedToLoad = false
+                            viewModel.getProfessionalAdapterList()
+                        }
+                        if (issueCategoriesFailedToLoad) {
+                            issueCategoriesFailedToLoad = false
+                            viewModel.getIssueCategoriesAdapterList()
+                        }
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)
                             if (userProfileFailedToLoad) {
@@ -347,6 +392,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     if (networkNotAvailableAtAppLoading) {
                         networkNotAvailableAtAppLoading = false
+                        if (professionalAdapterFailedToLoad) {
+                            professionalAdapterFailedToLoad = false
+                            viewModel.getProfessionalAdapterList()
+                        }
+                        if (issueCategoriesFailedToLoad) {
+                            issueCategoriesFailedToLoad = false
+                            viewModel.getIssueCategoriesAdapterList()
+                        }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)

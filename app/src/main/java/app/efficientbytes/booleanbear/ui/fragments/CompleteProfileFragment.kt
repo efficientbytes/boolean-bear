@@ -64,7 +64,7 @@ class CompleteProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.phoneNumberTextInputEditText.setText(phoneNumber)
-        mainViewModel.professionAdapterList.observe(viewLifecycleOwner) { professionList ->
+        mainViewModel.professionAdapterListFromDB.observe(viewLifecycleOwner) { professionList ->
             professionList?.let {
                 val currentProfessionCategories = it.map { item -> item.name }
                 val currentProfessionCategoryDropDownAdapter = ArrayAdapter(

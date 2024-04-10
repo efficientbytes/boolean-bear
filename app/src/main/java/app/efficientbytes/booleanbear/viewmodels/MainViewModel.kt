@@ -39,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,7 +54,8 @@ class MainViewModel(
     private val utilityDataRepository: UtilityDataRepository,
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
-    private val statisticsRepository: StatisticsRepository
+    private val statisticsRepository: StatisticsRepository,
+    private val externalScope : CoroutineScope
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
 
@@ -177,9 +179,31 @@ class MainViewModel(
         }
     }
 
-    val professionAdapterList: LiveData<MutableList<Profession>> =
+    val professionAdapterListFromDB: LiveData<MutableList<Profession>> =
         utilityDataRepository.professionAdapterListFromDB.asLiveData()
-    val issueCategoryAdapterList: LiveData<MutableList<IssueCategory>> =
+    private val _professionalAdapterList: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val professionalAdapterList: LiveData<DataStatus<Boolean>> = _professionalAdapterList
+
+    fun getProfessionalAdapterList() {
+        externalScope.launch {
+            utilityDataRepository.getProfessionAdapterList().collect {
+                _professionalAdapterList.postValue(it)
+            }
+        }
+    }
+
+    private val _issueCategoriesAdapter: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val issueCategoriesAdapter: LiveData<DataStatus<Boolean>> = _issueCategoriesAdapter
+
+    fun getIssueCategoriesAdapterList() {
+        externalScope.launch {
+            utilityDataRepository.getIssueCategoryAdapterList().collect {
+                _issueCategoriesAdapter.postValue(it)
+            }
+        }
+    }
+
+    val issueCategoryAdapterListFromDB: LiveData<MutableList<IssueCategory>> =
         utilityDataRepository.issueCategoryAdapterListFromDB.asLiveData()
     private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
         MutableLiveData()
@@ -236,6 +260,8 @@ class MainViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
+                getProfessionalAdapterList()
+                getIssueCategoriesAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
