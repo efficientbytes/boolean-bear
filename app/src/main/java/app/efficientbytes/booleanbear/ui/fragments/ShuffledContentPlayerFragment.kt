@@ -70,7 +70,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private val viewModel: ShuffledContentPlayerViewModel by inject()
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
-
     private val connectivityListener: ConnectivityListener by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,10 +105,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         val playerQualityButton = rootView.findViewById<ImageButton>(R.id.exo_track_selection_view)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
 
-        if (!connectivityListener.isInternetAvailable()){
+        if (!connectivityListener.isInternetAvailable()) {
             binding.parentConstraintLayout.visibility = View.GONE
             binding.noInternetLinearLayout.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.noInternetLinearLayout.visibility = View.GONE
             binding.parentConstraintLayout.visibility = View.VISIBLE
             viewModel.getPlayUrl(contentId)
@@ -135,8 +134,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-
                 DataStatus.Status.NoInternet -> {
                     noInternet = true
                     gifDrawable.stop()
@@ -144,11 +141,13 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     binding.noNetworkLinearLayout.visibility = View.VISIBLE
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.TimeOut -> {
 
-                DataStatus.Status.UnAuthorized -> {}
+                }
 
-                DataStatus.Status.UnKnownException -> {}
+                else -> {
+
+                }
             }
         }
 
@@ -203,17 +202,32 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-
                 DataStatus.Status.NoInternet -> {
+                    noInternet = true
+                    binding.contentDetailsConstraintLayout.visibility = View.GONE
+                    binding.suggestedContentCardView.visibility = View.GONE
 
+                    binding.shimmerContentDetails.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+
+                    binding.shimmerContentDetails.stopShimmer()
+                    binding.shimmerSuggestedContent.stopShimmer()
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.contentDetailsConstraintLayout.visibility = View.GONE
+                    binding.suggestedContentCardView.visibility = View.GONE
 
-                DataStatus.Status.UnAuthorized -> {}
+                    binding.shimmerContentDetails.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
 
-                DataStatus.Status.UnKnownException -> {}
+                    binding.shimmerContentDetails.stopShimmer()
+                    binding.shimmerSuggestedContent.stopShimmer()
+                }
+
+                else -> {
+
+                }
             }
         }
 
@@ -241,15 +255,21 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.suggestedContentCardView.visibility = View.GONE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.stopShimmer()
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.suggestedContentCardView.visibility = View.GONE
+                    binding.shimmerSuggestedContent.visibility = View.VISIBLE
+                    binding.shimmerSuggestedContent.stopShimmer()
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
 
@@ -312,7 +332,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
 
         binding.retryAfterNoInternetButton.setOnClickListener {
-            if (connectivityListener.isInternetAvailable()){
+            if (connectivityListener.isInternetAvailable()) {
+                noInternet = false
                 binding.noInternetLinearLayout.visibility = View.GONE
                 binding.parentConstraintLayout.visibility = View.VISIBLE
                 viewModel.getPlayUrl(contentId)
