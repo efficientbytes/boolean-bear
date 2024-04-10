@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 class UserProfileRepository(
     private val userProfileService: UserProfileService,
@@ -166,11 +165,7 @@ class UserProfileRepository(
             } catch (socketTimeOutException: SocketTimeoutException) {
                 userProfileListener.postLatestValue(DataStatus.timeOut())
             } catch (exception: IOException) {
-                if (exception is UnknownHostException) {
-                    userProfileListener.postLatestValue(DataStatus.noInternet())
-                } else {
-                    userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
-                }
+                userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
             }
         }
     }

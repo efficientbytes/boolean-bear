@@ -42,9 +42,9 @@ class UtilityDataRepository(
                     }
                 }
             } catch (noInternet: NoInternetException) {
-                serviceError.postValue("No Internet Connection")
+                //serviceError.postValue("No Internet Connection")
             } catch (socketTimeOutException: SocketTimeoutException) {
-                serviceError.postValue("TimeOut")
+                //serviceError.postValue("TimeOut")
             } catch (exception: IOException) {
                 serviceError.postValue(exception.message.toString())
             }
@@ -88,9 +88,9 @@ class UtilityDataRepository(
                     }
                 }
             } catch (noInternet: NoInternetException) {
-                serviceError.postValue("No Internet Connection")
+                //serviceError.postValue("No Internet Connection")
             } catch (socketTimeOutException: SocketTimeoutException) {
-                serviceError.postValue("TimeOut")
+                //serviceError.postValue("TimeOut")
             } catch (exception: IOException) {
                 serviceError.postValue(exception.message.toString())
             }
