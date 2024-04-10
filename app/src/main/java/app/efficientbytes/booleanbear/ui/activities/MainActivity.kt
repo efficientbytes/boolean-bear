@@ -1,7 +1,6 @@
 package app.efficientbytes.booleanbear.ui.activities
 
 import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.view.MenuItem
@@ -11,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
@@ -36,6 +36,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.absoluteValue
@@ -110,7 +112,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 DataStatus.Status.EmptyResult -> {}
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.NoInternet -> {
+
+                }
 
                 DataStatus.Status.TimeOut -> {}
 
@@ -141,7 +145,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        userProfileListener.userProfileListener.observe(this) {
+        userProfileListener.userProfileLiveListener.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     val snackBar = Snackbar.make(
@@ -167,12 +171,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.EmptyResult -> {}
 
                 DataStatus.Status.NoInternet -> {
-                    val snackBar = Snackbar.make(
-                        binding.mainCoordinatorLayout,
-                       "No Internet Connection",
-                        Snackbar.LENGTH_LONG
-                    )
-                    snackBar.show()
+
                 }
 
                 DataStatus.Status.TimeOut -> {}
@@ -350,6 +349,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.UnKnownException -> {}
             }
         }
+        binding.retryButton.setOnClickListener {
+            if (connectivityListener.isInternetAvailable()) {
+                binding.noInternetConstraintLayout.visibility = View.GONE
+                binding.mainCoordinatorLayout.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun setupConnectivityListener() {
@@ -358,13 +363,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 true -> {
                     if (networkNotAvailable) {
                         networkNotAvailable = false
-                        val snackBar = Snackbar.make(
-                            binding.mainCoordinatorLayout,
-                            "Yay! You're back online.", Snackbar.LENGTH_LONG
-                        )
-                        snackBar.setBackgroundTint(Color.parseColor("#4CAF50"))
-                        snackBar.setTextColor(Color.parseColor("#FFFFFF"))
-                        snackBar.show()
+                        binding.noInternetConstraintLayout.visibility = View.GONE
+                        binding.mainCoordinatorLayout.visibility = View.VISIBLE
+                        binding.noInternetLabelTextView.visibility = View.GONE
+                        binding.internetIsBackLabelTextView.visibility = View.VISIBLE
+                        lifecycleScope.launch {
+                            delay(3000)
+                            binding.internetIsBackLabelTextView.visibility = View.GONE
+                        }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)
@@ -381,28 +387,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 false -> {
                     networkNotAvailable = true
-                    val snackBar = Snackbar.make(
-                        binding.mainCoordinatorLayout,
-                        "Oops! Looks like you're offline.",
-                        Snackbar.LENGTH_LONG
-                    )
-                    snackBar.setBackgroundTint(Color.parseColor("#B00020"))
-                    snackBar.setTextColor(Color.parseColor("#FFFFFF"))
-                    snackBar.show()
+                    binding.internetIsBackLabelTextView.visibility = View.GONE
+                    binding.noInternetLabelTextView.visibility = View.VISIBLE
                 }
             }
         }
         connectivityListener.isInternetAvailable().apply {
             if (!this) {
+                binding.noInternetConstraintLayout.visibility = View.VISIBLE
+                binding.mainCoordinatorLayout.visibility = View.GONE
                 networkNotAvailable = true
-                val snackBar = Snackbar.make(
-                    binding.mainCoordinatorLayout,
-                    "Oops! Looks like you're offline.",
-                    Snackbar.LENGTH_LONG
-                )
-                snackBar.setBackgroundTint(Color.parseColor("#B00020"))
-                snackBar.setTextColor(Color.parseColor("#FFFFFF"))
-                snackBar.show()
             }
         }
     }
