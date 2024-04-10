@@ -9,7 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -26,6 +25,7 @@ import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAd
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
@@ -45,11 +45,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val authenticationRepository: AuthenticationRepository by inject()
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
     private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
+    private val connectivityListener: ConnectivityListener by inject()
 
     companion object {
 
         var selectedCategoryId = ""
         var selectedCategoryPosition = -1
+        var loadingCategoriesFailed = false
+        var loadingContentsFailed = false
     }
 
     override fun onCreateView(
@@ -111,29 +114,51 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.GONE
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
                 }
 
                 DataStatus.Status.Loading -> {
+                    binding.noInternetLinearLayout.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    binding.shimmerLayout.visibility = View.VISIBLE
                     binding.shimmerLayout.startShimmer()
                 }
 
                 DataStatus.Status.Success -> {
+                    binding.noInternetLinearLayout.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.GONE
+                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
                     it.data?.let { shuffledContentIds ->
                         viewModel.getYoutubeContentViewForListOf(shuffledContentIds.contentIds)
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-                DataStatus.Status.NoInternet -> {
-                    Toast.makeText(requireContext(),"No Internet",Toast.LENGTH_LONG).show()
+                DataStatus.Status.EmptyResult -> {
+                    binding.contentsRecyclerView.visibility = View.GONE
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.VISIBLE
                 }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingContentsFailed = true
+                    binding.contentsRecyclerView.visibility = View.GONE
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.VISIBLE
+                }
+
                 DataStatus.Status.TimeOut -> {}
+
                 DataStatus.Status.UnAuthorized -> {}
+
                 DataStatus.Status.UnKnownException -> {}
             }
         }
@@ -142,22 +167,25 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
                 }
 
                 DataStatus.Status.Loading -> {
+                    binding.noInternetLinearLayout.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    binding.shimmerLayout.visibility = View.VISIBLE
                     binding.shimmerLayout.startShimmer()
                 }
 
                 DataStatus.Status.Success -> {
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.shimmerLayout.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
                         youtubeContentViewRecyclerViewAdapter =
@@ -170,14 +198,68 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-                DataStatus.Status.NoInternet -> {
-                    Toast.makeText(requireContext(),"No Internet",Toast.LENGTH_LONG).show()
+                DataStatus.Status.EmptyResult -> {
+                    binding.noInternetLinearLayout.visibility = View.GONE
+                    binding.contentsRecyclerView.visibility = View.GONE
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.VISIBLE
                 }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingContentsFailed = true
+                    binding.contentsRecyclerView.visibility = View.GONE
+                    binding.shimmerLayout.stopShimmer()
+                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
+                    binding.noSearchResultConstraintLayout.visibility = View.GONE
+                    binding.noInternetLinearLayout.visibility = View.VISIBLE
+                }
+
                 DataStatus.Status.TimeOut -> {}
+
                 DataStatus.Status.UnAuthorized -> {}
+
                 DataStatus.Status.UnKnownException -> {}
             }
+        }
+
+        viewModel.categories.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.NoInternet -> {
+                    loadingCategoriesFailed = true
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
+        connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
+            when (isAvailable) {
+                true -> {
+                    if (loadingCategoriesFailed) {
+                        loadingCategoriesFailed = false
+                        viewModel.getCategories()
+                    }
+                    if (loadingContentsFailed) {
+                        loadingContentsFailed = false
+                        viewModel.getShuffledContentIdsFor(selectedCategoryId)
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+
+        binding.retryAfterNoResultButton.setOnClickListener {
+            viewModel.getShuffledContentIdsFor(selectedCategoryId)
+        }
+
+        binding.retryAfterNoInternetButton.setOnClickListener {
+            viewModel.getShuffledContentIdsFor(selectedCategoryId)
         }
 
     }
@@ -283,7 +365,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
         selectedCategoryPosition = position
         selectedCategoryId = shuffledCategory.id
-        //viewModel.getShuffledContentIdsFor(selectedCategoryId)
+        viewModel.getShuffledContentIdsFor(selectedCategoryId)
     }
 
     override fun onChipLastItemClicked() {
