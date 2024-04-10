@@ -78,7 +78,6 @@ class EditProfileFieldFragment : Fragment() {
                 )
             }
         }
-
         mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
@@ -276,15 +275,26 @@ class EditProfileFieldFragment : Fragment() {
                     binding.saveButton.isEnabled = false
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "No Internet Connection."
+                    binding.saveButton.isEnabled = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Updating your profile is taking unusually long time. Please try again."
+                    binding.saveButton.isEnabled = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
@@ -329,15 +339,26 @@ class EditProfileFieldFragment : Fragment() {
                         .show()
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "No Internet Connection."
+                    binding.verifyButton.isEnabled = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    binding.progressLinearLayout.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Sending verification link is taking unusually long time. Please try again."
+                    binding.verifyButton.isEnabled = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
 
