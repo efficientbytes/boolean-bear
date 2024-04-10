@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val customAuthStateListener: CustomAuthStateListener by inject()
     private val serviceError: ServiceError by inject()
     private val statisticsRepository: StatisticsRepository by inject()
+    private var userProfileFailedToLoad = false
+    private var singleDeviceLoginFailedToLoad = false
+    private var serverTimeFailedToLoad = false
+    private var accountDeletionFailed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,27 +104,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     snackBar.show()
                 }
 
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     it.data?.let { userProfile ->
                         viewModel.saveUserProfile(userProfile)
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-
                 DataStatus.Status.NoInternet -> {
-
+                    userProfileFailedToLoad = true
                 }
 
-                DataStatus.Status.TimeOut -> {}
+                DataStatus.Status.TimeOut -> {
+                    userProfileFailedToLoad = true
+                }
 
-                DataStatus.Status.UnAuthorized -> {}
+                else -> {
 
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         customAuthStateListener.liveData.observe(this) {
@@ -164,21 +164,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.getFirebaseUserToken()
                 }
 
-                DataStatus.Status.Loading -> {
+                else -> {
 
                 }
-
-                DataStatus.Status.EmptyResult -> {}
-
-                DataStatus.Status.NoInternet -> {
-
-                }
-
-                DataStatus.Status.TimeOut -> {}
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
             }
         }
         serviceError.liveData.observe(this) { errorMessage ->
@@ -210,15 +198,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewModel.singleDeviceLoginFromServer.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    /*//failed to fetch try again
-                    FirebaseAuth.getInstance().currentUser?.let { user ->
-                        viewModel.getSingleDeviceLogin(user.uid)
-                    }*/
-
-                }
-
-                DataStatus.Status.Loading -> {
-
+                    singleDeviceLoginFailedToLoad = true
                 }
 
                 DataStatus.Status.Success -> {
@@ -244,15 +224,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    singleDeviceLoginFailedToLoad = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    singleDeviceLoginFailedToLoad = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         singleDeviceLoginListener.liveData.observe(this) {
@@ -285,14 +267,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         viewModel.serverTime.observe(this) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     val calendar: Calendar = Calendar.getInstance()
                     val now: Long = calendar.timeInMillis
@@ -313,40 +287,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                else -> {
 
-                DataStatus.Status.NoInternet -> {}
-
-                DataStatus.Status.TimeOut -> {}
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         viewModel.deleteUserAccountStatus.observe(this) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     viewModel.signOutUser()
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                DataStatus.Status.NoInternet -> {
+                    accountDeletionFailed = true
+                }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.TimeOut -> {
+                    accountDeletionFailed = true
+                }
 
-                DataStatus.Status.TimeOut -> {}
+                else -> {
 
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
         binding.retryButton.setOnClickListener {
@@ -374,6 +336,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin(currentUser.uid)
+                            if (userProfileFailedToLoad) {
+                                userProfileFailedToLoad = false
+                                userProfileRepository.getUserProfile(
+                                    currentUser.uid
+                                )
+                            }
+                            if (singleDeviceLoginFailedToLoad) {
+                                singleDeviceLoginFailedToLoad = false
+                                viewModel.getSingleDeviceLogin(
+                                    currentUser.uid
+                                )
+                            }
+                            if (accountDeletionFailed) {
+                                accountDeletionFailed = false
+                                viewModel.signOutUser()
+                            }
                         }
                     }
                     if (networkNotAvailableAtAppLoading) {
