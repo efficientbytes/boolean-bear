@@ -186,11 +186,24 @@ class CompleteProfileFragment : Fragment() {
                     findNavController().popBackStack(R.id.homeFragment, false)
                 }
 
-                DataStatus.Status.EmptyResult -> {}
-                DataStatus.Status.NoInternet -> {}
-                DataStatus.Status.TimeOut -> {}
-                DataStatus.Status.UnAuthorized -> {}
-                DataStatus.Status.UnKnownException -> {}
+                DataStatus.Status.NoInternet -> {
+                    binding.submitButton.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = "No Internet Connection."
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    binding.submitButton.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        "Updating profile is taking unsually long time. Please try submitting it again."
+                }
+
+                else -> {
+
+                }
             }
         }
     }
