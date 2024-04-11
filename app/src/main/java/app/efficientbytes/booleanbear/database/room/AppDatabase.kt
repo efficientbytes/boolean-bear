@@ -9,16 +9,18 @@ import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
 import app.efficientbytes.booleanbear.database.models.CategoryContentId
 import app.efficientbytes.booleanbear.database.models.Dummy
+import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.services.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.Profession
+import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class],
-    version = 2,
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, YoutubeContentView::class, LocalYoutubeContentView::class],
+    version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

@@ -110,57 +110,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         //set contents recycler view
         binding.contentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        viewModel.shuffledCategoryContentIds.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    binding.shimmerLayout.startShimmer()
-                }
-
-                DataStatus.Status.Success -> {
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    it.data?.let { shuffledContentIds ->
-                        viewModel.getYoutubeContentViewForListOf(shuffledContentIds.contentIds)
-                    }
-                }
-
-                DataStatus.Status.EmptyResult -> {
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.VISIBLE
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    loadingContentsFailed = true
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.VISIBLE
-                }
-
-                else -> {
-
-                }
-            }
-        }
-
         viewModel.youtubeContentViewList.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
@@ -221,12 +170,54 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
         viewModel.categories.observe(viewLifecycleOwner) {
             when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Failed -> {
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+                }
+
                 DataStatus.Status.NoInternet -> {
                     loadingCategoriesFailed = true
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.contentCategoryScrollView.visibility = View.GONE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    loadingContentsFailed = true
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+                }
+
+                DataStatus.Status.UnKnownException -> {
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
                 }
 
                 else -> {
-
+                    binding.contentCategoryScrollView.visibility = View.VISIBLE
+                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
                 }
             }
         }
@@ -236,11 +227,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 true -> {
                     if (loadingCategoriesFailed) {
                         loadingCategoriesFailed = false
-                        viewModel.getCategories()
+                        viewModel.getShuffledCategories()
                     }
                     if (loadingContentsFailed) {
                         loadingContentsFailed = false
-                        viewModel.getShuffledContentIdsFor(selectedCategoryId)
+                        viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
                     }
                 }
 
@@ -251,11 +242,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         }
 
         binding.retryAfterNoResultButton.setOnClickListener {
-            viewModel.getShuffledContentIdsFor(selectedCategoryId)
+            viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
         }
 
         binding.retryAfterNoInternetButton.setOnClickListener {
-            viewModel.getShuffledContentIdsFor(selectedCategoryId)
+            viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
         }
 
     }
@@ -361,7 +352,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
         selectedCategoryPosition = position
         selectedCategoryId = shuffledCategory.id
-        viewModel.getShuffledContentIdsFor(selectedCategoryId)
+        viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
     }
 
     override fun onChipLastItemClicked() {

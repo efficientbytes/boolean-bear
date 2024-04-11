@@ -18,6 +18,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
@@ -56,6 +57,7 @@ class MainViewModel(
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
     private val statisticsRepository: StatisticsRepository,
+    private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope
 ) : AndroidViewModel(application),
     LifecycleEventObserver {
@@ -298,6 +300,7 @@ class MainViewModel(
             }
 
             ON_STOP -> {
+                assetsRepository.deleteAllContents()
             }
 
             ON_DESTROY -> {
