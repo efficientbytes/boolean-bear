@@ -46,6 +46,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
     private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
     private val connectivityListener: ConnectivityListener by inject()
+    private var loginToContinueFragment: LoginToContinueFragment? = null
+    private var accountSettingsFragment: AccountSettingsFragment? = null
 
     companion object {
 
@@ -77,11 +79,16 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.accountSettingsMenu -> {
-                        val accountSettingsFragment = AccountSettingsFragment()
-                        accountSettingsFragment.show(
-                            parentFragmentManager,
-                            AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
-                        )
+                        if (accountSettingsFragment == null) {
+                            accountSettingsFragment = AccountSettingsFragment()
+                        }
+                        if (!AccountSettingsFragment.isOpened) {
+                            AccountSettingsFragment.isOpened = true
+                            accountSettingsFragment!!.show(
+                                parentFragmentManager,
+                                AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
+                            )
+                        }
                         return true
                     }
                 }
@@ -378,11 +385,16 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 )
             findNavController().navigate(directions)
         } else {
-            val loginToContinueFragment = LoginToContinueFragment()
-            loginToContinueFragment.show(
-                parentFragmentManager,
-                LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
-            )
+            if (loginToContinueFragment == null) {
+                loginToContinueFragment = LoginToContinueFragment()
+            }
+            if (!LoginToContinueFragment.isOpened) {
+                LoginToContinueFragment.isOpened = true
+                loginToContinueFragment!!.show(
+                    parentFragmentManager,
+                    LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
+                )
+            }
         }
     }
 

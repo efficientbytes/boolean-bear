@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,8 +19,8 @@ class LoginToContinueFragment : BottomSheetDialogFragment() {
     companion object {
 
         const val LOGIN_TO_CONTINUE_FRAGMENT: String = "frag-login-to-continue"
+        var isOpened: Boolean = false
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +38,26 @@ class LoginToContinueFragment : BottomSheetDialogFragment() {
             dismiss()
             findNavController().navigate(R.id.homeFragment_to_loginOrSignUpFragment)
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isOpened = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isOpened = false
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        isOpened = false
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isOpened = false
     }
 
 }

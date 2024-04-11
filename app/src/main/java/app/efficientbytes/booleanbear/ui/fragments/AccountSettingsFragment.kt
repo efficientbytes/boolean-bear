@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
     companion object {
 
         const val ACCOUNT_SETTINGS_FRAGMENT: String = "frag-account-settings"
+        var isOpened: Boolean = false
     }
 
     private lateinit var _binding: FragmentAccountSettingsBinding
@@ -84,4 +86,23 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         startActivity(Intent.createChooser(intent, "Select One"))
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isOpened = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isOpened = false
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        isOpened = false
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isOpened = false
+    }
 }
