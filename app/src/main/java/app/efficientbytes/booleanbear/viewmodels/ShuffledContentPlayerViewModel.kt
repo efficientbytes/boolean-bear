@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import app.efficientbytes.booleanbear.models.ContentViewType
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
@@ -51,7 +52,7 @@ class ShuffledContentPlayerViewModel(
     private var suggestedContentJob: Job? = null
     fun getSuggestedContent(contentId: String) {
         suggestedContentJob = externalScope.launch(Dispatchers.IO) {
-            assetsRepository.getYoutubeTypeContentViewForContentId(contentId).collect {
+            assetsRepository.fetchContent(contentId, ContentViewType.YOUTUBE).collect {
                 _suggestedContent.postValue(it)
             }
         }
