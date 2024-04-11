@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.utils.LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE
 import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
 import kotlinx.coroutines.flow.Flow
 
@@ -19,5 +22,14 @@ interface AssetsDao {
 
     @Query("SELECT * FROM $SHUFFLED_CATEGORY_TABLE ORDER BY `index`")
     fun getShuffledCategories(): Flow<MutableList<ShuffledCategory>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShuffledCategoryContents(contents: List<LocalYoutubeContentView>)
+
+    @Query("SELECT * FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE WHERE categoryId = :category")
+    suspend fun getShuffledYoutubeViewContents(category: String): List<YoutubeContentView>
+
+    @Query("DELETE FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE ")
+    suspend fun deleteShuffledYoutubeContentView()
 
 }
