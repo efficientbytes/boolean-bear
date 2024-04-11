@@ -99,5 +99,8 @@
     <string name="share">Share</string>
     <string name="full_description">+ Full Description</string>
     <string name="up_next">Up Next</string>
+    <string name="login_to_access_the_videos">Login to access the videos.</string>
+    <string name="unlock_the_videos_by_signing_in_now_your_access_awaits_with_a_quick_login">Unlock the videos by signing in now. Your access awaits with a quick login.</string>
+    <string name="login_now">Login Now</string>
 
 </resources>

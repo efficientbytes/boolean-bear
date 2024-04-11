@@ -32,6 +32,9 @@
         <action
             android:id="@+id/homeFragment_to_shuffledContentPlayerFragment"
             app:destination="@id/shuffledContentPlayerFragment" />
+        <action
+            android:id="@+id/homeFragment_to_loginToContinueFragment"
+            app:destination="@id/loginToContinueFragment" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -198,4 +201,8 @@
             android:name="contentId"
             app:argType="string" />
     </fragment>
+    <dialog
+        android:id="@+id/loginToContinueFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.LoginToContinueFragment"
+        android:label="LoginToContinueFragment" />
 </navigation>
