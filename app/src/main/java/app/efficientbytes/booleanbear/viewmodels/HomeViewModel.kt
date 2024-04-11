@@ -14,101 +14,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
-import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
-    private val assetsDao: AssetsDao,
-    private val externalScope: CoroutineScope,
 ) : ViewModel(),
-    LifecycleEventObserver {
+    LifecycleEventObserver, AssetsRepository.CategoryListener, AssetsRepository.ContentListener {
 
     val contentCategoriesFromDB: LiveData<MutableList<ShuffledCategory>> =
         assetsRepository.categoriesFromDB.asLiveData()
-    private val _categories: MutableLiveData<DataStatus<ContentCategoriesStatus>> =
-        MutableLiveData()
-    val categories: LiveData<DataStatus<ContentCategoriesStatus>> = _categories
+    private val _categories: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val categories: LiveData<DataStatus<Boolean>> = _categories
 
-    fun getCategories() {
-        externalScope.launch(Dispatchers.IO) {
-            assetsRepository.getShuffledCategories().collect {
-                _categories.postValue(it)
-                when (it.status) {
-                    DataStatus.Status.Failed -> {
-
-                    }
-
-                    DataStatus.Status.Loading -> {
-
-                    }
-
-                    DataStatus.Status.Success -> {
-                        it.data?.let { list ->
-                            val serviceContentCategory =
-                                list.categoryList.find { serviceContentCategory -> serviceContentCategory.index == 1 }
-                            serviceContentCategory?.let { category ->
-                                HomeFragment.selectedCategoryId = category.id
-                                HomeFragment.selectedCategoryPosition = 0
-                                getShuffledContentIdsFor(category.id)
-                            }
-                            assetsRepository.saveShuffledCategories(list.categoryList)
-                        }
-                    }
-
-                    DataStatus.Status.EmptyResult -> {
-
-                    }
-
-                    DataStatus.Status.NoInternet -> {
-                        HomeFragment.loadingCategoriesFailed = true
-                    }
-
-                    DataStatus.Status.TimeOut -> {
-
-                    }
-
-                    DataStatus.Status.UnAuthorized -> {
-
-                    }
-
-                    DataStatus.Status.UnKnownException -> {
-
-                    }
-                }
-            }
-        }
-    }
-
-    private val _shuffledCategoryContentIds: MutableLiveData<DataStatus<ShuffledCategoryContentIds?>> =
-        MutableLiveData()
-    val shuffledCategoryContentIds: LiveData<DataStatus<ShuffledCategoryContentIds?>> =
-        _shuffledCategoryContentIds
-    private var contentIdListJob: Job? = null
-    private var youtubeContentViewJob: Job? = null
-
-    fun getShuffledContentIdsFor(categoryId: String) {
-        if (contentIdListJob != null || youtubeContentViewJob != null) {
-            contentIdListJob?.cancel()
-            youtubeContentViewJob?.cancel()
-            contentIdListJob = null
-            youtubeContentViewJob = null
-        }
-        contentIdListJob = externalScope.launch {
-            assetsRepository.getContentIdsUnderShuffledCategoryForCategoryId(categoryId).collect {
-                _shuffledCategoryContentIds.postValue(it)
-            }
-        }
+    fun getShuffledCategories() {
+        assetsRepository.downloadShuffledCategories(this@HomeViewModel)
     }
 
     private val _youtubeContentViewList: MutableLiveData<DataStatus<List<YoutubeContentView>>> =
@@ -116,22 +39,14 @@ class HomeViewModel(
     val youtubeContentViewList: LiveData<DataStatus<List<YoutubeContentView>>> =
         _youtubeContentViewList
 
-    fun getYoutubeContentViewForListOf(list: List<String>) {
-        youtubeContentViewJob = externalScope.launch(Dispatchers.IO) {
-            _youtubeContentViewList.postValue(DataStatus.loading())
-            val result = assetsRepository.getYoutubeTypeContentForListOf(list)
-            if (result.isEmpty()) {
-                _youtubeContentViewList.postValue(DataStatus.emptyResult())
-            } else {
-                _youtubeContentViewList.postValue(DataStatus.success(result))
-            }
-        }
+    fun getYoutubeViewContentsUnderShuffledCategory(categoryId: String) {
+        assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-                getCategories()
+                getShuffledCategories()
             }
 
             ON_START -> {
@@ -158,6 +73,18 @@ class HomeViewModel(
 
             }
         }
+    }
+
+    override fun onCategoryDataStatusChanged(status: DataStatus<Boolean>) {
+        _categories.postValue(status)
+    }
+
+    override fun onIndex1CategoryFound(categoryId: String) {
+        assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
+    }
+
+    override fun onContentsDataStatusChanged(status: DataStatus<List<YoutubeContentView>>) {
+        _youtubeContentViewList.postValue(status)
     }
 
 }
