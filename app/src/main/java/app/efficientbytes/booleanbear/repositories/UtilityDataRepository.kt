@@ -8,7 +8,6 @@ import app.efficientbytes.booleanbear.services.models.Profession
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -22,10 +21,7 @@ class UtilityDataRepository(
     private val utilityDataDao: UtilityDataDao,
 ) {
 
-    val professionAdapterListFromDB: Flow<MutableList<Profession>> =
-        utilityDataDao.getProfessionAdapterList()
-
-    suspend fun getProfessionAdapterList() = flow {
+    private fun fetchProfessionsAdapterList() = flow {
         try {
             emit(DataStatus.loading())
             val response = utilityDataService.getProfessionAdapterList()
@@ -33,83 +29,172 @@ class UtilityDataRepository(
             when {
                 responseCode == 200 -> {
                     val professionList = response.body() ?: emptyList()
-                    if (professionList.isNotEmpty()) {
-                        deleteProfessions()
-                        saveProfessionAdapterList(professionList)
-                        emit(DataStatus.success<Boolean>(true))
+                    if (professionList.isEmpty()) {
+                        emit(DataStatus.emptyResult())
+                    } else {
+                        emit(DataStatus.success(professionList))
                     }
                 }
 
                 responseCode >= 400 -> {
-                    emit(DataStatus.failed<Boolean>(""))
+                    emit(DataStatus.failed(""))
                 }
             }
         } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet<Boolean>())
+            emit(DataStatus.noInternet())
         } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut<Boolean>())
+            emit(DataStatus.timeOut())
         } catch (exception: IOException) {
-            emit(DataStatus.unknownException<Boolean>(exception.message.toString()))
+            emit(DataStatus.unknownException(exception.message.toString()))
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    private fun saveProfessionAdapterList(professionAdapterList: List<Profession>) {
+    fun getProfessionsAdapterList(utilityListener: UtilityListener) {
         externalScope.launch {
-            utilityDataDao.insertProfessionAdapterList(professionAdapterList)
+            utilityListener.onProfessionsAdapterListStatusChanged(DataStatus.loading())
+            val result = utilityDataDao.getProfessionAdapterList()
+            if (!result.isNullOrEmpty()) {
+                utilityListener.onProfessionsAdapterListStatusChanged(DataStatus.success(result))
+            } else {
+                fetchProfessionsAdapterList().collect {
+                    when (it.status) {
+                        DataStatus.Status.EmptyResult -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.emptyResult()
+                        )
+
+                        DataStatus.Status.Failed -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.failed(it.message.toString())
+                        )
+
+                        DataStatus.Status.Loading -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.loading()
+                        )
+
+                        DataStatus.Status.NoInternet -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.noInternet()
+                        )
+
+                        DataStatus.Status.Success -> {
+                            it.data?.let { professionList ->
+                                utilityListener.onProfessionsAdapterListStatusChanged(
+                                    DataStatus.success(professionList)
+                                )
+                                utilityDataDao.insertProfessionAdapterList(professionList)
+                            }
+                        }
+
+                        DataStatus.Status.TimeOut -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.timeOut()
+                        )
+
+                        DataStatus.Status.UnAuthorized -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.unAuthorized()
+                        )
+
+                        DataStatus.Status.UnKnownException -> utilityListener.onProfessionsAdapterListStatusChanged(
+                            DataStatus.unknownException(it.message.toString())
+                        )
+                    }
+                }
+            }
         }
     }
 
-    private fun deleteProfessions() {
+    fun deleteProfessions() {
         externalScope.launch {
             utilityDataDao.deleteProfessionAdapterList()
         }
     }
 
-    val issueCategoryAdapterListFromDB: Flow<MutableList<IssueCategory>> =
-        utilityDataDao.getIssueCategoryAdapterList()
-
-    suspend fun getIssueCategoryAdapterList() = flow {
+    private fun fetchIssueCategoriesAdapterList() = flow {
         try {
-            emit(DataStatus.loading<Boolean>())
+            emit(DataStatus.loading())
             val response = utilityDataService.getIssueCategoryAdapterList()
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val issueCategoryList = response.body() ?: emptyList()
-                    if (issueCategoryList.isNotEmpty()) {
-                        deleteIssueCategories()
-                        saveIssueCategoryAdapterList(
-                            issueCategoryList
-                        )
-                        emit(DataStatus.success<Boolean>(true))
+                    val issueCategoriesList = response.body() ?: emptyList()
+                    if (issueCategoriesList.isEmpty()) {
+                        emit(DataStatus.emptyResult())
+                    } else {
+                        emit(DataStatus.success(issueCategoriesList))
                     }
                 }
 
                 responseCode >= 400 -> {
-                    emit(DataStatus.failed<Boolean>(""))
+                    emit(DataStatus.failed(""))
                 }
             }
         } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet<Boolean>())
+            emit(DataStatus.noInternet())
         } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut<Boolean>())
+            emit(DataStatus.timeOut())
         } catch (exception: IOException) {
-            emit(DataStatus.unknownException<Boolean>(exception.message.toString()))
+            emit(DataStatus.unknownException(exception.message.toString()))
         }
-    }.catch { t -> emit(DataStatus.unknownException<Boolean>(t.message.toString())) }
-        .flowOn(Dispatchers.IO)
+    }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    private fun saveIssueCategoryAdapterList(issueCategoryAdapterList: List<IssueCategory>) {
+    fun getIssueCategoriesAdapterList(utilityListener: UtilityListener) {
         externalScope.launch {
-            utilityDataDao.insertIssueCategoryAdapterList(issueCategoryAdapterList)
+            utilityListener.onIssueCategoriesAdapterListStatusChanged(DataStatus.loading())
+            val result = utilityDataDao.getIssueCategoryAdapterList()
+            if (!result.isNullOrEmpty()) {
+                utilityListener.onIssueCategoriesAdapterListStatusChanged(DataStatus.success(result))
+            } else {
+                fetchIssueCategoriesAdapterList().collect {
+                    when (it.status) {
+                        DataStatus.Status.EmptyResult -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.emptyResult()
+                        )
+
+                        DataStatus.Status.Failed -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.failed(it.message.toString())
+                        )
+
+                        DataStatus.Status.Loading -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.loading()
+                        )
+
+                        DataStatus.Status.NoInternet -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.noInternet()
+                        )
+
+                        DataStatus.Status.Success -> {
+                            it.data?.let { issueCategoriesList ->
+                                utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                                    DataStatus.success(issueCategoriesList)
+                                )
+                                utilityDataDao.insertIssueCategoryAdapterList(issueCategoriesList)
+                            }
+                        }
+
+                        DataStatus.Status.TimeOut -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.timeOut()
+                        )
+
+                        DataStatus.Status.UnAuthorized -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.unAuthorized()
+                        )
+
+                        DataStatus.Status.UnKnownException -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
+                            DataStatus.unknownException(it.message.toString())
+                        )
+                    }
+                }
+            }
         }
     }
 
-    private fun deleteIssueCategories() {
+    fun deleteIssueCategories() {
         externalScope.launch {
             utilityDataDao.deleteIssueCategoryAdapterList()
         }
     }
 
+    interface UtilityListener {
+
+        fun onProfessionsAdapterListStatusChanged(status: DataStatus<List<Profession>>)
+        fun onIssueCategoriesAdapterListStatusChanged(status: DataStatus<List<IssueCategory>>)
+    }
 
 }

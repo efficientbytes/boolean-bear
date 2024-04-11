@@ -60,7 +60,7 @@ class MainViewModel(
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope
 ) : AndroidViewModel(application),
-    LifecycleEventObserver {
+    LifecycleEventObserver, UtilityDataRepository.UtilityListener {
 
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
@@ -192,32 +192,22 @@ class MainViewModel(
         }
     }
 
-    val professionAdapterListFromDB: LiveData<MutableList<Profession>> =
-        utilityDataRepository.professionAdapterListFromDB.asLiveData()
-    private val _professionalAdapterList: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val professionalAdapterList: LiveData<DataStatus<Boolean>> = _professionalAdapterList
+    private val _professionalAdapterList: MutableLiveData<DataStatus<List<Profession>>> =
+        MutableLiveData()
+    val professionalAdapterList: LiveData<DataStatus<List<Profession>>> = _professionalAdapterList
 
     fun getProfessionalAdapterList() {
-        externalScope.launch {
-            utilityDataRepository.getProfessionAdapterList().collect {
-                _professionalAdapterList.postValue(it)
-            }
-        }
+        utilityDataRepository.getProfessionsAdapterList(this@MainViewModel)
     }
 
-    private val _issueCategoriesAdapter: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val issueCategoriesAdapter: LiveData<DataStatus<Boolean>> = _issueCategoriesAdapter
+    private val _issueCategoriesAdapter: MutableLiveData<DataStatus<List<IssueCategory>>> =
+        MutableLiveData()
+    val issueCategoriesAdapter: LiveData<DataStatus<List<IssueCategory>>> = _issueCategoriesAdapter
 
     fun getIssueCategoriesAdapterList() {
-        externalScope.launch {
-            utilityDataRepository.getIssueCategoryAdapterList().collect {
-                _issueCategoriesAdapter.postValue(it)
-            }
-        }
+        utilityDataRepository.getIssueCategoriesAdapterList(this@MainViewModel)
     }
 
-    val issueCategoryAdapterListFromDB: LiveData<MutableList<IssueCategory>> =
-        utilityDataRepository.issueCategoryAdapterListFromDB.asLiveData()
     private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
         MutableLiveData()
     val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
@@ -310,5 +300,13 @@ class MainViewModel(
             ON_ANY -> {
             }
         }
+    }
+
+    override fun onProfessionsAdapterListStatusChanged(status: DataStatus<List<Profession>>) {
+        _professionalAdapterList.postValue(status)
+    }
+
+    override fun onIssueCategoriesAdapterListStatusChanged(status: DataStatus<List<IssueCategory>>) {
+        _issueCategoriesAdapter.postValue(status)
     }
 }

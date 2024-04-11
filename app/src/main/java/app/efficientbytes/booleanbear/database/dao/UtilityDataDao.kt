@@ -8,7 +8,6 @@ import app.efficientbytes.booleanbear.services.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.Profession
 import app.efficientbytes.booleanbear.utils.ISSUE_CATEGORY_ADAPTER_TABLE
 import app.efficientbytes.booleanbear.utils.PROFESSION_ADAPTER_TABLE
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UtilityDataDao {
@@ -20,7 +19,7 @@ interface UtilityDataDao {
     suspend fun deleteProfessionAdapterList()
 
     @Query("SELECT * FROM $PROFESSION_ADAPTER_TABLE ")
-    fun getProfessionAdapterList(): Flow<MutableList<Profession>>
+    suspend fun getProfessionAdapterList(): List<Profession>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIssueCategoryAdapterList(issueCategories: List<IssueCategory>)
@@ -29,6 +28,6 @@ interface UtilityDataDao {
     suspend fun deleteIssueCategoryAdapterList()
 
     @Query("SELECT * FROM $ISSUE_CATEGORY_ADAPTER_TABLE ")
-    fun getIssueCategoryAdapterList(): Flow<MutableList<IssueCategory>>
+    suspend fun getIssueCategoryAdapterList(): List<IssueCategory>?
 
 }
