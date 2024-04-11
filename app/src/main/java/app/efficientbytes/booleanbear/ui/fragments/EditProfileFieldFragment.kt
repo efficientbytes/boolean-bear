@@ -16,6 +16,7 @@ import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.ui.models.EDIT_PROFILE_FIELD
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
@@ -35,6 +36,9 @@ class EditProfileFieldFragment : Fragment() {
     private var currentProfessionCategoryPosition: Int = 0
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private val viewModel: EditProfileFieldViewModel by inject()
+    private val connectivityListener: ConnectivityListener by inject()
+    private var professionsListFailedToLoad = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
@@ -60,22 +64,41 @@ class EditProfileFieldFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.GONE
         binding.progressLinearLayout.visibility = View.GONE
         var currentValue = ""
-        mainViewModel.professionAdapterListFromDB.observe(viewLifecycleOwner) { professionList ->
-            professionList?.let {
-                val currentProfessionCategories = it.map { item -> item.name }
-                val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.drop_down_item,
-                    currentProfessionCategories
-                )
-                val userProfile = SingletonUserData.getInstance()?.profession
-                userProfile?.let { index ->
-                    val profession = currentProfessionCategories[index]
-                    binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+        mainViewModel.getProfessionalAdapterList()
+        mainViewModel.professionalAdapterList.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.NoInternet -> {
+                    professionsListFailedToLoad = true
                 }
-                binding.currentProfessionAutoCompleteTextView.setAdapter(
-                    currentProfessionCategoryDropDownAdapter
-                )
+
+                DataStatus.Status.Success -> {
+                    val professionsAdapterList = it.data
+                    if (professionsAdapterList != null) {
+                        val currentProfessionCategories =
+                            professionsAdapterList.map { item -> item.name }
+                        val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
+                            requireContext(),
+                            R.layout.drop_down_item,
+                            currentProfessionCategories
+                        )
+                        val userProfile = SingletonUserData.getInstance()?.profession
+                        userProfile?.let { index ->
+                            val profession = currentProfessionCategories[index]
+                            binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+                        }
+                        binding.currentProfessionAutoCompleteTextView.setAdapter(
+                            currentProfessionCategoryDropDownAdapter
+                        )
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    professionsListFailedToLoad = true
+                }
+
+                else -> {
+
+                }
             }
         }
         mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
@@ -357,6 +380,21 @@ class EditProfileFieldFragment : Fragment() {
                 }
 
                 else -> {
+
+                }
+            }
+        }
+
+        connectivityListener.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    if (professionsListFailedToLoad) {
+                        professionsListFailedToLoad = false
+                        mainViewModel.getProfessionalAdapterList()
+                    }
+                }
+
+                false -> {
 
                 }
             }

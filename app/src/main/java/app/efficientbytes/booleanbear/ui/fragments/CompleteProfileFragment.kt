@@ -15,6 +15,7 @@ import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCompleteProfileBinding
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.CompleteProfileViewModel
@@ -33,6 +34,8 @@ class CompleteProfileFragment : Fragment() {
     private var currentProfessionCategoryPosition: Int = 0
     private val viewModel: CompleteProfileViewModel by inject()
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
+    private val connectivityListener: ConnectivityListener by inject()
+    private var professionsListFailedToLoad = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,20 +67,40 @@ class CompleteProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.phoneNumberTextInputEditText.setText(phoneNumber)
-        mainViewModel.professionAdapterListFromDB.observe(viewLifecycleOwner) { professionList ->
-            professionList?.let {
-                val currentProfessionCategories = it.map { item -> item.name }
-                val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
-                    requireContext(),
-                    R.layout.drop_down_item,
-                    currentProfessionCategories
-                )
-                val profession = currentProfessionCategories[currentProfessionCategoryPosition]
-                binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+        mainViewModel.getProfessionalAdapterList()
+        mainViewModel.professionalAdapterList.observe(viewLifecycleOwner) { it ->
+            when (it.status) {
+                DataStatus.Status.NoInternet -> {
+                    professionsListFailedToLoad = true
+                }
 
-                binding.currentProfessionAutoCompleteTextView.setAdapter(
-                    currentProfessionCategoryDropDownAdapter
-                )
+                DataStatus.Status.Success -> {
+                    val professionsAdapterList = it.data
+                    if (professionsAdapterList != null) {
+                        val currentProfessionCategories =
+                            professionsAdapterList.map { item -> item.name }
+                        val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
+                            requireContext(),
+                            R.layout.drop_down_item,
+                            currentProfessionCategories
+                        )
+                        val profession =
+                            currentProfessionCategories[currentProfessionCategoryPosition]
+                        binding.currentProfessionAutoCompleteTextView.setText(profession, true)
+
+                        binding.currentProfessionAutoCompleteTextView.setAdapter(
+                            currentProfessionCategoryDropDownAdapter
+                        )
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    professionsListFailedToLoad = true
+                }
+
+                else -> {
+
+                }
             }
         }
         val currentProfessionCategories =
@@ -202,6 +225,20 @@ class CompleteProfileFragment : Fragment() {
                 }
 
                 else -> {
+
+                }
+            }
+        }
+        connectivityListener.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    if (professionsListFailedToLoad) {
+                        professionsListFailedToLoad = false
+                        mainViewModel.getProfessionalAdapterList()
+                    }
+                }
+
+                false -> {
 
                 }
             }
