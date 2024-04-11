@@ -27,7 +27,10 @@ interface AssetsDao {
     suspend fun insertShuffledCategoryContents(contents: List<LocalYoutubeContentView>)
 
     @Query("SELECT * FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE WHERE categoryId = :category")
-    suspend fun getShuffledYoutubeViewContents(category: String): List<YoutubeContentView>
+    suspend fun getAllShuffledYoutubeViewContents(category: String): List<YoutubeContentView>
+
+    @Query("SELECT * FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE WHERE contentId = :content")
+    suspend fun getShuffledYoutubeViewContent(content: String): YoutubeContentView?
 
     @Query("DELETE FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE ")
     suspend fun deleteShuffledYoutubeContentView()

@@ -166,37 +166,42 @@ class AssetsRepository(
         emit(DataStatus.loading())
         when (viewType) {
             ContentViewType.YOUTUBE -> {
-                try {
-                    val response = assetsService.getYoutubeTypeContentForContentId(contentId)
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            val body = response.body()
-                            if (body != null) {
-                                if (body.youtubeContentView == null) {
-                                    emit(DataStatus.emptyResult<YoutubeContentView>())
+                val result = assetsDao.getShuffledYoutubeViewContent(contentId)
+                if (result != null) {
+                    emit(DataStatus.success(result))
+                } else {
+                    try {
+                        val response = assetsService.getYoutubeTypeContentForContentId(contentId)
+                        val responseCode = response.code()
+                        when {
+                            responseCode == 200 -> {
+                                val body = response.body()
+                                if (body != null) {
+                                    if (body.youtubeContentView == null) {
+                                        emit(DataStatus.emptyResult<YoutubeContentView>())
+                                    } else {
+                                        emit(DataStatus.success(body.youtubeContentView))
+                                    }
                                 } else {
-                                    emit(DataStatus.success(body.youtubeContentView))
+                                    emit(DataStatus.emptyResult<YoutubeContentView>())
                                 }
-                            } else {
-                                emit(DataStatus.emptyResult<YoutubeContentView>())
+                            }
+
+                            responseCode >= 400 -> {
+                                val errorResponse: ContentCategoriesStatus = gson.fromJson(
+                                    response.errorBody()!!.string(),
+                                    ContentCategoriesStatus::class.java
+                                )
+                                emit(DataStatus.failed<YoutubeContentView>(errorResponse.message))
                             }
                         }
-
-                        responseCode >= 400 -> {
-                            val errorResponse: ContentCategoriesStatus = gson.fromJson(
-                                response.errorBody()!!.string(),
-                                ContentCategoriesStatus::class.java
-                            )
-                            emit(DataStatus.failed<YoutubeContentView>(errorResponse.message))
-                        }
+                    } catch (noInternet: NoInternetException) {
+                        emit(DataStatus.noInternet<YoutubeContentView>())
+                    } catch (socketTimeOutException: SocketTimeoutException) {
+                        emit(DataStatus.timeOut<YoutubeContentView>())
+                    } catch (exception: IOException) {
+                        emit(DataStatus.unknownException<YoutubeContentView>(exception.message.toString()))
                     }
-                } catch (noInternet: NoInternetException) {
-                    emit(DataStatus.noInternet<YoutubeContentView>())
-                } catch (socketTimeOutException: SocketTimeoutException) {
-                    emit(DataStatus.timeOut<YoutubeContentView>())
-                } catch (exception: IOException) {
-                    emit(DataStatus.unknownException<YoutubeContentView>(exception.message.toString()))
                 }
             }
         }
@@ -327,7 +332,7 @@ class AssetsRepository(
         allContentJob = externalScope.launch {
             if (categoryType === CategoryType.SHUFFLED) {
                 contentListener.onContentsDataStatusChanged(DataStatus.loading())
-                val listFromDB = assetsDao.getShuffledYoutubeViewContents(categoryId)
+                val listFromDB = assetsDao.getAllShuffledYoutubeViewContents(categoryId)
                 if (listFromDB.isNotEmpty()) {
                     contentListener.onContentsDataStatusChanged(DataStatus.success(listFromDB))
                 } else {
