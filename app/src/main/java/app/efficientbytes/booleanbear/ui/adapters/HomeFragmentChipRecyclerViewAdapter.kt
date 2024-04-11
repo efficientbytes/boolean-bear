@@ -56,8 +56,8 @@ class HomeFragmentChipRecyclerViewAdapter(
             if (checkedPosition != -1) {
                 if (checkedPosition == bindingAdapterPosition) {
                     binding.chipCardView.strokeWidth = 0
-                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_checked_color))
-                    binding.titleValueTextView.setTextColor(context.getColor(R.color.white))
+                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
+                    binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
                 } else {
                     binding.chipCardView.strokeWidth = 2
                     binding.chipCardView.strokeColor =
@@ -69,8 +69,8 @@ class HomeFragmentChipRecyclerViewAdapter(
                 binding.chipCardView.setOnClickListener {
                     itemClickListener.onChipItemClicked(bindingAdapterPosition, item)
                     binding.chipCardView.strokeWidth = 0
-                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_checked_color))
-                    binding.titleValueTextView.setTextColor(context.getColor(R.color.white))
+                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
+                    binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
                     if (checkedPosition != bindingAdapterPosition) {
                         notifyItemChanged(checkedPosition)
                         checkedPosition = bindingAdapterPosition
