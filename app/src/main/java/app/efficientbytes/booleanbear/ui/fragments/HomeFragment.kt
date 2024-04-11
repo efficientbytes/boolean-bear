@@ -371,9 +371,19 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         position: Int,
         youtubeContentView: YoutubeContentView
     ) {
-        val directions =
-            HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(youtubeContentView.contentId)
-        findNavController().navigate(directions)
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            val directions =
+                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
+                    youtubeContentView.contentId
+                )
+            findNavController().navigate(directions)
+        } else {
+            val loginToContinueFragment = LoginToContinueFragment()
+            loginToContinueFragment.show(
+                parentFragmentManager,
+                LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
+            )
+        }
     }
 
 }
