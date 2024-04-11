@@ -127,8 +127,8 @@
                     app:layout_constraintTop_toBottomOf="@id/categoriesRecyclerView">
 
                     <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="220dp"
+                        android:layout_height="220dp"
                         android:src="@drawable/no_search_result_icon"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
