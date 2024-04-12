@@ -4,7 +4,10 @@ import android.content.Context
 import android.util.Log
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.InstructorLiveListener
+import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
 import app.efficientbytes.booleanbear.utils.ServiceError
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
@@ -33,3 +36,9 @@ fun provideAuthStateCoroutineScope() = AuthStateCoroutineScope
 fun provideCustomAuthStateListener() = CustomAuthStateListener
 
 fun provideServiceError() = ServiceError
+
+fun provideInstructorLiveListener() = InstructorLiveListener()
+
+fun provideMentionedLinksLiveListener() = MentionedLinksLiveListener()
+
+fun provideContentDetailsLiveListener() = ContentDetailsLiveListener()

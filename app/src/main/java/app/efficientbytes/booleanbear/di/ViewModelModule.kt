@@ -26,5 +26,5 @@ val viewModelModule = module {
     viewModel { AccountSettingsViewModel(get()) }
     viewModel { EditProfileFieldViewModel(get(), get()) }
     viewModel { ShareFeedbackViewModel(get()) }
-    viewModel { ShuffledContentPlayerViewModel(get(), get()) }
+    viewModel { ShuffledContentPlayerViewModel(get(), get(), get(), get(), get()) }
 }
