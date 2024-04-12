@@ -12,6 +12,9 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
+import app.efficientbytes.booleanbear.utils.InstructorLiveListener
+import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,6 +23,9 @@ import kotlinx.coroutines.launch
 class ShuffledContentPlayerViewModel(
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope,
+    private val instructorLiveListener: InstructorLiveListener,
+    private val mentionedLinksLiveListener: MentionedLinksLiveListener,
+    private val contentDetailsLiveListener: ContentDetailsLiveListener
 ) : ViewModel(), LifecycleEventObserver {
 
     private val _playUrl: MutableLiveData<DataStatus<PlayUrl?>> = MutableLiveData()
@@ -42,6 +48,7 @@ class ShuffledContentPlayerViewModel(
         playDetailsJob = externalScope.launch(Dispatchers.IO) {
             assetsRepository.getPlayDetails(contentId).collect {
                 _playDetails.postValue(it)
+                contentDetailsLiveListener.setContentDetailsStatus(it)
             }
         }
     }

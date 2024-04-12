@@ -18,5 +18,7 @@ data class PlayDetails(
     val instructorLastName: String? = null,
     val instructorProfilePic: String? = null,
     val nextSuggestion: String? = null,
-    val message: String? = null
+    val message: String? = null,
+    val hashTags: List<String>? = null,
+    val mentionedLinkIds: List<String>? = null
 )
