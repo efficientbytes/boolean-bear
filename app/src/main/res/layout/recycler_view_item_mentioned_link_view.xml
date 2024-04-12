@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/stroked_text_view_background">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mentionedLinkTitleValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat_light"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="Android Installation Link rhh4g84h 4rg4rhg4u"
+            android:textColor="@color/white_1000"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/copyToClipboardImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <ImageButton
+            android:id="@+id/externalLinkImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/external_link_icon"
+            app:layout_constraintBottom_toBottomOf="@id/mentionedLinkTitleValueTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/mentionedLinkTitleValueTextView"
+            app:tint="@color/white_1000">
+
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/copyToClipboardImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/copy_icon"
+            app:layout_constraintBottom_toBottomOf="@id/mentionedLinkTitleValueTextView"
+            app:layout_constraintEnd_toStartOf="@id/externalLinkImageButton"
+            app:layout_constraintTop_toTopOf="@id/mentionedLinkTitleValueTextView"
+            app:tint="@color/white_1000">
+
+        </ImageButton>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

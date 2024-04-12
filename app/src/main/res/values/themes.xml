@@ -79,4 +79,8 @@
         <item name="cornerSize">10%</item>
     </style>
 
+    <style name="CompletelyRounded">
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>
