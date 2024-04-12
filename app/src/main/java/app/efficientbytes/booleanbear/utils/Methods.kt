@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.PlayDetails
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -242,5 +243,38 @@ class NoInternetException : IOException() {
 
     override val message: String
         get() = "No Internet Connection."
+
+}
+
+class InstructorLiveListener() {
+
+    private val _mutableLiveData: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<Boolean>> = _mutableLiveData
+
+    fun setInstructorStatus(status: DataStatus<Boolean>) {
+        _mutableLiveData.postValue(status)
+    }
+
+}
+
+class MentionedLinksLiveListener() {
+
+    private val _mutableLiveData: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<Boolean>> = _mutableLiveData
+
+    fun setMentionedLinksStatus(status: DataStatus<Boolean>) {
+        _mutableLiveData.postValue(status)
+    }
+
+}
+
+class ContentDetailsLiveListener() {
+
+    private val _mutableLiveData: MutableLiveData<DataStatus<PlayDetails?>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<PlayDetails?>> = _mutableLiveData
+
+    fun setContentDetailsStatus(status: DataStatus<PlayDetails?>) {
+        _mutableLiveData.postValue(status)
+    }
 
 }
