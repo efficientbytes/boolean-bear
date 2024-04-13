@@ -44,7 +44,9 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:scrollbarSize="0dp"
+            android:scrollbars="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,7 +70,8 @@
                     android:id="@+id/shimmerTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"
@@ -87,7 +90,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:visibility="gone"
-                    app:cardBackgroundColor="@color/black_200"
+                    app:cardBackgroundColor="@color/black_600"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
@@ -134,7 +137,8 @@
                     android:id="@+id/shimmerInstructor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp">
+                    android:layout_marginTop="18dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"
@@ -161,7 +165,8 @@
                     android:id="@+id/shimmerDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp">
+                    android:layout_marginTop="22dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"
@@ -196,7 +201,8 @@
                     android:id="@+id/shimmerMentionedLinks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"
@@ -208,6 +214,7 @@
                 </com.facebook.shimmer.ShimmerFrameLayout>
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/hashTagsLabelTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -219,8 +226,9 @@
                     android:id="@+id/hashtagsChipGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone">
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"
+                    app:chipSpacingVertical="0dp">
 
                 </com.google.android.material.chip.ChipGroup>
 
@@ -228,7 +236,8 @@
                     android:id="@+id/shimmerHashtags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
 
                     <View
                         android:layout_width="match_parent"

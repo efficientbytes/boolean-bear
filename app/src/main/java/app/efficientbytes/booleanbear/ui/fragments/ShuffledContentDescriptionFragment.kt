@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentDescriptionBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.bindingadapters.loadImageFromUrl
@@ -12,6 +13,7 @@ import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
 class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
@@ -42,15 +44,8 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         contentDetailsLiveListener.liveData.observe(viewLifecycleOwner) {
             when (it.status) {
-                DataStatus.Status.EmptyResult -> {}
-
-                DataStatus.Status.Failed -> {}
-
                 DataStatus.Status.Loading -> {
                     shimmerContentDetails()
-                }
-
-                DataStatus.Status.NoInternet -> {
                 }
 
                 DataStatus.Status.Success -> {
@@ -59,20 +54,35 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
                         displayContentDetails()
                         binding.contentTitleValueTextView.text = details.title
                         binding.contentDescriptionValueTextView.text = details.description
-                        //check for if there are hast tags
-                        //if so hide the shimmer
-                        //if so populate the chip group
-                        //else hide the shimmer and the label - hash tag
+                        val hashTags = details.hashTags
+                        if (hashTags != null) {
+                            binding.hashtagsChipGroup.removeAllViews()
+                            for (item in hashTags) {
+                                binding.shimmerHashtags.stopShimmer()
+                                binding.shimmerHashtags.visibility = View.GONE
+                                binding.hashtagsChipGroup.visibility = View.VISIBLE
+                                val chip = Chip(requireContext())
+                                chip.textSize = 10F
+                                chip.text = "#" + item
+                                chip.chipStrokeWidth = 0F
+                                chip.elevation = 0F
+                                chip.isCheckable = false
+                                chip.chipBackgroundColor =
+                                    requireContext().getColorStateList(R.color.black_600)
+                                binding.hashtagsChipGroup.addView(chip)
+                            }
+                        } else {
+                            binding.shimmerHashtags.stopShimmer()
+                            binding.shimmerHashtags.visibility = View.GONE
+                            binding.hashTagsLabelTextView.visibility = View.GONE
+                            binding.hashtagsChipGroup.visibility = View.GONE
+                        }
                     }
                 }
 
-                DataStatus.Status.TimeOut -> {
+                else -> {
 
                 }
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
             }
         }
         instructorLiveListener.liveData.observe(viewLifecycleOwner) {
