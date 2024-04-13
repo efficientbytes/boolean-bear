@@ -11,6 +11,7 @@ import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -248,10 +249,11 @@ class NoInternetException : IOException() {
 
 class InstructorLiveListener() {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<Boolean>> = _mutableLiveData
+    private val _mutableLiveData: MutableLiveData<DataStatus<RemoteInstructorProfile>> =
+        MutableLiveData()
+    val liveData: LiveData<DataStatus<RemoteInstructorProfile>> = _mutableLiveData
 
-    fun setInstructorStatus(status: DataStatus<Boolean>) {
+    fun setInstructorStatus(status: DataStatus<RemoteInstructorProfile>) {
         _mutableLiveData.postValue(status)
     }
 

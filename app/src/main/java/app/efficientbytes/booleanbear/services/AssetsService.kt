@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
+import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
@@ -37,5 +38,10 @@ interface AssetsService {
     suspend fun getPlayDetails(
         @Path("contentId") contentId: String,
     ): Response<PlayDetails>
+
+    @GET("instructors/profile/{instructorId}")
+    suspend fun getInstructorDetails(
+        @Path("instructorId") instructorId: String,
+    ): Response<InstructorProfileStatus>
 
 }

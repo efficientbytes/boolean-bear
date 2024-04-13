@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
+import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
@@ -8,8 +9,10 @@ import app.efficientbytes.booleanbear.models.ContentViewType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
+import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
@@ -508,6 +511,122 @@ class AssetsRepository(
         }
     }
 
+    private fun fetchInstructorDetails(instructorId: String) = flow {
+        emit(DataStatus.loading<RemoteInstructorProfile>())
+        try {
+            val response = assetsService.getInstructorDetails(instructorId)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val instructorProfileStatus = response.body()
+                    if (instructorProfileStatus == null) {
+                        emit(DataStatus.emptyResult<RemoteInstructorProfile>())
+                    } else {
+                        val instructorProfile = instructorProfileStatus.instructorProfile
+                        if (instructorProfile == null) {
+                            emit(DataStatus.emptyResult<RemoteInstructorProfile>())
+                        } else {
+                            emit(DataStatus.success<RemoteInstructorProfile>(instructorProfile))
+                        }
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: InstructorProfileStatus = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        InstructorProfileStatus::class.java
+                    )
+                    emit(DataStatus.failed<RemoteInstructorProfile>(errorResponse.message.toString()))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }
+
+    fun getInstructorDetails(
+        instructorId: String,
+        instructorProfileListener: InstructorProfileListener
+    ) {
+        externalScope.launch {
+            val result = assetsDao.getInstructorProfile(instructorId)
+            if (result != null) {
+                instructorProfileListener.onInstructorProfileDataStatusChanged(
+                    DataStatus.success(
+                        result
+                    )
+                )
+            } else {
+                fetchInstructorDetails(instructorId).collect {
+                    when (it.status) {
+                        DataStatus.Status.EmptyResult -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.emptyResult()
+                        )
+
+                        DataStatus.Status.Failed -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.failed(it.message.toString())
+                        )
+
+                        DataStatus.Status.Loading -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.loading()
+                        )
+
+                        DataStatus.Status.NoInternet -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.noInternet()
+                        )
+
+                        DataStatus.Status.Success -> {
+                            val instructorProfile = it.data
+                            instructorProfile?.let { profile ->
+                                instructorProfileListener.onInstructorProfileDataStatusChanged(
+                                    DataStatus.success(profile)
+                                )
+                                val skillList = profile.skills ?: emptyList<String>()
+                                val localInstructorProfile = LocalInstructorProfile(
+                                    instructorId = profile.instructorId,
+                                    firstName = profile.firstName,
+                                    lastName = profile.lastName,
+                                    bio = profile.bio,
+                                    oneLineDescription = profile.oneLineDescription,
+                                    profession = profile.profession,
+                                    workingAt = profile.workingAt,
+                                    profileImage = profile.profileImage,
+                                    coverImage = profile.coverImage,
+                                    gitHubUsername = profile.gitHubUsername,
+                                    linkedInUsername = profile.linkedInUsername,
+                                    skills = skillList
+                                )
+                                assetsDao.insertInstructorProfile(localInstructorProfile)
+                            }
+                        }
+
+                        DataStatus.Status.TimeOut -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.timeOut()
+                        )
+
+                        DataStatus.Status.UnAuthorized -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.unAuthorized()
+                        )
+
+                        DataStatus.Status.UnKnownException -> instructorProfileListener.onInstructorProfileDataStatusChanged(
+                            DataStatus.unknownException(it.message.toString())
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteAllInstructorDetails() {
+        externalScope.launch {
+            assetsDao.deleteAllInstructorProfile()
+        }
+    }
+
     interface CategoryListener {
 
         fun onCategoryDataStatusChanged(status: DataStatus<Boolean>)
@@ -519,6 +638,12 @@ class AssetsRepository(
     interface ContentListener {
 
         fun onContentsDataStatusChanged(status: DataStatus<List<YoutubeContentView>>)
+
+    }
+
+    interface InstructorProfileListener {
+
+        fun onInstructorProfileDataStatusChanged(status: DataStatus<RemoteInstructorProfile>)
 
     }
 
