@@ -1,13 +1,18 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentDescriptionBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
+import app.efficientbytes.booleanbear.ui.adapters.MentionedLinkRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.bindingadapters.loadImageFromUrl
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
@@ -16,7 +21,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
+class ShuffledContentDescriptionFragment : BottomSheetDialogFragment(),
+    MentionedLinkRecyclerViewAdapter.OnItemClickListener {
 
     private lateinit var _binding: FragmentShuffledContentDescriptionBinding
     private val binding get() = _binding
@@ -24,6 +30,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
     private val instructorLiveListener: InstructorLiveListener by inject()
     private val mentionedLinksLiveListener: MentionedLinksLiveListener by inject()
     private val contentDetailsLiveListener: ContentDetailsLiveListener by inject()
+    private lateinit var mentionedLinkRecyclerViewAdapter: MentionedLinkRecyclerViewAdapter
 
     companion object {
 
@@ -112,6 +119,36 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+        binding.mentionedLinksRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext())
+        mentionedLinksLiveListener.liveData.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Loading -> {
+                    shimmerMentionedLinks()
+                }
+
+                DataStatus.Status.Success -> {
+                    displayMentionedLinks()
+                    val list = it.data
+                    list?.let {
+                        mentionedLinkRecyclerViewAdapter =
+                            MentionedLinkRecyclerViewAdapter(
+                                list,
+                                requireContext(),
+                                this@ShuffledContentDescriptionFragment
+                            )
+                    }
+                    binding.mentionedLinksRecyclerView.adapter = mentionedLinkRecyclerViewAdapter
+                }
+
+                else -> {
+                    binding.shimmerMentionedLinks.stopShimmer()
+                    binding.shimmerMentionedLinks.visibility = View.GONE
+                    binding.mentionedLinksLabelTextView.visibility = View.GONE
+                    binding.mentionedLinksRecyclerView.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun shimmerContentDetails() {
@@ -121,6 +158,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
         binding.contentDescriptionValueTextView.visibility = View.GONE
         binding.shimmerDescription.visibility = View.VISIBLE
         binding.shimmerDescription.startShimmer()
+        binding.hashTagsLabelTextView.visibility = View.GONE
         binding.hashtagsChipGroup.visibility = View.GONE
         binding.shimmerHashtags.visibility = View.VISIBLE
         binding.shimmerHashtags.startShimmer()
@@ -135,6 +173,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
         binding.contentDescriptionValueTextView.visibility = View.VISIBLE
         binding.shimmerHashtags.stopShimmer()
         binding.shimmerHashtags.visibility = View.GONE
+        binding.hashTagsLabelTextView.visibility = View.VISIBLE
         binding.hashtagsChipGroup.visibility = View.VISIBLE
     }
 
@@ -151,6 +190,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
     }
 
     private fun shimmerMentionedLinks() {
+        binding.mentionedLinksLabelTextView.visibility = View.GONE
         binding.mentionedLinksRecyclerView.visibility = View.GONE
         binding.shimmerMentionedLinks.visibility = View.VISIBLE
         binding.shimmerMentionedLinks.startShimmer()
@@ -159,6 +199,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
     private fun displayMentionedLinks() {
         binding.shimmerMentionedLinks.stopShimmer()
         binding.shimmerMentionedLinks.visibility = View.GONE
+        binding.mentionedLinksLabelTextView.visibility = View.VISIBLE
         binding.mentionedLinksRecyclerView.visibility = View.VISIBLE
     }
 
@@ -180,6 +221,11 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         isOpened = false
+    }
+
+    override fun onMentionedExternalLinkClicked(position: Int, mentionedLink: RemoteMentionedLink) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mentionedLink.link))
+        startActivity(browserIntent)
     }
 
 }

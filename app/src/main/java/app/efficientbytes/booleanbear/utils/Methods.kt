@@ -12,6 +12,7 @@ import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -261,10 +262,11 @@ class InstructorLiveListener() {
 
 class MentionedLinksLiveListener() {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<Boolean>> = _mutableLiveData
+    private val _mutableLiveData: MutableLiveData<DataStatus<List<RemoteMentionedLink>>> =
+        MutableLiveData()
+    val liveData: LiveData<DataStatus<List<RemoteMentionedLink>>> = _mutableLiveData
 
-    fun setMentionedLinksStatus(status: DataStatus<Boolean>) {
+    fun setMentionedLinksStatus(status: DataStatus<List<RemoteMentionedLink>>) {
         _mutableLiveData.postValue(status)
     }
 

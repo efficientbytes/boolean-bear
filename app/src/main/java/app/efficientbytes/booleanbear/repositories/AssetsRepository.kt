@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
+import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
@@ -13,6 +14,8 @@ import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
 import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
@@ -627,6 +630,126 @@ class AssetsRepository(
         }
     }
 
+    suspend fun fetchMentionedLink(linkId: String) = flow {
+        try {
+            val response = assetsService.getMentionedLinks(linkId)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val mentionedLinkStatus = response.body()
+                    if (mentionedLinkStatus != null) {
+                        val mentionedLink = mentionedLinkStatus.mentionedLink
+                        if (mentionedLink != null) {
+                            emit(DataStatus.success<RemoteMentionedLink>(mentionedLink))
+                        } else emit(DataStatus.emptyResult<RemoteMentionedLink>())
+                    } else {
+                        emit(DataStatus.emptyResult<RemoteMentionedLink>())
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: RemoteMentionedLinkStatus = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        RemoteMentionedLinkStatus::class.java
+                    )
+                    emit(DataStatus.failed<RemoteMentionedLink>(errorResponse.message.toString()))
+                }
+
+                else -> {
+                    emit(DataStatus.emptyResult<RemoteMentionedLink>())
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<RemoteMentionedLink>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<RemoteMentionedLink>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<RemoteMentionedLink>(exception.message.toString()))
+        }
+    }.catch {
+        emit(DataStatus.unknownException(it.message.toString()))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getMentionedLink(linkId: String) = flow {
+        val result = assetsDao.getMentionedLink(linkId)
+        if (result != null) {
+            emit(DataStatus.success(result))
+        } else {
+            fetchMentionedLink(linkId).collect {
+                emit(it)
+                when (it.status) {
+                    DataStatus.Status.Success -> {
+                        val link = it.data
+                        link?.let { li ->
+                            assetsDao.insertMentionedLink(
+                                LocalMentionedLink(
+                                    linkId = li.linkId,
+                                    link = li.link,
+                                    name = li.name,
+                                    createdOn = li.createdOn
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+    fun getAllMentionedLinks(list: List<String>, mentionedLinksListener: MentionedLinksListener) {
+        externalScope.launch {
+            mentionedLinksListener.onMentionedLinkDataStatusChanged(DataStatus.loading())
+            try {
+                val result = mutableListOf<RemoteMentionedLink>()
+                val jobs = list.map { id ->
+                    externalScope.launch {
+                        getMentionedLink(id).collect {
+                            when (it.status) {
+                                DataStatus.Status.Success -> {
+                                    it.data?.let { link -> result.add(link) }
+                                }
+
+                                else -> {
+
+                                }
+                            }
+                        }
+                    }
+                }
+                jobs.joinAll()
+                if (result.isEmpty()) {
+                    mentionedLinksListener.onMentionedLinkDataStatusChanged(DataStatus.emptyResult())
+                } else {
+                    mentionedLinksListener.onMentionedLinkDataStatusChanged(
+                        DataStatus.success(
+                            result
+                        )
+                    )
+                }
+            } catch (noInternet: NoInternetException) {
+                mentionedLinksListener.onMentionedLinkDataStatusChanged(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                mentionedLinksListener.onMentionedLinkDataStatusChanged(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                mentionedLinksListener.onMentionedLinkDataStatusChanged(
+                    DataStatus.unknownException(
+                        exception.message.toString()
+                    )
+                )
+            }
+        }
+    }
+
+    fun deleteAllMentionedLinks() {
+        externalScope.launch {
+            assetsDao.deleteAllMentionedLinks()
+        }
+    }
+
     interface CategoryListener {
 
         fun onCategoryDataStatusChanged(status: DataStatus<Boolean>)
@@ -644,6 +767,12 @@ class AssetsRepository(
     interface InstructorProfileListener {
 
         fun onInstructorProfileDataStatusChanged(status: DataStatus<RemoteInstructorProfile>)
+
+    }
+
+    interface MentionedLinksListener {
+
+        fun onMentionedLinkDataStatusChanged(status: DataStatus<List<RemoteMentionedLink>>)
 
     }
 

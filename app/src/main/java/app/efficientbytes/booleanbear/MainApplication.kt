@@ -33,6 +33,7 @@ class MainApplication : Application() {
         utilityDataRepository.deleteProfessions()
         utilityDataRepository.deleteIssueCategories()
         assetsRepository.deleteAllInstructorDetails()
+        assetsRepository.deleteAllMentionedLinks()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
             authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)

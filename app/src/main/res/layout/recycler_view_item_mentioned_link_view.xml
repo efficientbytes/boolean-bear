@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <variable
+            name="mentionedLink"
+            type="app.efficientbytes.booleanbear.services.models.RemoteMentionedLink" />
+
+        <variable
+            name="onClick"
+            type="android.view.View.OnClickListener" />
 
     </data>
 
@@ -10,7 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:background="@drawable/stroked_text_view_background">
+        android:background="@drawable/stroked_text_view_background"
+        android:clickable="true"
+        android:focusable="true">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mentionedLinkTitleValueTextView"
@@ -22,15 +33,17 @@
             android:fontFamily="@font/montserrat_light"
             android:foreground="?android:attr/selectableItemBackground"
             android:maxLines="1"
+            android:onClick="@{onClick}"
             android:paddingHorizontal="16dp"
             android:paddingVertical="14dp"
-            android:text="Android Installation Link rhh4g84h 4rg4rhg4u"
+            android:text="@{mentionedLink.name}"
             android:textColor="@color/white_1000"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/copyToClipboardImageButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Git Hub Link">
 
         </com.google.android.material.textview.MaterialTextView>
 

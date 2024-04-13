@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -12,6 +13,7 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
@@ -27,7 +29,8 @@ class ShuffledContentPlayerViewModel(
     private val instructorLiveListener: InstructorLiveListener,
     private val mentionedLinksLiveListener: MentionedLinksLiveListener,
     private val contentDetailsLiveListener: ContentDetailsLiveListener
-) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener {
+) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener,
+    AssetsRepository.MentionedLinksListener {
 
     private val _playUrl: MutableLiveData<DataStatus<PlayUrl?>> = MutableLiveData()
     val playUrl: LiveData<DataStatus<PlayUrl?>> = _playUrl
@@ -73,6 +76,13 @@ class ShuffledContentPlayerViewModel(
         }
     }
 
+    private var mentionedLinksJob: Job? = null
+    fun getMentionedLinks(list: List<String>) {
+        mentionedLinksJob = externalScope.launch {
+            assetsRepository.getAllMentionedLinks(list, this@ShuffledContentPlayerViewModel)
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event.targetState) {
             Lifecycle.State.DESTROYED -> {
@@ -87,6 +97,9 @@ class ShuffledContentPlayerViewModel(
                 }
                 if (instructorProfileJob != null) {
                     instructorProfileJob?.cancel()
+                }
+                if (mentionedLinksJob != null) {
+                    mentionedLinksJob?.cancel()
                 }
             }
 
@@ -112,5 +125,9 @@ class ShuffledContentPlayerViewModel(
         instructorLiveListener.setInstructorStatus(status)
     }
 
+    override fun onMentionedLinkDataStatusChanged(status: DataStatus<List<RemoteMentionedLink>>) {
+        Log.i("VIEW-MODEL", "status changed. Status is ${status.isSuccessful}")
+        mentionedLinksLiveListener.setMentionedLinksStatus(status)
+    }
 
 }

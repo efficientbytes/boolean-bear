@@ -72,7 +72,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
     private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
@@ -187,6 +186,11 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                             viewModel.getSuggestedContent(suggestedContentId)
                         }
                         viewModel.getInstructorProfile(playDetails.instructorId)
+                        playDetails.mentionedLinkIds?.let { mentionedLinkIds ->
+                            viewModel.getMentionedLinks(
+                                mentionedLinkIds
+                            )
+                        }
                         if (playDetails.nextSuggestion == null) {
                             binding.shimmerSuggestedContent.stopShimmer()
                             binding.shimmerSuggestedContent.visibility = View.GONE

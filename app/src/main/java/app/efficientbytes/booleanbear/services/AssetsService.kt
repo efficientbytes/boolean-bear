@@ -4,6 +4,7 @@ import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
 import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
 import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
 import retrofit2.Response
@@ -44,4 +45,8 @@ interface AssetsService {
         @Path("instructorId") instructorId: String,
     ): Response<InstructorProfileStatus>
 
+    @GET("mentioned-links/{linkId}")
+    suspend fun getMentionedLinks(
+        @Path("linkId") linkId: String,
+    ): Response<RemoteMentionedLinkStatus>
 }
