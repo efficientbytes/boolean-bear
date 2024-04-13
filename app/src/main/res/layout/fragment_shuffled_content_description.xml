@@ -89,8 +89,8 @@
                     android:layout_marginTop="18dp"
                     android:clickable="true"
                     android:focusable="true"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="@color/black_600"
+                    android:visibility="visible"
+                    app:cardBackgroundColor="@color/black_200"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
