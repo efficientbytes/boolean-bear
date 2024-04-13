@@ -186,6 +186,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                             nextSuggestedContentId = suggestedContentId
                             viewModel.getSuggestedContent(suggestedContentId)
                         }
+                        viewModel.getInstructorProfile(playDetails.instructorId)
                         if (playDetails.nextSuggestion == null) {
                             binding.shimmerSuggestedContent.stopShimmer()
                             binding.shimmerSuggestedContent.visibility = View.GONE
@@ -342,7 +343,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
-        binding.descriptionLinearLayout.setOnClickListener{
+        binding.descriptionLinearLayout.setOnClickListener {
             openDescriptionFragment()
         }
 
@@ -351,7 +352,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
     }
 
-    private fun openDescriptionFragment(){
+    private fun openDescriptionFragment() {
         if (shuffledContentDescriptionFragment == null) {
             shuffledContentDescriptionFragment = ShuffledContentDescriptionFragment()
         }

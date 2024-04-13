@@ -11,6 +11,7 @@ import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
@@ -26,7 +27,7 @@ class ShuffledContentPlayerViewModel(
     private val instructorLiveListener: InstructorLiveListener,
     private val mentionedLinksLiveListener: MentionedLinksLiveListener,
     private val contentDetailsLiveListener: ContentDetailsLiveListener
-) : ViewModel(), LifecycleEventObserver {
+) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener {
 
     private val _playUrl: MutableLiveData<DataStatus<PlayUrl?>> = MutableLiveData()
     val playUrl: LiveData<DataStatus<PlayUrl?>> = _playUrl
@@ -45,7 +46,7 @@ class ShuffledContentPlayerViewModel(
     private var playDetailsJob: Job? = null
 
     fun getPlayDetails(contentId: String) {
-        playDetailsJob = externalScope.launch(Dispatchers.IO) {
+        playDetailsJob = externalScope.launch {
             assetsRepository.getPlayDetails(contentId).collect {
                 _playDetails.postValue(it)
                 contentDetailsLiveListener.setContentDetailsStatus(it)
@@ -58,10 +59,17 @@ class ShuffledContentPlayerViewModel(
     val suggestedContent: LiveData<DataStatus<YoutubeContentView?>> = _suggestedContent
     private var suggestedContentJob: Job? = null
     fun getSuggestedContent(contentId: String) {
-        suggestedContentJob = externalScope.launch(Dispatchers.IO) {
+        suggestedContentJob = externalScope.launch {
             assetsRepository.fetchContent(contentId, ContentViewType.YOUTUBE).collect {
                 _suggestedContent.postValue(it)
             }
+        }
+    }
+
+    private var instructorProfileJob: Job? = null
+    fun getInstructorProfile(instructorId: String) {
+        instructorProfileJob = externalScope.launch {
+            assetsRepository.getInstructorDetails(instructorId, this@ShuffledContentPlayerViewModel)
         }
     }
 
@@ -76,6 +84,9 @@ class ShuffledContentPlayerViewModel(
                 }
                 if (suggestedContentJob != null) {
                     suggestedContentJob?.cancel()
+                }
+                if (instructorProfileJob != null) {
+                    instructorProfileJob?.cancel()
                 }
             }
 
@@ -95,6 +106,10 @@ class ShuffledContentPlayerViewModel(
 
             }
         }
+    }
+
+    override fun onInstructorProfileDataStatusChanged(status: DataStatus<RemoteInstructorProfile>) {
+        instructorLiveListener.setInstructorStatus(status)
     }
 
 

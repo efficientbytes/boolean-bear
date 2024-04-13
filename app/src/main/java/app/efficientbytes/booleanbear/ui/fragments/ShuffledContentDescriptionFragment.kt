@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentDescriptionBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.ui.bindingadapters.loadImageFromUrl
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
@@ -49,7 +50,8 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
                     shimmerContentDetails()
                 }
 
-                DataStatus.Status.NoInternet -> {}
+                DataStatus.Status.NoInternet -> {
+                }
 
                 DataStatus.Status.Success -> {
                     val playDetails = it.data
@@ -71,6 +73,33 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment() {
                 DataStatus.Status.UnAuthorized -> {}
 
                 DataStatus.Status.UnKnownException -> {}
+            }
+        }
+        instructorLiveListener.liveData.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Loading -> {
+                    shimmerInstructorCard()
+                }
+
+                DataStatus.Status.Success -> {
+                    displayInstructorCard()
+                    val profile = it.data
+                    profile?.let { remoteInstructorProfile ->
+                        val fullName = if (remoteInstructorProfile.lastName == null) {
+                            remoteInstructorProfile.firstName
+                        } else {
+                            remoteInstructorProfile.firstName + " " + remoteInstructorProfile.lastName
+                        }
+                        binding.instructorNameValueTextView.text = fullName
+                        binding.instructorProfilePicImage.loadImageFromUrl(remoteInstructorProfile.profileImage)
+                    }
+                }
+
+                else -> {
+                    binding.shimmerInstructor.stopShimmer()
+                    binding.shimmerInstructor.visibility = View.GONE
+                    binding.instructorCardView.visibility = View.GONE
+                }
             }
         }
     }
