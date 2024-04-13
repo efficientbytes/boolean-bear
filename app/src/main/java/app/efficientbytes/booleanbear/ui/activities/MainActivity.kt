@@ -443,6 +443,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
             when (destination.id) {
                 R.id.homeFragment -> {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     binding.toolbarAppImageView.visibility = View.VISIBLE
@@ -451,6 +452,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.shuffledContentPlayerFragment -> {
+                    window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
                     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
                     binding.toolbarAppImageView.visibility = View.GONE
@@ -458,6 +460,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 else -> {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     binding.toolbarAppImageView.visibility = View.GONE

@@ -126,7 +126,6 @@ class ShuffledContentPlayerViewModel(
     }
 
     override fun onMentionedLinkDataStatusChanged(status: DataStatus<List<RemoteMentionedLink>>) {
-        Log.i("VIEW-MODEL", "status changed. Status is ${status.isSuccessful}")
         mentionedLinksLiveListener.setMentionedLinksStatus(status)
     }
 
