@@ -4,10 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
+import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
 import app.efficientbytes.booleanbear.utils.LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE
+import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
 import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
 import kotlinx.coroutines.flow.Flow
 
@@ -34,5 +40,23 @@ interface AssetsDao {
 
     @Query("DELETE FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE ")
     suspend fun deleteShuffledYoutubeContentView()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertInstructorProfile(localInstructorProfile: LocalInstructorProfile)
+
+    @Query("SELECT instructorId,firstName,lastName,bio,oneLineDescription,profession,workingAt,profileImage,coverImage,gitHubUsername,linkedInUsername,skills FROM $INSTRUCTOR_PROFILE_TABLE WHERE instructorId = :id")
+    suspend fun getInstructorProfile(id: String): RemoteInstructorProfile?
+
+    @Query("DELETE FROM $INSTRUCTOR_PROFILE_TABLE ")
+    suspend fun deleteAllInstructorProfile()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMentionedLink(localMentionedLink: LocalMentionedLink)
+
+    @Query("SELECT linkId,link,createdOn,name FROM $MENTIONED_LINKS_TABLE WHERE linkId = :id")
+    suspend fun getMentionedLink(id: String): RemoteMentionedLink?
+
+    @Query("DELETE FROM $MENTIONED_LINKS_TABLE ")
+    suspend fun deleteAllMentionedLinks()
 
 }

@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear
 
 import android.app.Application
 import app.efficientbytes.booleanbear.di.appModule
+import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
@@ -18,6 +19,7 @@ class MainApplication : Application() {
     private val userProfileRepository: UserProfileRepository by inject()
     private val statisticsRepository: StatisticsRepository by inject()
     private val utilityDataRepository: UtilityDataRepository by inject()
+    private val assetsRepository: AssetsRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -30,6 +32,8 @@ class MainApplication : Application() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         utilityDataRepository.deleteProfessions()
         utilityDataRepository.deleteIssueCategories()
+        assetsRepository.deleteAllInstructorDetails()
+        assetsRepository.deleteAllMentionedLinks()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
             authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)

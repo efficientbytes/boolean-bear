@@ -71,7 +71,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
-
+    private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
@@ -184,6 +184,12 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         playDetails.nextSuggestion?.let { suggestedContentId ->
                             nextSuggestedContentId = suggestedContentId
                             viewModel.getSuggestedContent(suggestedContentId)
+                        }
+                        viewModel.getInstructorProfile(playDetails.instructorId)
+                        playDetails.mentionedLinkIds?.let { mentionedLinkIds ->
+                            viewModel.getMentionedLinks(
+                                mentionedLinkIds
+                            )
                         }
                         if (playDetails.nextSuggestion == null) {
                             binding.shimmerSuggestedContent.stopShimmer()
@@ -339,6 +345,27 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 viewModel.getPlayUrl(contentId)
                 viewModel.getPlayDetails(contentId)
             }
+        }
+
+        binding.descriptionLinearLayout.setOnClickListener {
+            openDescriptionFragment()
+        }
+
+        binding.fullDescriptionLabelTextView.setOnClickListener {
+            openDescriptionFragment()
+        }
+    }
+
+    private fun openDescriptionFragment() {
+        if (shuffledContentDescriptionFragment == null) {
+            shuffledContentDescriptionFragment = ShuffledContentDescriptionFragment()
+        }
+        if (!ShuffledContentDescriptionFragment.isOpened) {
+            ShuffledContentDescriptionFragment.isOpened = true
+            shuffledContentDescriptionFragment!!.show(
+                parentFragmentManager,
+                ShuffledContentDescriptionFragment.SHUFFLED_DESCRIPTION_FRAGMENT
+            )
         }
     }
 
