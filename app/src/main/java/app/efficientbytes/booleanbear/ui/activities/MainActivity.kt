@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.ui.activities
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.icu.util.Calendar
 import android.net.Uri
@@ -93,27 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupNavigation()
         setupConnectivityListener()
         setUpLiveDataObserver()
-        val intent = intent
-        if (intent != null && intent.data != null) {
-            val data: Uri = intent.data!!
-            val pathSegments = data.pathSegments
-            if (pathSegments.size >= 2) {
-                val watchSegment = pathSegments[1]
-                val firstCharacter = watchSegment.getOrNull(0)
-                when (firstCharacter) {
-                    'v' -> {
-                        val contentId = pathSegments.lastOrNull()
-                        if (contentId != null) {
-                            viewModel.watchContentIntent(contentId)
-                        }
-                    }
-
-                    else -> {
-
-                    }
-                }
-            }
-        }
+        processIntent(intent)
     }
 
     private fun setUpLiveDataObserver() {
@@ -525,6 +506,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         statisticsRepository.noteDownScreenClosingTime()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        processIntent(intent)
+    }
+
+    private fun processIntent(intent: Intent?){
+        val intent = intent
+        if (intent != null && intent.data != null) {
+            val data: Uri = intent.data!!
+            val pathSegments = data.pathSegments
+            if (pathSegments.size >= 2) {
+                val watchSegment = pathSegments[1]
+                val firstCharacter = watchSegment.getOrNull(0)
+                when (firstCharacter) {
+                    'v' -> {
+                        val contentId = pathSegments.lastOrNull()
+                        if (contentId != null) {
+                            viewModel.watchContentIntent(contentId)
+                        }
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+        }
     }
 
 
