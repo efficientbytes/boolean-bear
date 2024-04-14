@@ -330,6 +330,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             nextSuggestedContentId?.let { contentId ->
                 clearStartPosition()
                 isPlayingSuggested = true
+                this@ShuffledContentPlayerFragment.contentId = contentId
+                ShuffledContentPlayerViewModel.countRecorded = false
                 binding.videoPlayer.hideController()
                 playerQualityMenu.visibility = View.GONE
                 viewModel.getPlayUrl(contentId)
@@ -353,6 +355,23 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
         binding.fullDescriptionLabelTextView.setOnClickListener {
             openDescriptionFragment()
+        }
+        viewModel.viewCount.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.NoInternet -> {
+                    ShuffledContentPlayerViewModel.countRecorded = false
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    ShuffledContentPlayerViewModel.countRecorded = false
+                }
+
+                DataStatus.Status.Success -> {
+                    ShuffledContentPlayerViewModel.countRecorded = true
+                }
+
+                else -> {}
+            }
         }
     }
 
@@ -457,6 +476,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 }
 
                 ExoPlayer.STATE_READY -> {
+                    if (!ShuffledContentPlayerViewModel.countRecorded) {
+                        ShuffledContentPlayerViewModel.countRecorded = true
+                        viewModel.increaseContentViewCount(this@ShuffledContentPlayerFragment.contentId)
+                    }
                     binding.videoPlayer.showController()
                     binding.noNetworkLinearLayout.visibility = View.GONE
                     playerQualityMenu.visibility = View.VISIBLE
@@ -471,6 +494,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         binding.videoPlayer.hideController()
                         clearStartPosition()
                         isPlayingSuggested = true
+                        this@ShuffledContentPlayerFragment.contentId = contentId
+                        ShuffledContentPlayerViewModel.countRecorded = false
                         viewModel.getPlayUrl(contentId)
                         viewModel.getPlayDetails(contentId)
                     }

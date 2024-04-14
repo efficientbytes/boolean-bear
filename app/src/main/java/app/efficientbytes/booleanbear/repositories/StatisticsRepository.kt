@@ -4,12 +4,18 @@ import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import app.efficientbytes.booleanbear.database.dao.StatisticsDao
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.StatisticsService
+import app.efficientbytes.booleanbear.services.models.RequestContentCount
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.getTodayDateComponent
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
@@ -139,5 +145,28 @@ class StatisticsRepository(
         }
         return result.await()
     }
+
+    fun increaseContentViewCount(contentId: String) = flow {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            emit(DataStatus.loading<Unit>())
+            try {
+                val response =
+                    statisticsService.increaseContentViewCount(
+                        contentId,
+                        RequestContentCount(currentUser.uid)
+                    )
+                val responseCode = response.code()
+                if (responseCode == 200) emit(DataStatus.success(Unit))
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet<Unit>())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.noInternet<Unit>())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException<Unit>(exception.message.toString()))
+            }
+        }
+    }.catch { t -> emit(DataStatus.unknownException<Unit>(t.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
 }
