@@ -269,7 +269,7 @@ class MainViewModel(
         _watchContentIntentInvoked.postValue(contentId)
     }
 
-    fun resetWatchContentIntentInvoked(){
+    fun resetWatchContentIntentInvoked() {
         _watchContentIntentInvoked.postValue(null)
     }
 
