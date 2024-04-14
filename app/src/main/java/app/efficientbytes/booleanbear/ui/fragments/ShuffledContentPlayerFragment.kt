@@ -145,6 +145,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                 }
 
+                DataStatus.Status.EmptyResult -> {
+                    findNavController().popBackStack()
+                }
+
                 else -> {
 
                 }
@@ -229,6 +233,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                     binding.shimmerContentDetails.stopShimmer()
                     binding.shimmerSuggestedContent.stopShimmer()
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    findNavController().popBackStack()
                 }
 
                 else -> {

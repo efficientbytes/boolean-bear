@@ -2,7 +2,9 @@ package app.efficientbytes.booleanbear.ui.activities
 
 import android.content.pm.ActivityInfo
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
@@ -77,6 +79,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var professionalAdapterFailedToLoad = false
     private var issueCategoriesFailedToLoad = false
 
+    companion object {
+
+        var hasListenedToIntent = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -87,6 +94,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupNavigation()
         setupConnectivityListener()
         setUpLiveDataObserver()
+        val intent = intent
+        if (intent != null && intent.data != null) {
+            val data: Uri = intent.data!!
+            val pathSegments = data.pathSegments
+            if (pathSegments.size >= 2) {
+                val watchSegment = pathSegments[1]
+                val firstCharacter = watchSegment.getOrNull(0)
+                when (firstCharacter) {
+                    'v' -> {
+                        val contentId = pathSegments.lastOrNull()
+                        if (contentId != null) {
+                            viewModel.watchContentIntent(contentId)
+                        }
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+        }
     }
 
     private fun setUpLiveDataObserver() {
@@ -452,7 +480,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.shuffledContentPlayerFragment -> {
-                    window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+                    window.setFlags(
+                        WindowManager.LayoutParams.FLAG_SECURE,
+                        WindowManager.LayoutParams.FLAG_SECURE
+                    )
                     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
                     binding.toolbarAppImageView.visibility = View.GONE
@@ -496,5 +527,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onUserLeaveHint()
         statisticsRepository.noteDownScreenClosingTime()
     }
+
 
 }

@@ -459,7 +459,11 @@ class AssetsRepository(
                     emit(DataStatus.success(playUrl))
                 }
 
-                responseCode >= 400 -> {
+                responseCode == 404 -> {
+                    emit(DataStatus.emptyResult())
+                }
+
+                responseCode >= 400 && responseCode != 404 -> {
                     val errorResponse: PlayUrl = gson.fromJson(
                         response.errorBody()!!.string(),
                         PlayUrl::class.java
@@ -489,7 +493,11 @@ class AssetsRepository(
                     emit(DataStatus.success(playDetails))
                 }
 
-                responseCode >= 400 -> {
+                responseCode == 404 -> {
+                    emit(DataStatus.emptyResult())
+                }
+
+                responseCode >= 400 && responseCode != 404 -> {
                     val errorResponse: PlayDetails = gson.fromJson(
                         response.errorBody()!!.string(),
                         PlayDetails::class.java
