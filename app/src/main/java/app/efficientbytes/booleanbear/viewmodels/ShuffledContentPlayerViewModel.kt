@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -9,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.efficientbytes.booleanbear.models.ContentViewType
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
+import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
@@ -28,13 +28,19 @@ class ShuffledContentPlayerViewModel(
     private val externalScope: CoroutineScope,
     private val instructorLiveListener: InstructorLiveListener,
     private val mentionedLinksLiveListener: MentionedLinksLiveListener,
-    private val contentDetailsLiveListener: ContentDetailsLiveListener
+    private val contentDetailsLiveListener: ContentDetailsLiveListener,
+    private val statisticsRepository: StatisticsRepository
 ) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener,
     AssetsRepository.MentionedLinksListener {
 
     private val _playUrl: MutableLiveData<DataStatus<PlayUrl?>> = MutableLiveData()
     val playUrl: LiveData<DataStatus<PlayUrl?>> = _playUrl
     private var playUrlJob: Job? = null
+
+    companion object {
+
+        var countRecorded = false
+    }
 
     fun getPlayUrl(contentId: String) {
         playUrlJob = externalScope.launch(Dispatchers.IO) {
@@ -80,6 +86,16 @@ class ShuffledContentPlayerViewModel(
     fun getMentionedLinks(list: List<String>) {
         mentionedLinksJob = externalScope.launch {
             assetsRepository.getAllMentionedLinks(list, this@ShuffledContentPlayerViewModel)
+        }
+    }
+
+    private val _viewCount: MutableLiveData<DataStatus<Unit>> = MutableLiveData()
+    val viewCount: LiveData<DataStatus<Unit>> = _viewCount
+    fun increaseContentViewCount(contentId: String) {
+        externalScope.launch {
+            statisticsRepository.increaseContentViewCount(contentId).collect {
+                _viewCount.postValue(it)
+            }
         }
     }
 
