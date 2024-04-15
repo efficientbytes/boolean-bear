@@ -83,4 +83,9 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="BottomDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up_bottom_dialog</item>
+        <item name="android:windowExitAnimation">@anim/slide_down_bottom_dialog</item>
+    </style>
+
 </resources>
