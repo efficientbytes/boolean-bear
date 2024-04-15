@@ -36,6 +36,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerB
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import org.koin.android.ext.android.inject
 import pl.droidsonroids.gif.AnimationListener
@@ -149,6 +150,12 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 }
 
                 DataStatus.Status.EmptyResult -> {
+                    val snackBar = Snackbar.make(
+                        binding.constraintLayout,
+                        "Requested content is not available",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
                     findNavController().popBackStack()
                 }
 
