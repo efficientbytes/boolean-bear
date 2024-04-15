@@ -77,7 +77,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         val intent = Intent()
         intent.setAction(Intent.ACTION_SEND)
         intent.setType("text/plain")
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Android Now")
+        intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
         var shareMessage =
             "\n\n The only dedicated complete android development learning platform\n\n"
         shareMessage =

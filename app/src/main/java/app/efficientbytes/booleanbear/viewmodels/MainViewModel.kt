@@ -260,6 +260,19 @@ class MainViewModel(
         }
     }
 
+    private val _watchContentIntentInvoked: MutableLiveData<String?> =
+        MutableLiveData()
+    val watchContentIntentInvoked: LiveData<String?> =
+        _watchContentIntentInvoked
+
+    fun watchContentIntent(contentId: String) {
+        _watchContentIntentInvoked.postValue(contentId)
+    }
+
+    fun resetWatchContentIntentInvoked() {
+        _watchContentIntentInvoked.postValue(null)
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {

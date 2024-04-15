@@ -27,8 +27,10 @@ import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerView
 import app.efficientbytes.booleanbear.ui.models.CoursesBanner
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
+import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener {
@@ -37,6 +39,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
+    private val mainViewModel by activityViewModel<MainViewModel>()
     private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
     private var sampleList: MutableList<CoursesBanner> = mutableListOf()
     private val handler = Handler(Looper.getMainLooper())
@@ -255,6 +258,12 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         binding.retryAfterNoInternetButton.setOnClickListener {
             viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
         }
+        mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
+            it?.let { contentId ->
+                watchContentViaIntent(contentId)
+                mainViewModel.resetWatchContentIntentInvoked()
+            }
+        }
 
     }
 
@@ -398,4 +407,24 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         }
     }
 
+    private fun watchContentViaIntent(contentId: String) {
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            val directions =
+                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
+                    contentId
+                )
+            findNavController().navigate(directions)
+        } else {
+            if (loginToContinueFragment == null) {
+                loginToContinueFragment = LoginToContinueFragment()
+            }
+            if (!LoginToContinueFragment.isOpened) {
+                LoginToContinueFragment.isOpened = true
+                loginToContinueFragment!!.show(
+                    parentFragmentManager,
+                    LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
+                )
+            }
+        }
+    }
 }

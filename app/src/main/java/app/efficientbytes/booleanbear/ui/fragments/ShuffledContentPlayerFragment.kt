@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
@@ -35,6 +36,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerB
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import org.koin.android.ext.android.inject
 import pl.droidsonroids.gif.AnimationListener
@@ -72,6 +74,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
     private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
+    private var contentTitle: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
@@ -145,6 +149,16 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                 }
 
+                DataStatus.Status.EmptyResult -> {
+                    val snackBar = Snackbar.make(
+                        binding.constraintLayout,
+                        "Requested content is not available",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
+                    findNavController().popBackStack()
+                }
+
                 else -> {
 
                 }
@@ -199,6 +213,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         }
                         binding.playDetails = playDetails
                         playerTitleText.text = playDetails.title
+                        contentTitle = playDetails.title
                         val instructorFullName = if (playDetails.instructorLastName == null) {
                             playDetails.instructorFirstName
                         } else {
@@ -229,6 +244,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                     binding.shimmerContentDetails.stopShimmer()
                     binding.shimmerSuggestedContent.stopShimmer()
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    findNavController().popBackStack()
                 }
 
                 else -> {
@@ -372,6 +391,11 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                 else -> {}
             }
+        }
+        binding.shareContentLabelTextView.setOnClickListener {
+            val shareLink = "https://app.booleanbear.com/watch/v/$contentId"
+            val title = this@ShuffledContentPlayerFragment.contentTitle
+            shareContent(shareLink, title)
         }
     }
 
@@ -638,5 +662,18 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+    }
+
+    private fun shareContent(shareLink: String, contentTitle: String) {
+        val intent = Intent()
+        intent.setAction(Intent.ACTION_SEND)
+        intent.setType("text/plain")
+        intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
+        var shareMessage =
+            "$contentTitle \n\nWatch it on boolean bear.\n"
+        shareMessage =
+            shareMessage + shareLink + "\n"
+        intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+        startActivity(Intent.createChooser(intent, "Select One"))
     }
 }
