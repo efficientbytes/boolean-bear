@@ -20,8 +20,8 @@
             android:name=".ui.activities.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:exported="true"
-            android:theme="@style/Theme.CustomSplashScreen"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.CustomSplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,6 +29,7 @@
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 

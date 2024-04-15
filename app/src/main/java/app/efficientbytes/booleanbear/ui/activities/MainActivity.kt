@@ -513,7 +513,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         processIntent(intent)
     }
 
-    private fun processIntent(intent: Intent?){
+    private fun processIntent(intent: Intent?) {
         val intent = intent
         if (intent != null && intent.data != null) {
             val data: Uri = intent.data!!

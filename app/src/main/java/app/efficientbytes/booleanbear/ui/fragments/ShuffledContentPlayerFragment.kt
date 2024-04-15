@@ -73,7 +73,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
     private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
-    private var contentTitle : String = ""
+    private var contentTitle: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -388,7 +388,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         binding.shareContentLabelTextView.setOnClickListener {
             val shareLink = "https://app.booleanbear.com/watch/v/$contentId"
             val title = this@ShuffledContentPlayerFragment.contentTitle
-            shareContent(shareLink,title)
+            shareContent(shareLink, title)
         }
     }
 
@@ -657,7 +657,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
     }
 
-    private fun shareContent(shareLink : String, contentTitle : String) {
+    private fun shareContent(shareLink: String, contentTitle: String) {
         val intent = Intent()
         intent.setAction(Intent.ACTION_SEND)
         intent.setType("text/plain")
