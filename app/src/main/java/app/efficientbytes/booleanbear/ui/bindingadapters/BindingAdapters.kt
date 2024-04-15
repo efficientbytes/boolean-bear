@@ -6,7 +6,7 @@ import app.efficientbytes.booleanbear.utils.getTimeAgo
 import coil.load
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
-import kotlinx.coroutines.runBlocking
+import java.text.DecimalFormat
 
 @BindingAdapter("load_image_from_url")
 fun ShapeableImageView.loadImageFromUrl(imageUrl: String? = null) {
@@ -34,7 +34,7 @@ fun MaterialTextView.secondsToMinutes(seconds: Long) {
 }
 
 @BindingAdapter("language")
-fun MaterialTextView.language(language: String?=null) {
+fun MaterialTextView.language(language: String? = null) {
     this.text = when (language) {
         "EN" -> "English"
         "HI" -> "Hindi"
@@ -43,11 +43,13 @@ fun MaterialTextView.language(language: String?=null) {
 }
 
 @BindingAdapter("runTime")
-fun MaterialTextView.runTime(runTime: Long?=null) {
-    val message : Long = if (runTime!=null){
-        runTime/60
+fun MaterialTextView.runTime(runTime: Long? = null) {
+    val message: String = if (runTime != null) {
+        val number = (runTime / 60.0)
+        val decimalFormat = DecimalFormat("#.##")
+        decimalFormat.format(number)
     } else {
-         0L
+        "0"
     }
-   this.text = "$message mins"
+    this.text = "$message mins"
 }
