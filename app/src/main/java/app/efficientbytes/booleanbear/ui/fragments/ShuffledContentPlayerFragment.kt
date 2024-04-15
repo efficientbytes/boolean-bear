@@ -663,7 +663,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         intent.setType("text/plain")
         intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
         var shareMessage =
-            "\n\n Check this out - \n$contentTitle \n\n"
+            "$contentTitle \n\nWatch it on boolean bear.\n"
         shareMessage =
             shareMessage + shareLink + "\n"
         intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
