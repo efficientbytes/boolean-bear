@@ -107,5 +107,6 @@
     <string name="_720p">720p</string>
     <string name="for_better_experience_select_auto">For better experience select - Auto</string>
     <string name="current_quality">Current Quality</string>
+    <string name="current_playback_speed">Current playback speed</string>
 
 </resources>

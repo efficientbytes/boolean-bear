@@ -35,10 +35,12 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerBinding
+import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
@@ -75,6 +77,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private lateinit var gifDrawable: GifDrawable
     private lateinit var contentId: String
     private lateinit var playerQualityButton: ImageButton
+    private lateinit var playerPlaybackSpeedButton: ImageButton
     private lateinit var playerQualityPortraitText: MaterialTextView
     private lateinit var playerSpeedPortraitText: MaterialTextView
     private var dialog: Dialog? = null
@@ -90,6 +93,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var contentTitle: String = ""
     private var isPlayerQualityOrSpeedDialogOpened: Boolean = false
     private var currentVideoQuality = VideoQualityType.AUTO
+    private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,21 +127,14 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         val closeButton = rootView.findViewById<ImageButton>(R.id.playerCancelAndGoBackImageButton)
         playerQualityButton =
             rootView.findViewById<ImageButton>(R.id.playerQualityImageButton)
+        playerPlaybackSpeedButton =
+            rootView.findViewById<ImageButton>(R.id.playerPortraitChooseSpeedImageButton)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
 
         playerQualityPortraitText = rootView.findViewById(R.id.playerPortraitQualityValueTextView)
         playerSpeedPortraitText = rootView.findViewById(R.id.playerPortraitSpeedValueTextView)
 
         playerQualityPortraitText.text = currentVideoQuality.label
-
-        trackSelector = DefaultTrackSelector(requireContext()).apply {
-            setParameters(
-                buildUponParameters().setMaxVideoSize(
-                    VideoQualityType.AUTO.width,
-                    VideoQualityType.AUTO.height
-                )
-            )
-        }
 
         if (!connectivityListener.isInternetAvailable()) {
             binding.parentConstraintLayout.visibility = View.GONE
@@ -366,6 +363,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             playerQualitySelectorDialog()
         }
 
+        playerPlaybackSpeedButton.setOnClickListener {
+            playerPlaybackSpeedSelectorDialog()
+        }
+
         binding.retryButton.setOnClickListener {
             if (noInternet) {
                 noInternet = false
@@ -447,6 +448,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
         if (player == null) {
+            trackSelector = DefaultTrackSelector(requireContext(), AdaptiveTrackSelection.Factory())
             val loadControl = DefaultLoadControl()
             player = ExoPlayer.Builder(requireContext())
                 .setLoadControl(loadControl)
@@ -599,78 +601,197 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             dialog = Dialog(requireContext())
         }
 
-        dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog!!.setContentView(R.layout.dialog_quality_selector)
-        dialog!!.setCanceledOnTouchOutside(true)
-        dialog!!.window!!.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog!!.window!!.attributes.windowAnimations = R.style.BottomDialogAnimation
-        dialog!!.window!!.setGravity(Gravity.BOTTOM)
-        val playerQualityChipGroup = dialog!!.findViewById<ChipGroup>(R.id.qualityChipGroup)
-        val playerCurrentQualityText =
-            dialog!!.findViewById<MaterialTextView>(R.id.currentQualityValueTextView)
+        if (!isPlayerQualityOrSpeedDialogOpened) {
+            isPlayerQualityOrSpeedDialogOpened = true
 
-        when (currentVideoQuality) {
-            VideoQualityType.AUTO -> {
-                playerCurrentQualityText.text = VideoQualityType.AUTO.label
-                dialog!!.findViewById<Chip>(R.id.qualityAutoChip).isChecked =
-                    true
+            dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setContentView(R.layout.dialog_video_quality_selector)
+            dialog!!.setCanceledOnTouchOutside(true)
+            dialog!!.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.window!!.attributes.windowAnimations = R.style.BottomDialogAnimation
+            dialog!!.window!!.setGravity(Gravity.BOTTOM)
+            val playerQualityChipGroup = dialog!!.findViewById<ChipGroup>(R.id.qualityChipGroup)
+            val playerCurrentQualityText =
+                dialog!!.findViewById<MaterialTextView>(R.id.currentQualityValueTextView)
+
+            when (currentVideoQuality) {
+                VideoQualityType.AUTO -> {
+                    playerCurrentQualityText.text = VideoQualityType.AUTO.label
+                    dialog!!.findViewById<Chip>(R.id.qualityAutoChip).isChecked =
+                        true
+                }
+
+                VideoQualityType._480P -> {
+                    playerCurrentQualityText.text = VideoQualityType._480P.label
+                    dialog!!.findViewById<Chip>(R.id.quality480pChip).isChecked = true
+                }
+
+                VideoQualityType._720P -> {
+                    playerCurrentQualityText.text = VideoQualityType._720P.label
+                    dialog!!.findViewById<Chip>(R.id.quality720pChip).isChecked =
+                        true
+                }
+
+                else -> {
+
+                }
             }
 
-            VideoQualityType._480P -> {
-                playerCurrentQualityText.text = VideoQualityType._480P.label
-                dialog!!.findViewById<Chip>(R.id.quality480pChip).isChecked = true
+            playerQualityChipGroup.setOnCheckedChangeListener { group, checkedId ->
+                when (checkedId) {
+                    R.id.quality480pChip -> {
+                        currentVideoQuality = VideoQualityType._480P
+                        playerQualityPortraitText.text = currentVideoQuality.label
+                        playerCurrentQualityText.text = currentVideoQuality.label
+                        changePlayerQuality(currentVideoQuality)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.quality720pChip -> {
+                        currentVideoQuality = VideoQualityType._720P
+                        playerQualityPortraitText.text = currentVideoQuality.label
+                        playerCurrentQualityText.text = currentVideoQuality.label
+                        changePlayerQuality(currentVideoQuality)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.qualityAutoChip -> {
+                        currentVideoQuality = VideoQualityType.AUTO
+                        playerQualityPortraitText.text = currentVideoQuality.label
+                        playerCurrentQualityText.text = currentVideoQuality.label
+                        changePlayerQuality(currentVideoQuality)
+                        dialog!!.dismiss()
+                    }
+                }
             }
 
-            VideoQualityType._720P -> {
-                playerCurrentQualityText.text = VideoQualityType._720P.label
-                dialog!!.findViewById<Chip>(R.id.quality720pChip).isChecked =
-                    true
+            dialog!!.setOnDismissListener {
+                isPlayerQualityOrSpeedDialogOpened = false
+                dialog = null
             }
 
-            else -> {
-
-            }
+            dialog!!.show()
         }
 
-        playerQualityChipGroup.setOnCheckedChangeListener { group, checkedId ->
-            when (checkedId) {
-                R.id.quality480pChip -> {
-                    currentVideoQuality = VideoQualityType._480P
-                    playerQualityPortraitText.text = currentVideoQuality.label
-                    playerCurrentQualityText.text = currentVideoQuality.label
-                    changePlayerQuality(currentVideoQuality)
-                    dialog!!.dismiss()
-                }
+    }
 
-                R.id.quality720pChip -> {
-                    currentVideoQuality = VideoQualityType._720P
-                    playerQualityPortraitText.text = currentVideoQuality.label
-                    playerCurrentQualityText.text = currentVideoQuality.label
-                    changePlayerQuality(currentVideoQuality)
-                    dialog!!.dismiss()
-                }
-
-                R.id.qualityAutoChip -> {
-                    currentVideoQuality = VideoQualityType.AUTO
-                    playerQualityPortraitText.text = currentVideoQuality.label
-                    playerCurrentQualityText.text = currentVideoQuality.label
-                    changePlayerQuality(currentVideoQuality)
-                    dialog!!.dismiss()
-                }
-            }
-        }
-
-        dialog!!.setOnDismissListener {
-            isPlayerQualityOrSpeedDialogOpened = false
-            dialog = null
+    @UnstableApi
+    private fun playerPlaybackSpeedSelectorDialog() {
+        if (dialog == null) {
+            dialog = Dialog(requireContext())
         }
 
         if (!isPlayerQualityOrSpeedDialogOpened) {
             isPlayerQualityOrSpeedDialogOpened = true
+
+            dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setContentView(R.layout.dialog_video_playback_speed_selector)
+            dialog!!.setCanceledOnTouchOutside(true)
+            dialog!!.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.window!!.attributes.windowAnimations = R.style.BottomDialogAnimation
+            dialog!!.window!!.setGravity(Gravity.BOTTOM)
+            val playerPlaybackSpeedChipGroup =
+                dialog!!.findViewById<ChipGroup>(R.id.playbackSpeedChipGroup)
+            val playerCurrentPlaybackSpeedText =
+                dialog!!.findViewById<MaterialTextView>(R.id.currentPlaybackSpeedValueTextView)
+
+            when (currentPlaybackSpeed) {
+                VideoPlaybackSpeed.x0_5 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x0_5.label
+                    dialog!!.findViewById<Chip>(R.id.x0_5Chip).isChecked = true
+                }
+
+                VideoPlaybackSpeed.x0_75 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x0_75.label
+                    dialog!!.findViewById<Chip>(R.id.x0_75Chip).isChecked = true
+                }
+
+                VideoPlaybackSpeed.x1 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x1.label
+                    dialog!!.findViewById<Chip>(R.id.x1Chip).isChecked = true
+                }
+
+                VideoPlaybackSpeed.x1_25 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x1_25.label
+                    dialog!!.findViewById<Chip>(R.id.x1_25Chip).isChecked = true
+                }
+
+                VideoPlaybackSpeed.x1_5 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x1_5.label
+                    dialog!!.findViewById<Chip>(R.id.x1_5Chip).isChecked = true
+                }
+
+                VideoPlaybackSpeed.x1_75 -> {
+                    playerCurrentPlaybackSpeedText.text = VideoPlaybackSpeed.x1_75.label
+                    dialog!!.findViewById<Chip>(R.id.x1_75Chip).isChecked = true
+                }
+            }
+
+            playerPlaybackSpeedChipGroup.setOnCheckedChangeListener { group, checkedId ->
+                when (checkedId) {
+                    R.id.x0_5Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x0_5
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.x0_75Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x0_75
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.x1Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x1
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.x1_25Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x1_25
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.x1_5Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x1_5
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.x1_75Chip -> {
+                        currentPlaybackSpeed = VideoPlaybackSpeed.x1_75
+                        playerSpeedPortraitText.text = currentPlaybackSpeed.label
+                        playerCurrentPlaybackSpeedText.text = currentPlaybackSpeed.label
+                        changePlayerPlaybackSpeed(currentPlaybackSpeed)
+                        dialog!!.dismiss()
+                    }
+                }
+            }
+
+            dialog!!.setOnDismissListener {
+                isPlayerQualityOrSpeedDialogOpened = false
+                dialog = null
+            }
+
             dialog!!.show()
         }
 
@@ -683,9 +804,15 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 buildUponParameters().setMaxVideoSize(
                     videoQualityType.width,
                     videoQualityType.height
-                )
+                ).setAllowVideoNonSeamlessAdaptiveness(true)
             )
         }
+        player!!.prepare()
+    }
+
+    @UnstableApi
+    private fun changePlayerPlaybackSpeed(playbackSpeed: VideoPlaybackSpeed) {
+        player!!.setPlaybackSpeed(playbackSpeed.speed)
         player!!.prepare()
     }
 
