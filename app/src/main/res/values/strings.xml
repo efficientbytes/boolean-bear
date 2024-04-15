@@ -102,5 +102,10 @@
     <string name="login_to_access_the_videos">Login to access the videos.</string>
     <string name="unlock_the_videos_by_signing_in_now_your_access_awaits_with_a_quick_login">Unlock the videos by signing in now. Your access awaits with a quick login.</string>
     <string name="login_now">Login Now</string>
+    <string name="auto">Auto</string>
+    <string name="_480p">480p</string>
+    <string name="_720p">720p</string>
+    <string name="for_better_experience_select_auto">For better experience select - Auto</string>
+    <string name="current_quality">Current Quality</string>
 
 </resources>

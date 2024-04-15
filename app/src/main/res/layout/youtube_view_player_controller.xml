@@ -37,7 +37,7 @@
             app:layout_constraintTop_toTopOf="@id/playerCancelAndGoBackImageButton">
 
             <ImageButton
-                android:id="@+id/exo_track_selection_view"
+                android:id="@+id/playerQualityImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="10dp"

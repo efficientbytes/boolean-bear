@@ -1,13 +1,18 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -22,6 +27,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -33,9 +39,12 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerBinding
+import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import org.koin.android.ext.android.inject
@@ -65,6 +74,10 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private lateinit var fullScreenButton: ImageButton
     private lateinit var gifDrawable: GifDrawable
     private lateinit var contentId: String
+    private lateinit var playerQualityButton: ImageButton
+    private lateinit var playerQualityPortraitText: MaterialTextView
+    private lateinit var playerSpeedPortraitText: MaterialTextView
+    private var dialog: Dialog? = null
 
     //flags
     private var isFullScreen = false
@@ -75,6 +88,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private val connectivityListener: ConnectivityListener by inject()
     private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
     private var contentTitle: String = ""
+    private var isPlayerQualityOrSpeedDialogOpened: Boolean = false
+    private var currentVideoQuality = VideoQualityType.AUTO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,8 +121,23 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         playerInstructorNameText = rootView.findViewById(R.id.playerInstructorNameValueTextView)
         playerQualityMenu = rootView.findViewById(R.id.playerQualityMenuLinearLayout)
         val closeButton = rootView.findViewById<ImageButton>(R.id.playerCancelAndGoBackImageButton)
-        val playerQualityButton = rootView.findViewById<ImageButton>(R.id.exo_track_selection_view)
+        playerQualityButton =
+            rootView.findViewById<ImageButton>(R.id.playerQualityImageButton)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
+
+        playerQualityPortraitText = rootView.findViewById(R.id.playerPortraitQualityValueTextView)
+        playerSpeedPortraitText = rootView.findViewById(R.id.playerPortraitSpeedValueTextView)
+
+        playerQualityPortraitText.text = currentVideoQuality.label
+
+        trackSelector = DefaultTrackSelector(requireContext()).apply {
+            setParameters(
+                buildUponParameters().setMaxVideoSize(
+                    VideoQualityType.AUTO.width,
+                    VideoQualityType.AUTO.height
+                )
+            )
+        }
 
         if (!connectivityListener.isInternetAvailable()) {
             binding.parentConstraintLayout.visibility = View.GONE
@@ -333,6 +363,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         }
 
         playerQualityButton.setOnClickListener {
+            playerQualitySelectorDialog()
         }
 
         binding.retryButton.setOnClickListener {
@@ -397,6 +428,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             val title = this@ShuffledContentPlayerFragment.contentTitle
             shareContent(shareLink, title)
         }
+
     }
 
     private fun openDescriptionFragment() {
@@ -414,10 +446,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
-        trackSelector = DefaultTrackSelector(requireContext())
-        trackSelector.setParameters(
-            trackSelector.buildUponParameters().setAllowVideoMixedMimeTypeAdaptiveness(true)
-        )
         if (player == null) {
             val loadControl = DefaultLoadControl()
             player = ExoPlayer.Builder(requireContext())
@@ -554,6 +582,111 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 }
             }
         }
+
+        @OptIn(UnstableApi::class)
+        override fun onEvents(player: Player, events: Player.Events) {
+            super.onEvents(player, events)
+            Log.i(
+                "OnEvent",
+                "Quality is ${player.trackSelectionParameters.maxVideoHeight} and ${player.trackSelectionParameters.maxVideoWidth}"
+            )
+        }
+    }
+
+    @UnstableApi
+    private fun playerQualitySelectorDialog() {
+        if (dialog == null) {
+            dialog = Dialog(requireContext())
+        }
+
+        dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog!!.setContentView(R.layout.dialog_quality_selector)
+        dialog!!.setCanceledOnTouchOutside(true)
+        dialog!!.window!!.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog!!.window!!.attributes.windowAnimations = R.style.BottomDialogAnimation
+        dialog!!.window!!.setGravity(Gravity.BOTTOM)
+        val playerQualityChipGroup = dialog!!.findViewById<ChipGroup>(R.id.qualityChipGroup)
+        val playerCurrentQualityText =
+            dialog!!.findViewById<MaterialTextView>(R.id.currentQualityValueTextView)
+
+        when (currentVideoQuality) {
+            VideoQualityType.AUTO -> {
+                playerCurrentQualityText.text = VideoQualityType.AUTO.label
+                dialog!!.findViewById<Chip>(R.id.qualityAutoChip).isChecked =
+                    true
+            }
+
+            VideoQualityType._480P -> {
+                playerCurrentQualityText.text = VideoQualityType._480P.label
+                dialog!!.findViewById<Chip>(R.id.quality480pChip).isChecked = true
+            }
+
+            VideoQualityType._720P -> {
+                playerCurrentQualityText.text = VideoQualityType._720P.label
+                dialog!!.findViewById<Chip>(R.id.quality720pChip).isChecked =
+                    true
+            }
+
+            else -> {
+
+            }
+        }
+
+        playerQualityChipGroup.setOnCheckedChangeListener { group, checkedId ->
+            when (checkedId) {
+                R.id.quality480pChip -> {
+                    currentVideoQuality = VideoQualityType._480P
+                    playerQualityPortraitText.text = currentVideoQuality.label
+                    playerCurrentQualityText.text = currentVideoQuality.label
+                    changePlayerQuality(currentVideoQuality)
+                    dialog!!.dismiss()
+                }
+
+                R.id.quality720pChip -> {
+                    currentVideoQuality = VideoQualityType._720P
+                    playerQualityPortraitText.text = currentVideoQuality.label
+                    playerCurrentQualityText.text = currentVideoQuality.label
+                    changePlayerQuality(currentVideoQuality)
+                    dialog!!.dismiss()
+                }
+
+                R.id.qualityAutoChip -> {
+                    currentVideoQuality = VideoQualityType.AUTO
+                    playerQualityPortraitText.text = currentVideoQuality.label
+                    playerCurrentQualityText.text = currentVideoQuality.label
+                    changePlayerQuality(currentVideoQuality)
+                    dialog!!.dismiss()
+                }
+            }
+        }
+
+        dialog!!.setOnDismissListener {
+            isPlayerQualityOrSpeedDialogOpened = false
+            dialog = null
+        }
+
+        if (!isPlayerQualityOrSpeedDialogOpened) {
+            isPlayerQualityOrSpeedDialogOpened = true
+            dialog!!.show()
+        }
+
+    }
+
+    @UnstableApi
+    private fun changePlayerQuality(videoQualityType: VideoQualityType) {
+        trackSelector = trackSelector.apply {
+            setParameters(
+                buildUponParameters().setMaxVideoSize(
+                    videoQualityType.width,
+                    videoQualityType.height
+                )
+            )
+        }
+        player!!.prepare()
     }
 
     @OptIn(UnstableApi::class)
