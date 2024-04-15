@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="8dp"
+    android:background="@drawable/rounded_constraint_layout_background"
+    android:orientation="vertical"
+    android:paddingHorizontal="22dp"
+    android:paddingVertical="22dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/current_playback_speed"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:fontFamily="@font/montserrat">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/currentPlaybackSpeedValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_weight="1"
+            android:textColor="@color/white_800"
+            android:textSize="15sp"
+            app:fontFamily="@font/montserrat"
+            tools:text="1x">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:orientation="vertical">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/playbackSpeedChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:chipSpacingVertical="0dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x0_5Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="0.5x"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x0_75Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="0.75"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x1Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:checked="true"
+                android:elevation="0dp"
+                android:text="1x"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x1_25Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="1.25x"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x1_5Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="1.5x"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/x1_75Chip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="1.75x"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
+        </com.google.android.material.chip.ChipGroup>
+
+    </LinearLayout>
+
+</LinearLayout>
