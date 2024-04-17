@@ -16,14 +16,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
+import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
+    private val adsRepository: AdsRepository
 ) : ViewModel(),
-    LifecycleEventObserver, AssetsRepository.CategoryListener, AssetsRepository.ContentListener {
+    LifecycleEventObserver, AssetsRepository.CategoryListener, AssetsRepository.ContentListener,
+    AdsRepository.HomePageAdsListener {
 
     val contentCategoriesFromDB: LiveData<MutableList<ShuffledCategory>> =
         assetsRepository.categoriesFromDB.asLiveData()
@@ -43,9 +47,19 @@ class HomeViewModel(
         assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
     }
 
+    private val _viewPagerBannerAds: MutableLiveData<DataStatus<List<RemoteHomePageBanner>>> =
+        MutableLiveData()
+    val viewPagerBannerAds: LiveData<DataStatus<List<RemoteHomePageBanner>>> =
+        _viewPagerBannerAds
+
+   fun getHomePageBannerAds() {
+        adsRepository.getHomePageBannerAds(this@HomeViewModel)
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
+                getHomePageBannerAds()
                 getShuffledCategories()
             }
 
@@ -85,6 +99,10 @@ class HomeViewModel(
 
     override fun onContentsDataStatusChanged(status: DataStatus<List<YoutubeContentView>>) {
         _youtubeContentViewList.postValue(status)
+    }
+
+    override fun onHomePageAdsStatusChanged(status: DataStatus<List<RemoteHomePageBanner>>) {
+        _viewPagerBannerAds.postValue(status)
     }
 
 }

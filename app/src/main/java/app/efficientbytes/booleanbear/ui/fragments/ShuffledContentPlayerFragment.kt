@@ -27,7 +27,6 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -588,10 +587,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         @OptIn(UnstableApi::class)
         override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
-            Log.i(
-                "OnEvent",
-                "Quality is ${player.trackSelectionParameters.maxVideoHeight} and ${player.trackSelectionParameters.maxVideoWidth}"
-            )
         }
     }
 

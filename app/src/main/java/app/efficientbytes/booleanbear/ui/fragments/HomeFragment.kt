@@ -20,11 +20,11 @@ import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
-import app.efficientbytes.booleanbear.ui.models.CoursesBanner
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
@@ -33,15 +33,15 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
-    YoutubeContentViewRecyclerViewAdapter.OnItemClickListener {
+    YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
+    InfiniteViewPagerAdapter.OnItemClickListener {
 
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private lateinit var infiniteRecyclerAdapter: InfiniteViewPagerAdapter
-    private var sampleList: MutableList<CoursesBanner> = mutableListOf()
+    private var infiniteRecyclerAdapter: InfiniteViewPagerAdapter? = null
     private val handler = Handler(Looper.getMainLooper())
     private var currentPage = 1
     private val DELAY_MS: Long = 3000 // Delay in milliseconds
@@ -58,6 +58,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         var selectedCategoryPosition = -1
         var loadingCategoriesFailed = false
         var loadingContentsFailed = false
+        var loadingBannersFailed = false
     }
 
     override fun onCreateView(
@@ -73,7 +74,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViewPager()
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
@@ -232,6 +232,36 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             }
         }
 
+        viewModel.viewPagerBannerAds.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    it.data?.let { banners ->
+                        binding.appBarLayout.visibility = View.VISIBLE
+                        binding.infiniteViewPager.setBackgroundColor(requireContext().getColor(R.color.black))
+                        infiniteRecyclerAdapter =
+                            InfiniteViewPagerAdapter(banners, this@HomeFragment)
+                        binding.infiniteViewPager.currentItem = 1
+                        onInfinitePageChangeCallback(banners.size + 2)
+                        startAutoScroll()
+                    }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    binding.appBarLayout.visibility = View.GONE
+                    loadingContentsFailed = true
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.appBarLayout.visibility = View.VISIBLE
+                    binding.infiniteViewPager.setBackgroundColor(requireContext().getColor(R.color.black_400))
+                }
+
+                else -> {
+                    binding.appBarLayout.visibility = View.GONE
+                }
+            }
+        }
+
         connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
             when (isAvailable) {
                 true -> {
@@ -242,6 +272,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     if (loadingContentsFailed) {
                         loadingContentsFailed = false
                         viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+                    }
+                    if (loadingBannersFailed) {
+                        loadingBannersFailed = false
+                        viewModel.getHomePageBannerAds()
                     }
                 }
 
@@ -265,38 +299,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             }
         }
 
-    }
-
-    private fun getSampleData() {
-        sampleList.clear()
-        val banner1 = CoursesBanner(
-            "1",
-            "Introduction to Programming",
-            "https://example.com/course1",
-            "https://firebasestorage.googleapis.com/v0/b/pdf-sync-project.appspot.com/o/PDF_FILES%2Fcoconut%20tree.png?alt=media&token=11e28d02-2bbd-4e65-8333-69483503fc18"
-        )
-        val banner2 = CoursesBanner(
-            "2",
-            "Mobile App Development",
-            "https://example.com/course2",
-            "https://firebasestorage.googleapis.com/v0/b/pdf-sync-project.appspot.com/o/PDF_FILES%2Fgirls%20standing.png?alt=media&token=e51ca378-bfe6-4700-8873-3c2637d30bdb"
-        )
-        val banner3 = CoursesBanner(
-            "3",
-            "Data Science Fundamentals",
-            null,
-            "https://firebasestorage.googleapis.com/v0/b/pdf-sync-project.appspot.com/o/PDF_FILES%2Fsky%20scrapper.png?alt=media&token=07b50caa-8960-4983-aa7e-94c00ba48c20"
-        )
-        val banner4 = CoursesBanner(
-            "4",
-            "Web Development Masterclass",
-            "https://example.com/course4",
-            "https://firebasestorage.googleapis.com/v0/b/pdf-sync-project.appspot.com/o/PDF_FILES%2Fsnow%20mountain.png?alt=media&token=a1c14e20-9716-492d-b191-ccd3ebdee13f"
-        )
-        sampleList.add(banner1)
-        sampleList.add(banner2)
-        sampleList.add(banner3)
-        sampleList.add(banner4)
     }
 
     private fun startAutoScroll() {
@@ -344,25 +346,19 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         })
     }
 
-    private fun setupViewPager() {
-        getSampleData()
-        infiniteRecyclerAdapter = InfiniteViewPagerAdapter(sampleList)
-        binding.infiniteViewPager.currentItem = 1
-    }
-
     override fun onStart() {
         super.onStart()
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
         }
-        onInfinitePageChangeCallback(sampleList.size + 2)
-        startAutoScroll()
     }
 
     override fun onStop() {
         super.onStop()
-        handler.removeCallbacksAndMessages(null)
+        if (infiniteRecyclerAdapter != null) {
+            handler.removeCallbacksAndMessages(null)
+        }
     }
 
     override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
@@ -426,5 +422,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 )
             }
         }
+    }
+
+    override fun onBannerClicked(position: Int, remoteHomePageBanner: RemoteHomePageBanner) {
+
     }
 }
