@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear
 
 import android.app.Application
 import app.efficientbytes.booleanbear.di.appModule
+import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
@@ -20,6 +21,7 @@ class MainApplication : Application() {
     private val statisticsRepository: StatisticsRepository by inject()
     private val utilityDataRepository: UtilityDataRepository by inject()
     private val assetsRepository: AssetsRepository by inject()
+    private val adsRepository : AdsRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +36,7 @@ class MainApplication : Application() {
         utilityDataRepository.deleteIssueCategories()
         assetsRepository.deleteAllInstructorDetails()
         assetsRepository.deleteAllMentionedLinks()
+        adsRepository.deleteAllHomePageBanner()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
             authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
