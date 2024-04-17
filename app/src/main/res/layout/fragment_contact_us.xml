@@ -29,6 +29,7 @@
             android:text="@string/collaborate"
             android:textColor="@color/white"
             android:textSize="18sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -42,6 +43,7 @@
             android:layout_marginTop="22dp"
             android:background="@drawable/rounded_constraint_layout_background"
             android:paddingVertical="18dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/collaborateWithUsLabelTextView">
@@ -73,7 +75,7 @@
             android:id="@+id/feedbackNSupportLabelTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="42dp"
             android:fontFamily="@font/montserrat_medium"
             android:text="@string/feedback_support"
             android:textColor="@color/white"
@@ -171,8 +173,8 @@
                 android:paddingVertical="10dp"
                 android:text="@string/delete_account"
                 android:textColor="@color/white_1200"
-                android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"
                 android:textSize="14sp"
+                android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/contactSupportLabelTextView">
