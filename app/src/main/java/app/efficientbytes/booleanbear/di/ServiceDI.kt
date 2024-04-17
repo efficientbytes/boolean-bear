@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.di
 
 import android.content.Context
+import app.efficientbytes.booleanbear.services.AdsService
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.AuthenticationService
 import app.efficientbytes.booleanbear.services.FeedbackNSupportService
@@ -54,3 +55,5 @@ fun provideAssetsService(retrofit: Retrofit): AssetsService =
 
 fun provideStatisticsService(retrofit: Retrofit): StatisticsService =
     retrofit.create(StatisticsService::class.java)
+
+fun provideAdsService(retrofit: Retrofit): AdsService = retrofit.create(AdsService::class.java)
