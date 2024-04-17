@@ -15,9 +15,9 @@ class InfiniteViewPagerAdapter(
 ) :
     RecyclerView.Adapter<InfiniteViewPagerAdapter.ViewHolder>() {
 
-    private val updatedList: List<RemoteHomePageBanner> = if(itemList.isEmpty()){
+    private val updatedList: List<RemoteHomePageBanner> = if (itemList.isEmpty()) {
         emptyList()
-    }else{
+    } else {
         listOf(itemList.last()) + itemList + listOf(itemList.first())
     }
 
@@ -27,8 +27,12 @@ class InfiniteViewPagerAdapter(
         fun bind(item: RemoteHomePageBanner) {
             binding.banner = item
             binding.onClick = View.OnClickListener {
-                val position = absoluteAdapterPosition
-                onItemClickListener.onBannerClicked(absoluteAdapterPosition, updatedList[position])
+                if (item.clickAble) {
+                    onItemClickListener.onBannerClicked(
+                        absoluteAdapterPosition,
+                        item
+                    )
+                }
             }
         }
     }

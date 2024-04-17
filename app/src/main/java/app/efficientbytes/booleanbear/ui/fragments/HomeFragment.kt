@@ -1,5 +1,7 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -425,6 +427,33 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     override fun onBannerClicked(position: Int, remoteHomePageBanner: RemoteHomePageBanner) {
+        if (remoteHomePageBanner.clickAble) {
+            val link = remoteHomePageBanner.redirectLink
+            if (!link.isNullOrBlank()) {
+                val uri = Uri.parse(link)
+                val domain = uri.host
+                if (domain == "app.booleanbear.com") {
+                    val pathSegments = uri.pathSegments
+                    if (pathSegments.size >= 2) {
+                        val watchSegment = pathSegments[1]
+                        when (watchSegment.getOrNull(0)) {
+                            'v' -> {
+                                val contentId = pathSegments.lastOrNull()
+                                if (contentId != null) {
+                                    watchContentViaIntent(contentId)
+                                }
+                            }
 
+                            else -> {
+
+                            }
+                        }
+                    }
+                } else {
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    requireContext().startActivity(intent)
+                }
+            }
+        }
     }
 }
