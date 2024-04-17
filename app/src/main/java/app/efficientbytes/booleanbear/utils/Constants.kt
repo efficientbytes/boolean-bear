@@ -17,3 +17,4 @@ const val LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE = "local_shuffled_youtube_co
 const val REMOTE_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE = "remote_shuffled_youtube_content_view"
 const val INSTRUCTOR_PROFILE_TABLE = "instructor_profile"
 const val MENTIONED_LINKS_TABLE = "mentioned_links"
+const val HOME_PAGE_BANNER_AD_TABLE = "home_page_banner_ad"
