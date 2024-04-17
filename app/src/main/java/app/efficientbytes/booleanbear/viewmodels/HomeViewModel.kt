@@ -52,7 +52,7 @@ class HomeViewModel(
     val viewPagerBannerAds: LiveData<DataStatus<List<RemoteHomePageBanner>>> =
         _viewPagerBannerAds
 
-    private fun getHomePageBannerAds() {
+   fun getHomePageBannerAds() {
         adsRepository.getHomePageBannerAds(this@HomeViewModel)
     }
 
