@@ -66,7 +66,7 @@ class PushNotificationService : FirebaseMessagingService(),
             val type = data["type"]
             val title = data["title"]
             val body = data["body"]
-            val handle = data["handle"]
+            //val handle = data["handle"]
 
             if (title != null && body != null) {
                 val builder: NotificationCompat.Builder = when (type) {

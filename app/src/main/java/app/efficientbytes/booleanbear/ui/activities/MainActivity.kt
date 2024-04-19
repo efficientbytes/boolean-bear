@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
@@ -547,20 +546,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun processIntent(intent: Intent?) {
         if (intent != null) {
             if (intent.getStringExtra("redirectLink") != null) {
-                Log.i("Main", "Intent via string extra")
                 val uri: Uri = Uri.parse(intent.getStringExtra("redirectLink"))
                 openAppLink(uri)
             } else {
                 val extras = intent.extras
                 if (extras != null && intent.data == null) {
-                    Log.i("Main", "Intent via extras")
                     val type = extras.getString("type")
                     if (type == getString(R.string.watch_recommendations)) {
                         val link = extras.getString("redirectLink")
                         openAppLink(Uri.parse(link))
                     }
                 } else if (intent.data != null) {
-                    Log.i("Main", "Intent via deep link")
                     val data: Uri = intent.data!!
                     openAppLink(data)
                 }
@@ -596,7 +592,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }

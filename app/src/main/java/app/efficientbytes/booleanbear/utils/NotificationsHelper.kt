@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import app.efficientbytes.booleanbear.R
@@ -28,7 +29,8 @@ object NotificationsHelper {
             channel.setShowBadge(showBadge)
             channel.enableLights(enableLights)
             channel.enableVibration(enableVibration)
-            if (enableLights) channel.vibrationPattern = longArrayOf(100, 200, 300)
+            if (enableLights) channel.vibrationPattern =
+                longArrayOf(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
@@ -51,6 +53,7 @@ object NotificationsHelper {
             defaultIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
+        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder = when (bigTextStyle) {
             true -> {
                 NotificationCompat.Builder(context, channelId)
@@ -58,6 +61,7 @@ object NotificationsHelper {
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
+                    .setSound(alarmSound)
                     .setStyle(
                         NotificationCompat.BigTextStyle()
                             .bigText(body)
@@ -71,6 +75,7 @@ object NotificationsHelper {
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
+                    .setSound(alarmSound)
 
             }
         }
