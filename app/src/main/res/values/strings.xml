@@ -109,4 +109,20 @@
     <string name="current_quality">Current Quality</string>
     <string name="current_playback_speed">Current playback speed</string>
 
+
+    <string name="app_update">App Updates</string>
+    <string name="app_update_description">Receive notifications about new app updates and exciting features. Stay informed about the latest enhancements, bug fixes, and improvements to enhance your app experience.</string>
+
+    <string name="account_update">Account Updates</string>
+    <string name="account_update_description">Stay updated on your account activities and important notifications. Receive alerts for actions such as email verification, account verification, complaint status updates, and other account-related information to ensure a smooth and secure experience.</string>
+
+    <string name="account_alerts">Account Alerts</string>
+    <string name="account_alert_description">Receive critical alerts for suspicious account activities and security-related events. Stay informed about unauthorized access attempts, unusual login activity, account deletions, and other security concerns to help safeguard your account.</string>
+
+    <string name="watch_recommendations">Watch Recommendations</string>
+    <string name="watch_recommendations_description">Stay ahead in your programming and design journey with personalized recommendations. Get notified about the latest courses, tutorials, and resources tailored to your interests and skill level. Discover new tools, techniques, and insights to enhance your programming skills and UI design expertise.</string>
+
+    <string name="engagements">Engagement</string>
+    <string name="engagement_description">Stay engaged and inspired with regular updates and insights. Receive notifications about new challenges and exclusive content to keep your skills sharp and your creativity flowing.</string>
+
 </resources>

@@ -1,15 +1,21 @@
 package app.efficientbytes.booleanbear.ui.activities
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.icu.util.Calendar
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
@@ -78,6 +84,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val utilityDataRepository: UtilityDataRepository by inject()
     private var professionalAdapterFailedToLoad = false
     private var issueCategoriesFailedToLoad = false
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+            } else {
+                Snackbar.make(
+                    binding.mainCoordinatorLayout,
+                    "You have denied the permission to show notifications. To show notifications you can enable it in settings.",
+                    Snackbar.LENGTH_INDEFINITE
+                ).setAction("Open Settings") {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val settingsIntent: Intent =
+                            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                        startActivity(settingsIntent)
+                    }
+                }.show()
+            }
+        }
 
     companion object {
 
@@ -93,6 +118,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(binding.mainToolbar)
         setupNavigation()
         setupConnectivityListener()
+        askNotificationPermission()
         setUpLiveDataObserver()
         processIntent(intent)
     }
@@ -138,6 +164,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (it) {
                     true -> {
                         FirebaseAuth.getInstance().currentUser?.let { user ->
+                            viewModel.generateFCMToken()
                             userProfileRepository.getUserProfile(user.uid)
                             viewModel.getSingleDeviceLogin(user.uid)
                             userProfileRepository.listenToUserProfileChange(user.uid)
@@ -147,6 +174,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     false -> {
                         viewModel.deleteSingleDeviceLogin()
+                        viewModel.deleteFCMToken()
                         externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
@@ -359,6 +387,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.mainCoordinatorLayout.visibility = View.VISIBLE
             }
         }
+
+        viewModel.notificationStatusChanged.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+
+                }
+
+                else -> {
+
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {
@@ -514,28 +554,58 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun processIntent(intent: Intent?) {
-        val intent = intent
-        if (intent != null && intent.data != null) {
-            val data: Uri = intent.data!!
-            val pathSegments = data.pathSegments
-            if (pathSegments.size >= 2) {
-                val watchSegment = pathSegments[1]
-                val firstCharacter = watchSegment.getOrNull(0)
-                when (firstCharacter) {
-                    'v' -> {
-                        val contentId = pathSegments.lastOrNull()
-                        if (contentId != null) {
-                            viewModel.watchContentIntent(contentId)
-                        }
+        if (intent != null) {
+            if (intent.getStringExtra("redirectLink") != null) {
+                val uri: Uri = Uri.parse(intent.getStringExtra("redirectLink"))
+                openAppLink(uri)
+            } else {
+                val extras = intent.extras
+                if (extras != null && intent.data == null) {
+                    val type = extras.getString("type")
+                    if (type == getString(R.string.watch_recommendations)) {
+                        val link = extras.getString("redirectLink")
+                        openAppLink(Uri.parse(link))
                     }
+                } else if (intent.data != null) {
+                    val data: Uri = intent.data!!
+                    openAppLink(data)
+                }
 
-                    else -> {
+            }
+        }
+    }
 
+    private fun openAppLink(uri: Uri) {
+        val pathSegments = uri.pathSegments
+        if (pathSegments.size >= 2) {
+            val watchSegment = pathSegments[1]
+            when (watchSegment.getOrNull(0)) {
+                'v' -> {
+                    val contentId = pathSegments.lastOrNull()
+                    if (contentId != null) {
+                        viewModel.watchContentIntent(contentId)
                     }
+                }
+
+                else -> {
+
                 }
             }
         }
     }
 
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
 }
