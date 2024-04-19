@@ -3,9 +3,11 @@ package app.efficientbytes.booleanbear.utils
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import app.efficientbytes.booleanbear.R
@@ -23,14 +25,37 @@ object NotificationsHelper {
         enableVibration: Boolean = false,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val audioAttributes = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build()
+            val sound =
+                Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + "app.efficientbytes.booleanbear" + "/" + app.efficientbytes.booleanbear.R.raw.level_up_191997_sound)
             val channelId = channelId(context, name)
             val channel = NotificationChannel(channelId, name, importance)
             channel.description = description
             channel.setShowBadge(showBadge)
             channel.enableLights(enableLights)
             channel.enableVibration(enableVibration)
+            channel.setSound((sound), audioAttributes)
             if (enableLights) channel.vibrationPattern =
-                longArrayOf(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
+                longArrayOf(
+                    200,
+                    400,
+                    600,
+                    800,
+                    1000,
+                    200,
+                    400,
+                    600,
+                    800,
+                    1000,
+                    200,
+                    400,
+                    600,
+                    800,
+                    1000
+                )
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
@@ -53,7 +78,8 @@ object NotificationsHelper {
             defaultIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
-        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val sound =
+            Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + "app.efficientbytes.booleanbear" + "/" + app.efficientbytes.booleanbear.R.raw.level_up_191997_sound)
         val builder = when (bigTextStyle) {
             true -> {
                 NotificationCompat.Builder(context, channelId)
@@ -61,7 +87,7 @@ object NotificationsHelper {
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
-                    .setSound(alarmSound)
+                    .setSound(sound)
                     .setStyle(
                         NotificationCompat.BigTextStyle()
                             .bigText(body)
@@ -75,7 +101,7 @@ object NotificationsHelper {
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
-                    .setSound(alarmSound)
+                    .setSound(sound)
 
             }
         }
