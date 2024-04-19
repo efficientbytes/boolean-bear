@@ -16,6 +16,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
@@ -29,6 +30,7 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.DeleteUserAccount
 import app.efficientbytes.booleanbear.services.models.DeleteUserAccountStatus
 import app.efficientbytes.booleanbear.services.models.IssueCategory
+import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.services.models.PhoneNumberVerificationStatus
 import app.efficientbytes.booleanbear.services.models.Profession
@@ -60,7 +62,8 @@ class MainViewModel(
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope
 ) : AndroidViewModel(application),
-    LifecycleEventObserver, UtilityDataRepository.UtilityListener {
+    LifecycleEventObserver, UtilityDataRepository.UtilityListener,
+    UserProfileRepository.NotificationUploadListener {
 
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
@@ -273,6 +276,20 @@ class MainViewModel(
         _watchContentIntentInvoked.postValue(null)
     }
 
+    private val _notificationStatusChanged: MutableLiveData<DataStatus<NotificationTokenStatus>> =
+        MutableLiveData()
+    val notificationStatusChanged: LiveData<DataStatus<NotificationTokenStatus>> =
+        _notificationStatusChanged
+
+    fun generateFCMToken() {
+        userProfileRepository.generateFCMToken(this@MainViewModel)
+    }
+
+    fun deleteFCMToken() {
+        userProfileRepository.deleteLocalNotificationToken()
+        userProfileRepository.deleteRemoteNotificationToken()
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
@@ -321,5 +338,22 @@ class MainViewModel(
 
     override fun onIssueCategoriesAdapterListStatusChanged(status: DataStatus<List<IssueCategory>>) {
         _issueCategoriesAdapter.postValue(status)
+    }
+
+    override fun onTokenStatusChanged(status: DataStatus<NotificationTokenStatus>) {
+        _notificationStatusChanged.postValue(status)
+    }
+
+    override fun onTokenGenerated(token: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            userProfileRepository.saveNotificationToken(
+                LocalNotificationToken(
+                    token,
+                    currentUser.uid
+                )
+            )
+            userProfileRepository.uploadNotificationsToken(token, this@MainViewModel)
+        }
     }
 }

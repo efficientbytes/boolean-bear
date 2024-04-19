@@ -4,7 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
+import app.efficientbytes.booleanbear.utils.FCM_TOKEN_TABLE
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_TABLE
 import kotlinx.coroutines.flow.Flow
 
@@ -19,5 +22,14 @@ interface UserProfileDao {
 
     @Query("SELECT * FROM $USER_PROFILE_TABLE ")
     fun getUserProfile(): Flow<UserProfile>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFCMToken(localNotificationToken: LocalNotificationToken)
+
+    @Query("DELETE FROM $FCM_TOKEN_TABLE")
+    suspend fun deleteFCMToken()
+
+    @Query("SELECT userAccountId,token FROM $FCM_TOKEN_TABLE ")
+    fun getFCMToken(): RemoteNotificationToken?
 
 }

@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class NotificationTokenStatus(
-    val notificationToken: NotificationToken? = null,
+    val remoteNotificationToken: RemoteNotificationToken? = null,
     val message: String? = null
 )

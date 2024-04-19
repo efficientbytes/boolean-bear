@@ -34,7 +34,7 @@ class PushNotificationService : FirebaseMessagingService(),
                     if (tokenFailedToUpdate) {
                         tokenFailedToUpdate = false
                         this.token?.let { token ->
-                            userProfileRepository.updateNotificationsToken(
+                            userProfileRepository.uploadNotificationsToken(
                                 token
                             )
                         }
@@ -55,7 +55,7 @@ class PushNotificationService : FirebaseMessagingService(),
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         this.token = token
-        userProfileRepository.updateNotificationsToken(token)
+        userProfileRepository.uploadNotificationsToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -67,7 +67,6 @@ class PushNotificationService : FirebaseMessagingService(),
             val title = data["title"]
             val body = data["body"]
             //val handle = data["handle"]
-
             if (title != null && body != null) {
                 val builder: NotificationCompat.Builder = when (type) {
                     "App Updates" -> {
@@ -178,6 +177,10 @@ class PushNotificationService : FirebaseMessagingService(),
 
             }
         }
+    }
+
+    override fun onTokenGenerated(token: String) {
+
     }
 
     override fun onDestroy() {

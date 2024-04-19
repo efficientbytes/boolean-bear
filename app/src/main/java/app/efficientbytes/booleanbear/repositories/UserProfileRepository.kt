@@ -1,19 +1,22 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
+import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
-import app.efficientbytes.booleanbear.services.models.NotificationToken
 import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
+import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -183,7 +186,7 @@ class UserProfileRepository(
                 notificationListener?.onTokenStatusChanged(DataStatus.loading())
                 try {
                     val response = userProfileService.uploadNotificationsToken(
-                        NotificationToken(
+                        RemoteNotificationToken(
                             token,
                             currentUser.uid
                         )
@@ -228,57 +231,46 @@ class UserProfileRepository(
         }
     }
 
-    fun updateNotificationsToken(
-        token: String,
-        notificationListener: NotificationUploadListener? = null
-    ) {
+    fun generateFCMToken(notificationListener: NotificationUploadListener) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            externalScope.launch {
+                val result = userProfileDao.getFCMToken()
+                if (result == null) {
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            return@OnCompleteListener
+                        }
+                        val token = task.result
+                        notificationListener.onTokenGenerated(token)
+                    })
+                }
+            }
+        }
+    }
+
+    fun saveNotificationToken(localNotificationToken: LocalNotificationToken) {
+        externalScope.launch {
+            userProfileDao.insertFCMToken(localNotificationToken)
+        }
+    }
+
+    fun deleteLocalNotificationToken() {
+        externalScope.launch {
+            userProfileDao.deleteFCMToken()
+        }
+    }
+
+    fun deleteRemoteNotificationToken() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             externalScope.launch {
-                notificationListener?.onTokenStatusChanged(DataStatus.loading())
-                try {
-                    val response = userProfileService.updateNotificationsToken(
-                        NotificationToken(
-                            token,
-                            currentUser.uid
-                        )
+                userProfileService.deleteFCMToken(
+                    RemoteNotificationToken(
+                        "",
+                        currentUser.uid
                     )
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            val body = response.body()
-                            if (body != null) notificationListener?.onTokenStatusChanged(
-                                DataStatus.success(
-                                    body
-                                )
-                            ) else notificationListener?.onTokenStatusChanged(DataStatus.emptyResult())
-                        }
-
-                        responseCode >= 400 -> {
-                            val errorResponse: NotificationTokenStatus = gson.fromJson(
-                                response.errorBody()!!.string(),
-                                NotificationTokenStatus::class.java
-                            )
-                            notificationListener?.onTokenStatusChanged(
-                                DataStatus.failed(
-                                    errorResponse.message.toString()
-                                )
-                            )
-                        }
-                    }
-                } catch (noInternet: NoInternetException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.noInternet()
-                    )
-                } catch (socketTimeOutException: SocketTimeoutException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.timeOut()
-                    )
-                } catch (exception: IOException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.unknownException(exception.message.toString())
-                    )
-                }
+                )
             }
         }
     }
@@ -286,6 +278,8 @@ class UserProfileRepository(
     interface NotificationUploadListener {
 
         fun onTokenStatusChanged(status: DataStatus<NotificationTokenStatus>)
+
+        fun onTokenGenerated(token: String)
     }
 
 }

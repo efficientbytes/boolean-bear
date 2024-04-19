@@ -72,6 +72,7 @@ class MainApplication : Application() {
             statisticsRepository.uploadPendingScreenTiming()
         } else {
             statisticsRepository.deleteUserScreenTime()
+            userProfileRepository.deleteLocalNotificationToken()
         }
 
     }

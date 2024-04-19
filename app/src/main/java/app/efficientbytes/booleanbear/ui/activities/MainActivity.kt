@@ -164,10 +164,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (it) {
                     true -> {
                         FirebaseAuth.getInstance().currentUser?.let { user ->
-                            //check if the fcm table is empty
-                            //if empty generate an fcm token
-                            //upload the fcm token
-                            //store in in table
+                            viewModel.generateFCMToken()
                             userProfileRepository.getUserProfile(user.uid)
                             viewModel.getSingleDeviceLogin(user.uid)
                             userProfileRepository.listenToUserProfileChange(user.uid)
@@ -177,6 +174,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     false -> {
                         viewModel.deleteSingleDeviceLogin()
+                        viewModel.deleteFCMToken()
                         externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
@@ -387,6 +385,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (connectivityListener.isInternetAvailable()) {
                 binding.noInternetConstraintLayout.visibility = View.GONE
                 binding.mainCoordinatorLayout.visibility = View.VISIBLE
+            }
+        }
+
+        viewModel.notificationStatusChanged.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+
+                }
+
+                else -> {
+
+                }
             }
         }
     }

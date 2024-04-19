@@ -1,8 +1,8 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.models.UserProfile
-import app.efficientbytes.booleanbear.services.models.NotificationToken
 import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
+import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import retrofit2.Response
 import retrofit2.http.Body
@@ -29,12 +29,12 @@ interface UserProfileService {
 
     @POST("user/notifications/token/upload")
     suspend fun uploadNotificationsToken(
-        @Body notificationToken: NotificationToken
+        @Body remoteNotificationToken: RemoteNotificationToken
     ): Response<NotificationTokenStatus>
 
-    @POST("user/notifications/token/update")
-    suspend fun updateNotificationsToken(
-        @Body notificationToken: NotificationToken
+    @POST("user/notification/token/delete")
+    suspend fun deleteFCMToken(
+        @Body remoteNotificationToken: RemoteNotificationToken
     ): Response<NotificationTokenStatus>
 
 
