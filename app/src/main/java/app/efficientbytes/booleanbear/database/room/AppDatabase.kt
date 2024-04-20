@@ -11,6 +11,7 @@ import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
 import app.efficientbytes.booleanbear.database.models.CategoryContentId
 import app.efficientbytes.booleanbear.database.models.Dummy
+import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.ListConverter
 import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
@@ -26,7 +27,7 @@ import app.efficientbytes.booleanbear.services.models.Profession
 import app.efficientbytes.booleanbear.services.models.YoutubeContentView
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, YoutubeContentView::class, LocalYoutubeContentView::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class],
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, YoutubeContentView::class, LocalYoutubeContentView::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class],
     version = 1,
     exportSchema = false
 )
