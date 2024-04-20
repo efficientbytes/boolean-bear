@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     false -> {
                         viewModel.deleteSingleDeviceLogin()
                         viewModel.deleteFCMToken()
+                        viewModel.deleteIDToken()
                         externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
