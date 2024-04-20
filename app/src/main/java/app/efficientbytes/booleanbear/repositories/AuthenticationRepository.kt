@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
+import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -11,6 +12,7 @@ import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
@@ -177,5 +179,33 @@ class AuthenticationRepository(
         }
     }
 
+    fun generateIDToken(idTokenListener: IDTokenListener) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            externalScope.launch {
+                currentUser.getIdToken(true)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val idToken: String? = task.result.token
+                            idTokenListener.onIDTokenGenerated(idToken)
+                        } else {
+                            idTokenListener.onIDTokenGenerated()
+                        }
+                    }
+            }
+        }
+    }
+
+    fun deleteIDToken() {
+        externalScope.launch {
+            authenticationDao.deleteIDTokenTable()
+        }
+    }
+
+    fun saveIDToken(idToken: IDToken) {
+        externalScope.launch {
+            authenticationDao.insertIDToken(idToken)
+        }
+    }
 
 }
