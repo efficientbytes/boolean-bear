@@ -6,8 +6,9 @@ import org.koin.dsl.module
 val serviceModule = module {
     single { baseUrl }
     single { provideMoshi() }
-    single { provideCustomInterceptor(androidContext()) }
-    single { provideOkHttpClient(get()) }
+    single { provideNetworkInterceptor(androidContext()) }
+    single { provideTokenInterceptor(get(), get()) }
+    single { provideOkHttpClient(get(), get()) }
     single { provideRetrofit(get(), get(), get()) }
     single { provideVerificationService(get()) }
     single { provideUserProfileService(get()) }
