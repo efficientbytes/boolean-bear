@@ -73,6 +73,7 @@ class MainApplication : Application() {
         } else {
             statisticsRepository.deleteUserScreenTime()
             userProfileRepository.deleteLocalNotificationToken()
+            authenticationRepository.deleteIDToken()
         }
 
     }

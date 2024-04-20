@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.di
 
 import android.content.Context
+import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.services.AdsService
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.AuthenticationService
@@ -10,8 +11,10 @@ import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.VerificationService
 import app.efficientbytes.booleanbear.utils.BASE_URL
-import app.efficientbytes.booleanbear.utils.CustomInterceptor
+import app.efficientbytes.booleanbear.utils.NetworkInterceptor
+import app.efficientbytes.booleanbear.utils.TokenInterceptor
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -21,13 +24,22 @@ const val baseUrl = BASE_URL
 
 fun provideMoshi(): Moshi = Moshi.Builder().build()
 
-fun provideCustomInterceptor(context: Context): CustomInterceptor = CustomInterceptor(context)
+fun provideNetworkInterceptor(context: Context): NetworkInterceptor = NetworkInterceptor(context)
 
-fun provideOkHttpClient(customInterceptor: CustomInterceptor) = OkHttpClient.Builder()
+fun provideTokenInterceptor(
+    authenticationDao: AuthenticationDao,
+    coroutineScope: CoroutineScope
+): TokenInterceptor = TokenInterceptor(authenticationDao, coroutineScope)
+
+fun provideOkHttpClient(
+    networkInterceptor: NetworkInterceptor,
+    tokenInterceptor: TokenInterceptor
+) = OkHttpClient.Builder()
     .connectTimeout(60, TimeUnit.SECONDS)
     .writeTimeout(60, TimeUnit.SECONDS)
     .readTimeout(60, TimeUnit.SECONDS)
-    .addInterceptor(customInterceptor)
+    .addInterceptor(networkInterceptor)
+    .addInterceptor(tokenInterceptor)
     .build()
 
 fun provideRetrofit(baseUrl: String, moshi: Moshi, okHttpClient: OkHttpClient): Retrofit =

@@ -7,6 +7,8 @@ import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
+import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -14,13 +16,14 @@ import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
-import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 import java.net.UnknownHostException
@@ -207,7 +210,7 @@ fun getTodayDateComponent(milliseconds: Long): Date {
     return calendar.time
 }
 
-class CustomInterceptor(context: Context) : Interceptor {
+class NetworkInterceptor(context: Context) : Interceptor {
 
     private val mContext: Context
 
@@ -220,9 +223,9 @@ class CustomInterceptor(context: Context) : Interceptor {
         if (!isConnected) {
             throw NoInternetException()
         }
+        val originalRequest = chain.request()
         try {
-            val builder: Request.Builder = chain.request().newBuilder()
-            return chain.proceed(builder.build())
+            return chain.proceed(originalRequest)
         } catch (exception: IOException) {
             if (exception is UnknownHostException) {
                 throw NoInternetException()
@@ -281,4 +284,69 @@ class ContentDetailsLiveListener() {
         _mutableLiveData.postValue(status)
     }
 
+}
+
+class TokenInterceptor(
+    private val authenticationDao: AuthenticationDao,
+    private val externalScope: CoroutineScope
+) : Interceptor,
+    IDTokenListener {
+
+    private var token: String? = null
+    private var isComplete: Boolean = false
+
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val response = chain.proceed(originalRequest)
+        if (response.code == 401) {
+            response.close()
+            val newAccessToken = getIdToken()
+            val newRequest = originalRequest.newBuilder()
+                .header("authorization", "Bearer $newAccessToken")
+                .build()
+            return chain.proceed(newRequest)
+        }
+        return response
+    }
+
+    private fun generateIDToken(idTokenListener: IDTokenListener) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser!!.getIdToken(true)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val idToken: String? = task.result.token
+                    idTokenListener.onIDTokenGenerated(idToken)
+                } else {
+                    idTokenListener.onIDTokenGenerated()
+                }
+            }
+    }
+
+    private fun getIdToken(): String? {
+        val result = authenticationDao.getIDToken()
+        return if (result == null) {
+            generateIDToken(this)
+            while (!isComplete) {
+            }
+            this.token
+        } else {
+            this.token = result
+            this.token
+        }
+    }
+
+    override fun onIDTokenGenerated(token: String?) {
+        this.token = token
+        this.isComplete = true
+        externalScope.launch {
+            if (token != null) authenticationDao.insertIDToken(IDToken(token = token))
+        }
+    }
+
+}
+
+interface IDTokenListener {
+
+    fun onIDTokenGenerated(token: String? = null)
 }

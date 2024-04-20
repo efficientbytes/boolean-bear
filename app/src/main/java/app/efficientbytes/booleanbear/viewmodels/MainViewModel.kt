@@ -16,6 +16,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
@@ -38,6 +39,7 @@ import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
+import app.efficientbytes.booleanbear.utils.IDTokenListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
@@ -63,7 +65,7 @@ class MainViewModel(
     private val externalScope: CoroutineScope
 ) : AndroidViewModel(application),
     LifecycleEventObserver, UtilityDataRepository.UtilityListener,
-    UserProfileRepository.NotificationUploadListener {
+    UserProfileRepository.NotificationUploadListener, IDTokenListener {
 
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
@@ -290,6 +292,14 @@ class MainViewModel(
         userProfileRepository.deleteRemoteNotificationToken()
     }
 
+    fun deleteIDToken() {
+        authenticationRepository.deleteIDToken()
+    }
+
+    private fun generateIDToken() {
+        authenticationRepository.generateIDToken(this@MainViewModel)
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
@@ -311,6 +321,7 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
+                generateIDToken()
                 statisticsRepository.noteDownScreenOpeningTime()
                 fetchServerTime()
             }
@@ -354,6 +365,12 @@ class MainViewModel(
                 )
             )
             userProfileRepository.uploadNotificationsToken(token, this@MainViewModel)
+        }
+    }
+
+    override fun onIDTokenGenerated(token: String?) {
+        if (token != null) {
+            authenticationRepository.saveIDToken(IDToken(token = token))
         }
     }
 }

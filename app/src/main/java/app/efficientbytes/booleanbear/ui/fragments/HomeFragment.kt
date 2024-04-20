@@ -385,7 +385,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         position: Int,
         youtubeContentView: YoutubeContentView
     ) {
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        if (FirebaseAuth.getInstance().currentUser != null) {
             val directions =
                 HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
                     youtubeContentView.contentId
@@ -406,7 +406,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     private fun watchContentViaIntent(contentId: String) {
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        if (FirebaseAuth.getInstance().currentUser != null) {
             val directions =
                 HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
                     contentId
