@@ -1,6 +1,6 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.services.models.DeleteUserAccount
 import app.efficientbytes.booleanbear.services.models.DeleteUserAccountStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
@@ -21,7 +21,7 @@ interface AuthenticationService {
     @GET("user/single-device-login")
     suspend fun getSingleDeviceLogin(
         @Query("userAccountId") userAccountId: String
-    ): Response<SingleDeviceLogin>
+    ): Response<SingleDeviceLoginResponse>
 
     @POST("user/delete-account")
     suspend fun deleteUserAccount(

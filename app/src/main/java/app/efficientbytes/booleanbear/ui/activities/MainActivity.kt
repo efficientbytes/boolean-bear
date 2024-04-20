@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.singleDeviceLoginFromDB.observe(this) {
+        viewModel.singleDeviceLoginResponseFromDB.observe(this) {
             val currentUser = FirebaseAuth.getInstance().currentUser
             this.singleDeviceLogin = it
             if (currentUser != null && it == null) {
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     .show()
             }
         }
-        viewModel.singleDeviceLoginFromServer.observe(this) {
+        viewModel.singleDeviceLoginResponseFromServer.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     singleDeviceLoginFailedToLoad = true

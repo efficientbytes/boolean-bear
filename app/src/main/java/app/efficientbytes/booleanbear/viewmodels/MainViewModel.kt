@@ -126,19 +126,19 @@ class MainViewModel(
         }
     }
 
-    val singleDeviceLoginFromDB: LiveData<SingleDeviceLogin?> =
-        authenticationRepository.singleDeviceLoginFromDB.asLiveData()
-    private val _singleDeviceLoginFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
+    val singleDeviceLoginResponseFromDB: LiveData<SingleDeviceLogin?> =
+        authenticationRepository.singleDeviceLoginResponseFromDB.asLiveData()
+    private val _singleDeviceLoginResponseFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
         MutableLiveData()
-    val singleDeviceLoginFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
-        _singleDeviceLoginFromServer
+    val singleDeviceLoginResponseFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
+        _singleDeviceLoginResponseFromServer
 
     fun getSingleDeviceLogin(
         userAccountId: String,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             authenticationRepository.getSingleDeviceLogin(userAccountId).collect {
-                _singleDeviceLoginFromServer.postValue(it)
+                _singleDeviceLoginResponseFromServer.postValue(it)
             }
         }
     }
