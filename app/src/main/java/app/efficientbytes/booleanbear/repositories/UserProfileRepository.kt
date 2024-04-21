@@ -73,71 +73,67 @@ class UserProfileRepository(
     }
 
     suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
-        externalScope.launch {
-            try {
-                emit(DataStatus.loading<UserProfilePayload>())
-                val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
-                val responseCode = response.code()
-                when {
-                    responseCode == 200 -> {
-                        val responseUserProfile = response.body()
-                        emit(DataStatus.success(responseUserProfile))
-                    }
-
-                    responseCode >= 400 -> {
-                        val errorResponse: UserProfilePayload = gson.fromJson(
-                            response.errorBody()!!.string(),
-                            UserProfilePayload::class.java
-                        )
-                        val message =
-                            "Error Code $responseCode. ${errorResponse.message.toString()}"
-                        emit(DataStatus.failed<UserProfilePayload>(message))
-                    }
+        try {
+            emit(DataStatus.loading<UserProfilePayload>())
+            val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val responseUserProfile = response.body()
+                    emit(DataStatus.success(responseUserProfile))
                 }
-            } catch (noInternet: NoInternetException) {
-                emit(DataStatus.noInternet<UserProfilePayload>())
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                emit(DataStatus.timeOut<UserProfilePayload>())
-            } catch (exception: IOException) {
-                emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
+
+                responseCode >= 400 -> {
+                    val errorResponse: UserProfilePayload = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        UserProfilePayload::class.java
+                    )
+                    val message =
+                        "Error Code $responseCode. ${errorResponse.message.toString()}"
+                    emit(DataStatus.failed<UserProfilePayload>(message))
+                }
             }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<UserProfilePayload>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<UserProfilePayload>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
         }
     }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
-        externalScope.launch {
-            try {
-                emit(DataStatus.loading())
-                val response = userProfileService.updateUserPrivateProfile(userProfile)
-                val responseCode = response.code()
-                when {
-                    responseCode == 200 -> {
-                        val responseUserProfile = response.body()
-                        if (responseUserProfile != null) emit(
-                            DataStatus.success<UserProfilePayload>(
-                                responseUserProfile
-                            )
+        try {
+            emit(DataStatus.loading())
+            val response = userProfileService.updateUserPrivateProfile(userProfile)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val responseUserProfile = response.body()
+                    if (responseUserProfile != null) emit(
+                        DataStatus.success<UserProfilePayload>(
+                            responseUserProfile
                         )
-                    }
-
-                    responseCode >= 400 -> {
-                        val errorResponse: UserProfilePayload = gson.fromJson(
-                            response.errorBody()!!.string(),
-                            UserProfilePayload::class.java
-                        )
-                        val message =
-                            "Error Code $responseCode. ${errorResponse.message.toString()}"
-                        emit(DataStatus.failed<UserProfilePayload>(message))
-                    }
+                    )
                 }
-            } catch (noInternet: NoInternetException) {
-                emit(DataStatus.noInternet<UserProfilePayload>())
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                emit(DataStatus.timeOut<UserProfilePayload>())
-            } catch (exception: IOException) {
-                emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
+
+                responseCode >= 400 -> {
+                    val errorResponse: UserProfilePayload = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        UserProfilePayload::class.java
+                    )
+                    val message =
+                        "Error Code $responseCode. ${errorResponse.message.toString()}"
+                    emit(DataStatus.failed<UserProfilePayload>(message))
+                }
             }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<UserProfilePayload>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<UserProfilePayload>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
         }
     }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
