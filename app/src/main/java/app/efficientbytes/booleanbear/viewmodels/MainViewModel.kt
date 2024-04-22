@@ -331,7 +331,7 @@ class MainViewModel(
             }
 
             ON_STOP -> {
-                assetsRepository.deleteAllContents()
+
             }
 
             ON_DESTROY -> {

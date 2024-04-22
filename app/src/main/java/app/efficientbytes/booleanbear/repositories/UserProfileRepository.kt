@@ -229,7 +229,7 @@ class UserProfileRepository(
 
     fun generateFCMToken(notificationListener: NotificationUploadListener) {
         val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser == null) {
+        if (currentUser != null) {
             externalScope.launch {
                 val result = userProfileDao.getFCMToken()
                 if (result == null) {

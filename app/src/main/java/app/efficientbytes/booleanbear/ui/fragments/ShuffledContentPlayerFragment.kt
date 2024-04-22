@@ -115,7 +115,6 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         return rootView
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

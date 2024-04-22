@@ -136,7 +136,8 @@ class EditProfileFieldFragment : Fragment() {
                 SingletonUserData.setInstance(it)
                 when (index) {
                     1 -> {
-                        currentValue = it.firstName
+                        val firstName = it.firstName
+                        currentValue = firstName ?: ""
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
@@ -159,7 +160,8 @@ class EditProfileFieldFragment : Fragment() {
                     }
 
                     5 -> {
-                        currentProfessionCategoryPosition = it.profession
+                        val profession = it.profession
+                        currentProfessionCategoryPosition = profession ?: 0
                         binding.saveButton.isEnabled = false
                     }
 

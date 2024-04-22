@@ -115,6 +115,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     companion object {
 
+        var isUserLoggedIn = false
         var hasListenedToIntent = false
     }
 
@@ -174,14 +175,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     true -> {
                         FirebaseAuth.getInstance().currentUser?.let { user ->
                             viewModel.generateFCMToken()
-                            userProfileRepository.getUserProfile(user.uid)
-                            viewModel.getSingleDeviceLogin(user.uid)
-                            userProfileRepository.listenToUserProfileChange(user.uid)
-                            authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
+                            if (!isUserLoggedIn) {
+                                isUserLoggedIn = true
+                                userProfileRepository.listenToUserProfileChange(user.uid)
+                                authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
+                            }
                         }
                     }
 
                     false -> {
+                        isUserLoggedIn = false
                         viewModel.deleteSingleDeviceLogin()
                         viewModel.deleteFCMToken()
                         viewModel.deleteIDToken()
@@ -208,8 +211,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     currentUser?.let { user ->
                         userProfileRepository.getUserProfile(user.uid)
+                        viewModel.getFirebaseUserToken()
                     }
-                    viewModel.getFirebaseUserToken()
                 }
 
                 else -> {
@@ -482,7 +485,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setupNavigation() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
             when (destination.id) {
                 R.id.homeFragment -> {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)

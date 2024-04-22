@@ -60,15 +60,14 @@ class MainApplication : Application() {
             enableVibration = true
         )
         val currentUser = FirebaseAuth.getInstance().currentUser
+        assetsRepository.deleteAllContents()
+        adsRepository.deleteAllHomePageBanner()
         utilityDataRepository.deleteProfessions()
         utilityDataRepository.deleteIssueCategories()
         assetsRepository.deleteAllInstructorDetails()
         assetsRepository.deleteAllMentionedLinks()
-        adsRepository.deleteAllHomePageBanner()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
-            authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
-            userProfileRepository.listenToUserProfileChange(currentUser.uid)
             statisticsRepository.uploadPendingScreenTiming()
         } else {
             statisticsRepository.deleteUserScreenTime()
