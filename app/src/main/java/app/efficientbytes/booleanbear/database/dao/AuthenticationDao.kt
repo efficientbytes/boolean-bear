@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthenticationDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin): Long
+    suspend fun insertSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin)
 
     @Query("DELETE FROM $SINGLE_DEVICE_LOGIN_TABLE ")
     suspend fun delete()

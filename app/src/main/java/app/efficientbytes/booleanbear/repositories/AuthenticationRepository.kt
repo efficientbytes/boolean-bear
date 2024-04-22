@@ -3,6 +3,7 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AuthenticationService
@@ -78,13 +79,19 @@ class AuthenticationRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    emit(DataStatus.success(response.body()))
+                    val body = response.body()
+                    if (body != null) {
+                        val singleDeviceLogin = body.data
+                        if (singleDeviceLogin != null) {
+                            emit(DataStatus.success(singleDeviceLogin))
+                        }
+                    }
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: SingleDeviceLogin = gson.fromJson(
+                    val errorResponse: SingleDeviceLoginResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        SingleDeviceLogin::class.java
+                        SingleDeviceLoginResponse::class.java
                     )
                     val message = "Error Code $responseCode. ${errorResponse.message}"
                     emit(DataStatus.failed(message))
@@ -100,7 +107,8 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    val singleDeviceLoginFromDB: Flow<SingleDeviceLogin> = authenticationDao.getSingleDeviceLogin()
+    val singleDeviceLoginResponseFromDB: Flow<SingleDeviceLogin> =
+        authenticationDao.getSingleDeviceLogin()
 
     suspend fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
         authenticationDao.insertSingleDeviceLogin(singleDeviceLogin)

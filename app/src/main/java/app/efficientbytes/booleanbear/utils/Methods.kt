@@ -300,27 +300,31 @@ class TokenInterceptor(
         val originalRequest = chain.request()
         val response = chain.proceed(originalRequest)
         if (response.code == 401) {
-            response.close()
-            val newAccessToken = getIdToken()
-            val newRequest = originalRequest.newBuilder()
-                .header("authorization", "Bearer $newAccessToken")
-                .build()
-            return chain.proceed(newRequest)
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                response.close()
+                val newAccessToken = getIdToken()
+                val newRequest = originalRequest.newBuilder()
+                    .header("authorization", "Bearer $newAccessToken")
+                    .build()
+                return chain.proceed(newRequest)
+            }
         }
         return response
     }
 
     private fun generateIDToken(idTokenListener: IDTokenListener) {
         val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser!!.getIdToken(true)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val idToken: String? = task.result.token
-                    idTokenListener.onIDTokenGenerated(idToken)
-                } else {
-                    idTokenListener.onIDTokenGenerated()
-                }
-            }
+        if (currentUser!=null){
+            currentUser.getIdToken(true)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val idToken: String? = task.result.token
+                        idTokenListener.onIDTokenGenerated(idToken)
+                    } else {
+                        idTokenListener.onIDTokenGenerated()
+                    }
+                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
+        }
     }
 
     private fun getIdToken(): String? {

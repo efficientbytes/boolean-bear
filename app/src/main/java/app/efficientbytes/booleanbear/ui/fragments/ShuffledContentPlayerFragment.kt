@@ -43,6 +43,7 @@ import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -93,6 +94,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private var isPlayerQualityOrSpeedDialogOpened: Boolean = false
     private var currentVideoQuality = VideoQualityType.AUTO
     private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
+    private val customAuthStateListener: CustomAuthStateListener by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -429,6 +431,17 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             shareContent(shareLink, title)
         }
 
+        customAuthStateListener.liveData.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+
+                }
+
+                false -> {
+                    findNavController().popBackStack(R.id.homeFragment, false)
+                }
+            }
+        }
     }
 
     private fun openDescriptionFragment() {

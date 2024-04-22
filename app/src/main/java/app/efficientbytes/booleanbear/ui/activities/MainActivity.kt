@@ -1,16 +1,22 @@
 package app.efficientbytes.booleanbear.ui.activities
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +44,7 @@ import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -84,6 +91,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val utilityDataRepository: UtilityDataRepository by inject()
     private var professionalAdapterFailedToLoad = false
     private var issueCategoriesFailedToLoad = false
+    private var dialog: Dialog? = null
+    private var isDialogOpened: Boolean = false
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -208,24 +217,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.singleDeviceLoginFromDB.observe(this) {
+        viewModel.singleDeviceLoginResponseFromDB.observe(this) {
             val currentUser = FirebaseAuth.getInstance().currentUser
             this.singleDeviceLogin = it
             if (currentUser != null && it == null) {
                 //show device id does not exist , please login again.
                 viewModel.signOutUser()
-                MaterialAlertDialogBuilder(
-                    this@MainActivity,
-                    com.google.android.material.R.style.MaterialAlertDialog_Material3
-                )
-                    .setTitle("Multiple Device Login")
-                    .setMessage("We have identified multiple device login associated with this same account. We are logging you out from this device. If you want to use account in this device login again.")
-                    .setPositiveButton("ok", null)
-                    .setCancelable(false)
-                    .show()
+                multipleDeviceLoginDetectedDialog()
             }
         }
-        viewModel.singleDeviceLoginFromServer.observe(this) {
+        viewModel.singleDeviceLoginResponseFromServer.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     singleDeviceLoginFailedToLoad = true
@@ -240,15 +241,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 )
                             ) {
                                 viewModel.signOutUser()
-                                MaterialAlertDialogBuilder(
-                                    this@MainActivity,
-                                    com.google.android.material.R.style.MaterialAlertDialog_Material3
-                                )
-                                    .setTitle("Multiple Account Login")
-                                    .setMessage("We have detected multiple device logins associated with your account. As a security measure, we are logging you out from this device. If you wish to continue using your account on this device, please log in again.")
-                                    .setPositiveButton("ok", null)
-                                    .setCancelable(false)
-                                    .show()
+                                multipleDeviceLoginDetectedDialog()
                             }
                         }
                     }
@@ -607,6 +600,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    private fun multipleDeviceLoginDetectedDialog() {
+        if (dialog == null) {
+            dialog = Dialog(this)
+        }
+
+        if (!isDialogOpened) {
+            isDialogOpened = true
+
+            dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setContentView(R.layout.dialog_multiple_login_detected)
+            dialog!!.setCanceledOnTouchOutside(false)
+            dialog!!.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.window!!.attributes.windowAnimations = R.style.BottomDialogAnimation
+            dialog!!.window!!.setGravity(Gravity.BOTTOM)
+            val dismissButton = dialog!!.findViewById<MaterialButton>(R.id.dismissButton)
+
+            dialog!!.setOnDismissListener {
+                isDialogOpened = false
+                dialog = null
+            }
+
+            dismissButton.setOnClickListener {
+                dialog!!.dismiss()
+            }
+
+            dialog!!.show()
+        }
+
     }
 
 }
