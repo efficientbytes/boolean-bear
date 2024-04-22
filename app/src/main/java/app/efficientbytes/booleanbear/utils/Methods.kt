@@ -4,7 +4,6 @@ import android.content.Context
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
 import android.net.ConnectivityManager
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
@@ -171,7 +170,6 @@ object SingleDeviceLoginListener {
 object AuthStateCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
-        Log.i(AUTH_CUSTOM_COROUTINE_SCOPE, exception.message.toString())
     }
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
@@ -297,24 +295,47 @@ class TokenInterceptor(
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
-        val originalRequest = chain.request()
-        val response = chain.proceed(originalRequest)
-        if (response.code == 401) {
-            if (FirebaseAuth.getInstance().currentUser != null) {
-                response.close()
-                val newAccessToken = getIdToken()
-                val newRequest = originalRequest.newBuilder()
-                    .header("authorization", "Bearer $newAccessToken")
-                    .build()
-                return chain.proceed(newRequest)
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            val newAccessToken = getIdToken()
+            val newRequest = chain.request().newBuilder()
+                .header("authorization", "Bearer $newAccessToken")
+                .build()
+            val response = chain.proceed(newRequest)
+            if (response.code == 401) {
+                return if (FirebaseAuth.getInstance().currentUser != null) {
+                    response.close()
+                    val secondToken = getIdToken()
+                    val secondRequest = newRequest.newBuilder()
+                        .header("authorization", "Bearer $secondToken")
+                        .build()
+                    chain.proceed(secondRequest)
+                }else{
+                    response
+                }
             }
+            return response
+        } else {
+            val originalRequest = chain.request()
+            val response = chain.proceed(originalRequest)
+            if (response.code == 401) {
+                return if (FirebaseAuth.getInstance().currentUser != null) {
+                    response.close()
+                    val newAccessToken = getIdToken()
+                    val newRequest = originalRequest.newBuilder()
+                        .header("authorization", "Bearer $newAccessToken")
+                        .build()
+                    chain.proceed(newRequest)
+                }else{
+                    response
+                }
+            }
+            return response
         }
-        return response
     }
 
     private fun generateIDToken(idTokenListener: IDTokenListener) {
         val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser!=null){
+        if (currentUser != null) {
             currentUser.getIdToken(true)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
