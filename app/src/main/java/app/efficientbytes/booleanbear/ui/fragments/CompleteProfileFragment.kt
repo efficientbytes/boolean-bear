@@ -103,17 +103,6 @@ class CompleteProfileFragment : Fragment() {
                 }
             }
         }
-        val currentProfessionCategories =
-            resources.getStringArray(R.array.array_current_profession_categories)
-        val currentProfessionCategoryDropDownAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.drop_down_item,
-            currentProfessionCategories
-        )
-        binding.currentProfessionAutoCompleteTextView.setText(currentProfessionCategories[0])
-        binding.currentProfessionAutoCompleteTextView.setAdapter(
-            currentProfessionCategoryDropDownAdapter
-        )
         binding.firstNameTextInputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -154,6 +143,7 @@ class CompleteProfileFragment : Fragment() {
             }
         })
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
+            currentProfessionCategoryPosition  = position
             selectedProfessionCategoryPosition = position
         }
         binding.submitButton.setOnClickListener {
@@ -200,9 +190,9 @@ class CompleteProfileFragment : Fragment() {
                     binding.submitButton.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    it.data?.also { userPayLoad ->
+                    it.data?.let { userPayLoad ->
                         binding.progressStatusValueTextView.text = userPayLoad.message.toString()
-                        userPayLoad.userProfile?.also { userProfile ->
+                        userPayLoad.userProfile?.let { userProfile ->
                             mainViewModel.saveUserProfile(userProfile)
                         }
                     }
