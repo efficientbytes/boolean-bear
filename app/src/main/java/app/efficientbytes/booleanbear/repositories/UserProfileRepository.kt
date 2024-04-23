@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.repositories
 
-import android.util.Log
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
@@ -151,7 +150,6 @@ class UserProfileRepository(
 
     fun listenToUserProfileChange(userAccountId: String) {
         userProfileCoroutineScope.getScope().launch {
-            Log.i("USER-REP","Inside user profile rep")
             val userProfileSnapshot =
                 Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
             try {
