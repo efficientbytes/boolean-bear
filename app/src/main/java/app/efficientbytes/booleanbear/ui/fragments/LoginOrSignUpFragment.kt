@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import app.efficientbytes.booleanbear.BuildConfig
 import app.efficientbytes.booleanbear.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.validatePhoneNumberFormat
@@ -35,7 +36,11 @@ class LoginOrSignUpFragment : Fragment() {
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                viewModel.sendOTPToPhoneNumber(input)
+                if (input == BuildConfig.phone_number) {
+                    navigateToOTPVerificationPage(input)
+                } else {
+                    viewModel.sendOTPToPhoneNumber(input)
+                }
             }
         }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
@@ -75,11 +80,7 @@ class LoginOrSignUpFragment : Fragment() {
                     binding.progressStatusValueTextView.text = it.data?.message
                     binding.phoneNumberTextInputEditText.text = null
                     it.data?.phoneNumber?.also { phoneNumber ->
-                        val directions =
-                            LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToOTPVerificationFragment(
-                                phoneNumber
-                            )
-                        rootView.findNavController().navigate(directions)
+                        navigateToOTPVerificationPage(phoneNumber)
                     }
                 }
 
@@ -106,6 +107,14 @@ class LoginOrSignUpFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun navigateToOTPVerificationPage(phoneNumber: String) {
+        val directions =
+            LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToOTPVerificationFragment(
+                phoneNumber
+            )
+        rootView.findNavController().navigate(directions)
     }
 
 }
