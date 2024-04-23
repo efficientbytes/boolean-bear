@@ -490,7 +490,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    binding.toolbarAppImageView.visibility = View.VISIBLE
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
                 }
@@ -502,7 +501,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     )
                     window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
-                    binding.toolbarAppImageView.visibility = View.GONE
                     binding.mainToolbar.visibility = View.GONE
                 }
 
@@ -510,7 +508,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    binding.toolbarAppImageView.visibility = View.GONE
                     binding.mainToolbar.visibility = View.VISIBLE
                 }
             }
