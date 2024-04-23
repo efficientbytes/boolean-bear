@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.repositories
 
+import android.util.Log
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
@@ -10,6 +11,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
+import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
 import com.google.android.gms.tasks.OnCompleteListener
@@ -32,6 +34,7 @@ class UserProfileRepository(
     private val userProfileService: UserProfileService,
     private val userProfileDao: UserProfileDao,
     private val externalScope: CoroutineScope,
+    private val userProfileCoroutineScope: UserAccountCoroutineScope,
     private val userProfileListener: UserProfileListener
 ) {
 
@@ -147,7 +150,8 @@ class UserProfileRepository(
     }
 
     fun listenToUserProfileChange(userAccountId: String) {
-        externalScope.launch {
+        userProfileCoroutineScope.getScope().launch {
+            Log.i("USER-REP","Inside user profile rep")
             val userProfileSnapshot =
                 Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
             try {

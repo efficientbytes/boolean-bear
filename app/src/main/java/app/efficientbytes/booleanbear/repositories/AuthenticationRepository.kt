@@ -17,6 +17,7 @@ import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
+import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
 import app.efficientbytes.booleanbear.utils.authStateFlow
 import com.google.firebase.auth.FirebaseAuth
@@ -38,6 +39,7 @@ class AuthenticationRepository(
     private val authenticationDao: AuthenticationDao,
     private val externalScope: CoroutineScope,
     private val authStateCoroutineScope: AuthStateCoroutineScope,
+    private val userAccountCoroutineScope: UserAccountCoroutineScope,
     private val singleDeviceLoginListener: SingleDeviceLoginListener,
     private val customAuthStateListener: CustomAuthStateListener
 ) {
@@ -119,7 +121,7 @@ class AuthenticationRepository(
     }
 
     fun listenToSingleDeviceLoginChange(userAccountId: String) {
-        externalScope.launch {
+        userAccountCoroutineScope.getScope().launch {
             try {
                 val singleDeviceLoginSnapshot =
                     Firebase.firestore.collection(SINGLE_DEVICE_LOGIN_DOCUMENT_PATH)
