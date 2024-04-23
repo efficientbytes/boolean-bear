@@ -17,6 +17,10 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.ui.models.EDIT_PROFILE_FIELD
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.extractUsernameFromGitHubUrl
+import app.efficientbytes.booleanbear.utils.extractUsernameFromLinkedInUrl
+import app.efficientbytes.booleanbear.utils.isGitHubAddress
+import app.efficientbytes.booleanbear.utils.isLinkedInAddress
 import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
@@ -248,8 +252,11 @@ class EditProfileFieldFragment : Fragment() {
                             selectedProfessionCategoryPosition
 
                         EDIT_PROFILE_FIELD.UNIVERSITY_NAME -> universityName = input
-                        EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> linkedInUsername = input
-                        EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> gitHubUsername = input
+                        EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> linkedInUsername =
+                            extractUsernameFromLinkedInUrl(input)
+
+                        EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> gitHubUsername =
+                            extractUsernameFromGitHubUrl(input)
 
                         EDIT_PROFILE_FIELD.DEFAULT -> {
 
@@ -431,10 +438,48 @@ class EditProfileFieldFragment : Fragment() {
             return true
         }
         if (EDIT_PROFILE_FIELD.getField(index) == EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME) {
-            return true
+            return if (input.isNotBlank()) {
+                if (isLinkedInAddress(input)) {
+                    binding.fieldTextInputLayout.error = null
+                    return if (extractUsernameFromLinkedInUrl(input) != null) {
+                        binding.fieldTextInputLayout.error = null
+                        true
+                    } else {
+                        binding.fieldTextInputLayout.error =
+                            "Oops! It seems like the input you provided doesn't match the LinkedIn address format. Please make sure you enter a valid LinkedIn profile URL. The correct format should be something like 'https://www.linkedin.com/in/username'. Please try again."
+                        false
+                    }
+                } else {
+                    binding.fieldTextInputLayout.error =
+                        "Oops! It seems like the input you provided doesn't match the LinkedIn address format. Please make sure you enter a valid LinkedIn profile URL. The correct format should be something like 'https://www.linkedin.com/in/username'. Please try again."
+                    return false
+                }
+            } else {
+                binding.fieldTextInputLayout.error = null
+                true
+            }
         }
         if (EDIT_PROFILE_FIELD.getField(index) == EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME) {
-            return true
+            return if (input.isNotBlank()) {
+                if (isGitHubAddress(input)) {
+                    binding.fieldTextInputLayout.error = null
+                    return if (extractUsernameFromGitHubUrl(input) != null) {
+                        binding.fieldTextInputLayout.error = null
+                        true
+                    } else {
+                        binding.fieldTextInputLayout.error =
+                            "Oops! It looks like the input you provided doesn't match the GitHub URL format. Please make sure you enter a valid GitHub profile URL. The correct format should be something like 'https://github.com/username'. Please try again."
+                        false
+                    }
+                } else {
+                    binding.fieldTextInputLayout.error =
+                        "Oops! It looks like the input you provided doesn't match the GitHub URL format. Please make sure you enter a valid GitHub profile URL. The correct format should be something like 'https://github.com/username'. Please try again."
+                    return false
+                }
+            } else {
+                binding.fieldTextInputLayout.error = null
+                true
+            }
         }
         return false
     }

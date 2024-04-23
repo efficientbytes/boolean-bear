@@ -171,7 +171,7 @@
                 android:foreground="?android:attr/selectableItemBackgroundBorderless"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="@string/delete_account"
+                android:text="@string/delete_your_account"
                 android:textColor="@color/white_1200"
                 android:textSize="14sp"
                 android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"

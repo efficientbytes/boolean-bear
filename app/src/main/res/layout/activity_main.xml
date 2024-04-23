@@ -17,11 +17,11 @@
             android:id="@+id/noInternetConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone">
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/noInternetIconCardView"
@@ -103,9 +103,9 @@
                     android:textColor="@color/black"
                     app:backgroundTint="@color/white"
                     app:cornerRadius="4dp"
-                    app:iconSize="14dp"
                     app:icon="@drawable/retry_icon"
-                    app:iconPadding="18dp">
+                    app:iconPadding="18dp"
+                    app:iconSize="14dp">
 
                 </com.google.android.material.button.MaterialButton>
 
@@ -119,10 +119,10 @@
             android:layout_height="match_parent"
             android:background="@color/black"
             android:visibility="visible"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="RtlSymmetry">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -131,39 +131,16 @@
                 android:layout_height="wrap_content"
                 android:background="@color/black">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/mainToolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="64dp"
+                    android:background="@color/black"
+                    android:paddingEnd="10dp"
+                    app:titleTextAppearance="@style/ToolbarTheme"
+                    app:titleTextColor="@color/white">
 
-                    <ImageView
-                        android:id="@+id/toolbarAppImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:src="@drawable/boolean_bear_logo_icon"
-                        android:visibility="visible"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription">
-
-                    </ImageView>
-
-                    <com.google.android.material.appbar.MaterialToolbar
-                        android:id="@+id/mainToolbar"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:background="@color/black"
-                        android:paddingEnd="10dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/toolbarAppImageView"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:titleTextAppearance="@style/ToolbarTheme"
-                        app:titleTextColor="@color/white">
-
-                    </com.google.android.material.appbar.MaterialToolbar>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.appbar.MaterialToolbar>
 
             </com.google.android.material.appbar.AppBarLayout>
 

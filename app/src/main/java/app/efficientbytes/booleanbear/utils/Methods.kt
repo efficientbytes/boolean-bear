@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.Currency
 import java.util.Date
 import java.util.Locale
+import java.util.regex.Pattern
 
 fun formatTimestampToDateString(timestampInSeconds: Long): String {
     val date = Date(timestampInSeconds * 1000) // Convert seconds to milliseconds
@@ -309,7 +310,7 @@ class TokenInterceptor(
                         .header("authorization", "Bearer $secondToken")
                         .build()
                     chain.proceed(secondRequest)
-                }else{
+                } else {
                     response
                 }
             }
@@ -325,7 +326,7 @@ class TokenInterceptor(
                         .header("authorization", "Bearer $newAccessToken")
                         .build()
                     chain.proceed(newRequest)
-                }else{
+                } else {
                     response
                 }
             }
@@ -374,4 +375,44 @@ class TokenInterceptor(
 interface IDTokenListener {
 
     fun onIDTokenGenerated(token: String? = null)
+}
+
+fun isLinkedInAddress(input: String): Boolean {
+    val linkedInPattern = Pattern.compile("^https?://(?:www\\.)?linkedin\\.com/in/[a-zA-Z0-9-]+/?$")
+    val matcher = linkedInPattern.matcher(input)
+    return matcher.matches()
+}
+
+fun extractUsernameFromLinkedInUrl(linkedInUrl: String): String? {
+    val trimmedUrl = linkedInUrl.trimEnd('/')
+    val parts = trimmedUrl.split("/")
+    val linkedInPattern = Regex("^https?://(?:www\\.)?linkedin\\.com/in/([a-zA-Z0-9-]+)/?$")
+
+    if (parts.size >= 2 && linkedInPattern.matches(trimmedUrl)) {
+        val usernameIndex = parts.indexOf("in") + 1
+        if (usernameIndex < parts.size) {
+            return parts[usernameIndex]
+        }
+    }
+    return null
+}
+
+fun isGitHubAddress(input: String): Boolean {
+    val gitHubPattern = Pattern.compile("^https?://(?:www\\.)?github\\.com/[a-zA-Z0-9_-]+/?$")
+    val matcher = gitHubPattern.matcher(input)
+    return matcher.matches()
+}
+
+fun extractUsernameFromGitHubUrl(gitHubUrl: String): String? {
+    val trimmedUrl = gitHubUrl.trimEnd('/')
+    val parts = trimmedUrl.split("/")
+    val gitHubPattern = Regex("^https?://(?:www\\.)?github\\.com/([a-zA-Z0-9_-]+)/?$")
+
+    if (parts.size >= 2 && gitHubPattern.matches(trimmedUrl)) {
+        val usernameIndex = parts.indexOf("github.com") + 1
+        if (usernameIndex < parts.size) {
+            return parts[usernameIndex]
+        }
+    }
+    return null
 }

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShareFeedbackBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -50,6 +52,7 @@ class ShareFeedbackFragment : Fragment() {
                     val error = it.message
                     binding.progressStatusValueTextView.text = error
                     binding.submitButton.isEnabled = true
+                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -67,7 +70,8 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     val message = it.data?.message
                     binding.progressStatusValueTextView.text = message
-                    binding.submitButton.isEnabled = true
+                    binding.submitButton.isEnabled = false
+                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.NoInternet -> {
@@ -77,6 +81,7 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
                         "No Internet Connection"
+                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.TimeOut -> {
@@ -86,6 +91,7 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
                         "The process is taking unusually long time. Please try again"
+                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 else -> {
@@ -109,6 +115,9 @@ class ShareFeedbackFragment : Fragment() {
             }
 
         })
+        binding.goToHomePageButton.setOnClickListener {
+            findNavController().popBackStack(R.id.homeFragment, false)
+        }
     }
 
     private fun validateInput(input: String): Boolean {
