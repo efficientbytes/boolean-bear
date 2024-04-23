@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -105,4 +106,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
     //fcm notifications
     implementation("com.google.firebase:firebase-messaging:23.4.1")
+    //crashlytics
+    implementation("com.google.firebase:firebase-crashlytics:18.6.4")
 }
