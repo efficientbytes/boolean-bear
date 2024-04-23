@@ -74,8 +74,8 @@ enum class EDIT_PROFILE_FIELD
     ),
     LINKED_IN_USER_NAME(
         7,
-        "Please share your LinkedIn username or profile URL. This will help us connect with you professionally.",
-        "It is optional to provide.",
+        "Please share your LinkedIn profile URL. This will help us connect with you professionally.",
+        "Example - https://www.linkedin.com/in/username/ . It is optional to provide.",
         "LinkedIn username",
         "",
         "TEXT",
@@ -84,8 +84,8 @@ enum class EDIT_PROFILE_FIELD
     ),
     GIT_HUB_USER_NAME(
         8,
-        "Please share your GitHub username or profile URL. This will help us connect with you professionally.",
-        "It is optional to provide.",
+        "Please share your GitHub profile URL. This will help us connect with you professionally.",
+        "Example - https://github.com/username/ . It is optional to provide.",
         "GitHub username",
         "",
         "TEXT",
