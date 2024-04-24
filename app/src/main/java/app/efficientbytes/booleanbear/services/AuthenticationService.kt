@@ -9,7 +9,6 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface AuthenticationService {
 
@@ -22,9 +21,7 @@ interface AuthenticationService {
     ): Response<SignInToken>
 
     @GET("user/single-device-login")
-    suspend fun getSingleDeviceLogin(
-        @Query("userAccountId") userAccountId: String
-    ): Response<SingleDeviceLoginResponse>
+    suspend fun getSingleDeviceLogin(): Response<SingleDeviceLoginResponse>
 
     @FormUrlEncoded
     @POST("user/delete-account")

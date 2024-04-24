@@ -136,11 +136,9 @@ class MainViewModel(
     val singleDeviceLoginResponseFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
         _singleDeviceLoginResponseFromServer
 
-    fun getSingleDeviceLogin(
-        userAccountId: String,
-    ) {
+    fun getSingleDeviceLogin() {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.getSingleDeviceLogin(userAccountId).collect {
+            authenticationRepository.getSingleDeviceLogin().collect {
                 _singleDeviceLoginResponseFromServer.postValue(it)
             }
         }

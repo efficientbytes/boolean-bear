@@ -74,10 +74,10 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun getSingleDeviceLogin(userAccountId: String) = flow {
+    suspend fun getSingleDeviceLogin() = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.getSingleDeviceLogin(userAccountId)
+            val response = authenticationService.getSingleDeviceLogin()
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {

@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser != null) {
-                        viewModel.getSingleDeviceLogin(currentUser.uid)
+                        viewModel.getSingleDeviceLogin()
                     }
                 }
 
@@ -425,7 +425,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.fetchServerTime()
                         }
                         if (currentUser != null) {
-                            viewModel.getSingleDeviceLogin(currentUser.uid)
+                            viewModel.getSingleDeviceLogin()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
                                 userProfileRepository.getUserProfile(
@@ -434,9 +434,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             }
                             if (singleDeviceLoginFailedToLoad) {
                                 singleDeviceLoginFailedToLoad = false
-                                viewModel.getSingleDeviceLogin(
-                                    currentUser.uid
-                                )
+                                viewModel.getSingleDeviceLogin()
                             }
                             if (accountDeletionFailed) {
                                 accountDeletionFailed = false
@@ -460,7 +458,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
-                            viewModel.getSingleDeviceLogin(currentUser.uid)
+                            viewModel.getSingleDeviceLogin()
                         }
                     }
                 }
