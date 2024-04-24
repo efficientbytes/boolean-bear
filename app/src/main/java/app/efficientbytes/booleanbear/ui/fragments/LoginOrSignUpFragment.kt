@@ -56,54 +56,57 @@ class LoginOrSignUpFragment : Fragment() {
 
         })
         viewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "${it.message}"
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.continueButton.isEnabled = false
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Please wait while we send the OTP..."
-                }
-
-                DataStatus.Status.Success -> {
-                    binding.continueButton.isEnabled = false
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = it.data?.message
-                    binding.phoneNumberTextInputEditText.text = null
-                    it.data?.phoneNumber?.also { phoneNumber ->
-                        navigateToOTPVerificationPage(phoneNumber)
+            if (it != null) {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.continueButton.isEnabled = true
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = "${it.message}"
                     }
-                }
 
-                DataStatus.Status.NoInternet -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "No Internet Connection"
-                }
+                    DataStatus.Status.Loading -> {
+                        binding.continueButton.isEnabled = false
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "Please wait while we send the OTP..."
+                    }
 
-                DataStatus.Status.TimeOut -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "The process is taking unusually long time. Please try again"
-                }
+                    DataStatus.Status.Success -> {
+                        binding.continueButton.isEnabled = false
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = it.data?.message
+                        binding.phoneNumberTextInputEditText.text = null
+                        it.data?.phoneNumber?.also { phoneNumber ->
+                            navigateToOTPVerificationPage(phoneNumber)
+                            viewModel.resetLiveData()
+                        }
+                    }
 
-                else -> {
+                    DataStatus.Status.NoInternet -> {
+                        binding.continueButton.isEnabled = true
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "No Internet Connection"
+                    }
 
+                    DataStatus.Status.TimeOut -> {
+                        binding.continueButton.isEnabled = true
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "The process is taking unusually long time. Please try again"
+                    }
+
+                    else -> {
+
+                    }
                 }
             }
         }

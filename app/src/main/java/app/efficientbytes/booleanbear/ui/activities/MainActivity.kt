@@ -566,17 +566,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun openAppLink(uri: Uri) {
         val pathSegments = uri.pathSegments
         if (pathSegments.size >= 2) {
-            val watchSegment = pathSegments[1]
-            when (watchSegment.getOrNull(0)) {
-                'v' -> {
-                    val contentId = pathSegments.lastOrNull()
-                    if (contentId != null) {
-                        viewModel.watchContentIntent(contentId)
+            val firstSegment = pathSegments[0].orEmpty()
+            when {
+                firstSegment == "account" -> {
+                    val secondSegment = pathSegments[1].orEmpty()
+                    when {
+                        secondSegment == "delete" -> {
+                            if (FirebaseAuth.getInstance().currentUser != null) {
+                                viewModel.deleteAccountIntent()
+                            } else {
+                                val snackBar = Snackbar.make(
+                                    binding.mainCoordinatorLayout,
+                                    "You need to be logged in to delete your account.",
+                                    Snackbar.LENGTH_INDEFINITE
+                                )
+                                snackBar.show()
+                            }
+                        }
+
+                        else -> {
+
+                        }
                     }
                 }
 
                 else -> {
-
+                    val secondSegment = pathSegments[1].orEmpty()
+                    when {
+                        secondSegment == "v" -> {
+                            val contentId = pathSegments.lastOrNull()
+                            if (contentId != null) {
+                                viewModel.watchContentIntent(contentId)
+                            }
+                        }
+                    }
                 }
             }
         }

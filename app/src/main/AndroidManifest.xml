@@ -48,6 +48,16 @@
                 <data android:scheme="https" />
                 <data android:pathPattern="/watch/v/*" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="app.booleanbear.com" />
+                <data android:path="/account/delete" />
+            </intent-filter>
         </activity>
         <service
             android:name=".services.PushNotificationService"
