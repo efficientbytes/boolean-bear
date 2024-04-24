@@ -280,6 +280,19 @@ class MainViewModel(
         _watchContentIntentInvoked.postValue(null)
     }
 
+    private val _deleteAccountIntentInvoked: MutableLiveData<Boolean?> =
+        MutableLiveData()
+    val deleteAccountIntentInvoked: LiveData<Boolean?> =
+        _deleteAccountIntentInvoked
+
+    fun deleteAccountIntent() {
+        _deleteAccountIntentInvoked.postValue(true)
+    }
+
+    fun resetDeleteAccountIntentInvoked() {
+        _deleteAccountIntentInvoked.postValue(null)
+    }
+
     private val _notificationStatusChanged: MutableLiveData<DataStatus<NotificationTokenStatus>> =
         MutableLiveData()
     val notificationStatusChanged: LiveData<DataStatus<NotificationTokenStatus>> =

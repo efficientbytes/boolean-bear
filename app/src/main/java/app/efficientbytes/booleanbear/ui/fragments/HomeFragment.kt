@@ -300,7 +300,13 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 mainViewModel.resetWatchContentIntentInvoked()
             }
         }
-
+        mainViewModel.deleteAccountIntentInvoked.observe(viewLifecycleOwner) {
+            it?.let {
+                val directions = HomeFragmentDirections.homeFragmentToDeleteUserAccountFragment()
+                findNavController().navigate(directions)
+                mainViewModel.resetDeleteAccountIntentInvoked()
+            }
+        }
     }
 
     private fun startAutoScroll() {

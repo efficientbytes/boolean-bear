@@ -35,6 +35,9 @@
         <action
             android:id="@+id/homeFragment_to_loginToContinueFragment"
             app:destination="@id/loginToContinueFragment" />
+        <action
+            android:id="@+id/homeFragment_to_deleteUserAccountFragment"
+            app:destination="@id/deleteUserAccountFragment" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
