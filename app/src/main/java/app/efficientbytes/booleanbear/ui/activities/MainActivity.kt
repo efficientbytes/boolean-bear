@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.generateFCMToken()
                             if (!isUserLoggedIn) {
                                 isUserLoggedIn = true
-                                userProfileRepository.getUserProfile(user.uid)
+                                userProfileRepository.getUserProfile()
                                 userProfileRepository.listenToUserProfileChange(user.uid)
                                 authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
                             }
@@ -209,7 +209,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     currentUser?.let { user ->
-                        userProfileRepository.getUserProfile(user.uid)
+                        userProfileRepository.getUserProfile()
                         viewModel.getFirebaseUserToken()
                     }
                 }
@@ -428,9 +428,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.getSingleDeviceLogin()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
-                                userProfileRepository.getUserProfile(
-                                    currentUser.uid
-                                )
+                                userProfileRepository.getUserProfile()
                             }
                             if (singleDeviceLoginFailedToLoad) {
                                 singleDeviceLoginFailedToLoad = false

@@ -39,11 +39,11 @@ class UserProfileRepository(
     val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
     private val gson = Gson()
 
-    fun getUserProfile(userAccountId: String) {
+    fun getUserProfile() {
         userProfileListener.postLatestValue(DataStatus.loading())
         externalScope.launch {
             try {
-                val response = userProfileService.getUserProfile(userAccountId = userAccountId)
+                val response = userProfileService.getUserProfile()
                 val responseCode = response.code()
                 when {
                     responseCode == 200 -> {
@@ -212,10 +212,7 @@ class UserProfileRepository(
             externalScope.launch {
                 notificationListener?.onTokenStatusChanged(DataStatus.loading())
                 try {
-                    val response = userProfileService.uploadNotificationsToken(
-                        token,
-                        currentUser.uid
-                    )
+                    val response = userProfileService.uploadNotificationsToken(token)
                     val responseCode = response.code()
                     when {
                         responseCode == 200 -> {
@@ -290,10 +287,7 @@ class UserProfileRepository(
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             externalScope.launch {
-                userProfileService.deleteFCMToken(
-                    "",
-                    currentUser.uid
-                )
+                userProfileService.deleteFCMToken("")
             }
         }
     }
