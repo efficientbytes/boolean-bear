@@ -16,7 +16,6 @@ interface StatisticsService {
     @POST("statistics/screen-timing/app/{userAccountId}/")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadScreenTimings(
-        @Path("userAccountId") userAccountId: String,
         @Field("screenTimingPerDayList") screenTimingPerDayList: List<ScreenTimingPerDay>
     ): Response<ResponseMessage>
 
@@ -25,7 +24,6 @@ interface StatisticsService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun increaseContentViewCount(
         @Path("contentId") contentId: String,
-        @Field("userAccountId") userAccountId: String? = null,
         @Field("message") message: String? = null
     ): Response<RequestContentCount>
 

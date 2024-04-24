@@ -71,7 +71,7 @@ class StatisticsRepository(
                     val list =
                         statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(today.time)
                     if (list.isNotEmpty()) {
-                        val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                        val response = statisticsService.uploadScreenTimings(list)
                         val responseCode = response.code()
                         when {
                             responseCode == 200 -> {
@@ -95,7 +95,7 @@ class StatisticsRepository(
                 if (!isEmpty) {
                     val list = statisticsDao.getTotalScreenTimePerDayBasisForAllDay()
                     if (list.isNotEmpty()) {
-                        val response = statisticsService.uploadScreenTimings(userAccountId, list)
+                        val response = statisticsService.uploadScreenTimings(list)
                         val responseCode = response.code()
                         when {
                             responseCode == 200 -> {
@@ -152,8 +152,7 @@ class StatisticsRepository(
             try {
                 val response =
                     statisticsService.increaseContentViewCount(
-                        contentId,
-                        currentUser.uid
+                        contentId
                     )
                 val responseCode = response.code()
                 if (responseCode == 200) emit(DataStatus.success(Unit))
