@@ -13,7 +13,7 @@ import retrofit2.http.Path
 interface StatisticsService {
 
     @FormUrlEncoded
-    @POST("statistics/screen-timing/app/{userAccountId}/")
+    @POST("statistics/screen-timing/app/")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadScreenTimings(
         @Field("screenTimingPerDayList") screenTimingPerDayList: List<ScreenTimingPerDay>
