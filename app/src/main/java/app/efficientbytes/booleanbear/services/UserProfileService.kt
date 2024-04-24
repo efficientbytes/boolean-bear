@@ -8,7 +8,6 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface UserProfileService {
 
@@ -52,17 +51,14 @@ interface UserProfileService {
         @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
     ): Response<UserProfilePayload>
 
-    @GET("/user/profile")
-    suspend fun getUserProfile(
-        @Query("userAccountId") userAccountId: String? = null
-    ): Response<UserProfilePayload>
+    @GET("user/profile")
+    suspend fun getUserProfile(): Response<UserProfilePayload>
 
     @FormUrlEncoded
     @POST("user/notifications/token/upload")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadNotificationsToken(
-        @Field("token") token: String,
-        @Field("userAccountId") userAccountId: String? = null
+        @Field("token") token: String
     ): Response<NotificationTokenStatus>
 
     @FormUrlEncoded
@@ -70,7 +66,6 @@ interface UserProfileService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun deleteFCMToken(
         @Field("token") token: String,
-        @Field("userAccountId") userAccountId: String? = null
     ): Response<NotificationTokenStatus>
 
 

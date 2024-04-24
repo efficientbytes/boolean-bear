@@ -272,7 +272,7 @@ class EditProfileFieldFragment : Fragment() {
                 val userProfile = SingletonUserData.getInstance()
                 userProfile?.let { profile ->
                     val verifyPrimaryEmailAddress =
-                        VerifyPrimaryEmailAddress(input, profile.userAccountId, profile.firstName)
+                        VerifyPrimaryEmailAddress(input,profile.firstName)
                     viewModel.sendVerificationLinkToPrimaryEmailAddress(verifyPrimaryEmailAddress)
                 }
 

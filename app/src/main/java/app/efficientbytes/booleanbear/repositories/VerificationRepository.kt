@@ -90,7 +90,6 @@ class VerificationRepository(private val verificationService: VerificationServic
                 val response =
                     verificationService.verifyPrimaryEmailAddress(
                         verifyPrimaryEmailAddress.emailAddress,
-                        verifyPrimaryEmailAddress.userAccountId,
                         verifyPrimaryEmailAddress.firstName
                     )
                 val responseCode = response.code()

@@ -413,6 +413,7 @@ fun isGitHubAddress(input: String): Boolean {
 }
 
 fun extractUsernameFromGitHubUrl(gitHubUrl: String): String? {
+    //for github url check
     val trimmedUrl = gitHubUrl.trimEnd('/')
     val parts = trimmedUrl.split("/")
     val gitHubPattern = Regex("^https?://(?:www\\.)?github\\.com/([a-zA-Z0-9_-]+)/?$")

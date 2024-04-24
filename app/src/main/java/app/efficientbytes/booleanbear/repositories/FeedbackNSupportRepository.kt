@@ -22,7 +22,6 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
             emit(DataStatus.loading())
             val response = feedbackNSupportService.uploadFeedback(
                 feedback.feedback,
-                feedback.userAccountId,
                 feedback.message
             )
             val responseCode = response.code()

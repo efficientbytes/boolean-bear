@@ -31,7 +31,6 @@ interface VerificationService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun verifyPrimaryEmailAddress(
         @Field("emailAddress") emailAddress: String? = null,
-        @Field("userAccountId") userAccountId: String? = null,
         @Field("firstName") firstName: String? = null
     ): Response<PrimaryEmailAddressVerificationStatus>
 

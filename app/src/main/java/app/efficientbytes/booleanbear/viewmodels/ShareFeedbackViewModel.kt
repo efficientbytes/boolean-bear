@@ -18,9 +18,9 @@ class ShareFeedbackViewModel(private val feedbackNSupportRepository: FeedbackNSu
         MutableLiveData()
     val feedbackUploadStatus: LiveData<DataStatus<Feedback?>> = _feedbackUploadStatus
 
-    fun uploadFeedback(feedback: String, userAccountId: String) {
+    fun uploadFeedback(feedback: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            feedbackNSupportRepository.postFeedback(Feedback(feedback, userAccountId, ""))
+            feedbackNSupportRepository.postFeedback(Feedback(feedback, ""))
                 .collect {
                     _feedbackUploadStatus.postValue(it)
                 }
