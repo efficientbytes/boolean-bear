@@ -40,12 +40,14 @@ import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
 import app.efficientbytes.booleanbear.utils.IDTokenListener
+import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
@@ -62,7 +64,8 @@ class MainViewModel(
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
     private val statisticsRepository: StatisticsRepository,
     private val assetsRepository: AssetsRepository,
-    private val externalScope: CoroutineScope
+    private val externalScope: CoroutineScope,
+    private val userAccountCoroutineScope: UserAccountCoroutineScope
 ) : AndroidViewModel(application),
     LifecycleEventObserver, UtilityDataRepository.UtilityListener,
     UserProfileRepository.NotificationUploadListener, IDTokenListener {
@@ -156,10 +159,11 @@ class MainViewModel(
     }
 
     fun signOutUser() {
-        if (auth.currentUser != null) {
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            userAccountCoroutineScope.getScope().coroutineContext.cancelChildren()
             statisticsRepository.noteDownScreenClosingTime()
             statisticsRepository.forceUploadPendingScreenTiming()
-            auth.signOut()
+            FirebaseAuth.getInstance().signOut()
         }
     }
 

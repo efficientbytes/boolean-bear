@@ -29,6 +29,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "phone_number", "\"9600165087\"")
+            buildConfigField("String", "otp", "\"191614\"")
+        }
+        debug {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "phone_number", "\"9600165087\"")
+            buildConfigField("String", "otp", "\"191614\"")
         }
     }
     compileOptions {
@@ -40,6 +51,7 @@ android {
     }
     buildFeatures {
         dataBinding = true
+        buildConfig = true
     }
 }
 val moshiVersion = "1.15.0"

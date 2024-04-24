@@ -177,6 +177,15 @@ object AuthStateCoroutineScope {
     fun getScope() = scope
 }
 
+object UserAccountCoroutineScope {
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+    }
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+
+    fun getScope() = scope
+}
+
 object CustomAuthStateListener {
 
     private val _mutableLiveData: MutableLiveData<Boolean> = MutableLiveData()

@@ -50,7 +50,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -177,6 +176,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.generateFCMToken()
                             if (!isUserLoggedIn) {
                                 isUserLoggedIn = true
+                                userProfileRepository.getUserProfile(user.uid)
                                 userProfileRepository.listenToUserProfileChange(user.uid)
                                 authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
                             }
@@ -188,7 +188,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.deleteSingleDeviceLogin()
                         viewModel.deleteFCMToken()
                         viewModel.deleteIDToken()
-                        externalScope.coroutineContext.cancelChildren()
                         viewModel.deleteUserProfile()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                         statisticsRepository.deleteUserScreenTime()

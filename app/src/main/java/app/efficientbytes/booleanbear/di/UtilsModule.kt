@@ -10,6 +10,7 @@ val utilsModule = module {
     single { provideUserProfileListener() }
     single { provideSingleDeviceLoginListener() }
     single { provideAuthStateCoroutineScope() }
+    single { provideUserAccountCoroutineScope() }
     single { provideCustomAuthStateListener() }
     single { provideServiceError() }
     single { provideInstructorLiveListener() }
