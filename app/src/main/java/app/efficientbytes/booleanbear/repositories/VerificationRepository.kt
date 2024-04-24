@@ -21,7 +21,10 @@ class VerificationRepository(private val verificationService: VerificationServic
     suspend fun sendOTPToPhoneNumber(verifyPhoneNumber: VerifyPhoneNumber) = flow {
         try {
             emit(DataStatus.loading())
-            val response = verificationService.sendOtpToPhoneNumber(verifyPhoneNumber)
+            val response = verificationService.sendOtpToPhoneNumber(
+                verifyPhoneNumber.phoneNumber,
+                verifyPhoneNumber.otp
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -50,7 +53,10 @@ class VerificationRepository(private val verificationService: VerificationServic
     suspend fun verifyPhoneNumberOTP(verifyPhoneNumber: VerifyPhoneNumber) = flow {
         try {
             emit(DataStatus.loading())
-            val response = verificationService.verifyPhoneNumberOTP(verifyPhoneNumber)
+            val response = verificationService.verifyPhoneNumberOTP(
+                verifyPhoneNumber.phoneNumber,
+                verifyPhoneNumber.otp
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -82,7 +88,11 @@ class VerificationRepository(private val verificationService: VerificationServic
             try {
                 emit(DataStatus.loading())
                 val response =
-                    verificationService.verifyPrimaryEmailAddress(verifyPrimaryEmailAddress)
+                    verificationService.verifyPrimaryEmailAddress(
+                        verifyPrimaryEmailAddress.emailAddress,
+                        verifyPrimaryEmailAddress.userAccountId,
+                        verifyPrimaryEmailAddress.firstName
+                    )
                 val responseCode = response.code()
                 when {
                     responseCode == 200 -> {

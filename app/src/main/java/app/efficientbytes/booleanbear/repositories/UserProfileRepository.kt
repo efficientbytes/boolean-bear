@@ -6,7 +6,6 @@ import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
-import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
@@ -77,7 +76,22 @@ class UserProfileRepository(
     suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
         try {
             emit(DataStatus.loading<UserProfilePayload>())
-            val response = userProfileService.updateUserPrivateProfileBasicDetails(userProfile)
+            val response = userProfileService.updateUserPrivateProfileBasicDetails(
+                userProfile.firstName,
+                userProfile.phoneNumber,
+                userProfile.phoneNumberPrefix,
+                userProfile.completePhoneNumber,
+                userProfile.userAccountId,
+                userProfile.activityId,
+                userProfile.profession,
+                userProfile.lastName,
+                userProfile.emailAddress,
+                userProfile.linkedInUsername,
+                userProfile.gitHubUsername,
+                userProfile.universityName,
+                userProfile.createdOn,
+                userProfile.lastUpdatedOn
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -108,7 +122,22 @@ class UserProfileRepository(
     suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
         try {
             emit(DataStatus.loading())
-            val response = userProfileService.updateUserPrivateProfile(userProfile)
+            val response = userProfileService.updateUserPrivateProfile(
+                userProfile.firstName,
+                userProfile.phoneNumber,
+                userProfile.phoneNumberPrefix,
+                userProfile.completePhoneNumber,
+                userProfile.userAccountId,
+                userProfile.activityId,
+                userProfile.profession,
+                userProfile.lastName,
+                userProfile.emailAddress,
+                userProfile.linkedInUsername,
+                userProfile.gitHubUsername,
+                userProfile.universityName,
+                userProfile.createdOn,
+                userProfile.lastUpdatedOn
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -184,10 +213,8 @@ class UserProfileRepository(
                 notificationListener?.onTokenStatusChanged(DataStatus.loading())
                 try {
                     val response = userProfileService.uploadNotificationsToken(
-                        RemoteNotificationToken(
-                            token,
-                            currentUser.uid
-                        )
+                        token,
+                        currentUser.uid
                     )
                     val responseCode = response.code()
                     when {
@@ -264,10 +291,8 @@ class UserProfileRepository(
         if (currentUser != null) {
             externalScope.launch {
                 userProfileService.deleteFCMToken(
-                    RemoteNotificationToken(
-                        "",
-                        currentUser.uid
-                    )
+                    "",
+                    currentUser.uid
                 )
             }
         }
