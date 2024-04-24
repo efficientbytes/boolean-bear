@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 class LoginOrSignUpViewModel(private val verificationRepository: VerificationRepository) :
     ViewModel() {
 
-    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>?> =
         MutableLiveData()
-    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>?> =
         _sendOTPToPhoneNumberResponse
 
     fun sendOTPToPhoneNumber(phoneNumber: String) {
@@ -24,6 +24,12 @@ class LoginOrSignUpViewModel(private val verificationRepository: VerificationRep
             verificationRepository.sendOTPToPhoneNumber(VerifyPhoneNumber(phoneNumber)).collect {
                 _sendOTPToPhoneNumberResponse.postValue(it)
             }
+        }
+    }
+
+    fun resetLiveData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _sendOTPToPhoneNumberResponse.postValue(null)
         }
     }
 
