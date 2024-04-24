@@ -48,7 +48,7 @@ class AuthenticationRepository(
     suspend fun getSignInToken(phoneNumber: PhoneNumber) = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.getSignInToken(phoneNumber)
+            val response = authenticationService.getSignInToken(phoneNumber.phoneNumber)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -151,7 +151,7 @@ class AuthenticationRepository(
     suspend fun deleteUserAccount(deleteUserAccount: DeleteUserAccount) = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.deleteUserAccount(deleteUserAccount)
+            val response = authenticationService.deleteUserAccount(deleteUserAccount.userAccountId)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {

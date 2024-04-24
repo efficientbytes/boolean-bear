@@ -6,7 +6,6 @@ import app.efficientbytes.booleanbear.database.dao.StatisticsDao
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.StatisticsService
-import app.efficientbytes.booleanbear.services.models.RequestContentCount
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.getTodayDateComponent
 import com.google.firebase.auth.FirebaseAuth
@@ -154,7 +153,7 @@ class StatisticsRepository(
                 val response =
                     statisticsService.increaseContentViewCount(
                         contentId,
-                        RequestContentCount(currentUser.uid)
+                        currentUser.uid
                     )
                 val responseCode = response.code()
                 if (responseCode == 200) emit(DataStatus.success(Unit))

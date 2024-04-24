@@ -20,7 +20,11 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
     suspend fun postFeedback(feedback: Feedback) = flow {
         try {
             emit(DataStatus.loading())
-            val response = feedbackNSupportService.uploadFeedback(feedback)
+            val response = feedbackNSupportService.uploadFeedback(
+                feedback.feedback,
+                feedback.userAccountId,
+                feedback.message
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -48,7 +52,13 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
     suspend fun requestSupport(requestSupport: RequestSupport) = flow {
         try {
             emit(DataStatus.loading())
-            val response = feedbackNSupportService.requestSupport(requestSupport)
+            val response = feedbackNSupportService.requestSupport(
+                requestSupport.title,
+                requestSupport.description,
+                requestSupport.category,
+                requestSupport.completePhoneNumber,
+                requestSupport.userAccountId
+            )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {

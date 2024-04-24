@@ -1,25 +1,55 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
-import app.efficientbytes.booleanbear.services.models.RemoteNotificationToken
 import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import retrofit2.Response
-import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface UserProfileService {
 
+    @FormUrlEncoded
     @POST("user/profile/update/basic-details")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfileBasicDetails(
-        @Body userProfile: UserProfile
+        @Field("firstName") firstName: String? = null,
+        @Field("phoneNumber") phoneNumber: String,
+        @Field("phoneNumberPrefix") phoneNumberPrefix: String,
+        @Field("completePhoneNumber") completePhoneNumber: String,
+        @Field("userAccountId") userAccountId: String,
+        @Field("activityId") activityId: String? = null,
+        @Field("profession") profession: Int? = 0,
+        @Field("lastName") lastName: String? = null,
+        @Field("emailAddress") emailAddress: String? = null,
+        @Field("linkedInUsername") linkedInUsername: String? = null,
+        @Field("gitHubUsername") gitHubUsername: String? = null,
+        @Field("universityName") universityName: String? = null,
+        @Field("createdOn") createdOn: Long? = null,
+        @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
     ): Response<UserProfilePayload>
 
+    @FormUrlEncoded
     @POST("user/profile/update")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfile(
-        @Body userProfile: UserProfile
+        @Field("firstName") firstName: String? = null,
+        @Field("phoneNumber") phoneNumber: String,
+        @Field("phoneNumberPrefix") phoneNumberPrefix: String,
+        @Field("completePhoneNumber") completePhoneNumber: String,
+        @Field("userAccountId") userAccountId: String,
+        @Field("activityId") activityId: String? = null,
+        @Field("profession") profession: Int? = 0,
+        @Field("lastName") lastName: String? = null,
+        @Field("emailAddress") emailAddress: String? = null,
+        @Field("linkedInUsername") linkedInUsername: String? = null,
+        @Field("gitHubUsername") gitHubUsername: String? = null,
+        @Field("universityName") universityName: String? = null,
+        @Field("createdOn") createdOn: Long? = null,
+        @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
     ): Response<UserProfilePayload>
 
     @GET("/user/profile")
@@ -27,14 +57,20 @@ interface UserProfileService {
         @Query("userAccountId") userAccountId: String? = null
     ): Response<UserProfilePayload>
 
+    @FormUrlEncoded
     @POST("user/notifications/token/upload")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadNotificationsToken(
-        @Body remoteNotificationToken: RemoteNotificationToken
+        @Field("token") token: String,
+        @Field("userAccountId") userAccountId: String? = null
     ): Response<NotificationTokenStatus>
 
+    @FormUrlEncoded
     @POST("user/notification/token/delete")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun deleteFCMToken(
-        @Body remoteNotificationToken: RemoteNotificationToken
+        @Field("token") token: String,
+        @Field("userAccountId") userAccountId: String? = null
     ): Response<NotificationTokenStatus>
 
 
