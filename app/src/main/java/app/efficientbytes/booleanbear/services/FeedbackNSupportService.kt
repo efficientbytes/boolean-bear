@@ -15,7 +15,6 @@ interface FeedbackNSupportService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadFeedback(
         @Field("feedback") feedback: String,
-        @Field("userAccountId") userAccountId: String,
         @Field("message") message: String
     ): Response<Feedback>
 

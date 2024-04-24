@@ -39,7 +39,7 @@ class ShareFeedbackFragment : Fragment() {
             if (validateInput(input)) {
                 val userAccountId = SingletonUserData.getInstance()?.userAccountId
                 if (userAccountId != null) {
-                    viewModel.uploadFeedback(input, userAccountId)
+                    viewModel.uploadFeedback(input)
                 }
             }
         }
