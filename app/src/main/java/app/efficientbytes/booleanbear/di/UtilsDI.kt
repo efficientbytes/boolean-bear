@@ -1,7 +1,6 @@
 package app.efficientbytes.booleanbear.di
 
 import android.content.Context
-import android.util.Log
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
@@ -22,9 +21,7 @@ fun provideConnectivityListener(context: Context) = ConnectivityListener(context
 
 fun provideReviewManager(context: Context) = ReviewManagerFactory.create(context)
 
-private val handler = CoroutineExceptionHandler { _, exception ->
-    Log.i("Common Scope", exception.message.toString())
-}
+private val handler = CoroutineExceptionHandler { _, _ -> }
 
 fun provideIOCoroutineScope() = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
 
