@@ -120,5 +120,8 @@
     <string name="we_have_detected_multiple_device_logins_associated_with_your_account_as_a_security_measure_we_are_logging_you_out_from_this_device_if_you_wish_to_continue_using_your_account_on_this_device_please_log_in_again">We have detected multiple device logins associated with your account. As a security measure, we are logging you out from this device. If you wish to continue using your account on this device, please log in again.</string>
     <string name="multiple_device_login_detected">Multiple Device Login Detected</string>
     <string name="dismiss">Dismiss</string>
+    <string name="privacy_amp_policy"><![CDATA[Privacy & Policy]]></string>
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="privacy_amp_terms_of_use"><![CDATA[Privacy & Terms Of Use]]></string>
 
 </resources>

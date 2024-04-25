@@ -86,9 +86,9 @@
                     android:id="@+id/progressStatusValueTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:textSize="14sp"
                     android:visibility="gone"
-                    android:textAlignment="center"
                     app:fontFamily="@font/montserrat"
                     app:layout_constraintEnd_toStartOf="@id/guideline3"
                     app:layout_constraintStart_toEndOf="@id/progressBar"
@@ -102,7 +102,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="36dp"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="80dp"
                 android:fontFamily="@font/montserrat"
                 android:text="@string/enter_your_phone_number"
                 android:textAlignment="textStart"
@@ -151,18 +151,31 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/policyNConditionsLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="11sp"
+                android:paddingHorizontal="8dp"
+                app:layout_constraintEnd_toEndOf="@id/phoneNumberTextInputLayout"
+                app:layout_constraintStart_toStartOf="@id/phoneNumberTextInputLayout"
+                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
+
+            </com.google.android.material.textview.MaterialTextView>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/continueButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="34dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="26dp"
                 android:text="@string/continue_"
                 android:textColor="@color/black"
                 app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
+                app:layout_constraintTop_toBottomOf="@id/policyNConditionsLabelTextView">
 
             </com.google.android.material.button.MaterialButton>
 
@@ -171,7 +184,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.05" />
+                app:layout_constraintGuide_percent="0.01" />
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/barrier1"
