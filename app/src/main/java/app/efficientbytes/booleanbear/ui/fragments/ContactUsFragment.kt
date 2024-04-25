@@ -1,5 +1,7 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -73,6 +75,24 @@ class ContactUsFragment : Fragment() {
             findNavController().navigate(R.id.contactUsFragment_to_deleteUserAccountFragment)
         }
 
+        binding.privacyPolicyLabelTextView.setOnClickListener {
+            val link =
+                "https://efficientbytes.notion.site/Boolean-Bear-Privacy-Policy-b2f43ae39b8a4c5880ef2a1cbd811b15"
+            openLink(link)
+        }
+
+        binding.termsNConditionLabelTextView.setOnClickListener {
+            val link =
+                "https://efficientbytes.notion.site/Boolean-Bear-Terms-of-use-803e636c627946e4b6fdefdbf23b9ede"
+            openLink(link)
+        }
+
+    }
+
+    private fun openLink(link: String) {
+        val uri = Uri.parse(link)
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        requireContext().startActivity(intent)
     }
 
 }

@@ -87,7 +87,7 @@
         </com.google.android.material.textview.MaterialTextView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/basicDetailsConstraintLayout"
+            android:id="@+id/feedbackNSupportConstraintLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
@@ -178,6 +178,76 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/contactSupportLabelTextView">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/privacyPolicyNTermsConditionLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="42dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:text="@string/privacy_amp_terms_of_use"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/feedbackNSupportConstraintLayout">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/privacyNConditionConstraintLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/rounded_constraint_layout_background"
+            android:paddingVertical="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/privacyPolicyNTermsConditionLabelTextView">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/privacyPolicyLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="8dp"
+                android:text="@string/privacy_amp_policy"
+                android:textAlignment="textStart"
+                android:textColor="@color/white_1200"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/termsNConditionLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="8dp"
+                android:text="@string/terms_of_use"
+                android:textAlignment="textStart"
+                android:textColor="@color/white_1200"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/privacyPolicyLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 
