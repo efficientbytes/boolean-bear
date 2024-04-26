@@ -6,13 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
-import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
+import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
 import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
-import app.efficientbytes.booleanbear.utils.LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE
+import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE
 import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
 import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
 import kotlinx.coroutines.flow.Flow
@@ -30,15 +30,15 @@ interface AssetsDao {
     fun getShuffledCategories(): Flow<MutableList<ShuffledCategory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShuffledCategoryContents(contents: List<LocalYoutubeContentView>)
+    suspend fun insertShuffledCategoryContents(contents: List<LocalShuffledContent>)
 
-    @Query("SELECT * FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE WHERE categoryId = :category")
-    suspend fun getAllShuffledYoutubeViewContents(category: String): List<YoutubeContentView>
+    @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE categoryId = :category")
+    suspend fun getAllShuffledYoutubeViewContents(category: String): List<RemoteShuffledContent>
 
-    @Query("SELECT * FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE WHERE contentId = :content")
-    suspend fun getShuffledYoutubeViewContent(content: String): YoutubeContentView?
+    @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE contentId = :content")
+    suspend fun getShuffledYoutubeViewContent(content: String): RemoteShuffledContent?
 
-    @Query("DELETE FROM $LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE ")
+    @Query("DELETE FROM $SHUFFLED_CONTENT_TABLE ")
     suspend fun deleteShuffledYoutubeContentView()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

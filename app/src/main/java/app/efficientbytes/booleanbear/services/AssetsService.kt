@@ -6,7 +6,7 @@ import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
-import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
+import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -28,7 +28,7 @@ interface AssetsService {
     suspend fun getYoutubeTypeContentForContentId(
         @Path("contentId") contentId: String,
         @Query(value = "viewType") viewType: String = "YOUTUBE"
-    ): Response<YoutubeContentViewStatus>
+    ): Response<ShuffledContentResponse>
 
     @GET("contents/{contentId}/play-link")
     suspend fun getPlayUrl(

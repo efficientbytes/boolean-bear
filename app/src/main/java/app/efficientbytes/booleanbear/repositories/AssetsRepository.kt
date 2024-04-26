@@ -3,7 +3,7 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
-import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
+import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.models.ContentViewType
@@ -18,8 +18,8 @@ import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
 import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
-import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -183,13 +183,13 @@ class AssetsRepository(
                             responseCode == 200 -> {
                                 val body = response.body()
                                 if (body != null) {
-                                    if (body.youtubeContentView == null) {
-                                        emit(DataStatus.emptyResult<YoutubeContentView>())
+                                    if (body.data == null) {
+                                        emit(DataStatus.emptyResult<RemoteShuffledContent>())
                                     } else {
-                                        emit(DataStatus.success(body.youtubeContentView))
+                                        emit(DataStatus.success(body.data))
                                     }
                                 } else {
-                                    emit(DataStatus.emptyResult<YoutubeContentView>())
+                                    emit(DataStatus.emptyResult<RemoteShuffledContent>())
                                 }
                             }
 
@@ -198,15 +198,15 @@ class AssetsRepository(
                                     response.errorBody()!!.string(),
                                     ContentCategoriesStatus::class.java
                                 )
-                                emit(DataStatus.failed<YoutubeContentView>(errorResponse.message))
+                                emit(DataStatus.failed<RemoteShuffledContent>(errorResponse.message))
                             }
                         }
                     } catch (noInternet: NoInternetException) {
-                        emit(DataStatus.noInternet<YoutubeContentView>())
+                        emit(DataStatus.noInternet<RemoteShuffledContent>())
                     } catch (socketTimeOutException: SocketTimeoutException) {
-                        emit(DataStatus.timeOut<YoutubeContentView>())
+                        emit(DataStatus.timeOut<RemoteShuffledContent>())
                     } catch (exception: IOException) {
-                        emit(DataStatus.unknownException<YoutubeContentView>(exception.message.toString()))
+                        emit(DataStatus.unknownException<RemoteShuffledContent>(exception.message.toString()))
                     }
                 }
             }
@@ -218,7 +218,7 @@ class AssetsRepository(
         when (viewType) {
             ContentViewType.YOUTUBE -> {
                 try {
-                    val list = mutableListOf<YoutubeContentView>()
+                    val list = mutableListOf<RemoteShuffledContent>()
                     val jobs = contentIdList.map { id ->
                         externalScope.launch {
                             try {
@@ -228,17 +228,17 @@ class AssetsRepository(
                                 when {
                                     responseCode == 200 -> {
                                         val youtubeViewContent =
-                                            response.body()?.youtubeContentView
+                                            response.body()?.data
                                         youtubeViewContent?.let {
                                             list.add(it)
                                         }
                                     }
 
                                     responseCode >= 400 -> {
-                                        val errorResponse: YoutubeContentViewStatus =
+                                        val errorResponse: ShuffledContentResponse =
                                             gson.fromJson(
                                                 response.errorBody()!!.string(),
-                                                YoutubeContentViewStatus::class.java
+                                                ShuffledContentResponse::class.java
                                             )
                                     }
                                 }
@@ -253,9 +253,9 @@ class AssetsRepository(
                     }
                     jobs.joinAll()
                     if (list.isEmpty()) {
-                        emit(DataStatus.emptyResult<MutableList<YoutubeContentView>>())
+                        emit(DataStatus.emptyResult<MutableList<RemoteShuffledContent>>())
                     } else {
-                        emit(DataStatus.success<MutableList<YoutubeContentView>>(list))
+                        emit(DataStatus.success<MutableList<RemoteShuffledContent>>(list))
                     }
                 } catch (noInternet: NoInternetException) {
                     throw NoInternetException()
@@ -399,14 +399,15 @@ class AssetsRepository(
                                                     youtubeViewContents
                                                 )
                                                 val modifiedList = youtubeContentList.map {
-                                                    LocalYoutubeContentView(
+                                                    LocalShuffledContent(
                                                         categoryId,
                                                         it.contentId,
                                                         it.title,
                                                         it.instructorName,
                                                         it.createdOn,
                                                         it.runTime,
-                                                        it.thumbnail
+                                                        it.thumbnail,
+                                                        it.hashTags
                                                     )
                                                 }
                                                 assetsDao.insertShuffledCategoryContents(
@@ -768,7 +769,7 @@ class AssetsRepository(
 
     interface ContentListener {
 
-        fun onContentsDataStatusChanged(status: DataStatus<List<YoutubeContentView>>)
+        fun onContentsDataStatusChanged(status: DataStatus<List<RemoteShuffledContent>>)
 
     }
 

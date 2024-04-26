@@ -2,10 +2,10 @@ package app.efficientbytes.booleanbear.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE
+import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE
 
-@Entity(tableName = LOCAL_SHUFFLED_YOUTUBE_CONTENT_VIEW_TABLE)
-data class LocalYoutubeContentView(
+@Entity(tableName = SHUFFLED_CONTENT_TABLE)
+data class LocalShuffledContent(
     val categoryId: String,
     @PrimaryKey(autoGenerate = false)
     val contentId: String,
@@ -13,5 +13,6 @@ data class LocalYoutubeContentView(
     val instructorName: String,
     val createdOn: Long,
     val runTime: Long,
-    val thumbnail: String
+    val thumbnail: String,
+    val hashTags: List<String>?=null
 )
