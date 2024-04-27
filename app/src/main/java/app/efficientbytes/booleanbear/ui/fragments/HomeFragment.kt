@@ -100,6 +100,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 return false
             }
         }, viewLifecycleOwner)
+
+        binding.searchConstraintParentLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.adapter = null
         //set content category recycler view
         binding.categoriesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
