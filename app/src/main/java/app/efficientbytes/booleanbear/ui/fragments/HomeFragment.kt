@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -84,7 +83,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
                 val search = menu.findItem(R.id.searchMenu)
-                searchView?.visibility = View.GONE
                 searchView = search.actionView as? SearchView
                 searchView?.maxWidth = Integer.MAX_VALUE
                 searchView?.setOnCloseListener {
@@ -103,18 +101,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         query?.apply {
-                            val searchQuery = "%$this%"
-                            Log.i("HOME FRAG", "Search term is $searchQuery")
-                            viewModel.getSearchContents(selectedCategoryId, searchQuery)
+                            viewModel.getSearchContents(selectedCategoryId, this)
                         }
                         return true
                     }
 
                     override fun onQueryTextChange(query: String?): Boolean {
                         query?.apply {
-                            val searchQuery = "%$this%"
-                            Log.i("HOME FRAG", "Search term is $searchQuery")
-                            viewModel.getSearchContents(selectedCategoryId, searchQuery)
+                            viewModel.getSearchContents(selectedCategoryId, this)
                         }
                         return true
                     }
@@ -163,6 +157,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 binding.contentCategoryScrollView.visibility = View.VISIBLE
                 binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
                 binding.categoriesRecyclerView.visibility = View.INVISIBLE
+                searchView?.apply {
+                    visibility = View.GONE
+                }
             }
         }
         //set search recycler view
@@ -174,7 +171,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         viewModel.searchResult.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Success -> {
-                    Log.i("HOME FRAG", "List is ${it.data}")
                     binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
                     binding.searchViewRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
@@ -189,7 +185,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.EmptyResult -> {
-                    Log.i("HOME FRAG", "LIST IS EMPTY")
                     binding.searchViewRecyclerView.visibility = View.GONE
                     binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
                 }
@@ -205,9 +200,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         viewModel.remoteShuffledContentList.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    searchView?.apply {
-                        visibility = View.GONE
-                    }
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
                     binding.noInternetLinearLayout.visibility = View.GONE
@@ -216,9 +208,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.Loading -> {
-                    searchView?.apply {
-                        visibility = View.GONE
-                    }
                     binding.noInternetLinearLayout.visibility = View.GONE
                     binding.noSearchResultConstraintLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
@@ -241,15 +230,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                             )
                     }
                     binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
-                    searchView?.apply {
-                        visibility = View.VISIBLE
-                    }
                 }
 
                 DataStatus.Status.EmptyResult -> {
-                    searchView?.apply {
-                        visibility = View.GONE
-                    }
                     binding.noInternetLinearLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayout.stopShimmer()
@@ -258,9 +241,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.NoInternet -> {
-                    searchView?.apply {
-                        visibility = View.GONE
-                    }
                     loadingContentsFailed = true
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayout.stopShimmer()
@@ -270,9 +250,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 else -> {
-                    searchView?.apply {
-                        visibility = View.GONE
-                    }
+
                 }
             }
         }

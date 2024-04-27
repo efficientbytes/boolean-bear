@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
 import androidx.lifecycle.Lifecycle.Event.ON_CREATE
@@ -65,30 +64,14 @@ class HomeViewModel(
     val searchResult: LiveData<DataStatus<List<RemoteShuffledContent>>> = _searchResult
 
     fun getSearchContents(categoryId: String, query: String = "") {
-        Log.i("HOME VIEW MODEL", "Search category is $categoryId  and search query is $query")
         viewModelScope.launch {
-            when {
-                query.isEmpty() -> {
-                    val allContents = assetsRepository.getSearchContents(categoryId)
-                    if (allContents.isNullOrEmpty()) {
-                        _searchResult.postValue(DataStatus.emptyResult())
-                    } else {
-                        _searchResult.postValue(DataStatus.success(allContents))
-                    }
-                }
-
-                query.isNotEmpty() && query.startsWith("#") -> {
-
-                }
-
-                query.isNotEmpty() && (!query.startsWith("#")) -> {
-                    val allContents = assetsRepository.getSearchContents(categoryId, query)
-                    if (allContents.isNullOrEmpty()) {
-                        _searchResult.postValue(DataStatus.emptyResult())
-                    } else {
-                        _searchResult.postValue(DataStatus.success(allContents))
-                    }
-                }
+            if (categoryId.isEmpty() || categoryId.isBlank()) {
+                _searchResult.postValue(DataStatus.emptyResult())
+            } else {
+                val result = assetsRepository.getSearchContents(categoryId, query)
+                if (result.isNullOrEmpty()) _searchResult.postValue(DataStatus.emptyResult()) else _searchResult.postValue(
+                    DataStatus.success(result)
+                )
             }
         }
     }

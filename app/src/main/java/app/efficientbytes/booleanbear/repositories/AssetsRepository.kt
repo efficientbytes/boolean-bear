@@ -21,6 +21,7 @@ import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
+import app.efficientbytes.booleanbear.utils.sanitizeSearchQuery
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -773,10 +774,28 @@ class AssetsRepository(
         categoryId: String,
         query: String? = null
     ): List<RemoteShuffledContent>? {
-        return if (query == null) assetsDao.getAllShuffledYoutubeViewContents(categoryId) else assetsDao.getSearchContents(
-            categoryId,
-            query
-        )
+        return when {
+            query.isNullOrEmpty() -> {
+                assetsDao.getAllShuffledYoutubeViewContents(categoryId)
+            }
+
+            query.isNotEmpty() && query.startsWith("#") -> {
+                val searchQuery = sanitizeSearchQuery(query.trim())
+                assetsDao.getShuffledContentsByHashTags(categoryId, searchQuery)
+            }
+
+            query.isNotEmpty() && (!query.startsWith("#")) -> {
+                val searchQuery = sanitizeSearchQuery(query.trim())
+                assetsDao.getShuffledContentsByTitle(
+                    categoryId,
+                    searchQuery
+                )
+            }
+
+            else -> {
+                emptyList<RemoteShuffledContent>()
+            }
+        }
     }
 
     interface CategoryListener {
