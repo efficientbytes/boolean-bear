@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
 import androidx.lifecycle.Lifecycle.Event.ON_CREATE
@@ -14,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.repositories.AdsRepository
@@ -21,6 +23,8 @@ import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
@@ -52,8 +56,41 @@ class HomeViewModel(
     val viewPagerBannerAds: LiveData<DataStatus<List<RemoteHomePageBanner>>> =
         _viewPagerBannerAds
 
-   fun getHomePageBannerAds() {
+    fun getHomePageBannerAds() {
         adsRepository.getHomePageBannerAds(this@HomeViewModel)
+    }
+
+    private val _searchResult: MutableLiveData<DataStatus<List<RemoteShuffledContent>>> =
+        MutableLiveData()
+    val searchResult: LiveData<DataStatus<List<RemoteShuffledContent>>> = _searchResult
+
+    fun getSearchContents(categoryId: String, query: String = "") {
+        Log.i("HOME VIEW MODEL", "Search category is $categoryId  and search query is $query")
+        viewModelScope.launch {
+            when {
+                query.isEmpty() -> {
+                    val allContents = assetsRepository.getSearchContents(categoryId)
+                    if (allContents.isNullOrEmpty()) {
+                        _searchResult.postValue(DataStatus.emptyResult())
+                    } else {
+                        _searchResult.postValue(DataStatus.success(allContents))
+                    }
+                }
+
+                query.isNotEmpty() && query.startsWith("#") -> {
+
+                }
+
+                query.isNotEmpty() && (!query.startsWith("#")) -> {
+                    val allContents = assetsRepository.getSearchContents(categoryId, query)
+                    if (allContents.isNullOrEmpty()) {
+                        _searchResult.postValue(DataStatus.emptyResult())
+                    } else {
+                        _searchResult.postValue(DataStatus.success(allContents))
+                    }
+                }
+            }
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -94,6 +131,8 @@ class HomeViewModel(
     }
 
     override fun onIndex1CategoryFound(categoryId: String) {
+        HomeFragment.selectedCategoryId = categoryId
+        HomeFragment.selectedCategoryPosition = 1
         assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
     }
 

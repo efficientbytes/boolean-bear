@@ -340,7 +340,7 @@ class AssetsRepository(
             if (categoryType === CategoryType.SHUFFLED) {
                 contentListener.onContentsDataStatusChanged(DataStatus.loading())
                 val listFromDB = assetsDao.getAllShuffledYoutubeViewContents(categoryId)
-                if (listFromDB.isNotEmpty()) {
+                if (!listFromDB.isNullOrEmpty()) {
                     contentListener.onContentsDataStatusChanged(DataStatus.success(listFromDB))
                 } else {
                     //fetch from server
@@ -767,6 +767,16 @@ class AssetsRepository(
         externalScope.launch {
             assetsDao.deleteAllMentionedLinks()
         }
+    }
+
+    suspend fun getSearchContents(
+        categoryId: String,
+        query: String? = null
+    ): List<RemoteShuffledContent>? {
+        return if (query == null) assetsDao.getAllShuffledYoutubeViewContents(categoryId) else assetsDao.getSearchContents(
+            categoryId,
+            query
+        )
     }
 
     interface CategoryListener {

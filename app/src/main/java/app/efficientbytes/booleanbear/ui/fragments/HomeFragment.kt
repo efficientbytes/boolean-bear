@@ -5,12 +5,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -50,9 +52,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val authenticationRepository: AuthenticationRepository by inject()
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
     private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
+    private lateinit var searchRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
     private var accountSettingsFragment: AccountSettingsFragment? = null
+    private var searchView: SearchView? = null
 
     companion object {
 
@@ -79,6 +83,42 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
+                val search = menu.findItem(R.id.searchMenu)
+                searchView?.visibility = View.GONE
+                searchView = search.actionView as? SearchView
+                searchView?.maxWidth = Integer.MAX_VALUE
+                searchView?.setOnCloseListener {
+                    binding.searchConstraintParentLayout.visibility = View.GONE
+                    binding.searchViewRecyclerView.adapter = null
+                    binding.appBarLayout.visibility = View.VISIBLE
+                    binding.contentParentConstraintLayout.visibility = View.VISIBLE
+                    false
+                }
+                searchView?.setOnSearchClickListener {
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.contentParentConstraintLayout.visibility = View.GONE
+                    binding.searchConstraintParentLayout.visibility = View.VISIBLE
+                    viewModel.getSearchContents(selectedCategoryId)
+                }
+                searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        query?.apply {
+                            val searchQuery = "%$this%"
+                            Log.i("HOME FRAG", "Search term is $searchQuery")
+                            viewModel.getSearchContents(selectedCategoryId, searchQuery)
+                        }
+                        return true
+                    }
+
+                    override fun onQueryTextChange(query: String?): Boolean {
+                        query?.apply {
+                            val searchQuery = "%$this%"
+                            Log.i("HOME FRAG", "Search term is $searchQuery")
+                            viewModel.getSearchContents(selectedCategoryId, searchQuery)
+                        }
+                        return true
+                    }
+                })
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -96,13 +136,14 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         }
                         return true
                     }
+
+                    R.id.searchMenu -> {
+
+                    }
                 }
                 return false
             }
         }, viewLifecycleOwner)
-
-        binding.searchConstraintParentLayout.visibility = View.GONE
-        binding.searchViewRecyclerView.adapter = null
         //set content category recycler view
         binding.categoriesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -116,10 +157,46 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
                 binding.categoriesRecyclerView.visibility = View.VISIBLE
                 homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0, 6))
+                val firstCategory = it.toList()[0].title
+                searchView?.queryHint = "Search for ${firstCategory} contents"
             } else {
                 binding.contentCategoryScrollView.visibility = View.VISIBLE
                 binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
                 binding.categoriesRecyclerView.visibility = View.INVISIBLE
+            }
+        }
+        //set search recycler view
+        binding.searchConstraintParentLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.adapter = null
+        binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        searchRecyclerViewAdapter =
+            YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+        viewModel.searchResult.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    Log.i("HOME FRAG", "List is ${it.data}")
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                    binding.searchViewRecyclerView.visibility = View.VISIBLE
+                    it.data?.let { list ->
+                        youtubeContentViewRecyclerViewAdapter =
+                            YoutubeContentViewRecyclerViewAdapter(
+                                list,
+                                requireContext(),
+                                this@HomeFragment
+                            )
+                    }
+                    binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    Log.i("HOME FRAG", "LIST IS EMPTY")
+                    binding.searchViewRecyclerView.visibility = View.GONE
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
+                }
+
+                else -> {
+
+                }
             }
         }
         //set contents recycler view
@@ -128,6 +205,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         viewModel.remoteShuffledContentList.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
+                    searchView?.apply {
+                        visibility = View.GONE
+                    }
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
                     binding.noInternetLinearLayout.visibility = View.GONE
@@ -136,6 +216,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.Loading -> {
+                    searchView?.apply {
+                        visibility = View.GONE
+                    }
                     binding.noInternetLinearLayout.visibility = View.GONE
                     binding.noSearchResultConstraintLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
@@ -158,9 +241,15 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                             )
                     }
                     binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
+                    searchView?.apply {
+                        visibility = View.VISIBLE
+                    }
                 }
 
                 DataStatus.Status.EmptyResult -> {
+                    searchView?.apply {
+                        visibility = View.GONE
+                    }
                     binding.noInternetLinearLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayout.stopShimmer()
@@ -169,6 +258,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.NoInternet -> {
+                    searchView?.apply {
+                        visibility = View.GONE
+                    }
                     loadingContentsFailed = true
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayout.stopShimmer()
@@ -178,7 +270,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 else -> {
-
+                    searchView?.apply {
+                        visibility = View.GONE
+                    }
                 }
             }
         }
@@ -376,6 +470,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         selectedCategoryPosition = position
         selectedCategoryId = shuffledCategory.id
         viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+        val title = shuffledCategory.title
+        searchView?.queryHint = "Search for ${title.replaceFirstChar { it.lowercase() }} contents"
     }
 
     override fun onChipLastItemClicked() {

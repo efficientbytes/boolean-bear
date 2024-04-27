@@ -12,9 +12,9 @@ import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
 import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
-import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE
 import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
 import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
+import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -33,7 +33,10 @@ interface AssetsDao {
     suspend fun insertShuffledCategoryContents(contents: List<LocalShuffledContent>)
 
     @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE categoryId = :category")
-    suspend fun getAllShuffledYoutubeViewContents(category: String): List<RemoteShuffledContent>
+    suspend fun getAllShuffledYoutubeViewContents(category: String): List<RemoteShuffledContent>?
+
+    @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE categoryId = :category AND title LIKE :query")
+    suspend fun getSearchContents(category: String, query: String): List<RemoteShuffledContent>?
 
     @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE contentId = :content")
     suspend fun getShuffledYoutubeViewContent(content: String): RemoteShuffledContent?
