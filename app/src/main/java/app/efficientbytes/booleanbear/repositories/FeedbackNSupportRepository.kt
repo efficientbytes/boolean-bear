@@ -2,9 +2,9 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.FeedbackNSupportService
-import app.efficientbytes.booleanbear.services.models.Feedback
 import app.efficientbytes.booleanbear.services.models.RequestSupport
-import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
+import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +17,10 @@ import java.net.SocketTimeoutException
 class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNSupportService) {
 
     private val gson = Gson()
-    suspend fun postFeedback(feedback: Feedback) = flow {
+    suspend fun postFeedback(feedback: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = feedbackNSupportService.uploadFeedback(
-                feedback.feedback,
-                feedback.message
-            )
+            val response = feedbackNSupportService.uploadFeedback(feedback)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -31,9 +28,9 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: Feedback = gson.fromJson(
+                    val errorResponse: ResponseMessage = gson.fromJson(
                         response.errorBody()!!.string(),
-                        Feedback::class.java
+                        ResponseMessage::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message))
                 }
@@ -65,9 +62,9 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: RequestSupportStatus = gson.fromJson(
+                    val errorResponse: RequestSupportResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        RequestSupportStatus::class.java
+                        RequestSupportResponse::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message))
                 }

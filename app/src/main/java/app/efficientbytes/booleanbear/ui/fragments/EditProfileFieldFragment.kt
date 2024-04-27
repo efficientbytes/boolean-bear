@@ -272,7 +272,7 @@ class EditProfileFieldFragment : Fragment() {
                 val userProfile = SingletonUserData.getInstance()
                 userProfile?.let { profile ->
                     val verifyPrimaryEmailAddress =
-                        VerifyPrimaryEmailAddress(input,profile.firstName)
+                        VerifyPrimaryEmailAddress(input, profile.firstName)
                     viewModel.sendVerificationLinkToPrimaryEmailAddress(verifyPrimaryEmailAddress)
                 }
 
@@ -297,7 +297,7 @@ class EditProfileFieldFragment : Fragment() {
                 }
 
                 DataStatus.Status.Success -> {
-                    it.data?.userProfile?.let { userProfile ->
+                    it.data?.let { userProfile ->
                         mainViewModel.saveUserProfile(userProfile)
                     }
                     binding.progressLinearLayout.visibility = View.VISIBLE

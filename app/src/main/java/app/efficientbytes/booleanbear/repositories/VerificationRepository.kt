@@ -2,9 +2,9 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.VerificationService
-import app.efficientbytes.booleanbear.services.models.PhoneNumberVerificationStatus
-import app.efficientbytes.booleanbear.services.models.PrimaryEmailAddressVerificationStatus
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
+import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
@@ -18,12 +18,12 @@ import java.net.SocketTimeoutException
 class VerificationRepository(private val verificationService: VerificationService) {
 
     private val gson = Gson()
-    suspend fun sendOTPToPhoneNumber(verifyPhoneNumber: VerifyPhoneNumber) = flow {
+    suspend fun sendOTPToPhoneNumber(phoneOTP: PhoneOTP) = flow {
         try {
             emit(DataStatus.loading())
             val response = verificationService.sendOtpToPhoneNumber(
-                verifyPhoneNumber.phoneNumber,
-                verifyPhoneNumber.otp
+                phoneOTP.phoneNumber,
+                phoneOTP.otp
             )
             val responseCode = response.code()
             when {
@@ -33,9 +33,9 @@ class VerificationRepository(private val verificationService: VerificationServic
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: PhoneNumberVerificationStatus = gson.fromJson(
+                    val errorResponse: VerifyPhoneResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        PhoneNumberVerificationStatus::class.java
+                        VerifyPhoneResponse::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message.toString()))
                 }
@@ -50,12 +50,12 @@ class VerificationRepository(private val verificationService: VerificationServic
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun verifyPhoneNumberOTP(verifyPhoneNumber: VerifyPhoneNumber) = flow {
+    suspend fun verifyPhoneNumberOTP(phoneOTP: PhoneOTP) = flow {
         try {
             emit(DataStatus.loading())
             val response = verificationService.verifyPhoneNumberOTP(
-                verifyPhoneNumber.phoneNumber,
-                verifyPhoneNumber.otp
+                phoneOTP.phoneNumber,
+                phoneOTP.otp
             )
             val responseCode = response.code()
             when {
@@ -65,9 +65,9 @@ class VerificationRepository(private val verificationService: VerificationServic
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: PhoneNumberVerificationStatus = gson.fromJson(
+                    val errorResponse: VerifyPhoneResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        PhoneNumberVerificationStatus::class.java
+                        VerifyPhoneResponse::class.java
                     )
                     val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
                     emit(DataStatus.failed(message))
@@ -100,12 +100,12 @@ class VerificationRepository(private val verificationService: VerificationServic
                     }
 
                     responseCode >= 400 -> {
-                        val errorResponse: PrimaryEmailAddressVerificationStatus = gson.fromJson(
+                        val errorResponse: ResponseMessage = gson.fromJson(
                             response.errorBody()!!.string(),
-                            PrimaryEmailAddressVerificationStatus::class.java
+                            ResponseMessage::class.java
                         )
                         val message =
-                            "Error Code $responseCode. ${errorResponse.message.toString()}"
+                            "Error Code $responseCode. ${errorResponse.message}"
                         emit(DataStatus.failed(message))
                     }
                 }

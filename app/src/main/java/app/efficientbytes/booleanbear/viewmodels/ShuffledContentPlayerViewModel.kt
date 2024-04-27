@@ -117,6 +117,7 @@ class ShuffledContentPlayerViewModel(
                 if (mentionedLinksJob != null) {
                     mentionedLinksJob?.cancel()
                 }
+                countRecorded = false
             }
 
             Lifecycle.State.INITIALIZED -> {

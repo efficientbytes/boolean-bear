@@ -1,4 +1,4 @@
-package app.efficientbytes.booleanbear.services.models
+package app.efficientbytes.booleanbear.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

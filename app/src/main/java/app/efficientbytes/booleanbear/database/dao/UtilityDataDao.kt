@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import app.efficientbytes.booleanbear.services.models.IssueCategory
-import app.efficientbytes.booleanbear.services.models.Profession
+import app.efficientbytes.booleanbear.models.IssueCategory
+import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.utils.ISSUE_CATEGORY_ADAPTER_TABLE
 import app.efficientbytes.booleanbear.utils.PROFESSION_ADAPTER_TABLE
 

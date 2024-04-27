@@ -9,16 +9,16 @@ import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.models.ContentViewType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
-import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
-import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
-import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
+import app.efficientbytes.booleanbear.services.models.PlayDetailsResponse
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
-import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
-import app.efficientbytes.booleanbear.services.models.ServiceContentCategory
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledCategory
 import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
@@ -56,30 +56,30 @@ class AssetsRepository(
                         responseCode == 200 -> {
                             val body = response.body()
                             if (body != null) {
-                                if (body.categoryList.isEmpty()) {
-                                    emit(DataStatus.emptyResult<List<ServiceContentCategory>>())
+                                if (body.data.isEmpty()) {
+                                    emit(DataStatus.emptyResult<List<RemoteShuffledCategory>>())
                                 } else {
-                                    emit(DataStatus.success(body.categoryList))
+                                    emit(DataStatus.success(body.data))
                                 }
                             } else {
-                                emit(DataStatus.emptyResult<List<ServiceContentCategory>>())
+                                emit(DataStatus.emptyResult<List<RemoteShuffledCategory>>())
                             }
                         }
 
                         responseCode >= 400 -> {
-                            val errorResponse: ContentCategoriesStatus = gson.fromJson(
+                            val errorResponse: ShuffledCategoriesResponse = gson.fromJson(
                                 response.errorBody()!!.string(),
-                                ContentCategoriesStatus::class.java
+                                ShuffledCategoriesResponse::class.java
                             )
-                            emit(DataStatus.failed<List<ServiceContentCategory>>(errorResponse.message))
+                            emit(DataStatus.failed<List<RemoteShuffledCategory>>(errorResponse.message))
                         }
                     }
                 } catch (noInternet: NoInternetException) {
-                    emit(DataStatus.noInternet<List<ServiceContentCategory>>())
+                    emit(DataStatus.noInternet<List<RemoteShuffledCategory>>())
                 } catch (socketTimeOutException: SocketTimeoutException) {
-                    emit(DataStatus.timeOut<List<ServiceContentCategory>>())
+                    emit(DataStatus.timeOut<List<RemoteShuffledCategory>>())
                 } catch (exception: IOException) {
-                    emit(DataStatus.unknownException<List<ServiceContentCategory>>(exception.message.toString()))
+                    emit(DataStatus.unknownException<List<RemoteShuffledCategory>>(exception.message.toString()))
                 }
             }
 
@@ -141,7 +141,7 @@ class AssetsRepository(
 
     private fun saveCategories(
         categoryType: CategoryType,
-        contentCategories: List<ServiceContentCategory>
+        contentCategories: List<RemoteShuffledCategory>
     ) {
         externalScope.launch {
             when (categoryType) {
@@ -194,9 +194,9 @@ class AssetsRepository(
                             }
 
                             responseCode >= 400 -> {
-                                val errorResponse: ContentCategoriesStatus = gson.fromJson(
+                                val errorResponse: ShuffledCategoriesResponse = gson.fromJson(
                                     response.errorBody()!!.string(),
-                                    ContentCategoriesStatus::class.java
+                                    ShuffledCategoriesResponse::class.java
                                 )
                                 emit(DataStatus.failed<RemoteShuffledContent>(errorResponse.message))
                             }
@@ -283,10 +283,10 @@ class AssetsRepository(
                             responseCode == 200 -> {
                                 val body = response.body()
                                 if (body != null) {
-                                    if (body.contentIds.isEmpty()) {
+                                    if (body.data.isEmpty()) {
                                         DataStatus.emptyResult<List<String>>()
                                     } else {
-                                        DataStatus.success<List<String>>(body.contentIds)
+                                        DataStatus.success<List<String>>(body.data)
                                     }
                                 } else {
                                     DataStatus.emptyResult<List<String>>()
@@ -294,10 +294,11 @@ class AssetsRepository(
                             }
 
                             responseCode >= 400 -> {
-                                val errorResponse: ShuffledCategoryContentIds = gson.fromJson(
-                                    response.errorBody()!!.string(),
-                                    ShuffledCategoryContentIds::class.java
-                                )
+                                val errorResponse: ShuffledCategoryContentIdListResponse =
+                                    gson.fromJson(
+                                        response.errorBody()!!.string(),
+                                        ShuffledCategoryContentIdListResponse::class.java
+                                    )
                                 DataStatus.failed<List<String>>(errorResponse.message)
                             }
 
@@ -490,8 +491,17 @@ class AssetsRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val playDetails = response.body()
-                    emit(DataStatus.success(playDetails))
+                    val playDetailsResponse = response.body()
+                    if (playDetailsResponse != null) {
+                        val playDetails = playDetailsResponse.data
+                        if (playDetails != null) {
+                            emit(DataStatus.success(playDetails))
+                        } else {
+                            emit(DataStatus.emptyResult())
+                        }
+                    } else {
+                        emit(DataStatus.emptyResult())
+                    }
                 }
 
                 responseCode == 404 -> {
@@ -499,9 +509,9 @@ class AssetsRepository(
                 }
 
                 responseCode >= 400 && responseCode != 404 -> {
-                    val errorResponse: PlayDetails = gson.fromJson(
+                    val errorResponse: PlayDetailsResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        PlayDetails::class.java
+                        PlayDetailsResponse::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message.toString()))
                 }
@@ -534,7 +544,7 @@ class AssetsRepository(
                     if (instructorProfileStatus == null) {
                         emit(DataStatus.emptyResult<RemoteInstructorProfile>())
                     } else {
-                        val instructorProfile = instructorProfileStatus.instructorProfile
+                        val instructorProfile = instructorProfileStatus.data
                         if (instructorProfile == null) {
                             emit(DataStatus.emptyResult<RemoteInstructorProfile>())
                         } else {
@@ -544,9 +554,9 @@ class AssetsRepository(
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: InstructorProfileStatus = gson.fromJson(
+                    val errorResponse: InstructorProfileResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        InstructorProfileStatus::class.java
+                        InstructorProfileResponse::class.java
                     )
                     emit(DataStatus.failed<RemoteInstructorProfile>(errorResponse.message.toString()))
                 }
@@ -647,7 +657,7 @@ class AssetsRepository(
                 responseCode == 200 -> {
                     val mentionedLinkStatus = response.body()
                     if (mentionedLinkStatus != null) {
-                        val mentionedLink = mentionedLinkStatus.mentionedLink
+                        val mentionedLink = mentionedLinkStatus.data
                         if (mentionedLink != null) {
                             emit(DataStatus.success<RemoteMentionedLink>(mentionedLink))
                         } else emit(DataStatus.emptyResult<RemoteMentionedLink>())
@@ -657,9 +667,9 @@ class AssetsRepository(
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: RemoteMentionedLinkStatus = gson.fromJson(
+                    val errorResponse: RemoteMentionedLinkResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        RemoteMentionedLinkStatus::class.java
+                        RemoteMentionedLinkResponse::class.java
                     )
                     emit(DataStatus.failed<RemoteMentionedLink>(errorResponse.message.toString()))
                 }

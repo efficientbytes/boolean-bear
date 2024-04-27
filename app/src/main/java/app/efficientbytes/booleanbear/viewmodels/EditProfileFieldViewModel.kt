@@ -8,8 +8,7 @@ import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.PrimaryEmailAddressVerificationStatus
-import app.efficientbytes.booleanbear.services.models.UserProfilePayload
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,9 +19,9 @@ class EditProfileFieldViewModel(
 ) :
     ViewModel() {
 
-    private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfilePayload?>> =
+    private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfile?>> =
         MutableLiveData()
-    val userProfileServerResponse: LiveData<DataStatus<UserProfilePayload?>> =
+    val userProfileServerResponse: LiveData<DataStatus<UserProfile?>> =
         _userProfileServerResponse
 
     fun updateUserProfile(userProfile: UserProfile) {
@@ -33,9 +32,9 @@ class EditProfileFieldViewModel(
         }
     }
 
-    private val _primaryEmailAddressVerificationServerResponse: MutableLiveData<DataStatus<PrimaryEmailAddressVerificationStatus?>> =
+    private val _primaryEmailAddressVerificationServerResponse: MutableLiveData<DataStatus<ResponseMessage?>> =
         MutableLiveData()
-    val primaryEmailAddressVerificationServerStatus: LiveData<DataStatus<PrimaryEmailAddressVerificationStatus?>> =
+    val primaryEmailAddressVerificationServerStatus: LiveData<DataStatus<ResponseMessage?>> =
         _primaryEmailAddressVerificationServerResponse
 
     fun sendVerificationLinkToPrimaryEmailAddress(verifyPrimaryEmailAddress: VerifyPrimaryEmailAddress) {

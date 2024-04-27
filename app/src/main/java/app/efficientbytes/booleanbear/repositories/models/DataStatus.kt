@@ -12,10 +12,11 @@ data class DataStatus<out T>(
             return DataStatus(Status.Loading)
         }
 
-        fun <T> success(data: T): DataStatus<T> {
+        fun <T> success(data: T,message: String?=null): DataStatus<T> {
             return DataStatus(
                 status = Status.Success,
-                data = data
+                data = data,
+                message = message
             )
         }
 

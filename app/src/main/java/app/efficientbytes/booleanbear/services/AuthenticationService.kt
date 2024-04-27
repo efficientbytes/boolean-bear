@@ -1,8 +1,9 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccountStatus
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -18,7 +19,7 @@ interface AuthenticationService {
     suspend fun getSignInToken(
         @Field("phoneNumber") phoneNumber: String,
         @Field("prefix") prefix: String = "+91"
-    ): Response<SignInToken>
+    ): Response<SignInTokenResponse>
 
     @GET("user/single-device-login")
     suspend fun getSingleDeviceLogin(): Response<SingleDeviceLoginResponse>
@@ -28,6 +29,6 @@ interface AuthenticationService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun deleteUserAccount(
         @Field("userAccountId") userAccountId: String = ""
-    ): Response<DeleteUserAccountStatus>
+    ): Response<ResponseMessage>
 
 }

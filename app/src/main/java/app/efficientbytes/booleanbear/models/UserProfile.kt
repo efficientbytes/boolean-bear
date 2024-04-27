@@ -34,3 +34,13 @@ object SingletonUserData {
         this.userProfile = userProfile
     }
 }
+
+object SingletonPreviousUserId {
+
+    private var userId: String? = null
+    fun getInstance() = userId
+
+    fun setInstance(userId: String?) {
+        this.userId = userId
+    }
+}

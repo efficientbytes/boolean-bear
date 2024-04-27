@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.Feedback
-import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
+import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -15,8 +15,7 @@ interface FeedbackNSupportService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadFeedback(
         @Field("feedback") feedback: String,
-        @Field("message") message: String
-    ): Response<Feedback>
+    ): Response<ResponseMessage>
 
     @FormUrlEncoded
     @POST("app/contact-support/")
@@ -27,6 +26,6 @@ interface FeedbackNSupportService {
         @Field("category") category: Int,
         @Field("completePhoneNumber") completePhoneNumber: String? = null,
         @Field("userAccountId") userAccountId: String? = null,
-    ): Response<RequestSupportStatus>
+    ): Response<RequestSupportResponse>
 
 }

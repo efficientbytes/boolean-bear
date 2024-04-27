@@ -16,7 +16,6 @@ import app.efficientbytes.booleanbear.databinding.DialogDeleteAccountConfirmatio
 import app.efficientbytes.booleanbear.databinding.FragmentDeleteUserAccountBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccount
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.delay
@@ -87,7 +86,7 @@ class DeleteUserAccountFragment : Fragment() {
                         dialog.dismiss()
                         val singletonUser = SingletonUserData.getInstance()
                         singletonUser?.let {
-                            mainViewModel.deleteUserAccount(DeleteUserAccount(it.userAccountId))
+                            mainViewModel.deleteUserAccount()
                         }
                     }
                 }

@@ -9,3 +9,9 @@ data class RemoteMentionedLink(
     val linkId: String,
     val name: String? = null
 )
+
+@JsonClass(generateAdapter = true)
+data class RemoteMentionedLinkResponse(
+    val data: RemoteMentionedLink? = null,
+    val message: String? = null
+)

@@ -5,8 +5,8 @@ import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
-import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
-import app.efficientbytes.booleanbear.services.models.UserProfilePayload
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.UserProfileResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
@@ -47,16 +47,17 @@ class UserProfileRepository(
                 val responseCode = response.code()
                 when {
                     responseCode == 200 -> {
-                        val responseUserProfile = response.body()
-                        responseUserProfile?.let { userProfilePayload ->
-                            userProfileListener.postValue(DataStatus.success(userProfilePayload.userProfile))
+                        val userProfileResponse = response.body()
+                        val user = userProfileResponse?.data
+                        if (user != null) {
+                            userProfileListener.postValue(DataStatus.success(user))
                         }
                     }
 
                     responseCode >= 400 -> {
-                        val errorResponse: UserProfilePayload = gson.fromJson(
+                        val errorResponse: UserProfileResponse = gson.fromJson(
                             response.errorBody()!!.string(),
-                            UserProfilePayload::class.java
+                            UserProfileResponse::class.java
                         )
                         val message =
                             "Error Code $responseCode. ${errorResponse.message.toString()}"
@@ -75,7 +76,7 @@ class UserProfileRepository(
 
     suspend fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) = flow {
         try {
-            emit(DataStatus.loading<UserProfilePayload>())
+            emit(DataStatus.loading<UserProfile>())
             val response = userProfileService.updateUserPrivateProfileBasicDetails(
                 userProfile.firstName,
                 userProfile.phoneNumber,
@@ -95,28 +96,31 @@ class UserProfileRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val responseUserProfile = response.body()
-                    emit(DataStatus.success(responseUserProfile))
+                    val userProfileResponse = response.body()
+                    val user = userProfileResponse?.data
+                    if (user != null) {
+                        emit(DataStatus.success(data = user, message = userProfileResponse.message))
+                    }
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: UserProfilePayload = gson.fromJson(
+                    val errorResponse: UserProfileResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        UserProfilePayload::class.java
+                        UserProfileResponse::class.java
                     )
                     val message =
                         "Error Code $responseCode. ${errorResponse.message.toString()}"
-                    emit(DataStatus.failed<UserProfilePayload>(message))
+                    emit(DataStatus.failed(message))
                 }
             }
         } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet<UserProfilePayload>())
+            emit(DataStatus.noInternet<UserProfile>())
         } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut<UserProfilePayload>())
+            emit(DataStatus.timeOut<UserProfile>())
         } catch (exception: IOException) {
-            emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
+            emit(DataStatus.unknownException<UserProfile>(exception.message.toString()))
         }
-    }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
+    }.catch { emit(DataStatus.unknownException<UserProfile>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun updateUserPrivateProfile(userProfile: UserProfile) = flow {
@@ -141,32 +145,31 @@ class UserProfileRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val responseUserProfile = response.body()
-                    if (responseUserProfile != null) emit(
-                        DataStatus.success<UserProfilePayload>(
-                            responseUserProfile
-                        )
-                    )
+                    val userProfileResponse = response.body()
+                    val user = userProfileResponse?.data
+                    if (user != null) {
+                        emit(DataStatus.success(user))
+                    }
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: UserProfilePayload = gson.fromJson(
+                    val errorResponse: UserProfileResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        UserProfilePayload::class.java
+                        UserProfileResponse::class.java
                     )
                     val message =
                         "Error Code $responseCode. ${errorResponse.message.toString()}"
-                    emit(DataStatus.failed<UserProfilePayload>(message))
+                    emit(DataStatus.failed(message))
                 }
             }
         } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet<UserProfilePayload>())
+            emit(DataStatus.noInternet<UserProfile>())
         } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut<UserProfilePayload>())
+            emit(DataStatus.timeOut<UserProfile>())
         } catch (exception: IOException) {
-            emit(DataStatus.unknownException<UserProfilePayload>(exception.message.toString()))
+            emit(DataStatus.unknownException<UserProfile>(exception.message.toString()))
         }
-    }.catch { emit(DataStatus.unknownException<UserProfilePayload>(it.message.toString())) }
+    }.catch { emit(DataStatus.unknownException<UserProfile>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
     suspend fun saveUserProfile(userProfile: UserProfile) {
@@ -225,9 +228,9 @@ class UserProfileRepository(
                         }
 
                         responseCode >= 400 -> {
-                            val errorResponse: NotificationTokenStatus = gson.fromJson(
+                            val errorResponse: ResponseMessage = gson.fromJson(
                                 response.errorBody()!!.string(),
-                                NotificationTokenStatus::class.java
+                                ResponseMessage::class.java
                             )
                             notificationListener?.onTokenStatusChanged(
                                 DataStatus.failed(
@@ -287,14 +290,14 @@ class UserProfileRepository(
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             externalScope.launch {
-                userProfileService.deleteFCMToken("")
+                userProfileService.deleteFCMToken()
             }
         }
     }
 
     interface NotificationUploadListener {
 
-        fun onTokenStatusChanged(status: DataStatus<NotificationTokenStatus>)
+        fun onTokenStatusChanged(status: DataStatus<ResponseMessage>)
 
         fun onTokenGenerated(token: String)
     }

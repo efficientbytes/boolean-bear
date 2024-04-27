@@ -7,16 +7,15 @@ import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.UserProfilePayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CompleteProfileViewModel(private val userProfileRepository: UserProfileRepository) :
     ViewModel() {
 
-    private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfilePayload?>> =
+    private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfile?>> =
         MutableLiveData()
-    val userProfileServerResponse: LiveData<DataStatus<UserProfilePayload?>> =
+    val userProfileServerResponse: LiveData<DataStatus<UserProfile?>> =
         _userProfileServerResponse
 
     fun updateUserPrivateProfileBasicDetails(userProfile: UserProfile) {

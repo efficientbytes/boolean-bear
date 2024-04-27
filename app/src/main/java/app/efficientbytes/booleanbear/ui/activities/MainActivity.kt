@@ -32,6 +32,7 @@ import androidx.navigation.ui.navigateUp
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository

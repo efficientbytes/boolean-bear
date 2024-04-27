@@ -16,5 +16,11 @@ data class RemoteInstructorProfile(
     val gitHubUsername: String? = null,
     val linkedInUsername: String? = null,
     val skills: List<String>? = null
-) {
-}
+)
+
+@JsonClass(generateAdapter = true)
+data class InstructorProfileResponse(
+    val data: RemoteInstructorProfile? = null,
+    val message: String? = null
+)
+

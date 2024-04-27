@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.PhoneNumberVerificationStatus
-import app.efficientbytes.booleanbear.services.models.PrimaryEmailAddressVerificationStatus
+import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -16,7 +16,7 @@ interface VerificationService {
     suspend fun sendOtpToPhoneNumber(
         @Field("phoneNumber") phoneNumber: String,
         @Field("otp") otp: String? = null
-    ): Response<PhoneNumberVerificationStatus>
+    ): Response<VerifyPhoneResponse>
 
     @FormUrlEncoded
     @POST("verification/phone-number/verify-otp")
@@ -24,7 +24,7 @@ interface VerificationService {
     suspend fun verifyPhoneNumberOTP(
         @Field("phoneNumber") phoneNumber: String,
         @Field("otp") otp: String? = null
-    ): Response<PhoneNumberVerificationStatus>
+    ): Response<VerifyPhoneResponse>
 
     @FormUrlEncoded
     @POST("verification/primary-mail/send-verification-link")
@@ -32,6 +32,6 @@ interface VerificationService {
     suspend fun verifyPrimaryEmailAddress(
         @Field("emailAddress") emailAddress: String? = null,
         @Field("firstName") firstName: String? = null
-    ): Response<PrimaryEmailAddressVerificationStatus>
+    ): Response<ResponseMessage>
 
 }

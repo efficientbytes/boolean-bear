@@ -3,9 +3,9 @@ package app.efficientbytes.booleanbear.services.models
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class ServiceContentCategory(
+data class RemoteShuffledCategory(
     val id: String,
-    val index : Int,
+    val index: Int,
     val title: String,
     val caption: String,
     val contentCount: Int,
@@ -15,4 +15,10 @@ data class ServiceContentCategory(
     val searchTags: List<String>,
     val dateCreated: Long,
     val dateModified: Long
+)
+
+@JsonClass(generateAdapter = true)
+data class ShuffledCategoriesResponse(
+    val data: List<RemoteShuffledCategory>,
+    val message: String
 )
