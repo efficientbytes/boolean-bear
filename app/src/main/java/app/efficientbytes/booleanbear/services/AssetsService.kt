@@ -1,11 +1,10 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
-import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayDetailsResponse
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import retrofit2.Response

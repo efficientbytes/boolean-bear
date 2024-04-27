@@ -2,7 +2,6 @@ package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
-import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import retrofit2.Response
 import retrofit2.http.Field
