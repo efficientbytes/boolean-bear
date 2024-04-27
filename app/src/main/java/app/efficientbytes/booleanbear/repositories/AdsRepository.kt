@@ -4,7 +4,7 @@ import app.efficientbytes.booleanbear.database.dao.AdsDao
 import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AdsService
-import app.efficientbytes.booleanbear.services.models.HomePageBannerStatus
+import app.efficientbytes.booleanbear.services.models.HomePageBannerListResponse
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
@@ -31,7 +31,7 @@ class AdsRepository(
                 responseCode == 200 -> {
                     val body = response.body()
                     if (body != null) {
-                        val remoteHomePageBanner = body.banners
+                        val remoteHomePageBanner = body.data
                         if (remoteHomePageBanner != null) {
                             if (remoteHomePageBanner.isEmpty()) {
                                 emit(DataStatus.emptyResult())
@@ -45,9 +45,9 @@ class AdsRepository(
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: HomePageBannerStatus = gson.fromJson(
+                    val errorResponse: HomePageBannerListResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        HomePageBannerStatus::class.java
+                        HomePageBannerListResponse::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message.toString()))
                 }

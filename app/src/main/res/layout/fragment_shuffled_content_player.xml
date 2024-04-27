@@ -11,7 +11,7 @@
 
         <variable
             name="suggestedContentDetails"
-            type="app.efficientbytes.booleanbear.services.models.YoutubeContentView" />
+            type="app.efficientbytes.booleanbear.services.models.RemoteShuffledContent" />
 
     </data>
 

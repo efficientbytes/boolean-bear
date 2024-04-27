@@ -23,7 +23,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
@@ -122,7 +122,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         //set contents recycler view
         binding.contentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        viewModel.youtubeContentViewList.observe(viewLifecycleOwner) {
+        viewModel.remoteShuffledContentList.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerLayout.stopShimmer()
@@ -389,12 +389,12 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onYoutubeContentViewItemClicked(
         position: Int,
-        youtubeContentView: YoutubeContentView
+        remoteShuffledContent: RemoteShuffledContent
     ) {
         if (FirebaseAuth.getInstance().currentUser != null) {
             val directions =
                 HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
-                    youtubeContentView.contentId
+                    remoteShuffledContent.contentId
                 )
             findNavController().navigate(directions)
         } else {

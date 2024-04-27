@@ -8,7 +8,6 @@ data class RequestSupport(
     var description: String,
     var category: Int,
     var completePhoneNumber: String? = null,
-    var message: String? = null,
     var userAccountId: String? = null,
 )
 
@@ -21,3 +20,9 @@ object SingletonRequestSupport {
         this.requestSupport = requestSupport
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class RequestSupportResponse(
+    val ticketId: String,
+    val message: String
+)

@@ -1,6 +1,5 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -160,7 +159,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                 DataStatus.Status.Success -> {
                     it.data?.let { playUrl ->
-                        mediaItem = playUrl.playUrl?.let { url -> MediaItem.fromUri(url) }
+                        mediaItem = playUrl.data?.let { url -> MediaItem.fromUri(url) }
                         initializePlayer()
                     }
                 }

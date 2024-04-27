@@ -3,7 +3,7 @@ package app.efficientbytes.booleanbear.services.models
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class PrimaryEmailAddressVerificationStatus(
-    val message: String? = null,
-    val emailAddress: String? = null
+data class ShuffledCategoryContentIdListResponse(
+    val data: List<String>,
+    val message: String
 )

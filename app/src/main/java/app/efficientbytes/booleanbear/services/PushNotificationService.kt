@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
@@ -167,7 +167,7 @@ class PushNotificationService : FirebaseMessagingService(),
         }
     }
 
-    override fun onTokenStatusChanged(status: DataStatus<NotificationTokenStatus>) {
+    override fun onTokenStatusChanged(status: DataStatus<ResponseMessage>) {
         when (status.status) {
             DataStatus.Status.NoInternet -> {
                 tokenFailedToUpdate = true

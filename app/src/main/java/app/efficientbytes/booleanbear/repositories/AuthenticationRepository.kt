@@ -7,10 +7,9 @@ import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AuthenticationService
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccount
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccountStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
-import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.IDTokenListener
@@ -52,13 +51,17 @@ class AuthenticationRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    emit(DataStatus.success(response.body()))
+                    val signInTokenResponse = response.body()
+                    val signInToken = signInTokenResponse?.data
+                    if (signInToken != null) {
+                        emit(DataStatus.success(signInToken))
+                    }
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: SignInToken = gson.fromJson(
+                    val errorResponse: SignInTokenResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        SignInToken::class.java
+                        SignInTokenResponse::class.java
                     )
                     val message = "Error Code $responseCode. ${errorResponse.message.toString()}"
                     emit(DataStatus.failed(message))
@@ -148,10 +151,10 @@ class AuthenticationRepository(
         }
     }
 
-    suspend fun deleteUserAccount(deleteUserAccount: DeleteUserAccount) = flow {
+    suspend fun deleteUserAccount() = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.deleteUserAccount(deleteUserAccount.userAccountId)
+            val response = authenticationService.deleteUserAccount()
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -159,9 +162,9 @@ class AuthenticationRepository(
                 }
 
                 responseCode >= 400 -> {
-                    val errorResponse: DeleteUserAccountStatus = gson.fromJson(
+                    val errorResponse: ResponseMessage = gson.fromJson(
                         response.errorBody()!!.string(),
-                        DeleteUserAccountStatus::class.java
+                        ResponseMessage::class.java
                     )
                     val message = "Error Code $responseCode. ${errorResponse.message}"
                     emit(DataStatus.failed(message))

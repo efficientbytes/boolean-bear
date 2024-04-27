@@ -1,12 +1,12 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.ContentCategoriesStatus
-import app.efficientbytes.booleanbear.services.models.InstructorProfileStatus
-import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
+import app.efficientbytes.booleanbear.services.models.PlayDetailsResponse
 import app.efficientbytes.booleanbear.services.models.PlayUrl
-import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkStatus
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIds
-import app.efficientbytes.booleanbear.services.models.YoutubeContentViewStatus
+import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
+import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
+import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -17,18 +17,18 @@ interface AssetsService {
     @GET("categories")
     suspend fun getCategories(
         @Query(value = "categoryType") categoryType: String = "shuffled"
-    ): Response<ContentCategoriesStatus>
+    ): Response<ShuffledCategoriesResponse>
 
     @GET("categories/shuffled/{categoryId}")
     suspend fun getContentIdsUnderShuffledCategoryForCategoryId(
         @Path("categoryId") categoryId: String
-    ): Response<ShuffledCategoryContentIds>
+    ): Response<ShuffledCategoryContentIdListResponse>
 
     @GET("contents/{contentId}")
     suspend fun getYoutubeTypeContentForContentId(
         @Path("contentId") contentId: String,
         @Query(value = "viewType") viewType: String = "YOUTUBE"
-    ): Response<YoutubeContentViewStatus>
+    ): Response<ShuffledContentResponse>
 
     @GET("contents/{contentId}/play-link")
     suspend fun getPlayUrl(
@@ -38,15 +38,15 @@ interface AssetsService {
     @GET("contents/{contentId}/play-details")
     suspend fun getPlayDetails(
         @Path("contentId") contentId: String,
-    ): Response<PlayDetails>
+    ): Response<PlayDetailsResponse>
 
     @GET("instructors/profile/{instructorId}")
     suspend fun getInstructorDetails(
         @Path("instructorId") instructorId: String,
-    ): Response<InstructorProfileStatus>
+    ): Response<InstructorProfileResponse>
 
     @GET("mentioned-links/{linkId}")
     suspend fun getMentionedLinks(
         @Path("linkId") linkId: String,
-    ): Response<RemoteMentionedLinkStatus>
+    ): Response<RemoteMentionedLinkResponse>
 }

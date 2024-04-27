@@ -28,17 +28,16 @@ import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccount
-import app.efficientbytes.booleanbear.services.models.DeleteUserAccountStatus
-import app.efficientbytes.booleanbear.services.models.IssueCategory
-import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
+import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
-import app.efficientbytes.booleanbear.services.models.PhoneNumberVerificationStatus
-import app.efficientbytes.booleanbear.services.models.Profession
+import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
+import app.efficientbytes.booleanbear.models.Profession
+import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.services.models.RequestSupport
-import app.efficientbytes.booleanbear.services.models.RequestSupportStatus
+import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
+import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import com.google.firebase.auth.FirebaseAuth
@@ -157,7 +156,9 @@ class MainViewModel(
     }
 
     fun signOutUser() {
-        if (FirebaseAuth.getInstance().currentUser != null) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            SingletonPreviousUserId.setInstance(currentUser.uid)
             userAccountCoroutineScope.getScope().coroutineContext.cancelChildren()
             statisticsRepository.noteDownScreenClosingTime()
             statisticsRepository.forceUploadPendingScreenTiming()
@@ -215,22 +216,22 @@ class MainViewModel(
         utilityDataRepository.getIssueCategoriesAdapterList(this@MainViewModel)
     }
 
-    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
         MutableLiveData()
-    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<VerifyPhoneResponse?>> =
         _sendOTPToPhoneNumberResponse
 
     fun sendOTPToPhoneNumber(phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.sendOTPToPhoneNumber(VerifyPhoneNumber(phoneNumber)).collect {
+            verificationRepository.sendOTPToPhoneNumber(PhoneOTP(phoneNumber)).collect {
                 _sendOTPToPhoneNumberResponse.postValue(it)
             }
         }
     }
 
-    private val _requestSupportResponse: MutableLiveData<DataStatus<RequestSupportStatus?>> =
+    private val _requestSupportResponse: MutableLiveData<DataStatus<RequestSupportResponse?>> =
         MutableLiveData()
-    val requestSupportResponse: LiveData<DataStatus<RequestSupportStatus?>> =
+    val requestSupportResponse: LiveData<DataStatus<RequestSupportResponse?>> =
         _requestSupportResponse
 
     fun requestSupport(requestSupport: RequestSupport) {
@@ -241,27 +242,27 @@ class MainViewModel(
         }
     }
 
-    private val _verifyOtpStatus: MutableLiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    private val _verifyOtpStatus: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
         MutableLiveData()
-    val verifyOtpStatus: LiveData<DataStatus<PhoneNumberVerificationStatus?>> =
+    val verifyOtpStatus: LiveData<DataStatus<VerifyPhoneResponse?>> =
         _verifyOtpStatus
 
-    fun verifyPhoneNumberOTP(verifyPhoneNumber: VerifyPhoneNumber) {
+    fun verifyPhoneNumberOTP(phoneOTP: PhoneOTP) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.verifyPhoneNumberOTP(verifyPhoneNumber).collect {
+            verificationRepository.verifyPhoneNumberOTP(phoneOTP).collect {
                 _verifyOtpStatus.postValue(it)
             }
         }
     }
 
-    private val _deleteUserAccountStatus: MutableLiveData<DataStatus<DeleteUserAccountStatus?>> =
+    private val _deleteUserAccountStatus: MutableLiveData<DataStatus<ResponseMessage?>> =
         MutableLiveData()
-    val deleteUserAccountStatus: LiveData<DataStatus<DeleteUserAccountStatus?>> =
+    val deleteUserAccountStatus: LiveData<DataStatus<ResponseMessage?>> =
         _deleteUserAccountStatus
 
-    fun deleteUserAccount(deleteUserAccount: DeleteUserAccount) {
+    fun deleteUserAccount() {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.deleteUserAccount(deleteUserAccount).collect {
+            authenticationRepository.deleteUserAccount().collect {
                 _deleteUserAccountStatus.postValue(it)
             }
         }
@@ -293,9 +294,9 @@ class MainViewModel(
         _deleteAccountIntentInvoked.postValue(null)
     }
 
-    private val _notificationStatusChanged: MutableLiveData<DataStatus<NotificationTokenStatus>> =
+    private val _notificationStatusChanged: MutableLiveData<DataStatus<ResponseMessage>> =
         MutableLiveData()
-    val notificationStatusChanged: LiveData<DataStatus<NotificationTokenStatus>> =
+    val notificationStatusChanged: LiveData<DataStatus<ResponseMessage>> =
         _notificationStatusChanged
 
     fun generateFCMToken() {
@@ -366,7 +367,7 @@ class MainViewModel(
         _issueCategoriesAdapter.postValue(status)
     }
 
-    override fun onTokenStatusChanged(status: DataStatus<NotificationTokenStatus>) {
+    override fun onTokenStatusChanged(status: DataStatus<ResponseMessage>) {
         _notificationStatusChanged.postValue(status)
     }
 

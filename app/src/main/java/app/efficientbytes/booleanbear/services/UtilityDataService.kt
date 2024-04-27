@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.IssueCategory
-import app.efficientbytes.booleanbear.services.models.Profession
+import app.efficientbytes.booleanbear.models.IssueCategory
+import app.efficientbytes.booleanbear.models.Profession
 import retrofit2.Response
 import retrofit2.http.GET
 

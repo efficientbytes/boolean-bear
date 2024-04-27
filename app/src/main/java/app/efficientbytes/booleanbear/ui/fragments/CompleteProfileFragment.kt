@@ -143,7 +143,7 @@ class CompleteProfileFragment : Fragment() {
             }
         })
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
-            currentProfessionCategoryPosition  = position
+            currentProfessionCategoryPosition = position
             selectedProfessionCategoryPosition = position
         }
         binding.submitButton.setOnClickListener {
@@ -173,9 +173,7 @@ class CompleteProfileFragment : Fragment() {
                     binding.submitButton.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    it.data?.also { userPayLoad ->
-                        binding.progressStatusValueTextView.text = userPayLoad.message.toString()
-                    }
+                    binding.progressStatusValueTextView.text = it.message
                 }
 
                 DataStatus.Status.Loading -> {
@@ -190,11 +188,9 @@ class CompleteProfileFragment : Fragment() {
                     binding.submitButton.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    it.data?.let { userPayLoad ->
-                        binding.progressStatusValueTextView.text = userPayLoad.message.toString()
-                        userPayLoad.userProfile?.let { userProfile ->
-                            mainViewModel.saveUserProfile(userProfile)
-                        }
+                    it.data?.let { userProfile ->
+                        binding.progressStatusValueTextView.text = it.message.toString()
+                        mainViewModel.saveUserProfile(userProfile)
                     }
                     findNavController().popBackStack(R.id.homeFragment, false)
                 }

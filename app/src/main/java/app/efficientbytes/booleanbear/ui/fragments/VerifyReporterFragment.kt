@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.databinding.FragmentVerifyReporterBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SingletonRequestSupport
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneNumber
+import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import `in`.aabhasjindal.otptextview.OTPListener
 import org.koin.android.ext.android.inject
@@ -68,7 +68,7 @@ class VerifyReporterFragment : Fragment() {
             }
 
             override fun onOTPComplete(otp: String) {
-                mainViewModel.verifyPhoneNumberOTP(VerifyPhoneNumber(phoneNumber, otp))
+                mainViewModel.verifyPhoneNumberOTP(PhoneOTP(phoneNumber, otp))
             }
         }
 
@@ -82,7 +82,7 @@ class VerifyReporterFragment : Fragment() {
                         }
 
                         override fun onOTPComplete(otp: String) {
-                            mainViewModel.verifyPhoneNumberOTP(VerifyPhoneNumber(phoneNumber, otp))
+                            mainViewModel.verifyPhoneNumberOTP(PhoneOTP(phoneNumber, otp))
                         }
                     }
                     binding.progressBar.visibility = View.GONE

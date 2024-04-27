@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
-import app.efficientbytes.booleanbear.services.models.NotificationTokenStatus
-import app.efficientbytes.booleanbear.services.models.UserProfilePayload
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.UserProfileResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -29,7 +29,7 @@ interface UserProfileService {
         @Field("universityName") universityName: String? = null,
         @Field("createdOn") createdOn: Long? = null,
         @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
-    ): Response<UserProfilePayload>
+    ): Response<UserProfileResponse>
 
     @FormUrlEncoded
     @POST("user/profile/update")
@@ -49,24 +49,22 @@ interface UserProfileService {
         @Field("universityName") universityName: String? = null,
         @Field("createdOn") createdOn: Long? = null,
         @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
-    ): Response<UserProfilePayload>
+    ): Response<UserProfileResponse>
 
     @GET("user/profile")
-    suspend fun getUserProfile(): Response<UserProfilePayload>
+    suspend fun getUserProfile(): Response<UserProfileResponse>
 
     @FormUrlEncoded
     @POST("user/notifications/token/upload")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun uploadNotificationsToken(
         @Field("token") token: String
-    ): Response<NotificationTokenStatus>
+    ): Response<ResponseMessage>
 
     @FormUrlEncoded
     @POST("user/notification/token/delete")
     @Headers("Content-Type: application/x-www-form-urlencoded")
-    suspend fun deleteFCMToken(
-        @Field("token") token: String,
-    ): Response<NotificationTokenStatus>
+    suspend fun deleteFCMToken(): Response<ResponseMessage>
 
 
 }

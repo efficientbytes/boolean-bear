@@ -13,7 +13,7 @@
 
         <variable
             name="content"
-            type="app.efficientbytes.booleanbear.services.models.YoutubeContentView" />
+            type="app.efficientbytes.booleanbear.services.models.RemoteShuffledContent" />
 
 
     </data>

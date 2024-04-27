@@ -17,17 +17,16 @@ import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
-import app.efficientbytes.booleanbear.database.models.LocalYoutubeContentView
+import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
-import app.efficientbytes.booleanbear.services.models.IssueCategory
-import app.efficientbytes.booleanbear.services.models.Profession
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.models.IssueCategory
+import app.efficientbytes.booleanbear.models.Profession
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, YoutubeContentView::class, LocalYoutubeContentView::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class],
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, LocalShuffledContent::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class],
     version = 1,
     exportSchema = false
 )

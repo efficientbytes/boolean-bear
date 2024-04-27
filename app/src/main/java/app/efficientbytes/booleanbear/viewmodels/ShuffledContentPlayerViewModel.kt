@@ -14,7 +14,7 @@ import app.efficientbytes.booleanbear.services.models.PlayDetails
 import app.efficientbytes.booleanbear.services.models.PlayUrl
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
@@ -63,9 +63,9 @@ class ShuffledContentPlayerViewModel(
         }
     }
 
-    private val _suggestedContent: MutableLiveData<DataStatus<YoutubeContentView?>> =
+    private val _suggestedContent: MutableLiveData<DataStatus<RemoteShuffledContent?>> =
         MutableLiveData()
-    val suggestedContent: LiveData<DataStatus<YoutubeContentView?>> = _suggestedContent
+    val suggestedContent: LiveData<DataStatus<RemoteShuffledContent?>> = _suggestedContent
     private var suggestedContentJob: Job? = null
     fun getSuggestedContent(contentId: String) {
         suggestedContentJob = externalScope.launch {
@@ -117,6 +117,7 @@ class ShuffledContentPlayerViewModel(
                 if (mentionedLinksJob != null) {
                     mentionedLinksJob?.cancel()
                 }
+                countRecorded = false
             }
 
             Lifecycle.State.INITIALIZED -> {

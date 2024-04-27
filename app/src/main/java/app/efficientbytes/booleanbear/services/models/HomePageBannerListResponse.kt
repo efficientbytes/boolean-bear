@@ -13,3 +13,9 @@ data class RemoteHomePageBanner(
     val startingDate: Long,
     val closingDate: Long
 )
+
+@JsonClass(generateAdapter = true)
+data class HomePageBannerListResponse(
+    val data: List<RemoteHomePageBanner>? = null,
+    val message: String? = null
+)

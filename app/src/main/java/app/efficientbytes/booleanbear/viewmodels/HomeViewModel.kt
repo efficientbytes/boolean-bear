@@ -20,7 +20,7 @@ import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
-import app.efficientbytes.booleanbear.services.models.YoutubeContentView
+import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
@@ -38,10 +38,10 @@ class HomeViewModel(
         assetsRepository.downloadShuffledCategories(this@HomeViewModel)
     }
 
-    private val _youtubeContentViewList: MutableLiveData<DataStatus<List<YoutubeContentView>>> =
+    private val _remoteShuffledContentList: MutableLiveData<DataStatus<List<RemoteShuffledContent>>> =
         MutableLiveData()
-    val youtubeContentViewList: LiveData<DataStatus<List<YoutubeContentView>>> =
-        _youtubeContentViewList
+    val remoteShuffledContentList: LiveData<DataStatus<List<RemoteShuffledContent>>> =
+        _remoteShuffledContentList
 
     fun getYoutubeViewContentsUnderShuffledCategory(categoryId: String) {
         assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
@@ -97,8 +97,8 @@ class HomeViewModel(
         assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
     }
 
-    override fun onContentsDataStatusChanged(status: DataStatus<List<YoutubeContentView>>) {
-        _youtubeContentViewList.postValue(status)
+    override fun onContentsDataStatusChanged(status: DataStatus<List<RemoteShuffledContent>>) {
+        _remoteShuffledContentList.postValue(status)
     }
 
     override fun onHomePageAdsStatusChanged(status: DataStatus<List<RemoteHomePageBanner>>) {
