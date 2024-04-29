@@ -48,7 +48,7 @@
                 android:clickable="false"
                 android:focusable="false"
                 android:visibility="@{(customAuthState.liveData ==true) ? View.VISIBLE : View.GONE}"
-                app:cardBackgroundColor="@color/black_200"
+                app:cardBackgroundColor="@color/black_1200"
                 app:cardCornerRadius="50dp"
                 app:layout_constraintBottom_toTopOf="@id/getInTouchWithUsCardView"
                 app:layout_constraintEnd_toEndOf="parent"
