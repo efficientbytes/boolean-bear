@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.repositories.AdsRepository
@@ -21,6 +22,8 @@ import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
@@ -52,8 +55,25 @@ class HomeViewModel(
     val viewPagerBannerAds: LiveData<DataStatus<List<RemoteHomePageBanner>>> =
         _viewPagerBannerAds
 
-   fun getHomePageBannerAds() {
+    fun getHomePageBannerAds() {
         adsRepository.getHomePageBannerAds(this@HomeViewModel)
+    }
+
+    private val _searchResult: MutableLiveData<DataStatus<List<RemoteShuffledContent>>> =
+        MutableLiveData()
+    val searchResult: LiveData<DataStatus<List<RemoteShuffledContent>>> = _searchResult
+
+    fun getSearchContents(categoryId: String, query: String = "") {
+        viewModelScope.launch {
+            if (categoryId.isEmpty() || categoryId.isBlank()) {
+                _searchResult.postValue(DataStatus.emptyResult())
+            } else {
+                val result = assetsRepository.getSearchContents(categoryId, query)
+                if (result.isNullOrEmpty()) _searchResult.postValue(DataStatus.emptyResult()) else _searchResult.postValue(
+                    DataStatus.success(result)
+                )
+            }
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -94,6 +114,8 @@ class HomeViewModel(
     }
 
     override fun onIndex1CategoryFound(categoryId: String) {
+        HomeFragment.selectedCategoryId = categoryId
+        HomeFragment.selectedCategoryPosition = 1
         assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
     }
 

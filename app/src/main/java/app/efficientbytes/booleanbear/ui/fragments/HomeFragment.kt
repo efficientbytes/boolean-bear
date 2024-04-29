@@ -11,6 +11,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.SearchView
+import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -30,9 +34,11 @@ import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerView
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Locale
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
@@ -46,18 +52,27 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private var infiniteRecyclerAdapter: InfiniteViewPagerAdapter? = null
     private val handler = Handler(Looper.getMainLooper())
     private var currentPage = 1
-    private val DELAY_MS: Long = 3000 // Delay in milliseconds
+    private val delay3k: Long = 3000 // Delay in milliseconds
+    private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
     private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
     private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
+    private lateinit var searchRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
     private var accountSettingsFragment: AccountSettingsFragment? = null
+    private var searchView: SearchView? = null
+    private val alternateSearchHint = "Search for tags \"#advanced\""
+    private val hintHandler = Handler(Looper.getMainLooper())
+    private var isFirstHintText = false
+    private var isSearchViewOpen = false
+    private var hintRunnable: Runnable? = null
 
     companion object {
 
         var selectedCategoryId = ""
         var selectedCategoryPosition = -1
+        var selectedCategoryTitle = ""
         var loadingCategoriesFailed = false
         var loadingContentsFailed = false
         var loadingBannersFailed = false
@@ -79,6 +94,57 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
+                val search = menu.findItem(R.id.searchMenu)
+                searchView = search.actionView as? SearchView
+                val linearLayout1 = searchView!!.getChildAt(0) as LinearLayout
+                val linearLayout2 = linearLayout1.getChildAt(2) as LinearLayout
+                val linearLayout3 = linearLayout2.getChildAt(1) as LinearLayout
+                val searchEditText = linearLayout3.getChildAt(0) as TextView
+                searchEditText.textSize = 16f
+                searchEditText.setTextColor(
+                    AppCompatResources.getColorStateList(
+                        requireContext(),
+                        R.color.white
+                    )
+                )
+                searchView?.maxWidth = Integer.MAX_VALUE
+                searchView?.setOnCloseListener {
+                    isSearchViewOpen = false
+                    hintHandler.removeCallbacksAndMessages(null)
+                    binding.searchConstraintParentLayout.visibility = View.GONE
+                    binding.searchViewRecyclerView.adapter = null
+                    binding.appBarLayout.visibility = View.VISIBLE
+                    binding.contentParentConstraintLayout.visibility = View.VISIBLE
+                    false
+                }
+                searchView?.setOnSearchClickListener {
+                    isSearchViewOpen = true
+                    startAlternateHint()
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.contentParentConstraintLayout.visibility = View.GONE
+                    binding.searchConstraintParentLayout.visibility = View.VISIBLE
+                    viewModel.getSearchContents(selectedCategoryId)
+                }
+                searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        query?.apply {
+                            viewModel.getSearchContents(selectedCategoryId, this)
+                        }
+                        return true
+                    }
+
+                    override fun onQueryTextChange(query: String?): Boolean {
+                        query?.apply {
+                            if (!query.startsWith("#")) {
+                                viewModel.getSearchContents(selectedCategoryId, this)
+                            } else {
+                                binding.searchViewRecyclerView.visibility = View.GONE
+                                binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                            }
+                        }
+                        return true
+                    }
+                })
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -95,6 +161,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                             )
                         }
                         return true
+                    }
+
+                    R.id.searchMenu -> {
+
                     }
                 }
                 return false
@@ -113,10 +183,46 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
                 binding.categoriesRecyclerView.visibility = View.VISIBLE
                 homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0, 6))
+                selectedCategoryTitle = it.toList()[0].title
             } else {
                 binding.contentCategoryScrollView.visibility = View.VISIBLE
                 binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
                 binding.categoriesRecyclerView.visibility = View.INVISIBLE
+                searchView?.apply {
+                    visibility = View.GONE
+                }
+            }
+        }
+        //set search recycler view
+        binding.searchConstraintParentLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.adapter = null
+        binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        searchRecyclerViewAdapter =
+            YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+        viewModel.searchResult.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                    binding.searchViewRecyclerView.visibility = View.VISIBLE
+                    it.data?.let { list ->
+                        youtubeContentViewRecyclerViewAdapter =
+                            YoutubeContentViewRecyclerViewAdapter(
+                                list,
+                                requireContext(),
+                                this@HomeFragment
+                            )
+                    }
+                    binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    binding.searchViewRecyclerView.visibility = View.GONE
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
+                }
+
+                else -> {
+
+                }
             }
         }
         //set contents recycler view
@@ -316,10 +422,28 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     currentPage = 1
                 }
                 binding.infiniteViewPager.setCurrentItem(currentPage++, true)
-                handler.postDelayed(this, DELAY_MS)
+                handler.postDelayed(this, delay3k)
             }
         }
-        handler.postDelayed(runnable, DELAY_MS)
+        handler.postDelayed(runnable, delay3k)
+    }
+
+    private fun startAlternateHint() {
+        if (hintRunnable == null) {
+            hintRunnable = object : Runnable {
+                override fun run() {
+                    if (isFirstHintText) {
+                        searchView?.queryHint = alternateSearchHint
+                    } else {
+                        searchView?.queryHint =
+                            "Search for ${selectedCategoryTitle.lowercase(Locale.ROOT)} contents"
+                    }
+                    isFirstHintText = !isFirstHintText
+                    handler.postDelayed(this, delay3k)
+                }
+            }
+            handler.postDelayed(hintRunnable!!, 0)
+        }
     }
 
     private fun onInfinitePageChangeCallback(listSize: Int) {
@@ -367,23 +491,44 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         if (infiniteRecyclerAdapter != null) {
             handler.removeCallbacksAndMessages(null)
         }
+        hintRunnable = null
+        hintHandler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (infiniteRecyclerAdapter != null) {
+            handler.removeCallbacksAndMessages(null)
+        }
+        hintRunnable = null
+        hintHandler.removeCallbacksAndMessages(null)
     }
 
     override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
         selectedCategoryPosition = position
         selectedCategoryId = shuffledCategory.id
         viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+        val title = shuffledCategory.title
+        selectedCategoryTitle = title
     }
 
     override fun onChipLastItemClicked() {
-
+        val snackBar = Snackbar.make(
+            binding.coordinatorLayout,
+            "Feature is still under development.",
+            Snackbar.LENGTH_LONG
+        )
+        snackBar.show()
     }
 
     override fun onResume() {
         super.onResume()
-        if (selectedCategoryPosition != -1 && selectedCategoryId.isNotBlank()) {
+        if (selectedCategoryPosition != -1 && selectedCategoryId.isBlank()) {
             homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedCategoryPosition
             homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedCategoryPosition)
+        }
+        if (isSearchViewOpen) {
+            startAlternateHint()
         }
     }
 

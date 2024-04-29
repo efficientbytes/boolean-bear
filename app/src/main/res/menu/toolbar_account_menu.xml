@@ -3,11 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/searchMenu"
+        android:icon="@drawable/search_icon"
+        android:title="@string/search_contents"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/accountSettingsMenu"
         android:icon="@drawable/hamburger_menu_icon"
+        android:title="@string/settings"
         app:iconTint="@color/white"
-        android:title="@string/account"
-        app:showAsAction="always">
-    </item>
+        app:showAsAction="always" />
 
 </menu>

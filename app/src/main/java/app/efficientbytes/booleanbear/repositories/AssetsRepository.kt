@@ -21,6 +21,7 @@ import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
 import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
+import app.efficientbytes.booleanbear.utils.sanitizeSearchQuery
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -340,7 +341,7 @@ class AssetsRepository(
             if (categoryType === CategoryType.SHUFFLED) {
                 contentListener.onContentsDataStatusChanged(DataStatus.loading())
                 val listFromDB = assetsDao.getAllShuffledYoutubeViewContents(categoryId)
-                if (listFromDB.isNotEmpty()) {
+                if (!listFromDB.isNullOrEmpty()) {
                     contentListener.onContentsDataStatusChanged(DataStatus.success(listFromDB))
                 } else {
                     //fetch from server
@@ -766,6 +767,34 @@ class AssetsRepository(
     fun deleteAllMentionedLinks() {
         externalScope.launch {
             assetsDao.deleteAllMentionedLinks()
+        }
+    }
+
+    suspend fun getSearchContents(
+        categoryId: String,
+        query: String? = null
+    ): List<RemoteShuffledContent>? {
+        return when {
+            query.isNullOrEmpty() -> {
+                assetsDao.getAllShuffledYoutubeViewContents(categoryId)
+            }
+
+            query.isNotEmpty() && query.startsWith("#") -> {
+                val searchQuery = sanitizeSearchQuery(query.trim())
+                assetsDao.getShuffledContentsByHashTags(categoryId, searchQuery)
+            }
+
+            query.isNotEmpty() && (!query.startsWith("#")) -> {
+                val searchQuery = sanitizeSearchQuery(query.trim())
+                assetsDao.getShuffledContentsByTitle(
+                    categoryId,
+                    searchQuery
+                )
+            }
+
+            else -> {
+                emptyList<RemoteShuffledContent>()
+            }
         }
     }
 

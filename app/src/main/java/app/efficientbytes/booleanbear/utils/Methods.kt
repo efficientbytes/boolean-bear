@@ -426,3 +426,8 @@ fun extractUsernameFromGitHubUrl(gitHubUrl: String): String? {
     }
     return null
 }
+
+fun sanitizeSearchQuery(query: String): String {
+    val queryWithEscapedQuotes = query.replace("-", " ").replace("\"", " ").trim()
+    return "*$queryWithEscapedQuotes*"
+}
