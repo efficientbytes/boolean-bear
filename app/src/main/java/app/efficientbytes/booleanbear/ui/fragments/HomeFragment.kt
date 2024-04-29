@@ -135,7 +135,12 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
                     override fun onQueryTextChange(query: String?): Boolean {
                         query?.apply {
-                            viewModel.getSearchContents(selectedCategoryId, this)
+                            if (!query.startsWith("#")) {
+                                viewModel.getSearchContents(selectedCategoryId, this)
+                            } else {
+                                binding.searchViewRecyclerView.visibility = View.GONE
+                                binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                            }
                         }
                         return true
                     }
