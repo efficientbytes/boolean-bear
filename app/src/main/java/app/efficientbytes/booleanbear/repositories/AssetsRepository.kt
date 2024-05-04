@@ -3,7 +3,7 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
-import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
+import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.models.ContentViewType
@@ -173,7 +173,7 @@ class AssetsRepository(
         emit(DataStatus.loading())
         when (viewType) {
             ContentViewType.YOUTUBE -> {
-                val result = assetsDao.getShuffledYoutubeViewContent(contentId)
+                val result = assetsDao.getReel(contentId)
                 if (result != null) {
                     emit(DataStatus.success(result))
                 } else {
@@ -340,7 +340,7 @@ class AssetsRepository(
         allContentJob = externalScope.launch {
             if (categoryType === CategoryType.SHUFFLED) {
                 contentListener.onContentsDataStatusChanged(DataStatus.loading())
-                val listFromDB = assetsDao.getAllShuffledYoutubeViewContents(categoryId)
+                val listFromDB = assetsDao.getReels(categoryId)
                 if (!listFromDB.isNullOrEmpty()) {
                     contentListener.onContentsDataStatusChanged(DataStatus.success(listFromDB))
                 } else {
@@ -401,7 +401,7 @@ class AssetsRepository(
                                                     youtubeViewContents
                                                 )
                                                 val modifiedList = youtubeContentList.map {
-                                                    LocalShuffledContent(
+                                                    LocalReel(
                                                         categoryId,
                                                         it.contentId,
                                                         it.title,
@@ -412,7 +412,7 @@ class AssetsRepository(
                                                         it.hashTags
                                                     )
                                                 }
-                                                assetsDao.insertShuffledCategoryContents(
+                                                assetsDao.insertReels(
                                                     modifiedList
                                                 )
                                             }
@@ -530,7 +530,7 @@ class AssetsRepository(
 
     fun deleteAllContents() {
         externalScope.launch {
-            assetsDao.deleteShuffledYoutubeContentView()
+            assetsDao.deleteAllReels()
         }
     }
 
@@ -776,17 +776,17 @@ class AssetsRepository(
     ): List<RemoteShuffledContent>? {
         return when {
             query.isNullOrEmpty() -> {
-                assetsDao.getAllShuffledYoutubeViewContents(categoryId)
+                assetsDao.getReels(categoryId)
             }
 
             query.isNotEmpty() && query.startsWith("#") -> {
                 val searchQuery = sanitizeSearchQuery(query.trim())
-                assetsDao.getShuffledContentsByHashTags(categoryId, searchQuery)
+                assetsDao.getReelsByHashTags(categoryId, searchQuery)
             }
 
             query.isNotEmpty() && (!query.startsWith("#")) -> {
                 val searchQuery = sanitizeSearchQuery(query.trim())
-                assetsDao.getShuffledContentsByTitle(
+                assetsDao.getReelsByTitle(
                     categoryId,
                     searchQuery
                 )
