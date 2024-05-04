@@ -12,9 +12,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -95,6 +95,23 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
                 val search = menu.findItem(R.id.searchMenu)
+                search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener{
+                    override fun onMenuItemActionExpand(p0: MenuItem): Boolean {
+                        return true
+                    }
+
+                    override fun onMenuItemActionCollapse(p0: MenuItem): Boolean {
+                        requireActivity().invalidateOptionsMenu()
+                        isSearchViewOpen = false
+                        hintHandler.removeCallbacksAndMessages(null)
+                        binding.searchConstraintParentLayout.visibility = View.GONE
+                        binding.searchViewRecyclerView.adapter = null
+                        binding.appBarLayout.visibility = View.VISIBLE
+                        binding.contentParentConstraintLayout.visibility = View.VISIBLE
+                        return true
+                    }
+
+                })
                 searchView = search.actionView as? SearchView
                 val linearLayout1 = searchView!!.getChildAt(0) as LinearLayout
                 val linearLayout2 = linearLayout1.getChildAt(2) as LinearLayout
@@ -108,16 +125,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     )
                 )
                 searchView?.maxWidth = Integer.MAX_VALUE
-                searchView?.setOnCloseListener {
-                    isSearchViewOpen = false
-                    hintHandler.removeCallbacksAndMessages(null)
-                    binding.searchConstraintParentLayout.visibility = View.GONE
-                    binding.searchViewRecyclerView.adapter = null
-                    binding.appBarLayout.visibility = View.VISIBLE
-                    binding.contentParentConstraintLayout.visibility = View.VISIBLE
-                    false
-                }
                 searchView?.setOnSearchClickListener {
+                    menu.findItem(R.id.accountSettingsMenu).setVisible(false)
                     isSearchViewOpen = true
                     startAlternateHint()
                     binding.appBarLayout.visibility = View.GONE
@@ -139,7 +148,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                                 viewModel.getSearchContents(selectedCategoryId, this)
                             } else {
                                 binding.searchViewRecyclerView.visibility = View.GONE
-                                binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                                binding.searchViewNoSearchResultConstraintLayout.visibility =
+                                    View.GONE
                             }
                         }
                         return true
