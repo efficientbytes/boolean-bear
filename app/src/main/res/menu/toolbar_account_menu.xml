@@ -6,14 +6,14 @@
         android:id="@+id/searchMenu"
         android:icon="@drawable/search_icon"
         android:title="@string/search_contents"
-        app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="ifRoom" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
 
     <item
         android:id="@+id/accountSettingsMenu"
         android:icon="@drawable/hamburger_menu_icon"
         android:title="@string/settings"
         app:iconTint="@color/white"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>
