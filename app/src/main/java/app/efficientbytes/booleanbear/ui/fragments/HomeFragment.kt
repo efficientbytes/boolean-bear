@@ -55,8 +55,12 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
-    private lateinit var homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter
-    private lateinit var youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
+    private val homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter by lazy {
+        HomeFragmentChipRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+    }
+    private val youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+    }
     private lateinit var searchRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
@@ -127,6 +131,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 searchView?.maxWidth = Integer.MAX_VALUE
                 searchView?.setOnSearchClickListener {
                     menu.findItem(R.id.accountSettingsMenu).setVisible(false)
+                    menu.findItem(R.id.discoverMenu).setVisible(false)
                     isSearchViewOpen = true
                     startAlternateHint()
                     binding.appBarLayout.visibility = View.GONE
@@ -217,12 +222,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.categoriesRecyclerView.visibility = View.VISIBLE
                     val list = it.data
                     if (!list.isNullOrEmpty()) {
-                        homeFragmentChipRecyclerViewAdapter =
-                            HomeFragmentChipRecyclerViewAdapter(
-                                list.subList(0, 5),
-                                requireContext(),
-                                this
-                            )
+                        homeFragmentChipRecyclerViewAdapter.setReelTopics(list.subList(0, 5))
                         binding.categoriesRecyclerView.adapter =
                             homeFragmentChipRecyclerViewAdapter
                         val firstTopic = list.find { topic -> topic.displayIndex == 1 }
@@ -290,12 +290,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.noInternetLinearLayout.visibility = View.GONE
                     binding.contentsRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
-                        youtubeContentViewRecyclerViewAdapter =
-                            YoutubeContentViewRecyclerViewAdapter(
-                                list,
-                                requireContext(),
-                                this@HomeFragment
-                            )
+                        youtubeContentViewRecyclerViewAdapter.setYoutubeContentViewList(list)
                     }
                     binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }
@@ -332,12 +327,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
                     binding.searchViewRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
-                        youtubeContentViewRecyclerViewAdapter =
-                            YoutubeContentViewRecyclerViewAdapter(
-                                list,
-                                requireContext(),
-                                this@HomeFragment
-                            )
+                        youtubeContentViewRecyclerViewAdapter.setYoutubeContentViewList(list)
                     }
                     binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }

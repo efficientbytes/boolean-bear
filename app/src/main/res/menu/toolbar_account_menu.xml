@@ -7,7 +7,15 @@
         android:icon="@drawable/search_icon"
         android:title="@string/search_contents"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="@color/white"
         app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/discoverMenu"
+        android:icon="@drawable/discover_icon"
+        android:title="@string/discover_topics"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/accountSettingsMenu"

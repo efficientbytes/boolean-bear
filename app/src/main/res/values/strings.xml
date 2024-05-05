@@ -127,5 +127,6 @@
     <string name="we_could_not_find_anything_that_matches_your_search_term">We could not find anything that matches your search term</string>
     <string name="search_contents">Search Contents</string>
     <string name="discover_more_topics">Discover More Topics</string>
+    <string name="discover_topics">Discover Topics</string>
 
 </resources>
