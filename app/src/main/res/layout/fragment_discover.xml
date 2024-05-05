@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:paddingHorizontal="18dp"
+        android:paddingVertical="8dp"
+        tools:context=".ui.fragments.DiscoverFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/watchFreeLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="start"
+                android:paddingHorizontal="8dp"
+                android:text="@string/binge_on_free_contents"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reelTopicsRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                app:flow_horizontalAlign="center"
+                app:flow_verticalAlign="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/watchFreeLabelTextView"
+                tools:itemCount="6"
+                tools:listitem="@layout/recycler_view_item_reel_topic_view">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/premiumCoursesLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:text="@string/premium_courses"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</layout>

@@ -38,6 +38,11 @@
         <action
             android:id="@+id/homeFragment_to_deleteUserAccountFragment"
             app:destination="@id/deleteUserAccountFragment" />
+        <action
+            android:id="@+id/homeFragment_to_discoverFragment"
+            app:destination="@id/discoverFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -208,4 +213,8 @@
         android:id="@+id/loginToContinueFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.LoginToContinueFragment"
         android:label="LoginToContinueFragment" />
+    <fragment
+        android:id="@+id/discoverFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.DiscoverFragment"
+        android:label="Discover your next passion" />
 </navigation>

@@ -34,7 +34,6 @@ import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerView
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -178,8 +177,13 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         return true
                     }
 
-                    R.id.searchMenu -> {
+                    R.id.discoverMenu -> {
+                        findNavController().navigate(R.id.homeFragment_to_discoverFragment)
+                        return true
+                    }
 
+                    R.id.searchMenu -> {
+                        return true
                     }
                 }
                 return false
@@ -515,12 +519,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     override fun onChipLastItemClicked() {
-        val snackBar = Snackbar.make(
-            binding.coordinatorLayout,
-            "Feature is still under development.",
-            Snackbar.LENGTH_LONG
-        )
-        snackBar.show()
+        findNavController().navigate(R.id.discoverFragment)
     }
 
     override fun onResume() {

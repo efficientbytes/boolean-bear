@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="onClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="topic"
+            type="app.efficientbytes.booleanbear.services.models.RemoteReelTopic" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/reelTopicParentCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="@{onClick}"
+        app:cardBackgroundColor="@color/black_1200"
+        app:cardCornerRadius="6dp"
+        app:strokeWidth="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/topicValueTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="16dp"
+                android:fontFamily="@font/montserrat"
+                android:gravity="center"
+                android:ellipsize="end"
+                android:lines="2"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:text="@{topic.topic}"
+                tools:ignore="SmallSp"
+                tools:text="Android Compose">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>

@@ -482,6 +482,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.homeFragment -> {
+                    binding.mainToolbar.setTitleTextColor(
+                        this@MainActivity.applicationContext.getColor(
+                            R.color.white
+                        )
+                    )
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -490,6 +495,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.shuffledContentPlayerFragment -> {
+                    binding.mainToolbar.setTitleTextColor(
+                        this@MainActivity.applicationContext.getColor(
+                            R.color.white
+                        )
+                    )
                     window.setFlags(
                         WindowManager.LayoutParams.FLAG_SECURE,
                         WindowManager.LayoutParams.FLAG_SECURE
@@ -499,7 +509,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     binding.mainToolbar.visibility = View.GONE
                 }
 
+                R.id.discoverFragment -> {
+                    binding.mainToolbar.setTitleTextColor(
+                        this@MainActivity.applicationContext.getColor(
+                            R.color.violet_600
+                        )
+                    )
+                }
+
                 else -> {
+                    binding.mainToolbar.setTitleTextColor(
+                        this@MainActivity.applicationContext.getColor(
+                            R.color.white
+                        )
+                    )
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

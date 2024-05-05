@@ -128,5 +128,8 @@
     <string name="search_contents">Search Contents</string>
     <string name="discover_more_topics">Discover More Topics</string>
     <string name="discover_topics">Discover Topics</string>
+    <string name="watch_for_free">Watch For Free</string>
+    <string name="premium_courses">Premium Courses</string>
+    <string name="binge_on_free_contents">Binge on free contents</string>
 
 </resources>
