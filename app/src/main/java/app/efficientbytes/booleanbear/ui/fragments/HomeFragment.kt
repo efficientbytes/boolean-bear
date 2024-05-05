@@ -22,12 +22,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.RemoteReel
+import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
@@ -70,11 +70,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     companion object {
 
-        var selectedCategoryId = ""
-        var selectedCategoryPosition = -1
-        var selectedCategoryTitle = ""
-        var loadingCategoriesFailed = false
-        var loadingContentsFailed = false
+        var selectedReelTopicId = ""
+        var selectedReelTopicPosition = -1
+        var selectedReelTopic = ""
+        var loadingReelTopicsFailed = false
+        var loadingReelsFailed = false
         var loadingBannersFailed = false
     }
 
@@ -95,7 +95,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.toolbar_account_menu, menu)
                 val search = menu.findItem(R.id.searchMenu)
-                search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener{
+                search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
                     override fun onMenuItemActionExpand(p0: MenuItem): Boolean {
                         return true
                     }
@@ -132,12 +132,12 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     binding.appBarLayout.visibility = View.GONE
                     binding.contentParentConstraintLayout.visibility = View.GONE
                     binding.searchConstraintParentLayout.visibility = View.VISIBLE
-                    viewModel.getSearchContents(selectedCategoryId)
+                    viewModel.getReelQueries(selectedReelTopicId)
                 }
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         query?.apply {
-                            viewModel.getSearchContents(selectedCategoryId, this)
+                            viewModel.getReelQueries(selectedReelTopicId, this)
                         }
                         return true
                     }
@@ -145,7 +145,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     override fun onQueryTextChange(query: String?): Boolean {
                         query?.apply {
                             if (!query.startsWith("#")) {
-                                viewModel.getSearchContents(selectedCategoryId, this)
+                                viewModel.getReelQueries(selectedReelTopicId, this)
                             } else {
                                 binding.searchViewRecyclerView.visibility = View.GONE
                                 binding.searchViewNoSearchResultConstraintLayout.visibility =
@@ -180,65 +180,92 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 return false
             }
         }, viewLifecycleOwner)
-        //set content category recycler view
+        //set reel topics recycler view
         binding.categoriesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        homeFragmentChipRecyclerViewAdapter =
-            HomeFragmentChipRecyclerViewAdapter(emptyList(), requireContext(), this)
-        binding.categoriesRecyclerView.adapter = homeFragmentChipRecyclerViewAdapter
-
-        viewModel.contentCategoriesFromDB.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
-                binding.contentCategoryScrollView.visibility = View.GONE
-                binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
-                binding.categoriesRecyclerView.visibility = View.VISIBLE
-                homeFragmentChipRecyclerViewAdapter.setContentCategories(it.toList().subList(0, 6))
-                selectedCategoryTitle = it.toList()[0].title
-            } else {
-                binding.contentCategoryScrollView.visibility = View.VISIBLE
-                binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                binding.categoriesRecyclerView.visibility = View.INVISIBLE
-                searchView?.apply {
-                    visibility = View.GONE
-                }
-            }
-        }
-        //set search recycler view
-        binding.searchConstraintParentLayout.visibility = View.GONE
-        binding.searchViewRecyclerView.adapter = null
-        binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        searchRecyclerViewAdapter =
-            YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
-        viewModel.searchResult.observe(viewLifecycleOwner) {
+        viewModel.reelTopics.observe(viewLifecycleOwner) {
             when (it.status) {
-                DataStatus.Status.Success -> {
-                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
-                    binding.searchViewRecyclerView.visibility = View.VISIBLE
-                    it.data?.let { list ->
-                        youtubeContentViewRecyclerViewAdapter =
-                            YoutubeContentViewRecyclerViewAdapter(
-                                list,
-                                requireContext(),
-                                this@HomeFragment
-                            )
-                    }
-                    binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
+                DataStatus.Status.EmptyResult -> {
+                    //there is some problem
+                    //show retry button
+
                 }
 
-                DataStatus.Status.EmptyResult -> {
-                    binding.searchViewRecyclerView.visibility = View.GONE
-                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
+                DataStatus.Status.Failed -> {
+                    //there is some problem
+                    //show retry button
+
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.contentCategoryShimmerScrollView.visibility = View.VISIBLE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingReelTopicsFailed = true
+                    //show no internet
+                    //show retry button
+                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.VISIBLE
+                    val list = it.data
+                    if (!list.isNullOrEmpty()) {
+                        homeFragmentChipRecyclerViewAdapter =
+                            HomeFragmentChipRecyclerViewAdapter(
+                                list.subList(0, 5),
+                                requireContext(),
+                                this
+                            )
+                        binding.categoriesRecyclerView.adapter =
+                            homeFragmentChipRecyclerViewAdapter
+                        val firstTopic = list.find { topic -> topic.displayIndex == 1 }
+                        if (firstTopic != null) {
+                            selectedReelTopic = firstTopic.topic
+                            selectedReelTopicId = firstTopic.topicId
+                            selectedReelTopicPosition = 0
+                            viewModel.getReels(firstTopic.topicId)
+                        }
+                    }
+
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    loadingReelTopicsFailed = true
+                    //show time out
+                    //show retry button
+                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+
+                }
+
+                DataStatus.Status.UnKnownException -> {
+                    //there is some problem
+                    //show retry button
+                    //show snack bar with indefinite
+                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.GONE
+
                 }
 
                 else -> {
+                    //there is some problem
+                    //show retry button
+                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
+                    binding.categoriesRecyclerView.visibility = View.GONE
 
                 }
             }
         }
-        //set contents recycler view
+        //set reels recycler view
         binding.contentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        viewModel.remoteShuffledContentList.observe(viewLifecycleOwner) {
+        viewModel.reels.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerLayout.stopShimmer()
@@ -282,7 +309,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
 
                 DataStatus.Status.NoInternet -> {
-                    loadingContentsFailed = true
+                    loadingReelsFailed = true
                     binding.contentsRecyclerView.visibility = View.GONE
                     binding.shimmerLayout.stopShimmer()
                     binding.shimmerLayoutNestedScrollView.visibility = View.GONE
@@ -295,57 +322,33 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 }
             }
         }
-
-        viewModel.categories.observe(viewLifecycleOwner) {
+        //set search recycler view
+        binding.searchConstraintParentLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.adapter = null
+        binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        viewModel.searchResult.observe(viewLifecycleOwner) {
             when (it.status) {
-                DataStatus.Status.EmptyResult -> {
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-                }
-
-                DataStatus.Status.Failed -> {
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    loadingCategoriesFailed = true
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-                }
-
                 DataStatus.Status.Success -> {
-                    binding.contentCategoryScrollView.visibility = View.GONE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.VISIBLE
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
+                    binding.searchViewRecyclerView.visibility = View.VISIBLE
+                    it.data?.let { list ->
+                        youtubeContentViewRecyclerViewAdapter =
+                            YoutubeContentViewRecyclerViewAdapter(
+                                list,
+                                requireContext(),
+                                this@HomeFragment
+                            )
+                    }
+                    binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
                 }
 
-                DataStatus.Status.TimeOut -> {
-                    loadingContentsFailed = true
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-                }
-
-                DataStatus.Status.UnKnownException -> {
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
+                DataStatus.Status.EmptyResult -> {
+                    binding.searchViewRecyclerView.visibility = View.GONE
+                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
                 }
 
                 else -> {
-                    binding.contentCategoryScrollView.visibility = View.VISIBLE
-                    binding.contentCategoryShimmerLinearLayout.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
+
                 }
             }
         }
@@ -366,7 +369,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
                 DataStatus.Status.NoInternet -> {
                     binding.appBarLayout.visibility = View.GONE
-                    loadingContentsFailed = true
+                    loadingBannersFailed = true
                 }
 
                 DataStatus.Status.Loading -> {
@@ -383,13 +386,13 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
             when (isAvailable) {
                 true -> {
-                    if (loadingCategoriesFailed) {
-                        loadingCategoriesFailed = false
-                        viewModel.getShuffledCategories()
+                    if (loadingReelTopicsFailed) {
+                        loadingReelTopicsFailed = false
+                        viewModel.getReelTopics()
                     }
-                    if (loadingContentsFailed) {
-                        loadingContentsFailed = false
-                        viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+                    if (loadingReelsFailed) {
+                        loadingReelsFailed = false
+                        viewModel.getReels(selectedReelTopicId)
                     }
                     if (loadingBannersFailed) {
                         loadingBannersFailed = false
@@ -404,11 +407,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         }
 
         binding.retryAfterNoResultButton.setOnClickListener {
-            viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+            viewModel.getReels(selectedReelTopicId)
         }
 
         binding.retryAfterNoInternetButton.setOnClickListener {
-            viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
+            viewModel.getReels(selectedReelTopicId)
         }
         mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
             it?.let { contentId ->
@@ -446,7 +449,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         searchView?.queryHint = alternateSearchHint
                     } else {
                         searchView?.queryHint =
-                            "Search for ${selectedCategoryTitle.lowercase(Locale.ROOT)} contents"
+                            "Search for ${selectedReelTopic.lowercase(Locale.ROOT)} contents"
                     }
                     isFirstHintText = !isFirstHintText
                     handler.postDelayed(this, delay3k)
@@ -514,12 +517,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         hintHandler.removeCallbacksAndMessages(null)
     }
 
-    override fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory) {
-        selectedCategoryPosition = position
-        selectedCategoryId = shuffledCategory.id
-        viewModel.getYoutubeViewContentsUnderShuffledCategory(selectedCategoryId)
-        val title = shuffledCategory.title
-        selectedCategoryTitle = title
+    override fun onChipItemClicked(position: Int, remoteReelTopic: RemoteReelTopic) {
+        selectedReelTopicPosition = position
+        selectedReelTopicId = remoteReelTopic.topicId
+        selectedReelTopic = remoteReelTopic.topic
+        viewModel.getReels(selectedReelTopicId)
     }
 
     override fun onChipLastItemClicked() {
@@ -533,9 +535,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onResume() {
         super.onResume()
-        if (selectedCategoryPosition != -1 && selectedCategoryId.isBlank()) {
-            homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedCategoryPosition
-            homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedCategoryPosition)
+        if (selectedReelTopicPosition != -1 && selectedReelTopicId.isNotBlank()) {
+            homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
+            homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)
         }
         if (isSearchViewOpen) {
             startAlternateHint()
@@ -544,13 +546,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onYoutubeContentViewItemClicked(
         position: Int,
-        remoteShuffledContent: RemoteShuffledContent
+        remoteReel: RemoteReel
     ) {
         if (FirebaseAuth.getInstance().currentUser != null) {
             val directions =
-                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
-                    remoteShuffledContent.contentId
-                )
+                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(reelId = remoteReel.reelId)
             findNavController().navigate(directions)
         } else {
             if (loginToContinueFragment == null) {
@@ -569,9 +569,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private fun watchContentViaIntent(contentId: String) {
         if (FirebaseAuth.getInstance().currentUser != null) {
             val directions =
-                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(
-                    contentId
-                )
+                HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(contentId)
             findNavController().navigate(directions)
         } else {
             if (loginToContinueFragment == null) {

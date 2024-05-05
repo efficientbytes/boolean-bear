@@ -9,7 +9,6 @@ import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.dao.StatisticsDao
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
-import app.efficientbytes.booleanbear.database.models.CategoryContentId
 import app.efficientbytes.booleanbear.database.models.Dummy
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.ListConverter
@@ -17,17 +16,17 @@ import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
-import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
-import app.efficientbytes.booleanbear.database.models.LocalShuffledContentFTS
+import app.efficientbytes.booleanbear.database.models.LocalReel
+import app.efficientbytes.booleanbear.database.models.LocalReelFTS
+import app.efficientbytes.booleanbear.database.models.LocalReelTopic
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ShuffledCategory::class, CategoryContentId::class, ScreenTiming::class, LocalShuffledContent::class, LocalShuffledContentFTS::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class],
+    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ScreenTiming::class, LocalReelTopic::class, LocalReel::class, LocalReelFTS::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class],
     version = 1,
     exportSchema = false
 )

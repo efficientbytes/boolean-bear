@@ -1,12 +1,12 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
-import app.efficientbytes.booleanbear.services.models.PlayDetailsResponse
-import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.ReelDetailsResponse
+import app.efficientbytes.booleanbear.services.models.ReelPlayLink
+import app.efficientbytes.booleanbear.services.models.ReelResponse
+import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
+import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
-import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -14,31 +14,30 @@ import retrofit2.http.Query
 
 interface AssetsService {
 
-    @GET("categories")
-    suspend fun getCategories(
-        @Query(value = "categoryType") categoryType: String = "shuffled"
-    ): Response<ShuffledCategoriesResponse>
+    @GET("reels/topics")
+    suspend fun getReelTopics(): Response<ReelTopicsResponse>
 
-    @GET("categories/shuffled/{categoryId}")
-    suspend fun getContentIdsUnderShuffledCategoryForCategoryId(
-        @Path("categoryId") categoryId: String
-    ): Response<ShuffledCategoryContentIdListResponse>
+    @GET("reels/topics/{topicId}")
+    suspend fun getReels(
+        @Path("topicId") topicId: String
+    ): Response<ReelsResponse>
 
-    @GET("contents/{contentId}")
-    suspend fun getYoutubeTypeContentForContentId(
-        @Path("contentId") contentId: String,
-        @Query(value = "viewType") viewType: String = "YOUTUBE"
-    ): Response<ShuffledContentResponse>
+    @GET("reels/{reelId}/reel-details")
+    suspend fun getReel(
+        @Path("reelId") reelId: String,
+        @Query("in_detailed") detailed : Int = 0
+    ): Response<ReelResponse>
 
-    @GET("contents/{contentId}/play-link")
-    suspend fun getPlayUrl(
-        @Path("contentId") contentId: String,
-    ): Response<PlayUrl>
+    @GET("reels/{reelId}/reel-details")
+    suspend fun getReelDetails(
+        @Path("reelId") reelId: String,
+        @Query("in_detailed") detailed: Int = 1
+    ): Response<ReelDetailsResponse>
 
-    @GET("contents/{contentId}/play-details")
-    suspend fun getPlayDetails(
-        @Path("contentId") contentId: String,
-    ): Response<PlayDetailsResponse>
+    @GET("reels/{reelId}/play-link")
+    suspend fun getReelPlayLink(
+        @Path("reelId") reelId: String
+    ): Response<ReelPlayLink>
 
     @GET("instructors/profile/{instructorId}")
     suspend fun getInstructorDetails(

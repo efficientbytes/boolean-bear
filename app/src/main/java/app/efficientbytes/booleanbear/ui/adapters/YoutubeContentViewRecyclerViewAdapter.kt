@@ -6,16 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemYoutubeContentViewBinding
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.RemoteReel
 
 class YoutubeContentViewRecyclerViewAdapter(
-    private var itemList: List<RemoteShuffledContent>,
+    private var itemList: List<RemoteReel>,
     private var context: Context,
     private val itemClickListener: OnItemClickListener
 ) :
     RecyclerView.Adapter<YoutubeContentViewRecyclerViewAdapter.ItemViewHolder>() {
 
-    fun setYoutubeContentViewList(itemList: List<RemoteShuffledContent>) {
+    fun setYoutubeContentViewList(itemList: List<RemoteReel>) {
         this.itemList = emptyList()
         this.itemList = itemList
         notifyDataSetChanged()
@@ -39,7 +39,7 @@ class YoutubeContentViewRecyclerViewAdapter(
     inner class ItemViewHolder(private val binding: RecyclerViewItemYoutubeContentViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: RemoteShuffledContent) {
+        fun bind(item: RemoteReel) {
             binding.content = item
             binding.onClick = View.OnClickListener {
                 itemClickListener.onYoutubeContentViewItemClicked(absoluteAdapterPosition, item)
@@ -49,7 +49,7 @@ class YoutubeContentViewRecyclerViewAdapter(
 
     interface OnItemClickListener {
 
-        fun onYoutubeContentViewItemClicked(position: Int, remoteShuffledContent: RemoteShuffledContent)
+        fun onYoutubeContentViewItemClicked(position: Int, remoteReel: RemoteReel)
 
     }
 

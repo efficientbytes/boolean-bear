@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -37,13 +38,13 @@ import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentPlayerBinding
+import app.efficientbytes.booleanbear.databinding.FragmentReelPlayerBinding
 import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
-import app.efficientbytes.booleanbear.viewmodels.ShuffledContentPlayerViewModel
+import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
@@ -53,9 +54,9 @@ import pl.droidsonroids.gif.AnimationListener
 import pl.droidsonroids.gif.GifDrawable
 import java.net.UnknownHostException
 
-class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
+class ReelPlayerFragment : Fragment(), AnimationListener {
 
-    private lateinit var _binding: FragmentShuffledContentPlayerBinding
+    private lateinit var _binding: FragmentReelPlayerBinding
     private val binding get() = _binding
 
     //exo player
@@ -74,7 +75,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     private lateinit var playerQualityMenu: LinearLayout
     private lateinit var fullScreenButton: ImageButton
     private lateinit var gifDrawable: GifDrawable
-    private lateinit var contentId: String
+    private lateinit var reelId: String
     private lateinit var playerQualityButton: ImageButton
     private lateinit var playerPlaybackSpeedButton: ImageButton
     private lateinit var playerQualityPortraitText: MaterialTextView
@@ -84,7 +85,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     //flags
     private var isFullScreen = false
     private var isPlayingSuggested = false
-    private val viewModel: ShuffledContentPlayerViewModel by inject()
+    private val viewModel: ReelPlayerViewModel by inject()
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
@@ -98,9 +99,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: return
-        val args = ShuffledContentPlayerFragmentArgs.fromBundle(bundle)
-        val contentId = args.contentId
-        this.contentId = contentId
+        val args = ReelPlayerFragmentArgs.fromBundle(bundle)
+        this.reelId = args.reelId
     }
 
     override fun onCreateView(
@@ -108,7 +108,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentShuffledContentPlayerBinding.inflate(inflater, container, false)
+        _binding = FragmentReelPlayerBinding.inflate(inflater, container, false)
         rootView = binding.root
         lifecycle.addObserver(viewModel)
         return rootView
@@ -119,7 +119,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         super.onViewCreated(view, savedInstanceState)
 
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
-        gifDrawable.addAnimationListener(this@ShuffledContentPlayerFragment)
+        gifDrawable.addAnimationListener(this@ReelPlayerFragment)
         playerTitleText = rootView.findViewById(R.id.playerTitleValueTextView)
         playerInstructorNameText = rootView.findViewById(R.id.playerInstructorNameValueTextView)
         playerQualityMenu = rootView.findViewById(R.id.playerQualityMenuLinearLayout)
@@ -141,11 +141,11 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         } else {
             binding.noInternetLinearLayout.visibility = View.GONE
             binding.parentConstraintLayout.visibility = View.VISIBLE
-            viewModel.getPlayUrl(contentId)
-            viewModel.getPlayDetails(contentId)
+            viewModel.getReelPlayLink(reelId)
+            viewModel.getReelDetails(reelId)
         }
 
-        viewModel.playUrl.observe(viewLifecycleOwner) {
+        viewModel.reelPlayLink.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
 
@@ -159,7 +159,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
 
                 DataStatus.Status.Success -> {
                     it.data?.let { playUrl ->
-                        mediaItem = playUrl.data?.let { url -> MediaItem.fromUri(url) }
+                        mediaItem = MediaItem.fromUri(Uri.parse(playUrl))
                         initializePlayer()
                     }
                 }
@@ -191,7 +191,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
-        viewModel.playDetails.observe(viewLifecycleOwner) {
+        viewModel.reelDetails.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.contentDetailsConstraintLayout.visibility = View.GONE
@@ -221,7 +221,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     binding.shimmerContentDetails.stopShimmer()
 
                     it.data?.let { playDetails ->
-                        playDetails.nextSuggestion?.let { suggestedContentId ->
+                        playDetails.nextReelId?.let { suggestedContentId ->
                             nextSuggestedContentId = suggestedContentId
                             viewModel.getSuggestedContent(suggestedContentId)
                         }
@@ -231,13 +231,13 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                                 mentionedLinkIds
                             )
                         }
-                        if (playDetails.nextSuggestion == null) {
+                        if (playDetails.nextReelId == null) {
                             binding.shimmerSuggestedContent.stopShimmer()
                             binding.shimmerSuggestedContent.visibility = View.GONE
                             binding.suggestedContentCardView.visibility = View.GONE
                             nextSuggestedContentId = null
                         }
-                        binding.playDetails = playDetails
+                        binding.reelDetails = playDetails
                         playerTitleText.text = playDetails.title
                         contentTitle = playDetails.title
                         val instructorFullName = if (playDetails.instructorLastName == null) {
@@ -276,13 +276,18 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     findNavController().popBackStack()
                 }
 
+                DataStatus.Status.UnKnownException -> {
+                    //show error
+                    //snack bar
+                }
+
                 else -> {
 
                 }
             }
         }
 
-        viewModel.suggestedContent.observe(viewLifecycleOwner) {
+        viewModel.nextReel.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.shimmerSuggestedContent.stopShimmer()
@@ -302,7 +307,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                         binding.shimmerSuggestedContent.stopShimmer()
                         binding.shimmerSuggestedContent.visibility = View.GONE
                         binding.suggestedContentCardView.visibility = View.VISIBLE
-                        binding.suggestedContentDetails = youtubeContentView
+                        binding.nextReel = youtubeContentView
                     }
                 }
 
@@ -316,6 +321,11 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                     binding.suggestedContentCardView.visibility = View.GONE
                     binding.shimmerSuggestedContent.visibility = View.VISIBLE
                     binding.shimmerSuggestedContent.stopShimmer()
+                }
+
+                DataStatus.Status.UnKnownException -> {
+                    //show error
+                    //snack-bar
                 }
 
                 else -> {
@@ -369,23 +379,23 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         binding.retryButton.setOnClickListener {
             if (noInternet) {
                 noInternet = false
-                viewModel.getPlayUrl(contentId)
-                viewModel.getPlayDetails(contentId)
+                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelDetails(reelId)
             } else {
                 initializePlayer()
             }
         }
 
         binding.suggestedContentCardView.setOnClickListener {
-            nextSuggestedContentId?.let { contentId ->
+            nextSuggestedContentId?.let { reelId ->
                 clearStartPosition()
                 isPlayingSuggested = true
-                this@ShuffledContentPlayerFragment.contentId = contentId
-                ShuffledContentPlayerViewModel.countRecorded = false
+                this@ReelPlayerFragment.reelId = reelId
+                ReelPlayerViewModel.countRecorded = false
                 binding.videoPlayer.hideController()
                 playerQualityMenu.visibility = View.GONE
-                viewModel.getPlayUrl(contentId)
-                viewModel.getPlayDetails(contentId)
+                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelDetails(reelId)
             }
         }
 
@@ -394,8 +404,8 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 noInternet = false
                 binding.noInternetLinearLayout.visibility = View.GONE
                 binding.parentConstraintLayout.visibility = View.VISIBLE
-                viewModel.getPlayUrl(contentId)
-                viewModel.getPlayDetails(contentId)
+                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelDetails(reelId)
             }
         }
 
@@ -409,23 +419,23 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
         viewModel.viewCount.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.NoInternet -> {
-                    ShuffledContentPlayerViewModel.countRecorded = false
+                    ReelPlayerViewModel.countRecorded = false
                 }
 
                 DataStatus.Status.TimeOut -> {
-                    ShuffledContentPlayerViewModel.countRecorded = false
+                    ReelPlayerViewModel.countRecorded = false
                 }
 
                 DataStatus.Status.Success -> {
-                    ShuffledContentPlayerViewModel.countRecorded = true
+                    ReelPlayerViewModel.countRecorded = true
                 }
 
                 else -> {}
             }
         }
         binding.shareContentLabelTextView.setOnClickListener {
-            val shareLink = "https://app.booleanbear.com/watch/v/$contentId"
-            val title = this@ShuffledContentPlayerFragment.contentTitle
+            val shareLink = "https://app.booleanbear.com/watch/v/$reelId"
+            val title = this@ReelPlayerFragment.contentTitle
             shareContent(shareLink, title)
         }
 
@@ -540,9 +550,9 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 }
 
                 ExoPlayer.STATE_READY -> {
-                    if (!ShuffledContentPlayerViewModel.countRecorded) {
-                        ShuffledContentPlayerViewModel.countRecorded = true
-                        viewModel.increaseContentViewCount(this@ShuffledContentPlayerFragment.contentId)
+                    if (!ReelPlayerViewModel.countRecorded) {
+                        ReelPlayerViewModel.countRecorded = true
+                        viewModel.increaseContentViewCount(this@ReelPlayerFragment.reelId)
                     }
                     binding.videoPlayer.showController()
                     binding.noNetworkLinearLayout.visibility = View.GONE
@@ -554,14 +564,14 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
                 ExoPlayer.STATE_ENDED -> {
                     binding.videoPlayer.showController()
                     playerQualityMenu.visibility = View.GONE
-                    nextSuggestedContentId?.let { contentId ->
+                    nextSuggestedContentId?.let { reelId ->
                         binding.videoPlayer.hideController()
                         clearStartPosition()
                         isPlayingSuggested = true
-                        this@ShuffledContentPlayerFragment.contentId = contentId
-                        ShuffledContentPlayerViewModel.countRecorded = false
-                        viewModel.getPlayUrl(contentId)
-                        viewModel.getPlayDetails(contentId)
+                        this@ReelPlayerFragment.reelId = reelId
+                        ReelPlayerViewModel.countRecorded = false
+                        viewModel.getReelPlayLink(reelId)
+                        viewModel.getReelDetails(reelId)
                     }
                     gifDrawable.stop()
                     binding.booleanBearLoadingGif.visibility = View.GONE
@@ -582,7 +592,7 @@ class ShuffledContentPlayerFragment : Fragment(), AnimationListener {
             if (cause is HttpDataSource.HttpDataSourceException) {
                 if (cause is HttpDataSource.InvalidResponseCodeException) {
                     if (cause.responseCode == 403) {
-                        viewModel.getPlayUrl(contentId)
+                        viewModel.getReelPlayLink(reelId)
                     }
 
                 } else {

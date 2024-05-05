@@ -3,31 +3,24 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
-import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
-import app.efficientbytes.booleanbear.models.CategoryType
-import app.efficientbytes.booleanbear.models.ContentViewType
+import app.efficientbytes.booleanbear.database.models.LocalReel
+import app.efficientbytes.booleanbear.database.models.LocalReelTopic
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
-import app.efficientbytes.booleanbear.services.models.PlayDetailsResponse
-import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.ReelDetailsResponse
+import app.efficientbytes.booleanbear.services.models.ReelPlayLink
+import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
+import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledCategory
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoriesResponse
-import app.efficientbytes.booleanbear.services.models.ShuffledCategoryContentIdListResponse
-import app.efficientbytes.booleanbear.services.models.ShuffledContentResponse
+import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.sanitizeSearchQuery
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -43,433 +36,174 @@ class AssetsRepository(
 ) {
 
     private val gson = Gson()
-    val categoriesFromDB: Flow<MutableList<ShuffledCategory>> =
-        assetsDao.getShuffledCategories()
 
-    fun fetchCategories(categoryType: CategoryType) = flow {
+    fun getReelTopics() = flow {
         emit(DataStatus.loading())
-        when (categoryType) {
-            CategoryType.SHUFFLED -> {
-                try {
-                    val response = assetsService.getCategories(categoryType.categoryKey)
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            val body = response.body()
-                            if (body != null) {
-                                if (body.data.isEmpty()) {
-                                    emit(DataStatus.emptyResult<List<RemoteShuffledCategory>>())
+        val result = assetsDao.getReelTopics()
+        if (!result.isNullOrEmpty()) {
+            emit(DataStatus.success(result))
+        } else {
+            try {
+                val response = assetsService.getReelTopics()
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val body = response.body()
+                        if (body != null) {
+                            val reelTopics = body.data
+                            if (reelTopics != null) {
+                                if (reelTopics.isEmpty()) {
+                                    emit(DataStatus.emptyResult())
                                 } else {
-                                    emit(DataStatus.success(body.data))
+                                    val sortedList = reelTopics.sortedBy { it.displayIndex }
+                                    emit(DataStatus.success(sortedList))
+                                    val modifiedList = reelTopics.map {
+                                        LocalReelTopic(
+                                            it.topicId,
+                                            it.topic,
+                                            it.displayIndex,
+                                            it.type1Thumbnail
+                                        )
+                                    }
+                                    assetsDao.insertReelTopics(modifiedList)
                                 }
-                            } else {
-                                emit(DataStatus.emptyResult<List<RemoteShuffledCategory>>())
                             }
                         }
-
-                        responseCode >= 400 -> {
-                            val errorResponse: ShuffledCategoriesResponse = gson.fromJson(
-                                response.errorBody()!!.string(),
-                                ShuffledCategoriesResponse::class.java
-                            )
-                            emit(DataStatus.failed<List<RemoteShuffledCategory>>(errorResponse.message))
-                        }
                     }
-                } catch (noInternet: NoInternetException) {
-                    emit(DataStatus.noInternet<List<RemoteShuffledCategory>>())
-                } catch (socketTimeOutException: SocketTimeoutException) {
-                    emit(DataStatus.timeOut<List<RemoteShuffledCategory>>())
-                } catch (exception: IOException) {
-                    emit(DataStatus.unknownException<List<RemoteShuffledCategory>>(exception.message.toString()))
+
+                    responseCode >= 400 -> {
+                        val errorResponse: ReelTopicsResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            ReelTopicsResponse::class.java
+                        )
+                        emit(DataStatus.failed(errorResponse.message.toString()))
+                    }
                 }
-            }
-
-            CategoryType.CURATED -> {
-
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException(exception.message.toString()))
             }
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    fun downloadShuffledCategories(categoryListener: CategoryListener) {
-        externalScope.launch {
-            fetchCategories(CategoryType.SHUFFLED).collect {
-                when (it.status) {
-                    DataStatus.Status.EmptyResult -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.emptyResult()
-                    )
-
-                    DataStatus.Status.Failed -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.failed(it.message.toString())
-                    )
-
-                    DataStatus.Status.Loading -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.loading()
-                    )
-
-                    DataStatus.Status.NoInternet -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.noInternet()
-                    )
-
-                    DataStatus.Status.Success -> {
-                        it.data?.let { list ->
-                            saveCategories(CategoryType.SHUFFLED, list)
-                            val serviceContentCategory =
-                                list.find { serviceContentCategory -> serviceContentCategory.index == 1 }
-                            if (serviceContentCategory != null) {
-                                categoryListener.onIndex1CategoryFound(serviceContentCategory.id)
-                            }
-                        }
-                        categoryListener.onCategoryDataStatusChanged(DataStatus.success(true))
-                    }
-
-                    DataStatus.Status.TimeOut -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.timeOut()
-                    )
-
-                    DataStatus.Status.UnAuthorized -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.unAuthorized()
-                    )
-
-                    DataStatus.Status.UnKnownException -> categoryListener.onCategoryDataStatusChanged(
-                        DataStatus.unknownException(
-                            it.message.toString()
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun saveCategories(
-        categoryType: CategoryType,
-        contentCategories: List<RemoteShuffledCategory>
-    ) {
-        externalScope.launch {
-            when (categoryType) {
-                CategoryType.SHUFFLED -> {
-                    assetsDao.insertShuffledCategories(contentCategories.map { contentCategory ->
-                        ShuffledCategory(
-                            id = contentCategory.id,
-                            index = contentCategory.index,
-                            title = contentCategory.title,
-                            caption = contentCategory.caption,
-                            contentCount = contentCategory.contentCount,
-                            deepLink = contentCategory.deepLink,
-                            type1Thumbnail = contentCategory.type1Thumbnail,
-                            dateCreated = contentCategory.dateCreated,
-                            dateModified = contentCategory.dateModified
-                        )
-                    })
-                }
-
-                CategoryType.CURATED -> {
-
-                }
-            }
-        }
-    }
-
-    fun fetchContent(contentId: String, viewType: ContentViewType) = flow {
+    fun getReels(topicId: String) = flow {
         emit(DataStatus.loading())
-        when (viewType) {
-            ContentViewType.YOUTUBE -> {
-                val result = assetsDao.getShuffledYoutubeViewContent(contentId)
-                if (result != null) {
-                    emit(DataStatus.success(result))
-                } else {
-                    try {
-                        val response = assetsService.getYoutubeTypeContentForContentId(contentId)
-                        val responseCode = response.code()
-                        when {
-                            responseCode == 200 -> {
-                                val body = response.body()
-                                if (body != null) {
-                                    if (body.data == null) {
-                                        emit(DataStatus.emptyResult<RemoteShuffledContent>())
-                                    } else {
-                                        emit(DataStatus.success(body.data))
-                                    }
+        val result = assetsDao.getReels(topicId)
+        if (!result.isNullOrEmpty()) {
+            emit(DataStatus.success(result))
+        } else {
+            try {
+                val response = assetsService.getReels(topicId)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val body = response.body()
+                        if (body != null) {
+                            val reels = body.data
+                            if (reels != null) {
+                                if (reels.isEmpty()) {
+                                    emit(DataStatus.emptyResult())
                                 } else {
-                                    emit(DataStatus.emptyResult<RemoteShuffledContent>())
+                                    emit(DataStatus.success(reels))
+                                    val nonNullTopicIdList =
+                                        reels.filter { remoteReel -> remoteReel.topicId != null }
+                                    val toLocalList = nonNullTopicIdList.map {
+                                        LocalReel(
+                                            it.topicId!!,
+                                            it.reelId,
+                                            it.title,
+                                            it.instructorName,
+                                            it.createdOn,
+                                            it.runTime,
+                                            it.thumbnail,
+                                            it.hashTags
+                                        )
+                                    }
+                                    assetsDao.insertReels(toLocalList)
                                 }
                             }
-
-                            responseCode >= 400 -> {
-                                val errorResponse: ShuffledCategoriesResponse = gson.fromJson(
-                                    response.errorBody()!!.string(),
-                                    ShuffledCategoriesResponse::class.java
-                                )
-                                emit(DataStatus.failed<RemoteShuffledContent>(errorResponse.message))
-                            }
                         }
-                    } catch (noInternet: NoInternetException) {
-                        emit(DataStatus.noInternet<RemoteShuffledContent>())
-                    } catch (socketTimeOutException: SocketTimeoutException) {
-                        emit(DataStatus.timeOut<RemoteShuffledContent>())
-                    } catch (exception: IOException) {
-                        emit(DataStatus.unknownException<RemoteShuffledContent>(exception.message.toString()))
+                    }
+
+                    responseCode >= 400 -> {
+                        val errorResponse: ReelsResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            ReelsResponse::class.java
+                        )
+                        emit(DataStatus.failed<List<RemoteReel>>(errorResponse.message.toString()))
                     }
                 }
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException(exception.message.toString()))
             }
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    private fun fetchAllContent(contentIdList: List<String>, viewType: ContentViewType) = flow {
+    fun getReel(reelId: String) = flow {
         emit(DataStatus.loading())
-        when (viewType) {
-            ContentViewType.YOUTUBE -> {
-                try {
-                    val list = mutableListOf<RemoteShuffledContent>()
-                    val jobs = contentIdList.map { id ->
-                        externalScope.launch {
-                            try {
-                                val response =
-                                    assetsService.getYoutubeTypeContentForContentId(id)
-                                val responseCode = response.code()
-                                when {
-                                    responseCode == 200 -> {
-                                        val youtubeViewContent =
-                                            response.body()?.data
-                                        youtubeViewContent?.let {
-                                            list.add(it)
-                                        }
-                                    }
-
-                                    responseCode >= 400 -> {
-                                        val errorResponse: ShuffledContentResponse =
-                                            gson.fromJson(
-                                                response.errorBody()!!.string(),
-                                                ShuffledContentResponse::class.java
-                                            )
-                                    }
-                                }
-                            } catch (noInternet: NoInternetException) {
-                                throw NoInternetException()
-                            } catch (socketTimeOutException: SocketTimeoutException) {
-                                throw SocketTimeoutException()
-                            } catch (exception: IOException) {
-                                throw IOException()
+        val result = assetsDao.getReel(reelId)
+        if (result != null) {
+            emit(DataStatus.success(result))
+        } else {
+            try {
+                val response = assetsService.getReel(reelId)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val body = response.body()
+                        if (body != null) {
+                            val reel = body.data
+                            if (reel != null) {
+                                emit(DataStatus.success(reel))
                             }
                         }
                     }
-                    jobs.joinAll()
-                    if (list.isEmpty()) {
-                        emit(DataStatus.emptyResult<MutableList<RemoteShuffledContent>>())
-                    } else {
-                        emit(DataStatus.success<MutableList<RemoteShuffledContent>>(list))
+
+                    responseCode >= 400 -> {
+                        val errorResponse: ReelsResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            ReelsResponse::class.java
+                        )
+                        emit(DataStatus.failed(errorResponse.message.toString()))
                     }
-                } catch (noInternet: NoInternetException) {
-                    throw NoInternetException()
-                } catch (socketTimeOutException: SocketTimeoutException) {
-                    throw SocketTimeoutException()
-                } catch (exception: IOException) {
-                    throw IOException()
                 }
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException(exception.message.toString()))
             }
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    private suspend fun fetchAllContentIds(
-        categoryId: String,
-        categoryType: CategoryType
-    ): DataStatus<List<String>> {
-        val result = when (categoryType) {
-            CategoryType.SHUFFLED -> {
-                val list = externalScope.async {
-                    try {
-                        val response =
-                            assetsService.getContentIdsUnderShuffledCategoryForCategoryId(categoryId)
-                        val responseCode = response.code()
-                        val status = when {
-                            responseCode == 200 -> {
-                                val body = response.body()
-                                if (body != null) {
-                                    if (body.data.isEmpty()) {
-                                        DataStatus.emptyResult<List<String>>()
-                                    } else {
-                                        DataStatus.success<List<String>>(body.data)
-                                    }
-                                } else {
-                                    DataStatus.emptyResult<List<String>>()
-                                }
-                            }
-
-                            responseCode >= 400 -> {
-                                val errorResponse: ShuffledCategoryContentIdListResponse =
-                                    gson.fromJson(
-                                        response.errorBody()!!.string(),
-                                        ShuffledCategoryContentIdListResponse::class.java
-                                    )
-                                DataStatus.failed<List<String>>(errorResponse.message)
-                            }
-
-                            else -> {
-                                DataStatus.unknownException<List<String>>("We encountered a problem while getting individual contents.")
-                            }
-                        }
-                        return@async status
-                    } catch (noInternet: NoInternetException) {
-                        return@async DataStatus.noInternet<List<String>>()
-                    } catch (socketTimeOutException: SocketTimeoutException) {
-                        return@async DataStatus.timeOut<List<String>>()
-                    } catch (exception: IOException) {
-                        return@async DataStatus.unknownException<List<String>>(exception.message.toString())
-                    }
-                }
-
-                list.await()
-            }
-
-            CategoryType.CURATED -> {
-                DataStatus.success(emptyList())
-            }
-        }
-        return result
-    }
-
-    private var allContentJob: Job? = null
-    fun getAllContent(
-        categoryId: String,
-        categoryType: CategoryType,
-        contentListener: ContentListener
-    ) {
-        if (allContentJob != null) {
-            allContentJob?.cancel()
-            allContentJob = null
-        }
-        allContentJob = externalScope.launch {
-            if (categoryType === CategoryType.SHUFFLED) {
-                contentListener.onContentsDataStatusChanged(DataStatus.loading())
-                val listFromDB = assetsDao.getAllShuffledYoutubeViewContents(categoryId)
-                if (!listFromDB.isNullOrEmpty()) {
-                    contentListener.onContentsDataStatusChanged(DataStatus.success(listFromDB))
-                } else {
-                    //fetch from server
-                    val contentIds = fetchAllContentIds(categoryId, CategoryType.SHUFFLED)
-                    when (contentIds.status) {
-                        DataStatus.Status.EmptyResult -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.emptyResult()
-                        )
-
-                        DataStatus.Status.Failed -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.failed(contentIds.message.toString())
-                        )
-
-                        DataStatus.Status.Loading -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.loading()
-                        )
-
-                        DataStatus.Status.NoInternet -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.noInternet()
-                        )
-
-                        DataStatus.Status.Success -> {
-                            val contentsIdsList = contentIds.data
-                            if (contentsIdsList == null) {
-                                contentListener.onContentsDataStatusChanged(DataStatus.emptyResult())
-                                return@launch
-                            } else {
-                                fetchAllContent(
-                                    contentsIdsList,
-                                    ContentViewType.YOUTUBE
-                                ).collect { youtubeViewContents ->
-                                    when (youtubeViewContents.status) {
-                                        DataStatus.Status.EmptyResult -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.emptyResult()
-                                        )
-
-                                        DataStatus.Status.Failed -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.failed(youtubeViewContents.message.toString())
-                                        )
-
-                                        DataStatus.Status.Loading -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.loading()
-                                        )
-
-                                        DataStatus.Status.NoInternet -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.noInternet()
-                                        )
-
-                                        DataStatus.Status.Success -> {
-                                            val youtubeContentList = youtubeViewContents.data
-                                            if (youtubeContentList == null) {
-                                                contentListener.onContentsDataStatusChanged(
-                                                    DataStatus.emptyResult()
-                                                )
-                                            } else {
-                                                contentListener.onContentsDataStatusChanged(
-                                                    youtubeViewContents
-                                                )
-                                                val modifiedList = youtubeContentList.map {
-                                                    LocalShuffledContent(
-                                                        categoryId,
-                                                        it.contentId,
-                                                        it.title,
-                                                        it.instructorName,
-                                                        it.createdOn,
-                                                        it.runTime,
-                                                        it.thumbnail,
-                                                        it.hashTags
-                                                    )
-                                                }
-                                                assetsDao.insertShuffledCategoryContents(
-                                                    modifiedList
-                                                )
-                                            }
-                                        }
-
-                                        DataStatus.Status.TimeOut -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.timeOut()
-                                        )
-
-                                        DataStatus.Status.UnAuthorized -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.unAuthorized()
-                                        )
-
-                                        DataStatus.Status.UnKnownException -> contentListener.onContentsDataStatusChanged(
-                                            DataStatus.unknownException(youtubeViewContents.message.toString())
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        DataStatus.Status.TimeOut -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.timeOut()
-                        )
-
-                        DataStatus.Status.UnAuthorized -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.unAuthorized()
-                        )
-
-                        DataStatus.Status.UnKnownException -> contentListener.onContentsDataStatusChanged(
-                            DataStatus.unknownException(contentIds.message.toString())
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    suspend fun getPlayUrl(contentId: String) = flow {
+    fun getReelDetails(reelId: String) = flow {
+        emit(DataStatus.loading())
         try {
-            emit(DataStatus.loading())
-            val response = assetsService.getPlayUrl(contentId)
+            val response = assetsService.getReelDetails(reelId)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val playUrl = response.body()
-                    emit(DataStatus.success(playUrl))
+                    val body = response.body()
+                    if (body != null) {
+                        val reel = body.data
+                        if (reel != null) {
+                            emit(DataStatus.success(reel))
+                        }
+                    }
                 }
 
-                responseCode == 404 -> {
-                    emit(DataStatus.emptyResult())
-                }
-
-                responseCode >= 400 && responseCode != 404 -> {
-                    val errorResponse: PlayUrl = gson.fromJson(
+                responseCode >= 400 -> {
+                    val errorResponse: ReelDetailsResponse = gson.fromJson(
                         response.errorBody()!!.string(),
-                        PlayUrl::class.java
+                        ReelDetailsResponse::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message.toString()))
                 }
@@ -481,22 +215,20 @@ class AssetsRepository(
         } catch (exception: IOException) {
             emit(DataStatus.unknownException(exception.message.toString()))
         }
-    }.catch {
-        emit(DataStatus.unknownException(it.message.toString()))
-    }.flowOn(Dispatchers.IO)
+    }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    suspend fun getPlayDetails(contentId: String) = flow {
+    suspend fun getReelPlayLink(reelId: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = assetsService.getPlayDetails(contentId)
+            val response = assetsService.getReelPlayLink(reelId)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val playDetailsResponse = response.body()
-                    if (playDetailsResponse != null) {
-                        val playDetails = playDetailsResponse.data
-                        if (playDetails != null) {
-                            emit(DataStatus.success(playDetails))
+                    val playLinkResponse = response.body()
+                    if (playLinkResponse != null) {
+                        val playLink = playLinkResponse.data
+                        if (playLink != null) {
+                            emit(DataStatus.success(playLink))
                         } else {
                             emit(DataStatus.emptyResult())
                         }
@@ -510,9 +242,9 @@ class AssetsRepository(
                 }
 
                 responseCode >= 400 && responseCode != 404 -> {
-                    val errorResponse: PlayDetailsResponse = gson.fromJson(
+                    val errorResponse: ReelPlayLink = gson.fromJson(
                         response.errorBody()!!.string(),
-                        PlayDetailsResponse::class.java
+                        ReelPlayLink::class.java
                     )
                     emit(DataStatus.failed(errorResponse.message.toString()))
                 }
@@ -528,9 +260,15 @@ class AssetsRepository(
         emit(DataStatus.unknownException(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
-    fun deleteAllContents() {
+    fun deleteReels() {
         externalScope.launch {
-            assetsDao.deleteShuffledYoutubeContentView()
+            assetsDao.deleteReels()
+        }
+    }
+
+    fun deleteReelTopics() {
+        externalScope.launch {
+            assetsDao.deleteReelTopics()
         }
     }
 
@@ -770,46 +508,32 @@ class AssetsRepository(
         }
     }
 
-    suspend fun getSearchContents(
-        categoryId: String,
+    suspend fun getReelQueries(
+        topicId: String,
         query: String? = null
-    ): List<RemoteShuffledContent>? {
+    ): List<RemoteReel>? {
         return when {
             query.isNullOrEmpty() -> {
-                assetsDao.getAllShuffledYoutubeViewContents(categoryId)
+                assetsDao.getReels(topicId)
             }
 
             query.isNotEmpty() && query.startsWith("#") -> {
                 val searchQuery = sanitizeSearchQuery(query.trim())
-                assetsDao.getShuffledContentsByHashTags(categoryId, searchQuery)
+                assetsDao.getReelsByHashTags(topicId, searchQuery)
             }
 
             query.isNotEmpty() && (!query.startsWith("#")) -> {
                 val searchQuery = sanitizeSearchQuery(query.trim())
-                assetsDao.getShuffledContentsByTitle(
-                    categoryId,
+                assetsDao.getReelsByTitle(
+                    topicId,
                     searchQuery
                 )
             }
 
             else -> {
-                emptyList<RemoteShuffledContent>()
+                emptyList<RemoteReel>()
             }
         }
-    }
-
-    interface CategoryListener {
-
-        fun onCategoryDataStatusChanged(status: DataStatus<Boolean>)
-
-        fun onIndex1CategoryFound(categoryId: String)
-
-    }
-
-    interface ContentListener {
-
-        fun onContentsDataStatusChanged(status: DataStatus<List<RemoteShuffledContent>>)
-
     }
 
     interface InstructorProfileListener {

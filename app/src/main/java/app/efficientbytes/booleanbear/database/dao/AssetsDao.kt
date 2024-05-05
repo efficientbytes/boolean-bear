@@ -6,63 +6,63 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
-import app.efficientbytes.booleanbear.database.models.LocalShuffledContent
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
+import app.efficientbytes.booleanbear.database.models.LocalReel
+import app.efficientbytes.booleanbear.database.models.LocalReelTopic
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.RemoteReel
+import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
 import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
-import app.efficientbytes.booleanbear.utils.SHUFFLED_CATEGORY_TABLE
-import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE
-import app.efficientbytes.booleanbear.utils.SHUFFLED_CONTENT_TABLE_FTS
-import kotlinx.coroutines.flow.Flow
+import app.efficientbytes.booleanbear.utils.REELS_TABLE
+import app.efficientbytes.booleanbear.utils.REELS_TABLE_FTS
+import app.efficientbytes.booleanbear.utils.REEL_TOPICS_TABLE
 
 @Dao
 interface AssetsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShuffledCategories(contentCategories: List<ShuffledCategory>)
+    suspend fun insertReelTopics(reelTopics: List<LocalReelTopic>)
 
-    @Query("DELETE FROM $SHUFFLED_CATEGORY_TABLE ")
-    suspend fun deleteShuffledCategories()
+    @Query("DELETE FROM $REEL_TOPICS_TABLE ")
+    suspend fun deleteReelTopics()
 
-    @Query("SELECT * FROM $SHUFFLED_CATEGORY_TABLE ORDER BY `index`")
-    fun getShuffledCategories(): Flow<MutableList<ShuffledCategory>>
+    @Query("SELECT * FROM $REEL_TOPICS_TABLE ORDER BY displayIndex")
+    fun getReelTopics(): List<RemoteReelTopic>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShuffledCategoryContents(contents: List<LocalShuffledContent>)
+    suspend fun insertReels(contents: List<LocalReel>)
 
-    @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE categoryId = :category")
-    suspend fun getAllShuffledYoutubeViewContents(category: String): List<RemoteShuffledContent>?
-
-    @Query(
-        "SELECT * FROM $SHUFFLED_CONTENT_TABLE" +
-                " JOIN $SHUFFLED_CONTENT_TABLE_FTS ON $SHUFFLED_CONTENT_TABLE_FTS.contentId == $SHUFFLED_CONTENT_TABLE.contentId" +
-                "  WHERE $SHUFFLED_CONTENT_TABLE_FTS.categoryId = :category" +
-                " AND $SHUFFLED_CONTENT_TABLE_FTS.title MATCH :query"
-    )
-    suspend fun getShuffledContentsByTitle(
-        category: String,
-        query: String
-    ): List<RemoteShuffledContent>?
+    @Query("SELECT * FROM $REELS_TABLE WHERE topicId = :topic")
+    suspend fun getReels(topic: String): List<RemoteReel>?
 
     @Query(
-        "SELECT * FROM $SHUFFLED_CONTENT_TABLE" +
-                " JOIN $SHUFFLED_CONTENT_TABLE_FTS ON $SHUFFLED_CONTENT_TABLE_FTS.contentId == $SHUFFLED_CONTENT_TABLE.contentId" +
-                "  WHERE $SHUFFLED_CONTENT_TABLE_FTS.categoryId = :category" +
-                " AND $SHUFFLED_CONTENT_TABLE_FTS.hashTags MATCH :query"
+        "SELECT * FROM $REELS_TABLE" +
+                " JOIN $REELS_TABLE_FTS ON $REELS_TABLE_FTS.reelId == $REELS_TABLE.reelId" +
+                "  WHERE $REELS_TABLE_FTS.topicId = :topic" +
+                " AND $REELS_TABLE_FTS.title MATCH :query"
     )
-    suspend fun getShuffledContentsByHashTags(
-        category: String,
+    suspend fun getReelsByTitle(
+        topic: String,
         query: String
-    ): List<RemoteShuffledContent>?
+    ): List<RemoteReel>?
 
-    @Query("SELECT * FROM $SHUFFLED_CONTENT_TABLE WHERE contentId = :content")
-    suspend fun getShuffledYoutubeViewContent(content: String): RemoteShuffledContent?
+    @Query(
+        "SELECT * FROM $REELS_TABLE" +
+                " JOIN $REELS_TABLE_FTS ON $REELS_TABLE_FTS.reelId == $REELS_TABLE.reelId" +
+                "  WHERE $REELS_TABLE_FTS.topicId = :topic" +
+                " AND $REELS_TABLE_FTS.hashTags MATCH :query"
+    )
+    suspend fun getReelsByHashTags(
+        topic: String,
+        query: String
+    ): List<RemoteReel>?
 
-    @Query("DELETE FROM $SHUFFLED_CONTENT_TABLE ")
-    suspend fun deleteShuffledYoutubeContentView()
+    @Query("SELECT * FROM $REELS_TABLE WHERE reelId = :reel")
+    suspend fun getReel(reel: String): RemoteReel?
+
+    @Query("DELETE FROM $REELS_TABLE ")
+    suspend fun deleteReels()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertInstructorProfile(localInstructorProfile: LocalInstructorProfile)
