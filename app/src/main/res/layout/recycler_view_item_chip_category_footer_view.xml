@@ -35,7 +35,7 @@
                 android:drawablePadding="4dp"
                 android:fontFamily="@font/montserrat"
                 android:gravity="center"
-                android:text="@string/explore_more_topics"
+                android:text="@string/discover_more_topics"
                 android:textColor="@color/md_theme_onSurface"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"
