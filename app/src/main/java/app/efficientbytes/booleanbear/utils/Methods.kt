@@ -11,7 +11,7 @@ import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.PlayDetails
+import app.efficientbytes.booleanbear.services.models.ReelDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import com.google.android.material.textfield.TextInputLayout
@@ -285,10 +285,10 @@ class MentionedLinksLiveListener() {
 
 class ContentDetailsLiveListener() {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<PlayDetails?>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<PlayDetails?>> = _mutableLiveData
+    private val _mutableLiveData: MutableLiveData<DataStatus<ReelDetails>> = MutableLiveData()
+    val liveData: LiveData<DataStatus<ReelDetails>> = _mutableLiveData
 
-    fun setContentDetailsStatus(status: DataStatus<PlayDetails?>) {
+    fun setContentDetailsStatus(status: DataStatus<ReelDetails>) {
         _mutableLiveData.postValue(status)
     }
 

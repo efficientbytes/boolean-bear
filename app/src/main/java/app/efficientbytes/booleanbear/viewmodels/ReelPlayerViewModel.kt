@@ -6,15 +6,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import app.efficientbytes.booleanbear.models.ContentViewType
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.PlayDetails
-import app.efficientbytes.booleanbear.services.models.PlayUrl
+import app.efficientbytes.booleanbear.services.models.ReelDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
+import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
@@ -23,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ShuffledContentPlayerViewModel(
+class ReelPlayerViewModel(
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope,
     private val instructorLiveListener: InstructorLiveListener,
@@ -33,44 +31,44 @@ class ShuffledContentPlayerViewModel(
 ) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener,
     AssetsRepository.MentionedLinksListener {
 
-    private val _playUrl: MutableLiveData<DataStatus<PlayUrl?>> = MutableLiveData()
-    val playUrl: LiveData<DataStatus<PlayUrl?>> = _playUrl
-    private var playUrlJob: Job? = null
-
     companion object {
 
         var countRecorded = false
     }
 
-    fun getPlayUrl(contentId: String) {
-        playUrlJob = externalScope.launch(Dispatchers.IO) {
-            assetsRepository.getPlayUrl(contentId).collect {
-                _playUrl.postValue(it)
+    private val _reelPlayLink: MutableLiveData<DataStatus<String>> = MutableLiveData()
+    val reelPlayLink: LiveData<DataStatus<String>> = _reelPlayLink
+    private var reelPlayLinkJob: Job? = null
+
+    fun getReelPlayLink(reelId: String) {
+        reelPlayLinkJob = externalScope.launch(Dispatchers.IO) {
+            assetsRepository.getReelPlayLink(reelId).collect {
+                _reelPlayLink.postValue(it)
             }
         }
     }
 
-    private val _playDetails: MutableLiveData<DataStatus<PlayDetails?>> = MutableLiveData()
-    val playDetails: LiveData<DataStatus<PlayDetails?>> = _playDetails
-    private var playDetailsJob: Job? = null
+    private val _reelDetails: MutableLiveData<DataStatus<ReelDetails>> = MutableLiveData()
+    val reelDetails: LiveData<DataStatus<ReelDetails>> = _reelDetails
+    private var reelDetailsJob: Job? = null
 
-    fun getPlayDetails(contentId: String) {
-        playDetailsJob = externalScope.launch {
-            assetsRepository.getPlayDetails(contentId).collect {
-                _playDetails.postValue(it)
+    fun getReelDetails(reelId: String) {
+        reelDetailsJob = externalScope.launch {
+            assetsRepository.getReelDetails(reelId).collect {
+                _reelDetails.postValue(it)
                 contentDetailsLiveListener.setContentDetailsStatus(it)
             }
         }
     }
 
-    private val _suggestedContent: MutableLiveData<DataStatus<RemoteShuffledContent?>> =
+    private val _nextReel: MutableLiveData<DataStatus<RemoteReel>> =
         MutableLiveData()
-    val suggestedContent: LiveData<DataStatus<RemoteShuffledContent?>> = _suggestedContent
-    private var suggestedContentJob: Job? = null
-    fun getSuggestedContent(contentId: String) {
-        suggestedContentJob = externalScope.launch {
-            assetsRepository.fetchContent(contentId, ContentViewType.YOUTUBE).collect {
-                _suggestedContent.postValue(it)
+    val nextReel: LiveData<DataStatus<RemoteReel>> = _nextReel
+    private var nextReelJob: Job? = null
+    fun getSuggestedContent(reelId: String) {
+        nextReelJob = externalScope.launch {
+            assetsRepository.getReel(reelId).collect {
+                _nextReel.postValue(it)
             }
         }
     }
@@ -78,14 +76,14 @@ class ShuffledContentPlayerViewModel(
     private var instructorProfileJob: Job? = null
     fun getInstructorProfile(instructorId: String) {
         instructorProfileJob = externalScope.launch {
-            assetsRepository.getInstructorDetails(instructorId, this@ShuffledContentPlayerViewModel)
+            assetsRepository.getInstructorDetails(instructorId, this@ReelPlayerViewModel)
         }
     }
 
     private var mentionedLinksJob: Job? = null
     fun getMentionedLinks(list: List<String>) {
         mentionedLinksJob = externalScope.launch {
-            assetsRepository.getAllMentionedLinks(list, this@ShuffledContentPlayerViewModel)
+            assetsRepository.getAllMentionedLinks(list, this@ReelPlayerViewModel)
         }
     }
 
@@ -102,14 +100,14 @@ class ShuffledContentPlayerViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event.targetState) {
             Lifecycle.State.DESTROYED -> {
-                if (playUrlJob != null) {
-                    playUrlJob?.cancel()
+                if (reelPlayLinkJob != null) {
+                    reelPlayLinkJob?.cancel()
                 }
-                if (playDetailsJob != null) {
-                    playDetailsJob?.cancel()
+                if (reelDetailsJob != null) {
+                    reelDetailsJob?.cancel()
                 }
-                if (suggestedContentJob != null) {
-                    suggestedContentJob?.cancel()
+                if (nextReelJob != null) {
+                    nextReelJob?.cancel()
                 }
                 if (instructorProfileJob != null) {
                     instructorProfileJob?.cancel()

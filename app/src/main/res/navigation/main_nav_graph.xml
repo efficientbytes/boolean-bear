@@ -129,7 +129,7 @@
             android:id="@+id/contactUsFragment_to_deleteUserAccountFragment"
             app:destination="@id/deleteUserAccountFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
@@ -198,10 +198,10 @@
         tools:layout="@layout/fragment_delete_user_account" />
     <fragment
         android:id="@+id/shuffledContentPlayerFragment"
-        android:name="app.efficientbytes.booleanbear.ui.fragments.ShuffledContentPlayerFragment"
-        android:label="" >
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ReelPlayerFragment"
+        android:label="">
         <argument
-            android:name="contentId"
+            android:name="reelId"
             app:argType="string" />
     </fragment>
     <dialog

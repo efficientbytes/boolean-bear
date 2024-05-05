@@ -6,19 +6,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryFooterViewBinding
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryViewBinding
+import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 
 class HomeFragmentChipRecyclerViewAdapter(
-    private var itemList: List<ShuffledCategory>,
+    private var itemList: List<RemoteReelTopic>,
     private var context: Context,
     private val itemClickListener: OnItemClickListener
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var checkedPosition = 0
-    fun setContentCategories(itemList: List<ShuffledCategory>) {
+    fun setReelTopics(itemList: List<RemoteReelTopic>) {
         this.itemList = emptyList()
         this.itemList = itemList
         notifyDataSetChanged()
@@ -52,7 +52,7 @@ class HomeFragmentChipRecyclerViewAdapter(
     inner class ItemViewHolder(private val binding: RecyclerViewItemChipCategoryViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ShuffledCategory) {
+        fun bind(item: RemoteReelTopic) {
             if (checkedPosition != -1) {
                 if (checkedPosition == bindingAdapterPosition) {
                     binding.chipCardView.strokeWidth = 0
@@ -65,7 +65,7 @@ class HomeFragmentChipRecyclerViewAdapter(
                     binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
                     binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
                 }
-                binding.titleValueTextView.text = item.title
+                binding.titleValueTextView.text = item.topic
                 binding.chipCardView.setOnClickListener {
                     itemClickListener.onChipItemClicked(bindingAdapterPosition, item)
                     binding.chipCardView.strokeWidth = 0
@@ -93,7 +93,7 @@ class HomeFragmentChipRecyclerViewAdapter(
 
     interface OnItemClickListener {
 
-        fun onChipItemClicked(position: Int, shuffledCategory: ShuffledCategory)
+        fun onChipItemClicked(position: Int, remoteReelTopic: RemoteReelTopic)
         fun onChipLastItemClicked()
     }
 

@@ -60,7 +60,8 @@ class MainApplication : Application() {
             enableVibration = true
         )
         val currentUser = FirebaseAuth.getInstance().currentUser
-        assetsRepository.deleteAllContents()
+        assetsRepository.deleteReelTopics()
+        assetsRepository.deleteReels()
         adsRepository.deleteAllHomePageBanner()
         utilityDataRepository.deleteProfessions()
         utilityDataRepository.deleteIssueCategories()

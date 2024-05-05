@@ -6,12 +6,12 @@
     <data>
 
         <variable
-            name="playDetails"
-            type="app.efficientbytes.booleanbear.services.models.PlayDetails" />
+            name="reelDetails"
+            type="app.efficientbytes.booleanbear.services.models.ReelDetails" />
 
         <variable
-            name="suggestedContentDetails"
-            type="app.efficientbytes.booleanbear.services.models.RemoteShuffledContent" />
+            name="nextReel"
+            type="app.efficientbytes.booleanbear.services.models.RemoteReel" />
 
     </data>
 
@@ -308,7 +308,7 @@
                                 android:ellipsize="end"
                                 android:fontFamily="@font/montserrat_medium"
                                 android:maxLines="2"
-                                android:text="@{playDetails.title}"
+                                android:text="@{reelDetails.title}"
                                 android:textColor="@color/white"
                                 android:textSize="18sp"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -339,7 +339,7 @@
                                     android:paddingEnd="8dp"
                                     android:textColor="@color/white_1000"
                                     android:textSize="11sp"
-                                    app:runTime="@{playDetails.runTime}"
+                                    app:runTime="@{reelDetails.runTime}"
                                     tools:text="12 min"
                                     tools:ignore="RtlSymmetry">
 
@@ -347,7 +347,7 @@
 
                                 <com.google.android.material.textview.MaterialTextView
                                     android:id="@+id/contentLanguageValueTextView"
-                                    language="@{playDetails.language}"
+                                    language="@{reelDetails.language}"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="1dp"
@@ -372,7 +372,7 @@
                                     android:paddingVertical="4dp"
                                     android:textColor="@color/white_1000"
                                     android:textSize="11sp"
-                                    app:uploaded_on="@{playDetails.createdOn}"
+                                    app:uploaded_on="@{reelDetails.createdOn}"
                                     tools:text="2 months ago">
 
                                 </com.google.android.material.textview.MaterialTextView>
@@ -424,7 +424,7 @@
                                     android:maxLines="3"
                                     android:paddingHorizontal="10dp"
                                     android:paddingVertical="4dp"
-                                    android:text="@{playDetails.description}"
+                                    android:text="@{reelDetails.description}"
                                     android:textSize="13sp"
                                     app:fontFamily="@font/montserrat_light"
                                     tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.">
@@ -538,7 +538,7 @@
                                     android:background="@color/black_1500"
                                     android:scaleType="fitXY"
                                     android:paddingStart="1dp"
-                                    load_image_from_url="@{suggestedContentDetails.thumbnail}"
+                                    load_image_from_url="@{nextReel.thumbnail}"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintDimensionRatio="4:3"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -575,7 +575,7 @@
                                     android:lines="2"
                                     android:maxLines="2"
                                     android:paddingEnd="20dp"
-                                    android:text="@{suggestedContentDetails.title}"
+                                    android:text="@{nextReel.title}"
                                     android:textColor="@color/white_1000"
                                     android:textSize="13sp"
                                     app:layout_constraintBottom_toBottomOf="parent"

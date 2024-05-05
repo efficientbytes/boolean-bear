@@ -13,41 +13,44 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import app.efficientbytes.booleanbear.database.models.ShuffledCategory
-import app.efficientbytes.booleanbear.models.CategoryType
 import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
-import app.efficientbytes.booleanbear.services.models.RemoteShuffledContent
-import app.efficientbytes.booleanbear.ui.fragments.HomeFragment
+import app.efficientbytes.booleanbear.services.models.RemoteReel
+import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
-    private val adsRepository: AdsRepository
+    private val adsRepository: AdsRepository,
+    private val externalScope: CoroutineScope
 ) : ViewModel(),
-    LifecycleEventObserver, AssetsRepository.CategoryListener, AssetsRepository.ContentListener,
+    LifecycleEventObserver,
     AdsRepository.HomePageAdsListener {
 
-    val contentCategoriesFromDB: LiveData<MutableList<ShuffledCategory>> =
-        assetsRepository.categoriesFromDB.asLiveData()
-    private val _categories: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
-    val categories: LiveData<DataStatus<Boolean>> = _categories
+    private val _reelTopics: MutableLiveData<DataStatus<List<RemoteReelTopic>>> = MutableLiveData()
+    val reelTopics: LiveData<DataStatus<List<RemoteReelTopic>>> = _reelTopics
 
-    fun getShuffledCategories() {
-        assetsRepository.downloadShuffledCategories(this@HomeViewModel)
+    fun getReelTopics() {
+        externalScope.launch {
+            assetsRepository.getReelTopics().collect {
+                _reelTopics.postValue(it)
+            }
+        }
     }
 
-    private val _remoteShuffledContentList: MutableLiveData<DataStatus<List<RemoteShuffledContent>>> =
-        MutableLiveData()
-    val remoteShuffledContentList: LiveData<DataStatus<List<RemoteShuffledContent>>> =
-        _remoteShuffledContentList
+    private val _reels: MutableLiveData<DataStatus<List<RemoteReel>>> = MutableLiveData()
+    val reels: LiveData<DataStatus<List<RemoteReel>>> = _reels
 
-    fun getYoutubeViewContentsUnderShuffledCategory(categoryId: String) {
-        assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
+    fun getReels(topicId: String) {
+        externalScope.launch {
+            assetsRepository.getReels(topicId).collect {
+                _reels.postValue(it)
+            }
+        }
     }
 
     private val _viewPagerBannerAds: MutableLiveData<DataStatus<List<RemoteHomePageBanner>>> =
@@ -59,16 +62,16 @@ class HomeViewModel(
         adsRepository.getHomePageBannerAds(this@HomeViewModel)
     }
 
-    private val _searchResult: MutableLiveData<DataStatus<List<RemoteShuffledContent>>> =
+    private val _searchResult: MutableLiveData<DataStatus<List<RemoteReel>>> =
         MutableLiveData()
-    val searchResult: LiveData<DataStatus<List<RemoteShuffledContent>>> = _searchResult
+    val searchResult: LiveData<DataStatus<List<RemoteReel>>> = _searchResult
 
-    fun getSearchContents(categoryId: String, query: String = "") {
+    fun getReelQueries(topicId: String, query: String = "") {
         viewModelScope.launch {
-            if (categoryId.isEmpty() || categoryId.isBlank()) {
+            if (topicId.isEmpty() || topicId.isBlank()) {
                 _searchResult.postValue(DataStatus.emptyResult())
             } else {
-                val result = assetsRepository.getSearchContents(categoryId, query)
+                val result = assetsRepository.getReelQueries(topicId, query)
                 if (result.isNullOrEmpty()) _searchResult.postValue(DataStatus.emptyResult()) else _searchResult.postValue(
                     DataStatus.success(result)
                 )
@@ -80,7 +83,7 @@ class HomeViewModel(
         when (event) {
             ON_CREATE -> {
                 getHomePageBannerAds()
-                getShuffledCategories()
+                getReelTopics()
             }
 
             ON_START -> {
@@ -109,22 +112,7 @@ class HomeViewModel(
         }
     }
 
-    override fun onCategoryDataStatusChanged(status: DataStatus<Boolean>) {
-        _categories.postValue(status)
-    }
-
-    override fun onIndex1CategoryFound(categoryId: String) {
-        HomeFragment.selectedCategoryId = categoryId
-        HomeFragment.selectedCategoryPosition = 1
-        assetsRepository.getAllContent(categoryId, CategoryType.SHUFFLED, this@HomeViewModel)
-    }
-
-    override fun onContentsDataStatusChanged(status: DataStatus<List<RemoteShuffledContent>>) {
-        _remoteShuffledContentList.postValue(status)
-    }
-
     override fun onHomePageAdsStatusChanged(status: DataStatus<List<RemoteHomePageBanner>>) {
         _viewPagerBannerAds.postValue(status)
     }
-
 }
