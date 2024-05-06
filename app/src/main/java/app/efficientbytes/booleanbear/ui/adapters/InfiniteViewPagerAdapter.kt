@@ -10,15 +10,26 @@ import app.efficientbytes.booleanbear.databinding.ViewPagerItemHomepageBannerVie
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 
 class InfiniteViewPagerAdapter(
-    private val itemList: List<RemoteHomePageBanner>,
+    private var itemList: List<RemoteHomePageBanner>,
     private val onItemClickListener: OnItemClickListener
 ) :
     RecyclerView.Adapter<InfiniteViewPagerAdapter.ViewHolder>() {
 
-    private val updatedList: List<RemoteHomePageBanner> = if (itemList.isEmpty()) {
+    private var updatedList: List<RemoteHomePageBanner> = if (itemList.isEmpty()) {
         emptyList()
     } else {
         listOf(itemList.last()) + itemList + listOf(itemList.first())
+    }
+
+    fun setViewPagerList(itemList: List<RemoteHomePageBanner>){
+        this.itemList = emptyList()
+        this.itemList = itemList
+        this.updatedList = if (itemList.isEmpty()) {
+            emptyList()
+        } else {
+            listOf(itemList.last()) + itemList + listOf(itemList.first())
+        }
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(val binding: ViewPagerItemHomepageBannerViewBinding) :

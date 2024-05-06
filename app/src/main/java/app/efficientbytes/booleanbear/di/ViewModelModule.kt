@@ -5,6 +5,7 @@ import app.efficientbytes.booleanbear.viewmodels.CompleteProfileViewModel
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
+import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import app.efficientbytes.booleanbear.viewmodels.LoginOrSignUpViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.PhoneNumberOTPVerificationViewModel
@@ -29,4 +30,5 @@ val viewModelModule = module {
     viewModel { ShareFeedbackViewModel(get()) }
     viewModel { ReelPlayerViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get(), get()) }
+    viewModel { ListReelViewModel(get(), get()) }
 }

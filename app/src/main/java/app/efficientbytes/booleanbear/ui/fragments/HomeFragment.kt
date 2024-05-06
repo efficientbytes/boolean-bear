@@ -34,10 +34,12 @@ import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerView
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Locale
+import kotlin.math.abs
 
 class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
@@ -48,8 +50,11 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private var infiniteRecyclerAdapter: InfiniteViewPagerAdapter? = null
-    private val handler = Handler(Looper.getMainLooper())
+    private val infiniteRecyclerAdapter: InfiniteViewPagerAdapter by lazy {
+        InfiniteViewPagerAdapter(emptyList(), this@HomeFragment)
+    }
+    private val bannerHandler = Handler(Looper.getMainLooper())
+    private var bannerRunnable: Runnable? = null
     private var currentPage = 1
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
@@ -60,7 +65,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private val youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
     }
-    private lateinit var searchRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
     private var accountSettingsFragment: AccountSettingsFragment? = null
@@ -96,7 +100,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         super.onViewCreated(view, savedInstanceState)
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.toolbar_account_menu, menu)
+                menuInflater.inflate(R.menu.home_toolbar, menu)
                 val search = menu.findItem(R.id.searchMenu)
                 search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
                     override fun onMenuItemActionExpand(p0: MenuItem): Boolean {
@@ -107,6 +111,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         requireActivity().invalidateOptionsMenu()
                         isSearchViewOpen = false
                         hintHandler.removeCallbacksAndMessages(null)
+                        hintRunnable = null
                         binding.searchConstraintParentLayout.visibility = View.GONE
                         binding.searchViewRecyclerView.adapter = null
                         binding.appBarLayout.visibility = View.VISIBLE
@@ -127,7 +132,6 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         R.color.white
                     )
                 )
-                searchView?.maxWidth = Integer.MAX_VALUE
                 searchView?.setOnSearchClickListener {
                     menu.findItem(R.id.accountSettingsMenu).setVisible(false)
                     menu.findItem(R.id.discoverMenu).setVisible(false)
@@ -347,14 +351,24 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             }
         }
 
+        binding.appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (verticalOffset == 0) {
+                startAutoScroll()
+            } else if (abs(verticalOffset) >= appBarLayout.totalScrollRange) {
+                bannerRunnable = null
+                bannerHandler.removeCallbacksAndMessages(null)
+            } else {
+            }
+        })
+
+        binding.infiniteViewPager.adapter = infiniteRecyclerAdapter
         viewModel.viewPagerBannerAds.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Success -> {
                     it.data?.let { banners ->
                         binding.appBarLayout.visibility = View.VISIBLE
                         binding.infiniteViewPager.setBackgroundColor(requireContext().getColor(R.color.black))
-                        infiniteRecyclerAdapter =
-                            InfiniteViewPagerAdapter(banners, this@HomeFragment)
+                        infiniteRecyclerAdapter.setViewPagerList(banners)
                         binding.infiniteViewPager.currentItem = 1
                         onInfinitePageChangeCallback(banners.size + 2)
                         startAutoScroll()
@@ -423,16 +437,18 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     private fun startAutoScroll() {
-        val runnable = object : Runnable {
-            override fun run() {
-                if (currentPage == (binding.infiniteViewPager.adapter?.itemCount ?: 1)) {
-                    currentPage = 1
+        if (bannerRunnable == null) {
+            bannerRunnable = object : Runnable {
+                override fun run() {
+                    if (currentPage == (binding.infiniteViewPager.adapter?.itemCount ?: 1)) {
+                        currentPage = 1
+                    }
+                    binding.infiniteViewPager.setCurrentItem(currentPage++, true)
+                    bannerHandler.postDelayed(this, delay3k)
                 }
-                binding.infiniteViewPager.setCurrentItem(currentPage++, true)
-                handler.postDelayed(this, delay3k)
             }
+            bannerHandler.postDelayed(bannerRunnable!!, delay3k)
         }
-        handler.postDelayed(runnable, delay3k)
     }
 
     private fun startAlternateHint() {
@@ -446,10 +462,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                             "Search for ${selectedReelTopic.lowercase(Locale.ROOT)} contents"
                     }
                     isFirstHintText = !isFirstHintText
-                    handler.postDelayed(this, delay3k)
+                    hintHandler.postDelayed(this, delay3k)
                 }
             }
-            handler.postDelayed(hintRunnable!!, 0)
+            hintHandler.postDelayed(hintRunnable!!, 0)
         }
     }
 
@@ -496,8 +512,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     override fun onStop() {
         super.onStop()
         if (infiniteRecyclerAdapter != null) {
-            handler.removeCallbacksAndMessages(null)
+            bannerHandler.removeCallbacksAndMessages(null)
         }
+        bannerRunnable = null
+        bannerHandler.removeCallbacksAndMessages(null)
         hintRunnable = null
         hintHandler.removeCallbacksAndMessages(null)
     }
@@ -505,8 +523,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     override fun onDestroy() {
         super.onDestroy()
         if (infiniteRecyclerAdapter != null) {
-            handler.removeCallbacksAndMessages(null)
+            bannerHandler.removeCallbacksAndMessages(null)
         }
+        bannerRunnable = null
+        bannerHandler.removeCallbacksAndMessages(null)
         hintRunnable = null
         hintHandler.removeCallbacksAndMessages(null)
     }
@@ -519,7 +539,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     override fun onChipLastItemClicked() {
-        findNavController().navigate(R.id.discoverFragment)
+        findNavController().navigate(R.id.homeFragment_to_discoverFragment)
     }
 
     override fun onResume() {
@@ -528,6 +548,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
             homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)
         }
+        startAutoScroll()
         if (isSearchViewOpen) {
             startAlternateHint()
         }

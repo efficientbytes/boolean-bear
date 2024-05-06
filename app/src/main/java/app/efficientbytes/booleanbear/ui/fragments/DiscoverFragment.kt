@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import app.efficientbytes.booleanbear.databinding.FragmentDiscoverBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -70,7 +71,9 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
     }
 
     override fun onReelTopicItemClicked(remoteReelTopic: RemoteReelTopic) {
-
+        val directions =
+            DiscoverFragmentDirections.discoverFragmentToListReelsFragment(remoteReelTopic.topicId,remoteReelTopic.topic)
+        findNavController().navigate(directions)
     }
 
 }
