@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/listReelsSearchMenu"
+        android:icon="@drawable/search_icon"
+        android:title="@string/search_contents"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/listReelsShareMenu"
+        android:icon="@drawable/share_icon"
+        android:title="@string/share"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
+
+</menu>

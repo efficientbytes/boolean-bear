@@ -482,24 +482,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.homeFragment -> {
-                    binding.mainToolbar.setTitleTextColor(
-                        this@MainActivity.applicationContext.getColor(
-                            R.color.white
-                        )
-                    )
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(this,R.style.HomeToolbarTitleAppearance)
+                    binding.mainToolbar.visibility = View.VISIBLE
+                    binding.mainToolbar.title = resources.getString(R.string.app_name)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    binding.mainToolbar.visibility = View.VISIBLE
-                    binding.mainToolbar.title = resources.getString(R.string.app_name)
                 }
 
                 R.id.shuffledContentPlayerFragment -> {
-                    binding.mainToolbar.setTitleTextColor(
-                        this@MainActivity.applicationContext.getColor(
-                            R.color.white
-                        )
-                    )
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DefaultToolbarTitleAppearance)
                     window.setFlags(
                         WindowManager.LayoutParams.FLAG_SECURE,
                         WindowManager.LayoutParams.FLAG_SECURE
@@ -510,19 +504,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.discoverFragment -> {
-                    binding.mainToolbar.setTitleTextColor(
-                        this@MainActivity.applicationContext.getColor(
-                            R.color.violet_600
-                        )
-                    )
+                    binding.mainToolbar.visibility = View.VISIBLE
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DiscoverToolbarTitleAppearance)
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
                 else -> {
-                    binding.mainToolbar.setTitleTextColor(
-                        this@MainActivity.applicationContext.getColor(
-                            R.color.white
-                        )
-                    )
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DefaultToolbarTitleAppearance)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
