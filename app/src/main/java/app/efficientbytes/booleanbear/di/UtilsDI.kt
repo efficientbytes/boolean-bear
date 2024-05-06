@@ -8,6 +8,7 @@ import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
 import app.efficientbytes.booleanbear.utils.ServiceError
+import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserProfileListener
@@ -30,7 +31,10 @@ fun provideUserProfileListener() = UserProfileListener
 fun provideSingleDeviceLoginListener() = SingleDeviceLoginListener
 
 fun provideAuthStateCoroutineScope() = AuthStateCoroutineScope
+
 fun provideUserAccountCoroutineScope() = UserAccountCoroutineScope
+
+fun provideSingleDeviceLoginCoroutineScope() = SingleDeviceLoginCoroutineScope
 
 fun provideCustomAuthStateListener() = CustomAuthStateListener
 

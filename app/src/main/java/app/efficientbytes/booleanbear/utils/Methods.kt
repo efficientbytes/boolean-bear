@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -172,18 +173,60 @@ object AuthStateCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
     }
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+    private var scope: CoroutineScope? = null
 
-    fun getScope() = scope
+    fun scopeStatus(): CoroutineScope? {
+        return scope
+    }
+
+    fun resetScope() {
+        scope?.coroutineContext?.cancelChildren()
+        scope = null
+    }
+
+    fun getScope(): CoroutineScope {
+        return scope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+    }
 }
 
 object UserAccountCoroutineScope {
 
     private val handler = CoroutineExceptionHandler { _, exception ->
     }
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+    private var scope: CoroutineScope? = null
 
-    fun getScope() = scope
+    fun scopeStatus(): CoroutineScope? {
+        return scope
+    }
+
+    fun resetScope() {
+        scope?.coroutineContext?.cancelChildren()
+        scope = null
+    }
+
+    fun getScope(): CoroutineScope {
+        return scope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+    }
+}
+
+object SingleDeviceLoginCoroutineScope {
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+    }
+    private var scope: CoroutineScope? = null
+
+    fun scopeStatus(): CoroutineScope? {
+        return scope
+    }
+
+    fun resetScope() {
+        scope?.coroutineContext?.cancelChildren()
+        scope = null
+    }
+
+    fun getScope(): CoroutineScope {
+        return scope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO + handler)
+    }
 }
 
 object CustomAuthStateListener {

@@ -331,8 +331,12 @@ class EditProfileFieldFragment : Fragment() {
         }
         binding.currentProfessionAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
             selectedProfessionCategoryPosition = position
-            binding.saveButton.isEnabled =
-                currentProfessionCategoryPosition != selectedProfessionCategoryPosition
+            if (SingletonUserData.getInstance()?.profession == null) {
+                binding.saveButton.isEnabled = true
+            } else {
+                binding.saveButton.isEnabled =
+                    currentProfessionCategoryPosition != selectedProfessionCategoryPosition
+            }
         }
         viewModel.primaryEmailAddressVerificationServerStatus.observe(viewLifecycleOwner) {
             when (it.status) {

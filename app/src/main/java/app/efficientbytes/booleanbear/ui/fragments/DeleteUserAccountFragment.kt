@@ -93,57 +93,58 @@ class DeleteUserAccountFragment : Fragment() {
             }
         }
         mainViewModel.deleteUserAccountStatus.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = it.message
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
-                }
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = it.message
+                        binding.takeMeToHomePageButton.visibility = View.VISIBLE
+                    }
 
-                DataStatus.Status.Loading -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Please wait while we process your request."
-                }
+                    DataStatus.Status.Loading -> {
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "Please wait while we process your request."
+                    }
 
-                DataStatus.Status.Success -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = it.data?.message
-                    lifecycleScope.launch {
-                        delay(1200)
-                        findNavController().popBackStack(R.id.homeFragment, false)
+                    DataStatus.Status.Success -> {
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = it.data?.message
+                        lifecycleScope.launch {
+                            delay(1200)
+                            findNavController().popBackStack(R.id.homeFragment, false)
+                        }
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = "No Internet Connection."
+                        binding.takeMeToHomePageButton.visibility = View.VISIBLE
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "Deleting account is taking unusually long time. Please try again after some time."
+                        binding.takeMeToHomePageButton.visibility = View.VISIBLE
+                    }
+
+                    else -> {
+
                     }
                 }
-
-                DataStatus.Status.NoInternet -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "No Internet Connection."
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
-                }
-
-                DataStatus.Status.TimeOut -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Deleting account is taking unusually long time. Please try again after some time."
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
-                }
-
-                else -> {
-
-                }
             }
-        }
-        binding.takeMeToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.homeFragment, false)
+            binding.takeMeToHomePageButton.setOnClickListener {
+                findNavController().popBackStack(R.id.homeFragment, false)
+            }
         }
 
     }
-
 }

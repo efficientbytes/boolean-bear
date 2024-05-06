@@ -18,7 +18,10 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
+import app.efficientbytes.booleanbear.models.IssueCategory
+import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
@@ -28,17 +31,15 @@ import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
-import app.efficientbytes.booleanbear.models.Profession
-import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
+import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
-import app.efficientbytes.booleanbear.services.models.PhoneOTP
+import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
 import app.efficientbytes.booleanbear.utils.IDTokenListener
+import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -46,7 +47,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
@@ -64,7 +64,8 @@ class MainViewModel(
     private val statisticsRepository: StatisticsRepository,
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope,
-    private val userAccountCoroutineScope: UserAccountCoroutineScope
+    private val userAccountCoroutineScope: UserAccountCoroutineScope,
+    private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
 ) : AndroidViewModel(application),
     LifecycleEventObserver, UtilityDataRepository.UtilityListener,
     UserProfileRepository.NotificationUploadListener, IDTokenListener {
@@ -159,9 +160,11 @@ class MainViewModel(
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             SingletonPreviousUserId.setInstance(currentUser.uid)
-            userAccountCoroutineScope.getScope().coroutineContext.cancelChildren()
+            userProfileRepository.resetUserProfileScope()
+            authenticationRepository.resetSingleDeviceScope()
             statisticsRepository.noteDownScreenClosingTime()
             statisticsRepository.forceUploadPendingScreenTiming()
+            authenticationRepository.resetAuthScope()
             FirebaseAuth.getInstance().signOut()
         }
     }
@@ -255,9 +258,9 @@ class MainViewModel(
         }
     }
 
-    private val _deleteUserAccountStatus: MutableLiveData<DataStatus<ResponseMessage?>> =
+    private val _deleteUserAccountStatus: MutableLiveData<DataStatus<ResponseMessage?>?> =
         MutableLiveData()
-    val deleteUserAccountStatus: LiveData<DataStatus<ResponseMessage?>> =
+    val deleteUserAccountStatus: LiveData<DataStatus<ResponseMessage?>?> =
         _deleteUserAccountStatus
 
     fun deleteUserAccount() {
@@ -265,6 +268,12 @@ class MainViewModel(
             authenticationRepository.deleteUserAccount().collect {
                 _deleteUserAccountStatus.postValue(it)
             }
+        }
+    }
+
+    fun resetDeleteUserAccountLiveData(){
+        externalScope.launch {
+            _deleteUserAccountStatus.postValue(null)
         }
     }
 

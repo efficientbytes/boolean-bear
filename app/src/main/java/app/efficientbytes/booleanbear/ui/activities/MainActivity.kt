@@ -141,12 +141,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userProfileListener.userProfile.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    val snackBar = Snackbar.make(
-                        binding.mainCoordinatorLayout,
-                        it.message.toString(),
-                        Snackbar.LENGTH_LONG
-                    )
-                    snackBar.show()
+                    it.message?.let { message ->
+                        val snackBar = Snackbar.make(
+                            binding.mainCoordinatorLayout,
+                            message,
+                            Snackbar.LENGTH_LONG
+                        )
+                        snackBar.show()
+                    }
                 }
 
                 DataStatus.Status.Success -> {
@@ -189,6 +191,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.deleteFCMToken()
                         viewModel.deleteIDToken()
                         viewModel.deleteUserProfile()
+                        userProfileRepository.resetUserProfileScope()
+                        authenticationRepository.resetSingleDeviceScope()
+                        authenticationRepository.resetAuthScope()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                         statisticsRepository.deleteUserScreenTime()
                     }
@@ -198,12 +203,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userProfileListener.userProfileLiveListener.observe(this) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    val snackBar = Snackbar.make(
-                        binding.mainCoordinatorLayout,
-                        it.message.toString(),
-                        Snackbar.LENGTH_LONG
-                    )
-                    snackBar.show()
+                    if (it.message?.contains("PERMISSION_DENIED") == false) {
+                        val snackBar = Snackbar.make(
+                            binding.mainCoordinatorLayout,
+                            it.message,
+                            Snackbar.LENGTH_INDEFINITE
+                        )
+                        snackBar.show()
+                    }
                 }
 
                 DataStatus.Status.Success -> {
@@ -326,21 +333,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         viewModel.deleteUserAccountStatus.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Success -> {
-                    viewModel.signOutUser()
-                }
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Success -> {
+                        viewModel.signOutUser()
+                        viewModel.resetDeleteUserAccountLiveData()
+                    }
 
-                DataStatus.Status.NoInternet -> {
-                    accountDeletionFailed = true
-                }
+                    DataStatus.Status.NoInternet -> {
+                        accountDeletionFailed = true
+                        viewModel.resetDeleteUserAccountLiveData()
+                    }
 
-                DataStatus.Status.TimeOut -> {
-                    accountDeletionFailed = true
-                }
+                    DataStatus.Status.TimeOut -> {
+                        accountDeletionFailed = true
+                        viewModel.resetDeleteUserAccountLiveData()
+                    }
 
-                else -> {
-
+                    else -> {
+                        viewModel.resetDeleteUserAccountLiveData()
+                    }
                 }
             }
         }
@@ -483,7 +495,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (destination.id) {
                 R.id.homeFragment -> {
                     binding.mainToolbar.subtitle = null
-                    binding.mainToolbar.setTitleTextAppearance(this,R.style.HomeToolbarTitleAppearance)
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.HomeToolbarTitleAppearance
+                    )
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.title = resources.getString(R.string.app_name)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -493,7 +508,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 R.id.shuffledContentPlayerFragment -> {
                     binding.mainToolbar.subtitle = null
-                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DefaultToolbarTitleAppearance)
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.DefaultToolbarTitleAppearance
+                    )
                     window.setFlags(
                         WindowManager.LayoutParams.FLAG_SECURE,
                         WindowManager.LayoutParams.FLAG_SECURE
@@ -506,7 +524,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.discoverFragment -> {
                     binding.mainToolbar.visibility = View.VISIBLE
                     binding.mainToolbar.subtitle = null
-                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DiscoverToolbarTitleAppearance)
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.DiscoverToolbarTitleAppearance
+                    )
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -514,7 +535,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 else -> {
                     binding.mainToolbar.subtitle = null
-                    binding.mainToolbar.setTitleTextAppearance(this,R.style.DefaultToolbarTitleAppearance)
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.DefaultToolbarTitleAppearance
+                    )
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
