@@ -22,7 +22,17 @@ val viewModelModule = module {
     viewModel { CompleteProfileViewModel(get()) }
     viewModel {
         MainViewModel(
-            androidApplication(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+            androidApplication(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+            get()
         )
     }
     viewModel { AccountSettingsViewModel(get()) }

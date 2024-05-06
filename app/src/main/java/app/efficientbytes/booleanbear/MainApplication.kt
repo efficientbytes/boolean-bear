@@ -69,6 +69,8 @@ class MainApplication : Application() {
         assetsRepository.deleteAllMentionedLinks()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
+            userProfileRepository.listenToUserProfileChange(currentUser.uid)
+            authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
             statisticsRepository.uploadPendingScreenTiming()
         } else {
             statisticsRepository.deleteUserScreenTime()

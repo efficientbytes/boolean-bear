@@ -15,6 +15,7 @@ import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
+import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
@@ -39,6 +40,7 @@ class AuthenticationRepository(
     private val externalScope: CoroutineScope,
     private val authStateCoroutineScope: AuthStateCoroutineScope,
     private val userAccountCoroutineScope: UserAccountCoroutineScope,
+    private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
     private val singleDeviceLoginListener: SingleDeviceLoginListener,
     private val customAuthStateListener: CustomAuthStateListener
 ) {
@@ -124,30 +126,38 @@ class AuthenticationRepository(
     }
 
     fun listenToSingleDeviceLoginChange(userAccountId: String) {
-        userAccountCoroutineScope.getScope().launch {
-            try {
-                val singleDeviceLoginSnapshot =
-                    Firebase.firestore.collection(SINGLE_DEVICE_LOGIN_DOCUMENT_PATH)
-                        .document(userAccountId)
+        if (singleDeviceLoginCoroutineScope.scopeStatus() == null) {
+            singleDeviceLoginCoroutineScope.getScope().launch {
+                try {
+                    val singleDeviceLoginSnapshot =
+                        Firebase.firestore.collection(SINGLE_DEVICE_LOGIN_DOCUMENT_PATH)
+                            .document(userAccountId)
 
-                singleDeviceLoginSnapshot.addSnapshotListenerFlow().collect {
-                    when {
-                        it.status == DataStatus.Status.Failed -> {
-                            singleDeviceLoginListener.postValue(it)
-                        }
+                    singleDeviceLoginSnapshot.addSnapshotListenerFlow().collect {
+                        when {
+                            it.status == DataStatus.Status.Failed -> {
+                                singleDeviceLoginListener.postValue(it)
+                            }
 
-                        it.status == DataStatus.Status.Success -> {
-                            singleDeviceLoginListener.postValue(it)
+                            it.status == DataStatus.Status.Success -> {
+                                singleDeviceLoginListener.postValue(it)
+                            }
                         }
                     }
+                } catch (noInternet: NoInternetException) {
+                    singleDeviceLoginListener.postValue(DataStatus.noInternet())
+                } catch (socketTimeOutException: SocketTimeoutException) {
+                    singleDeviceLoginListener.postValue(DataStatus.timeOut())
+                } catch (exception: IOException) {
+                    singleDeviceLoginListener.postValue(DataStatus.unknownException(exception.message.toString()))
                 }
-            } catch (noInternet: NoInternetException) {
-                singleDeviceLoginListener.postValue(DataStatus.noInternet())
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                singleDeviceLoginListener.postValue(DataStatus.timeOut())
-            } catch (exception: IOException) {
-                singleDeviceLoginListener.postValue(DataStatus.unknownException(exception.message.toString()))
             }
+        }
+    }
+
+    fun resetSingleDeviceScope() {
+        if (singleDeviceLoginCoroutineScope.scopeStatus() != null) {
+            singleDeviceLoginCoroutineScope.resetScope()
         }
     }
 
@@ -181,14 +191,22 @@ class AuthenticationRepository(
         .flowOn(Dispatchers.IO)
 
     fun listenForAuthStateChanges() {
-        authStateCoroutineScope.getScope().launch {
-            try {
-                val auth = FirebaseAuth.getInstance()
-                auth.authStateFlow().collect { authState ->
-                    customAuthStateListener.postValue(authState is AuthState.Authenticated)
+        if (authStateCoroutineScope.scopeStatus() == null) {
+            authStateCoroutineScope.getScope().launch {
+                try {
+                    val auth = FirebaseAuth.getInstance()
+                    auth.authStateFlow().collect { authState ->
+                        customAuthStateListener.postValue(authState is AuthState.Authenticated)
+                    }
+                } catch (exception: Exception) {
                 }
-            } catch (exception: Exception) {
             }
+        }
+    }
+
+    fun resetAuthScope() {
+        if (authStateCoroutineScope.scopeStatus() != null) {
+            authStateCoroutineScope.resetScope()
         }
     }
 

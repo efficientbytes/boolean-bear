@@ -11,6 +11,7 @@ val utilsModule = module {
     single { provideSingleDeviceLoginListener() }
     single { provideAuthStateCoroutineScope() }
     single { provideUserAccountCoroutineScope() }
+    single { provideSingleDeviceLoginCoroutineScope() }
     single { provideCustomAuthStateListener() }
     single { provideServiceError() }
     single { provideInstructorLiveListener() }

@@ -40,7 +40,7 @@ class UserProfileRepository(
     private val gson = Gson()
 
     fun getUserProfile() {
-        userProfileListener.postLatestValue(DataStatus.loading())
+        userProfileListener.postValue(DataStatus.loading())
         externalScope.launch {
             try {
                 val response = userProfileService.getUserProfile()
@@ -59,9 +59,11 @@ class UserProfileRepository(
                             response.errorBody()!!.string(),
                             UserProfileResponse::class.java
                         )
-                        val message =
-                            "Error Code $responseCode. ${errorResponse.message.toString()}"
-                        userProfileListener.postValue(DataStatus.failed(message))
+                        if (!(responseCode == 404 && errorResponse.message.equals("User profile does not exists."))) {
+                            val message =
+                                "Error Code $responseCode. ${errorResponse.message.toString()}"
+                            userProfileListener.postValue(DataStatus.failed(message))
+                        }
                     }
                 }
             } catch (noInternet: NoInternetException) {
@@ -181,28 +183,37 @@ class UserProfileRepository(
     }
 
     fun listenToUserProfileChange(userAccountId: String) {
-        userProfileCoroutineScope.getScope().launch {
-            val userProfileSnapshot =
-                Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH).document(userAccountId)
-            try {
-                userProfileSnapshot.addSnapshotListenerFlow().collect {
-                    when {
-                        it.status == DataStatus.Status.Failed -> {
-                            userProfileListener.postLatestValue(it)
-                        }
+        if (userProfileCoroutineScope.scopeStatus() == null) {
+            userProfileCoroutineScope.getScope().launch {
+                val userProfileSnapshot =
+                    Firebase.firestore.collection(USER_PROFILE_DOCUMENT_PATH)
+                        .document(userAccountId)
+                try {
+                    userProfileSnapshot.addSnapshotListenerFlow().collect {
+                        when {
+                            it.status == DataStatus.Status.Failed -> {
+                                userProfileListener.postLatestValue(it)
+                            }
 
-                        it.status == DataStatus.Status.Success -> {
-                            userProfileListener.postLatestValue(it)
+                            it.status == DataStatus.Status.Success -> {
+                                userProfileListener.postLatestValue(it)
+                            }
                         }
                     }
+                } catch (noInternet: NoInternetException) {
+                    userProfileListener.postLatestValue(DataStatus.noInternet())
+                } catch (socketTimeOutException: SocketTimeoutException) {
+                    userProfileListener.postLatestValue(DataStatus.timeOut())
+                } catch (exception: IOException) {
+                    userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
                 }
-            } catch (noInternet: NoInternetException) {
-                userProfileListener.postLatestValue(DataStatus.noInternet())
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                userProfileListener.postLatestValue(DataStatus.timeOut())
-            } catch (exception: IOException) {
-                userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
             }
+        }
+    }
+
+    fun resetUserProfileScope() {
+        if (userProfileCoroutineScope.scopeStatus() != null) {
+            userProfileCoroutineScope.resetScope()
         }
     }
 
