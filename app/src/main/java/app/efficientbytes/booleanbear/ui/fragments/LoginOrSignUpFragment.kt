@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import app.efficientbytes.booleanbear.BuildConfig
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -90,11 +89,7 @@ class LoginOrSignUpFragment : Fragment() {
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                if (input == BuildConfig.phone_number) {
-                    navigateToOTPVerificationPage(input)
-                } else {
-                    viewModel.sendOTPToPhoneNumber(input)
-                }
+                viewModel.sendOTPToPhoneNumber(input)
             }
         }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
