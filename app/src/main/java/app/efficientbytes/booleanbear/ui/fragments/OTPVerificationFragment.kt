@@ -319,9 +319,4 @@ class OTPVerificationFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        timer.cancel()
-    }
-
 }
