@@ -223,7 +223,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:paddingHorizontal="22dp"
-                        android:text="@string/we_could_not_find_anything_under_the_selected_category"
+                        android:text="@string/we_could_not_find_anything_under_the_selected_topic"
                         android:textAlignment="center"
                         android:textSize="14sp"
                         app:fontFamily="@font/montserrat">
