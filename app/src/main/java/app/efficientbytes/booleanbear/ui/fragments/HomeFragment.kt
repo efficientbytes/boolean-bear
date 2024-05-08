@@ -6,9 +6,17 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,19 +53,22 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private val bannerViewPagerAdapter: InfiniteViewPagerAdapter by lazy {
-        InfiniteViewPagerAdapter(dummyHomePageBannersList, this@HomeFragment)
-    }
     private val bannerHandler = Handler(Looper.getMainLooper())
     private var bannerRunnable: Runnable? = null
     private var currentPage = 1
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
+    private val bannerViewPagerAdapter: InfiniteViewPagerAdapter by lazy {
+        InfiniteViewPagerAdapter(dummyHomePageBannersList, this@HomeFragment)
+    }
     private val reelTopicsChipRecyclerViewAdapter: ReelTopicsChipRecyclerViewAdapter by lazy {
         ReelTopicsChipRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@HomeFragment)
     }
     private val reelsRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
+    }
+    private val searchResultRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
@@ -93,6 +104,99 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.home_toolbar, menu)
+                val search = menu.findItem(R.id.searchMenu)
+                search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                    override fun onMenuItemActionExpand(p0: MenuItem): Boolean {
+                        return true
+                    }
+
+                    override fun onMenuItemActionCollapse(p0: MenuItem): Boolean {
+                        requireActivity().invalidateOptionsMenu()
+                        isSearchViewOpen = false
+                        hintHandler.removeCallbacksAndMessages(null)
+                        hintRunnable = null
+                        hideSearchResultView()
+                        showContents()
+                        return true
+                    }
+
+                })
+                searchView = search.actionView as? SearchView
+                val linearLayout1 = searchView!!.getChildAt(0) as LinearLayout
+                val linearLayout2 = linearLayout1.getChildAt(2) as LinearLayout
+                val linearLayout3 = linearLayout2.getChildAt(1) as LinearLayout
+                val searchEditText = linearLayout3.getChildAt(0) as TextView
+                searchEditText.textSize = 16f
+                searchEditText.setTextColor(
+                    AppCompatResources.getColorStateList(
+                        requireContext(),
+                        R.color.white
+                    )
+                )
+                searchView?.setOnSearchClickListener {
+                    menu.findItem(R.id.accountSettingsMenu).setVisible(false)
+                    menu.findItem(R.id.discoverMenu).setVisible(false)
+                    isSearchViewOpen = true
+                    startAlternateHint()
+                    hideContents()
+                    showSearchResultView()
+                    viewModel.getReelQueries(selectedReelTopicId)
+                }
+                searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        query?.apply {
+                            viewModel.getReelQueries(selectedReelTopicId, this)
+                        }
+                        return true
+                    }
+
+                    override fun onQueryTextChange(query: String?): Boolean {
+                        query?.apply {
+                            if (!query.startsWith("#")) {
+                                viewModel.getReelQueries(selectedReelTopicId, this)
+                            } else {
+                                binding.searchResultsNoResultParentConstraintLayout.visibility =
+                                    View.GONE
+                                binding.searchResultsRecyclerView.visibility = View.GONE
+                            }
+                        }
+                        return true
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.accountSettingsMenu -> {
+                        if (accountSettingsFragment == null) {
+                            accountSettingsFragment = AccountSettingsFragment()
+                        }
+                        if (!AccountSettingsFragment.isOpened) {
+                            AccountSettingsFragment.isOpened = true
+                            accountSettingsFragment!!.show(
+                                parentFragmentManager,
+                                AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
+                            )
+                        }
+                        return true
+                    }
+
+                    R.id.discoverMenu -> {
+                        findNavController().navigate(R.id.homeFragment_to_discoverFragment)
+                        return true
+                    }
+
+                    R.id.searchMenu -> {
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner)
         //for banner ads
         binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
         binding.appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -240,6 +344,35 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelsRefreshButton.setOnClickListener {
             viewModel.getReels(selectedReelTopicId)
         }
+        //for search result
+        val searchResultLayoutManager = LinearLayoutManager(requireContext())
+        binding.searchResultsRecyclerView.layoutManager = searchResultLayoutManager
+        binding.searchResultsRecyclerView.adapter = searchResultRecyclerViewAdapter
+        viewModel.searchResult.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
+                    binding.searchResultsRecyclerView.visibility = View.GONE
+                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.Loading -> {
+                    searchResultRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { list ->
+                        showSearchResultView()
+                        searchResultRecyclerViewAdapter.setYoutubeContentViewList(list)
+                    }
+                }
+
+                else -> {
+                    binding.searchResultsRecyclerView.visibility = View.GONE
+                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+                }
+            }
+        }
         //for connectivity listener
         connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
             when (isAvailable) {
@@ -334,6 +467,28 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelTopicsRefreshButton.visibility = View.GONE
         binding.reelsRecyclerView.visibility = View.GONE
         binding.reelsRefreshButton.visibility = View.VISIBLE
+    }
+
+    private fun hideSearchResultView() {
+        binding.searchResultsParentConstraintLayout.visibility = View.GONE
+        binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+        binding.searchResultsRecyclerView.visibility = View.GONE
+    }
+
+    private fun showSearchResultView() {
+        binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
+        binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+        binding.searchResultsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun showContents() {
+        binding.appBarLayout.visibility = View.VISIBLE
+        binding.mainContentParentNestedScrollView.visibility = View.VISIBLE
+    }
+
+    private fun hideContents() {
+        binding.appBarLayout.visibility = View.GONE
+        binding.mainContentParentNestedScrollView.visibility = View.GONE
     }
 
     private fun startAutoScroll() {
