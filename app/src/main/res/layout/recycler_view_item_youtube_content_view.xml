@@ -12,132 +12,227 @@
             type="android.view.View.OnClickListener" />
 
         <variable
-            name="content"
+            name="reel"
             type="app.efficientbytes.booleanbear.services.models.RemoteReel" />
 
 
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/contentCardView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/reelsParentConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:onClick="@{onClick}"
-        app:cardBackgroundColor="@color/black"
-        app:cardCornerRadius="0dp"
-        app:strokeWidth="0dp">
+        android:background="@color/transparent">
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            style="@style/TextRippleColorOnBlack"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/reelsCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:paddingTop="4dp"
-            android:paddingBottom="12dp">
+            android:layout_marginBottom="3dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:onClick="@{onClick}"
+            android:visibility="@{(reel!=null)?View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/thumbnailImageView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:scaleType="fitXY"
-                app:load_image_from_url="@{content.thumbnail}"
-                app:layout_constraintDimensionRatio="16:9"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@tools:sample/backgrounds/scenic[25]">
-
-            </com.google.android.material.imageview.ShapeableImageView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/runTimeCardView"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/TextRippleColorOnBlack"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="10dp"
-                android:clickable="false"
-                android:focusable="false"
-                app:cardBackgroundColor="@android:color/transparent"
-                app:cardCornerRadius="4dp"
-                app:layout_constraintBottom_toBottomOf="@id/thumbnailImageView"
-                app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
-                app:strokeWidth="0dp">
+                android:background="@color/black"
+                android:paddingTop="4dp"
+                android:paddingBottom="12dp">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/runTimeValueTextView"
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/thumbnailImageView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="fitXY"
+                    app:layout_constraintDimensionRatio="16:9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:load_image_from_url="@{reel.thumbnail}"
+                    tools:src="@tools:sample/backgrounds/scenic[25]">
+
+                </com.google.android.material.imageview.ShapeableImageView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/runTimeCardView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/text_dark_transparent_background_200"
-                    app:seconds_to_minutes="@{content.runTime}"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/thumbnailImageView"
+                    app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
+                    app:strokeWidth="0dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/runTimeValueTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/text_dark_transparent_background_200"
+                        android:fontFamily="@font/montserrat"
+                        android:paddingStart="8dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="4dp"
+                        android:textSize="10sp"
+                        app:seconds_to_minutes="@{reel.runTime}"
+                        tools:text="06:45" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/titleValueTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:ellipsize="end"
                     android:fontFamily="@font/montserrat"
-                    android:paddingStart="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="4dp"
+                    android:maxLines="2"
+                    android:text="@{reel.title}"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
+                    app:layout_constraintStart_toStartOf="@id/thumbnailImageView"
+                    app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
+                    tools:text="Level Up With C++ jfi 5gjj5tg 4tgu 4g h oh5">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/instructorNameValueTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/montserrat"
+                    android:maxLines="2"
+                    android:text="@{reel.instructorName}"
                     android:textSize="10sp"
-                    tools:text="06:45" />
-            </com.google.android.material.card.MaterialCardView>
+                    app:layout_constraintStart_toStartOf="@id/titleValueTextView"
+                    app:layout_constraintTop_toBottomOf="@id/titleValueTextView"
+                    tools:text="Anubhav.P.S">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/titleValueTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/montserrat"
-                android:maxLines="2"
-                android:text="@{content.title}"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="@id/thumbnailImageView"
-                app:layout_constraintStart_toStartOf="@id/thumbnailImageView"
-                app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
-                tools:text="Level Up With C++ jfi 5gjj5tg 4tgu 4g h oh5">
+                </com.google.android.material.textview.MaterialTextView>
 
-            </com.google.android.material.textview.MaterialTextView>
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/uploadedOnValueTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/montserrat"
+                    android:maxLines="2"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@id/instructorNameValueTextView"
+                    app:layout_constraintEnd_toEndOf="@id/titleValueTextView"
+                    app:layout_constraintTop_toTopOf="@id/instructorNameValueTextView"
+                    app:uploaded_on="@{reel.createdOn}"
+                    tools:text="1 day ago">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/instructorNameValueTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/montserrat"
-                android:maxLines="2"
-                android:text="@{content.instructorName}"
-                android:textSize="10sp"
-                app:layout_constraintStart_toStartOf="@id/titleValueTextView"
-                app:layout_constraintTop_toBottomOf="@id/titleValueTextView"
-                tools:text="Anubhav.P.S">
+                </com.google.android.material.textview.MaterialTextView>
 
-            </com.google.android.material.textview.MaterialTextView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/uploadedOnValueTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/montserrat"
-                android:maxLines="2"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:textSize="10sp"
-                app:uploaded_on="@{content.createdOn}"
-                app:layout_constraintBottom_toBottomOf="@id/instructorNameValueTextView"
-                app:layout_constraintEnd_toEndOf="@id/titleValueTextView"
-                app:layout_constraintTop_toTopOf="@id/instructorNameValueTextView"
-                tools:text="1 day ago">
+        </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.textview.MaterialTextView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/shimmerCardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:visibility="@{(reel==null)?View.VISIBLE : View.GONE}"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    </com.google.android.material.card.MaterialCardView>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="12dp">
+
+                    <View
+                        android:id="@+id/thumbnailImage"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="@color/black_400"
+                        android:scaleType="fitXY"
+                        app:layout_constraintDimensionRatio="17:9"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    </View>
+
+                    <View
+                        android:id="@+id/titleLabelTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="1dp"
+                        android:background="@color/black_400"
+                        app:layout_constraintEnd_toEndOf="@id/thumbnailImage"
+                        app:layout_constraintStart_toStartOf="@id/thumbnailImage"
+                        app:layout_constraintTop_toBottomOf="@id/thumbnailImage">
+
+                    </View>
+
+                    <View
+                        android:id="@+id/instructorNameLabelTextView"
+                        android:layout_width="150dp"
+                        android:layout_height="22dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/black_400"
+                        app:layout_constraintStart_toStartOf="@id/titleLabelTextView"
+                        app:layout_constraintTop_toBottomOf="@id/titleLabelTextView">
+
+                    </View>
+
+                    <View
+                        android:id="@+id/uploadedOnLabelTextView"
+                        android:layout_width="80dp"
+                        android:layout_height="22dp"
+                        android:background="@color/black_400"
+                        app:layout_constraintBottom_toBottomOf="@id/instructorNameLabelTextView"
+                        app:layout_constraintEnd_toEndOf="@id/titleLabelTextView"
+                        app:layout_constraintTop_toTopOf="@id/instructorNameLabelTextView">
+
+                    </View>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

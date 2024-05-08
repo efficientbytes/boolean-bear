@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.utils
 
+import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 
 const val BASE_URL = "https://booleanbear-fb7pgif5zq-uc.a.run.app"
@@ -32,4 +33,12 @@ val dummyReelTopicsList = listOf<RemoteReelTopic>(
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
+)
+
+val dummyReelsList = listOf<RemoteReel>(
+   RemoteReel("","","","",-1,-1,"", emptyList()),
+   RemoteReel("","","","",-1,-1,"", emptyList()),
+   RemoteReel("","","","",-1,-1,"", emptyList()),
+   RemoteReel("","","","",-1,-1,"", emptyList()),
+   RemoteReel("","","","",-1,-1,"", emptyList()),
 )

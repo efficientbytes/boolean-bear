@@ -40,9 +40,15 @@ class YoutubeContentViewRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RemoteReel) {
-            binding.content = item
-            binding.onClick = View.OnClickListener {
-                itemClickListener.onYoutubeContentViewItemClicked(absoluteAdapterPosition, item)
+            if (item.reelId.isEmpty() && item.runTime == -1L && item.createdOn == -1L) {
+                binding.reel = null
+                binding.shimmerLayout.startShimmer()
+            } else {
+                binding.shimmerLayout.stopShimmer()
+                binding.reel = item
+                binding.onClick = View.OnClickListener {
+                    itemClickListener.onYoutubeContentViewItemClicked(absoluteAdapterPosition, item)
+                }
             }
         }
     }

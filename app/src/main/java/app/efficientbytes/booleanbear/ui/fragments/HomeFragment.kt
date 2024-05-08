@@ -25,6 +25,7 @@ import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsChipRecyclerViewAdap
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
+import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -53,8 +54,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private val reelTopicsChipRecyclerViewAdapter: ReelTopicsChipRecyclerViewAdapter by lazy {
         ReelTopicsChipRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@HomeFragment)
     }
-    private val youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
-        YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+    private val reelsRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
@@ -149,15 +150,61 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             viewModel.getReelTopics()
         }
         //for reels
+        val reelsLayoutManager = LinearLayoutManager(requireContext())
+        binding.reelsRecyclerView.layoutManager = reelsLayoutManager
+        binding.reelsRecyclerView.adapter = reelsRecyclerViewAdapter
+        viewModel.reels.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    emptyReels()
+                }
+
+                DataStatus.Status.Failed -> {
+                    reelsLoadingFailed()
+                }
+
+                DataStatus.Status.Loading -> {
+                    reelsLoading()
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingReelsFailed = true
+                    reelsLoadingFailed()
+                }
+
+                DataStatus.Status.Success -> {
+                    reelsLoaded()
+                    it.data?.let { list ->
+                        reelsRecyclerViewAdapter.setYoutubeContentViewList(list)
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    reelsLoadingFailed()
+                }
+
+                else -> {
+                    reelsLoadingFailed()
+                }
+            }
+        }
+        binding.reelsRefreshButton.setOnClickListener {
+            viewModel.getReels(selectedReelTopicId)
+        }
         //for connectivity listener
-
-    }
-
-    private fun emptyReels() {
-        binding.reelsRecyclerView.visibility = View.GONE
-        binding.reelsRefreshButton.visibility = View.GONE
-        binding.reelTopicsRefreshButton.visibility = View.GONE
-        binding.noResultLinearLayout.visibility = View.VISIBLE
+        mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
+            it?.let { contentId ->
+                watchContentViaIntent(contentId)
+                mainViewModel.resetWatchContentIntentInvoked()
+            }
+        }
+        mainViewModel.deleteAccountIntentInvoked.observe(viewLifecycleOwner) {
+            it?.let {
+                val directions = HomeFragmentDirections.homeFragmentToDeleteUserAccountFragment()
+                findNavController().navigate(directions)
+                mainViewModel.resetDeleteAccountIntentInvoked()
+            }
+        }
     }
 
     private fun topicsLoadingFailed() {
@@ -171,9 +218,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private fun topicsLoading() {
         binding.reelTopicsRecyclerView.visibility = View.VISIBLE
         binding.reelsRecyclerView.visibility = View.VISIBLE
-        //load the recycler adapter for reel topics
         reelTopicsChipRecyclerViewAdapter.setReelTopics(dummyReelTopicsList)
-        //load the recycler adapter for reel topics
+        reelsRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
         binding.noResultLinearLayout.visibility = View.GONE
         binding.reelTopicsRefreshButton.visibility = View.GONE
         binding.reelsRefreshButton.visibility = View.GONE
@@ -184,6 +230,35 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelTopicsRefreshButton.visibility = View.GONE
         binding.reelsRefreshButton.visibility = View.GONE
         binding.reelTopicsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun emptyReels() {
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.noResultLinearLayout.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoading() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+        reelsRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+    }
+
+    private fun reelsLoaded() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoadingFailed() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.VISIBLE
     }
 
     private fun startAutoScroll() {
