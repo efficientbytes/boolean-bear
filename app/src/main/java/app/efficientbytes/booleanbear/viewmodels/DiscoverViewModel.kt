@@ -33,7 +33,12 @@ class DiscoverViewModel(
         externalScope.launch {
             assetsRepository.getReelTopics().collect {
                 when (it.status) {
-                    DataStatus.Status.Success, DataStatus.Status.Loading -> {
+                    DataStatus.Status.Loading -> {
+                        _reelTopics.postValue(it)
+                    }
+
+                    DataStatus.Status.Success -> {
+                        delay(2000)
                         _reelTopics.postValue(it)
                     }
 
