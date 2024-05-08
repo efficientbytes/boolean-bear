@@ -21,6 +21,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -37,7 +38,16 @@ class HomeViewModel(
     fun getReelTopics() {
         externalScope.launch {
             assetsRepository.getReelTopics().collect {
-                _reelTopics.postValue(it)
+                when (it.status) {
+                    DataStatus.Status.Success -> {
+                        delay(6000)
+                        _reelTopics.postValue(it)
+                    }
+
+                    else -> {
+                        _reelTopics.postValue(it)
+                    }
+                }
             }
         }
     }

@@ -14,25 +14,26 @@
         android:background="@color/black">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/searchConstraintParentLayout"
+            android:id="@+id/searchResultsParentConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/searchViewRecyclerView"
+                android:id="@+id/searchResultsRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                tools:listitem="@layout/recycler_view_item_youtube_content_view">
 
             </androidx.recyclerview.widget.RecyclerView>
 
             <LinearLayout
-                android:id="@+id/searchViewNoSearchResultConstraintLayout"
+                android:id="@+id/searchResultsNoResultParentConstraintLayout"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="center"
@@ -96,28 +97,22 @@
                 app:layout_scrollFlags="scroll|snap"
                 app:titleEnabled="false">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/bannerAdsViewPager"
                     android:layout_width="match_parent"
                     android:layout_height="176dp"
-                    app:layout_collapseMode="parallax">
-
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/infiniteViewPager"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    app:layout_collapseMode="parallax"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
-            android:id="@+id/contentParentConstraintLayout"
+            android:id="@+id/mainContentParentNestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/black"
@@ -125,78 +120,74 @@
             android:overScrollMode="never"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
+            android:visibility="visible"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/recyclerViewContainerConstraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/reelTopicsConstraintLayout"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reelTopicsRecyclerView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="4dp"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/recycler_view_item_chip_category_view">
 
-                    <HorizontalScrollView
-                        android:id="@+id/contentCategoryShimmerScrollView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:paddingHorizontal="4dp"
-                        android:scrollbarSize="0dp"
-                        android:scrollbars="horizontal"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                </androidx.recyclerview.widget.RecyclerView>
 
-                        <LinearLayout
-                            android:id="@+id/contentCategoryShimmerLinearLayout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/md_theme_background"
-                            android:orientation="horizontal"
-                            android:visibility="visible">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reelsRecyclerView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="6dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView"
+                    tools:listitem="@layout/recycler_view_item_youtube_content_view">
 
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
+                </androidx.recyclerview.widget.RecyclerView>
 
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
+                <ImageButton
+                    android:id="@+id/reelTopicsRefreshButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/refresh_icon"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/reelTopicsRecyclerView">
 
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
+                </ImageButton>
 
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
+                <ImageButton
+                    android:id="@+id/reelsRefreshButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/refresh_icon"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/reelTopicsRecyclerView">
 
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
-
-                            <include layout="@layout/shimmer_view_item_chip_category_view" />
-
-                        </LinearLayout>
-
-                    </HorizontalScrollView>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/categoriesRecyclerView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="4dp"
-                        android:visibility="gone"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:listitem="@layout/recycler_view_item_chip_category_view">
-
-                    </androidx.recyclerview.widget.RecyclerView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                </ImageButton>
 
                 <LinearLayout
-                    android:id="@+id/noSearchResultConstraintLayout"
+                    android:id="@+id/noResultLinearLayout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -205,7 +196,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reelTopicsConstraintLayout">
+                    app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView">
 
                     <ImageView
                         android:layout_width="220dp"
@@ -239,167 +230,7 @@
 
                     </com.google.android.material.textview.MaterialTextView>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/retryAfterNoResultButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/montserrat"
-                        android:text="@string/retry"
-                        android:textColor="@color/black"
-                        app:backgroundTint="@color/white"
-                        app:cornerRadius="4dp"
-                        app:icon="@drawable/retry_icon"
-                        app:iconPadding="18dp"
-                        app:iconSize="14dp">
-
-                    </com.google.android.material.button.MaterialButton>
-
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/noInternetLinearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reelTopicsConstraintLayout">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/noInternetIconCardView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="@color/black_1200"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:strokeWidth="0dp">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:padding="22dp">
-
-                            <ImageView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginTop="4dp"
-                                android:src="@drawable/no_internet_icon"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                            </ImageView>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/noInternetConstraintLayoutLabelTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="22dp"
-                        android:gravity="center_horizontal"
-                        android:text="@string/network_error"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        app:fontFamily="@font/montserrat_medium">
-
-                    </com.google.android.material.textview.MaterialTextView>
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/noInternetReasonLabelTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center_horizontal"
-                        android:paddingHorizontal="50dp"
-                        android:text="@string/unable_to_connect_to_boolean_bear_there_could_be_a_problem_with_your_network_connection"
-                        android:textColor="@color/white_600"
-                        android:textSize="13sp"
-                        app:fontFamily="@font/montserrat">
-
-                    </com.google.android.material.textview.MaterialTextView>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/retryAfterNoInternetButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/montserrat"
-                        android:text="@string/retry"
-                        android:textColor="@color/black"
-                        app:backgroundTint="@color/white"
-                        app:cornerRadius="4dp"
-                        app:icon="@drawable/retry_icon"
-                        app:iconPadding="18dp"
-                        app:iconSize="14dp">
-
-                    </com.google.android.material.button.MaterialButton>
-
-                </LinearLayout>
-
-                <androidx.core.widget.NestedScrollView
-                    android:id="@+id/shimmerLayoutNestedScrollView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="@color/md_theme_background"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reelTopicsConstraintLayout">
-
-                    <com.facebook.shimmer.ShimmerFrameLayout
-                        android:id="@+id/shimmerLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/md_theme_background">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/md_theme_background"
-                            android:orientation="vertical">
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                            <include layout="@layout/shimmer_view_item_youtube_content_view" />
-
-                        </LinearLayout>
-
-                    </com.facebook.shimmer.ShimmerFrameLayout>
-
-                </androidx.core.widget.NestedScrollView>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/contentsRecyclerView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="6dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reelTopicsConstraintLayout"
-                    tools:listitem="@layout/recycler_view_item_youtube_content_view">
-
-                </androidx.recyclerview.widget.RecyclerView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

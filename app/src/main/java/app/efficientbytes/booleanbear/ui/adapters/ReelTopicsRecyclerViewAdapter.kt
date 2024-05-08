@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemReelTopicViewBinding
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 
@@ -44,6 +45,7 @@ class ReelTopicsRecyclerViewAdapter(
             } else {
                 binding.shimmerParentLayout.stopShimmer()
                 binding.topic = item
+                binding.reelTopicParentCardView.setCardBackgroundColor(context.getColor(R.color.black_1200))
                 binding.onClick = View.OnClickListener {
                     itemClickListener.onReelTopicItemClicked(item)
                 }
