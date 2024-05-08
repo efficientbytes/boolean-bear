@@ -9,6 +9,7 @@
 
 
     <ScrollView
+        android:id="@+id/parentScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
@@ -30,19 +31,33 @@
                 android:gravity="start"
                 android:paddingHorizontal="8dp"
                 android:text="@string/binge_on_free_contents"
-                android:textSize="14sp"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
             </com.google.android.material.textview.MaterialTextView>
 
+            <ImageButton
+                android:id="@+id/refreshButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/refresh_icon"
+                app:layout_constraintBottom_toBottomOf="@id/reelTopicsRecyclerView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/reelTopicsRecyclerView">
+
+            </ImageButton>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reelTopicsRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:visibility="invisible"
                 app:flow_horizontalAlign="center"
                 app:flow_verticalAlign="center"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -62,14 +77,13 @@
                 android:gravity="center"
                 android:paddingHorizontal="8dp"
                 android:text="@string/premium_courses"
-                android:textSize="14sp"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView">
 
             </com.google.android.material.textview.MaterialTextView>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

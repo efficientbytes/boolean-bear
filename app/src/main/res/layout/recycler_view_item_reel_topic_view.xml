@@ -9,19 +9,22 @@
             name="onClick"
             type="android.view.View.OnClickListener" />
 
+        <import type="android.view.View" />
+
         <variable
             name="topic"
             type="app.efficientbytes.booleanbear.services.models.RemoteReelTopic" />
 
     </data>
 
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/reelTopicParentCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:clickable="@{(topic!=null) ? true : false}"
+        android:focusable="@{(topic!=null) ? true : false}"
         android:onClick="@{onClick}"
         app:cardBackgroundColor="@color/black_1200"
         app:cardCornerRadius="6dp"
@@ -31,19 +34,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerParentLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="@{(topic==null)?View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shimmer_auto_start="true">
+
+                <LinearLayout
+                    android:id="@+id/shimmerLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black_300"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/topicValueTextView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingHorizontal="30dp"
-                android:paddingVertical="16dp"
+                android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
                 android:gravity="center"
-                android:ellipsize="end"
                 android:lines="2"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="16dp"
+                android:text="@{topic.topic}"
                 android:textColor="@color/white"
                 android:textSize="11sp"
-                android:text="@{topic.topic}"
+                android:visibility="@{(topic!=null)?View.VISIBLE : View.INVISIBLE}"
                 tools:ignore="SmallSp"
                 tools:text="Android Compose">
 
@@ -52,4 +78,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+
 </layout>
