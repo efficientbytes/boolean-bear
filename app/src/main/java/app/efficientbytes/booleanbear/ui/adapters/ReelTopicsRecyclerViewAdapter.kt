@@ -38,9 +38,15 @@ class ReelTopicsRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RemoteReelTopic) {
-            binding.topic = item
-            binding.onClick = View.OnClickListener {
-                itemClickListener.onReelTopicItemClicked(item)
+            if (item.displayIndex == -1) {
+                binding.topic = null
+                binding.shimmerParentLayout.startShimmer()
+            } else {
+                binding.shimmerParentLayout.stopShimmer()
+                binding.topic = item
+                binding.onClick = View.OnClickListener {
+                    itemClickListener.onReelTopicItemClicked(item)
+                }
             }
         }
     }

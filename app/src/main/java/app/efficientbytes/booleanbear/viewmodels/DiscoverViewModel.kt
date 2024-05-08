@@ -17,6 +17,7 @@ import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DiscoverViewModel(
@@ -31,7 +32,16 @@ class DiscoverViewModel(
     fun getReelTopics() {
         externalScope.launch {
             assetsRepository.getReelTopics().collect {
-                _reelTopics.postValue(it)
+                when (it.status) {
+                    DataStatus.Status.Success, DataStatus.Status.Loading -> {
+                        _reelTopics.postValue(it)
+                    }
+
+                    else -> {
+                        delay(4000)
+                        _reelTopics.postValue(it)
+                    }
+                }
             }
         }
     }
