@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.utils
 
+import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 
@@ -22,8 +23,6 @@ const val MENTIONED_LINKS_TABLE = "mentioned_links"
 const val HOME_PAGE_BANNER_AD_TABLE = "home_page_banner_ad"
 const val FCM_TOKEN_TABLE = "fcm_token"
 const val ID_TOKEN_TABLE = "id_token"
-
-
 val dummyReelTopicsList = listOf<RemoteReelTopic>(
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
@@ -32,13 +31,13 @@ val dummyReelTopicsList = listOf<RemoteReelTopic>(
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
-    RemoteReelTopic("", "", -1, ""),
 )
-
 val dummyReelsList = listOf<RemoteReel>(
-   RemoteReel("","","","",-1,-1,"", emptyList()),
-   RemoteReel("","","","",-1,-1,"", emptyList()),
-   RemoteReel("","","","",-1,-1,"", emptyList()),
-   RemoteReel("","","","",-1,-1,"", emptyList()),
-   RemoteReel("","","","",-1,-1,"", emptyList()),
+    RemoteReel("", "", "", "", -1, -1, "", emptyList()),
+    RemoteReel("", "", "", "", -1, -1, "", emptyList()),
+    RemoteReel("", "", "", "", -1, -1, "", emptyList()),
+    RemoteReel("", "", "", "", -1, -1, "", emptyList()),
+)
+val dummyHomePageBannersList = listOf<RemoteHomePageBanner>(
+    RemoteHomePageBanner("", "", "", false, "", -1L, -1L, -1L),
 )

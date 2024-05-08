@@ -24,14 +24,17 @@ import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.dummyHomePageBannersList
 import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
 import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Locale
+import kotlin.math.abs
 
 class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
@@ -42,8 +45,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private val infiniteRecyclerAdapter: InfiniteViewPagerAdapter by lazy {
-        InfiniteViewPagerAdapter(emptyList(), this@HomeFragment)
+    private val bannerViewPagerAdapter: InfiniteViewPagerAdapter by lazy {
+        InfiniteViewPagerAdapter(dummyHomePageBannersList, this@HomeFragment)
     }
     private val bannerHandler = Handler(Looper.getMainLooper())
     private var bannerRunnable: Runnable? = null
@@ -91,6 +94,52 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //for banner ads
+        binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
+        binding.appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (verticalOffset == 0) {
+                startAutoScroll()
+            } else if (abs(verticalOffset) >= appBarLayout.totalScrollRange) {
+                bannerRunnable = null
+                bannerHandler.removeCallbacksAndMessages(null)
+            } else {
+            }
+        })
+        viewModel.viewPagerBannerAds.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    it.data?.let { banners ->
+                        binding.appBarLayout.visibility = View.VISIBLE
+                        bannerViewPagerAdapter.setViewPagerList(banners)
+                        binding.bannerAdsViewPager.currentItem = 1
+                        onInfinitePageChangeCallback(banners.size + 2)
+                        startAutoScroll()
+                    }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
+                    loadingBannersFailed = true
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.appBarLayout.visibility = View.VISIBLE
+                    binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
+                    bannerViewPagerAdapter.setViewPagerList(dummyHomePageBannersList)
+                    binding.bannerAdsViewPager.currentItem = 1
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
+                }
+
+                else -> {
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
+                }
+            }
+        }
         //for reel topics
         val reelTopicsLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -321,8 +370,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     }
 
     private fun onInfinitePageChangeCallback(listSize: Int) {
-        binding.bannerAdsViewPager.adapter = null
-        binding.bannerAdsViewPager.adapter = infiniteRecyclerAdapter
         binding.bannerAdsViewPager.registerOnPageChangeCallback(object :
             ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
@@ -362,7 +409,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onStop() {
         super.onStop()
-        if (infiniteRecyclerAdapter != null) {
+        if (bannerViewPagerAdapter != null) {
             bannerHandler.removeCallbacksAndMessages(null)
         }
         bannerRunnable = null
@@ -373,7 +420,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onDestroy() {
         super.onDestroy()
-        if (infiniteRecyclerAdapter != null) {
+        if (bannerViewPagerAdapter != null) {
             bannerHandler.removeCallbacksAndMessages(null)
         }
         bannerRunnable = null
