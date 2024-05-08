@@ -192,6 +192,30 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             viewModel.getReels(selectedReelTopicId)
         }
         //for connectivity listener
+        connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
+            when (isAvailable) {
+                true -> {
+                    if (loadingReelTopicsFailed) {
+                        loadingReelTopicsFailed = false
+                        viewModel.getReelTopics()
+                    }
+                    if (loadingReelsFailed) {
+                        loadingReelsFailed = false
+                        viewModel.getReels(selectedReelTopicId)
+                    }
+                    if (loadingBannersFailed) {
+                        loadingBannersFailed = false
+                        viewModel.getHomePageBannerAds()
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+
+
         mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
             it?.let { contentId ->
                 watchContentViaIntent(contentId)
@@ -244,7 +268,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelsRefreshButton.visibility = View.GONE
         binding.reelTopicsRefreshButton.visibility = View.GONE
         binding.reelsRecyclerView.visibility = View.VISIBLE
+        binding.reelsRecyclerView.adapter = null
         reelsRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+        binding.reelsRecyclerView.adapter = reelsRecyclerViewAdapter
     }
 
     private fun reelsLoaded() {
@@ -357,6 +383,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     }
 
     override fun onChipItemClicked(position: Int, remoteReelTopic: RemoteReelTopic) {
+        loadingReelsFailed = false
         selectedReelTopicPosition = position
         selectedReelTopicId = remoteReelTopic.topicId
         selectedReelTopic = remoteReelTopic.topic
