@@ -38,7 +38,7 @@ class DiscoverViewModel(
                     }
 
                     DataStatus.Status.Success -> {
-                        delay(2000)
+                        delay(1200)
                         _reelTopics.postValue(it)
                     }
 
