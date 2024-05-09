@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.ui.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -10,7 +11,7 @@ import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryFo
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemChipCategoryViewBinding
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 
-class HomeFragmentChipRecyclerViewAdapter(
+class ReelTopicsChipRecyclerViewAdapter(
     private var itemList: List<RemoteReelTopic>,
     private var context: Context,
     private val itemClickListener: OnItemClickListener
@@ -53,27 +54,37 @@ class HomeFragmentChipRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RemoteReelTopic) {
-            if (checkedPosition != -1) {
-                if (checkedPosition == bindingAdapterPosition) {
-                    binding.chipCardView.strokeWidth = 0
-                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
-                    binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
-                } else {
-                    binding.chipCardView.strokeWidth = 2
-                    binding.chipCardView.strokeColor =
-                        context.getColor(R.color.md_theme_surfaceVariant)
-                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
-                    binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
-                }
+            if (item.displayIndex == -1 && item.topicId.isEmpty()) {
+                //for shimmer
+                binding.topic = null
+                binding.chipCardView.strokeWidth = 0
+                binding.titleValueTextView.text = context.getString(R.string.empty_space)
+                binding.shimmerParentLayout.startShimmer()
+            } else {
+                binding.shimmerParentLayout.stopShimmer()
+                binding.topic = item
                 binding.titleValueTextView.text = item.topic
-                binding.chipCardView.setOnClickListener {
-                    itemClickListener.onChipItemClicked(bindingAdapterPosition, item)
-                    binding.chipCardView.strokeWidth = 0
-                    binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
-                    binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
-                    if (checkedPosition != bindingAdapterPosition) {
-                        notifyItemChanged(checkedPosition)
-                        checkedPosition = bindingAdapterPosition
+                if (checkedPosition != -1) {
+                    if (checkedPosition == bindingAdapterPosition) {
+                        binding.chipCardView.strokeWidth = 0
+                        binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
+                        binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
+                    } else {
+                        binding.chipCardView.strokeWidth = 2
+                        binding.chipCardView.strokeColor =
+                            context.getColor(R.color.md_theme_surfaceVariant)
+                        binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
+                        binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
+                    }
+                    binding.onClick = View.OnClickListener {
+                        itemClickListener.onChipItemClicked(bindingAdapterPosition, item)
+                        binding.chipCardView.strokeWidth = 0
+                        binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.md_theme_primary))
+                        binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onPrimary))
+                        if (checkedPosition != bindingAdapterPosition) {
+                            notifyItemChanged(checkedPosition)
+                            checkedPosition = bindingAdapterPosition
+                        }
                     }
                 }
             }
@@ -84,7 +95,7 @@ class HomeFragmentChipRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {
-            binding.chipCardView.setOnClickListener {
+            binding.onClick = View.OnClickListener {
                 itemClickListener.onChipLastItemClicked()
             }
         }

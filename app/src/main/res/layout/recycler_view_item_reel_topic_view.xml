@@ -26,7 +26,7 @@
         android:clickable="@{(topic!=null) ? true : false}"
         android:focusable="@{(topic!=null) ? true : false}"
         android:onClick="@{onClick}"
-        app:cardBackgroundColor="@color/black_1200"
+        app:cardBackgroundColor="@color/transparent"
         app:cardCornerRadius="6dp"
         app:strokeWidth="0dp">
 
@@ -49,7 +49,7 @@
                     android:id="@+id/shimmerLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/black_300"
+                    android:background="@color/black_400"
                     android:orientation="vertical">
 
                 </LinearLayout>

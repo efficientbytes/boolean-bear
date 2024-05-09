@@ -24,9 +24,9 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import java.util.Locale
@@ -39,11 +39,19 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private val viewModel: ListReelViewModel by inject()
     private lateinit var topicId: String
     private lateinit var topic: String
-    private val youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
-        YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@ListReelsFragment)
+    private val reelsRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(
+            dummyReelsList,
+            requireContext(),
+            this@ListReelsFragment
+        )
     }
-    private val searchResultAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
-        YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@ListReelsFragment)
+    private val searchResultRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(
+            dummyReelsList,
+            requireContext(),
+            this@ListReelsFragment
+        )
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var loadingReelsFailed = false
@@ -89,13 +97,12 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
 
                     override fun onMenuItemActionCollapse(p0: MenuItem): Boolean {
                         requireActivity().invalidateOptionsMenu()
-                        hintRunnable = null
-                        hintHandler.removeCallbacksAndMessages(null)
                         isSearchViewOpen = false
-                        binding.searchViewNoSearchResultLinearLayout.visibility = View.GONE
-                        binding.searchViewRecyclerView.visibility = View.GONE
+                        hintHandler.removeCallbacksAndMessages(null)
+                        hintRunnable = null
                         binding.searchViewParentConstraintLayout.visibility = View.GONE
                         binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
+                        hideSearchResultView()
                         return true
                     }
 
@@ -117,11 +124,11 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                     menu.findItem(R.id.listReelsShareMenu).setVisible(false)
                     isSearchViewOpen = true
                     startAlternateHint()
-                    viewModel.getReelQueries(topicId)
                     binding.reelsViewParentConstraintLayout.visibility = View.GONE
                     binding.searchViewParentConstraintLayout.visibility = View.VISIBLE
                     binding.searchViewNoSearchResultLinearLayout.visibility = View.GONE
-                    binding.searchViewRecyclerView.visibility = View.VISIBLE
+                    binding.searchViewRecyclerView.visibility = View.GONE
+                    viewModel.getReelQueries(topicId)
                 }
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -170,123 +177,88 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
             R.style.ListReelsToolbarSubTitleAppearance
         )
 
+        binding.searchViewParentConstraintLayout.visibility = View.GONE
+        binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+        //reels
         binding.reelsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.reelsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
-
+        binding.reelsRecyclerView.adapter = reelsRecyclerAdapter
         viewModel.reels.observe(viewLifecycleOwner) {
-            binding.searchViewParentConstraintLayout.visibility = View.GONE
-            binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
+            if (!isSearchViewOpen) binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     toolbar.subtitle = "Failed to fetch contents..."
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultLinearLayout.visibility = View.GONE
-                    binding.reelsRecyclerView.visibility = View.GONE
+                    reelsLoadingFailed()
                 }
 
                 DataStatus.Status.Loading -> {
                     toolbar.subtitle = "Loading..."
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.reelsRecyclerView.visibility = View.GONE
-                    binding.noSearchResultLinearLayout.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    binding.shimmerLayout.startShimmer()
+                    reelsLoading()
                 }
 
                 DataStatus.Status.Success -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultLinearLayout.visibility = View.GONE
-                    binding.reelsRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
+                        reelsLoaded()
                         toolbar.subtitle = "${list.size} contents"
-                        youtubeContentViewRecyclerViewAdapter.setYoutubeContentViewList(list)
+                        binding.reelsRecyclerView.adapter = reelsRecyclerAdapter
+                        reelsRecyclerAdapter.setYoutubeContentViewList(list)
                     }
                 }
 
                 DataStatus.Status.EmptyResult -> {
                     toolbar.subtitle = "Currently no contents available..."
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.reelsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultLinearLayout.visibility = View.VISIBLE
+                    emptyReels()
                 }
 
                 DataStatus.Status.NoInternet -> {
                     toolbar.subtitle = "No internet!"
                     loadingReelsFailed = true
-                    binding.reelsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.noSearchResultLinearLayout.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.VISIBLE
+                    reelsLoadingFailed()
                 }
 
                 DataStatus.Status.TimeOut -> {
                     toolbar.subtitle = "Oops! Time out. Try again"
-                }
-
-                DataStatus.Status.UnKnownException -> {
-                    toolbar.subtitle = "Failed to fetch contents..."
-                    it.message?.let { message ->
-                        val snackBar = Snackbar.make(
-                            binding.parentConstraintLayout,
-                            message,
-                            Snackbar.LENGTH_LONG
-                        )
-                        snackBar.show()
-                    }
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultLinearLayout.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.reelsRecyclerView.visibility = View.GONE
+                    reelsLoadingFailed()
                 }
 
                 else -> {
-
+                    reelsLoadingFailed()
                 }
             }
         }
 
+        binding.reelsRefreshButton.setOnClickListener {
+            viewModel.getReels(topicId)
+        }
+        //search
         binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.searchViewRecyclerView.adapter = searchResultAdapter
+        binding.searchViewRecyclerView.adapter = searchResultRecyclerAdapter
 
         viewModel.searchResult.observe(viewLifecycleOwner) {
-            binding.reelsViewParentConstraintLayout.visibility = View.GONE
-            binding.searchViewParentConstraintLayout.visibility = View.VISIBLE
+            if (isSearchViewOpen) binding.searchViewParentConstraintLayout.visibility = View.VISIBLE
             when (it.status) {
+                DataStatus.Status.Loading -> {
+                    searchResultSuccess()
+                    searchResultRecyclerAdapter.setYoutubeContentViewList(dummyReelsList)
+                }
+
                 DataStatus.Status.Success -> {
-                    binding.searchViewNoSearchResultLinearLayout.visibility = View.GONE
-                    binding.searchViewRecyclerView.visibility = View.VISIBLE
                     it.data?.let { list ->
-                        searchResultAdapter.setYoutubeContentViewList(list)
+                        searchResultSuccess()
+                        searchResultRecyclerAdapter.setYoutubeContentViewList(list)
                     }
                 }
 
                 DataStatus.Status.EmptyResult -> {
-                    binding.searchViewRecyclerView.visibility = View.GONE
-                    binding.searchViewNoSearchResultLinearLayout.visibility = View.VISIBLE
+                    noSearchResult()
                 }
 
                 else -> {
-
+                    noSearchResult()
                 }
             }
         }
-
-        binding.retryAfterNoInternetButton.setOnClickListener {
-            viewModel.getReels(topicId)
-        }
-
-        binding.retryAfterNoResultButton.setOnClickListener {
-            viewModel.getReels(topicId)
-        }
-
+        //connectivity listener
         connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
             when (isAvailable) {
                 true -> {
@@ -301,6 +273,49 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 }
             }
         }
+    }
+
+    private fun hideSearchResultView() {
+        binding.searchViewNoSearchResultLinearLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.visibility = View.GONE
+    }
+
+    private fun emptyReels() {
+        binding.reelsRecyclerView.adapter = null
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.noResultLinearLayout.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoading() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+        binding.reelsRecyclerView.adapter = null
+        reelsRecyclerAdapter.setYoutubeContentViewList(dummyReelsList)
+        binding.reelsRecyclerView.adapter = reelsRecyclerAdapter
+    }
+
+    private fun reelsLoaded() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoadingFailed() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.VISIBLE
+    }
+
+    private fun noSearchResult() {
+        binding.searchViewRecyclerView.visibility = View.GONE
+        binding.searchViewNoSearchResultLinearLayout.visibility = View.VISIBLE
+    }
+
+    private fun searchResultSuccess() {
+        binding.searchViewNoSearchResultLinearLayout.visibility = View.GONE
+        binding.searchViewRecyclerView.visibility = View.VISIBLE
     }
 
     private fun startAlternateHint() {

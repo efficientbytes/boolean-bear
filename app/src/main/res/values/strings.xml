@@ -131,5 +131,7 @@
     <string name="watch_for_free">Watch For Free</string>
     <string name="premium_courses">Premium Courses</string>
     <string name="binge_on_free_contents">Binge on free contents</string>
+    <string name="we_could_not_find_anything_under_the_selected_topic">We could not find anything under the selected topic</string>
+    <string name="empty_space">\t\t\t\t\t\t\t</string>
 
 </resources>

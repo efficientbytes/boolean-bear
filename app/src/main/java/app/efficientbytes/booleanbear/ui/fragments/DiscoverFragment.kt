@@ -50,6 +50,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         super.onViewCreated(view, savedInstanceState)
 
         binding.refreshButton.visibility = View.GONE
+
         val reelTopicsManager = GridLayoutManager(context, 2)
         binding.reelTopicsRecyclerView.layoutManager = reelTopicsManager
         binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
@@ -60,7 +61,6 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                     binding.reelTopicsRecyclerView.visibility = View.VISIBLE
                     binding.refreshButton.visibility = View.GONE
                     reelTopicsRecyclerViewAdapter.setReelTopicList(dummyList)
-                    binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
                 }
 
                 DataStatus.Status.Success -> {
@@ -80,7 +80,6 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                                     }
                                 }
                             }
-                        binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
                     }
                 }
 

@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="banner"
             type="app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner" />
@@ -18,11 +20,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:selectableItemBackground"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp">
+        android:layout_marginEnd="8dp"
+        android:background="?android:selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/bannerCardView"
@@ -31,6 +33,8 @@
             android:clickable="true"
             android:focusable="true"
             android:onClick="@{onClick}"
+            android:visibility="visible"
+            app:cardBackgroundColor="@color/transparent"
             app:cardCornerRadius="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,10 +45,11 @@
                 android:layout_height="match_parent">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/bannerImg"
+                    android:id="@+id/bannerImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
+                    android:visibility="@{(banner!=null)? View.VISIBLE :View.GONE}"
                     app:layout_constraintDimensionRatio="16:9"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +58,22 @@
                     tools:src="@tools:sample/backgrounds/scenic[26]">
 
                 </com.google.android.material.imageview.ShapeableImageView>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="@{(banner==null)? View.VISIBLE :View.GONE}">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/black_400"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -21,6 +21,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -44,9 +45,13 @@ class HomeViewModel(
 
     private val _reels: MutableLiveData<DataStatus<List<RemoteReel>>> = MutableLiveData()
     val reels: LiveData<DataStatus<List<RemoteReel>>> = _reels
+    private var fetchReelsJob: Job? = null
 
     fun getReels(topicId: String) {
-        externalScope.launch {
+        if (fetchReelsJob != null) {
+            fetchReelsJob!!.cancel()
+        }
+        fetchReelsJob = externalScope.launch {
             assetsRepository.getReels(topicId).collect {
                 _reels.postValue(it)
             }

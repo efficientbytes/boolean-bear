@@ -28,10 +28,13 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
-import app.efficientbytes.booleanbear.ui.adapters.HomeFragmentChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
+import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.dummyHomePageBannersList
+import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
+import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.appbar.AppBarLayout
@@ -41,7 +44,7 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Locale
 import kotlin.math.abs
 
-class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClickListener,
+class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
     InfiniteViewPagerAdapter.OnItemClickListener {
 
@@ -50,20 +53,23 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private val infiniteRecyclerAdapter: InfiniteViewPagerAdapter by lazy {
-        InfiniteViewPagerAdapter(emptyList(), this@HomeFragment)
-    }
     private val bannerHandler = Handler(Looper.getMainLooper())
     private var bannerRunnable: Runnable? = null
     private var currentPage = 1
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
-    private val homeFragmentChipRecyclerViewAdapter: HomeFragmentChipRecyclerViewAdapter by lazy {
-        HomeFragmentChipRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+    private val bannerViewPagerAdapter: InfiniteViewPagerAdapter by lazy {
+        InfiniteViewPagerAdapter(dummyHomePageBannersList, this@HomeFragment)
     }
-    private val youtubeContentViewRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
-        YoutubeContentViewRecyclerViewAdapter(emptyList(), requireContext(), this@HomeFragment)
+    private val reelTopicsChipRecyclerViewAdapter: ReelTopicsChipRecyclerViewAdapter by lazy {
+        ReelTopicsChipRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@HomeFragment)
+    }
+    private val reelsRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
+    }
+    private val searchResultRecyclerViewAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
+        YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var loginToContinueFragment: LoginToContinueFragment? = null
@@ -98,6 +104,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.home_toolbar, menu)
@@ -112,10 +119,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                         isSearchViewOpen = false
                         hintHandler.removeCallbacksAndMessages(null)
                         hintRunnable = null
-                        binding.searchConstraintParentLayout.visibility = View.GONE
-                        binding.searchViewRecyclerView.adapter = null
+                        binding.searchResultsParentConstraintLayout.visibility = View.GONE
                         binding.appBarLayout.visibility = View.VISIBLE
-                        binding.contentParentConstraintLayout.visibility = View.VISIBLE
+                        binding.mainContentParentNestedScrollView.visibility = View.VISIBLE
                         return true
                     }
 
@@ -138,8 +144,10 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                     isSearchViewOpen = true
                     startAlternateHint()
                     binding.appBarLayout.visibility = View.GONE
-                    binding.contentParentConstraintLayout.visibility = View.GONE
-                    binding.searchConstraintParentLayout.visibility = View.VISIBLE
+                    binding.mainContentParentNestedScrollView.visibility = View.GONE
+                    binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
+                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+                    binding.searchResultsRecyclerView.visibility = View.GONE
                     viewModel.getReelQueries(selectedReelTopicId)
                 }
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -155,9 +163,9 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                             if (!query.startsWith("#")) {
                                 viewModel.getReelQueries(selectedReelTopicId, this)
                             } else {
-                                binding.searchViewRecyclerView.visibility = View.GONE
-                                binding.searchViewNoSearchResultConstraintLayout.visibility =
+                                binding.searchResultsNoResultParentConstraintLayout.visibility =
                                     View.GONE
+                                binding.searchResultsRecyclerView.visibility = View.GONE
                             }
                         }
                         return true
@@ -193,164 +201,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
                 return false
             }
         }, viewLifecycleOwner)
-        //set reel topics recycler view
-        binding.categoriesRecyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        viewModel.reelTopics.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.EmptyResult -> {
-                    //there is some problem
-                    //show retry button
-
-                }
-
-                DataStatus.Status.Failed -> {
-                    //there is some problem
-                    //show retry button
-
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.contentCategoryShimmerScrollView.visibility = View.VISIBLE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    loadingReelTopicsFailed = true
-                    //show no internet
-                    //show retry button
-                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-
-                }
-
-                DataStatus.Status.Success -> {
-                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.VISIBLE
-                    val list = it.data
-                    if (!list.isNullOrEmpty()) {
-                        homeFragmentChipRecyclerViewAdapter.setReelTopics(list.subList(0, 5))
-                        binding.categoriesRecyclerView.adapter =
-                            homeFragmentChipRecyclerViewAdapter
-                        val firstTopic = list.find { topic -> topic.displayIndex == 1 }
-                        if (firstTopic != null) {
-                            selectedReelTopic = firstTopic.topic
-                            selectedReelTopicId = firstTopic.topicId
-                            selectedReelTopicPosition = 0
-                            viewModel.getReels(firstTopic.topicId)
-                        }
-                    }
-
-                }
-
-                DataStatus.Status.TimeOut -> {
-                    loadingReelTopicsFailed = true
-                    //show time out
-                    //show retry button
-                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-
-                }
-
-                DataStatus.Status.UnKnownException -> {
-                    //there is some problem
-                    //show retry button
-                    //show snack bar with indefinite
-                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-
-                }
-
-                else -> {
-                    //there is some problem
-                    //show retry button
-                    binding.contentCategoryShimmerScrollView.visibility = View.GONE
-                    binding.categoriesRecyclerView.visibility = View.GONE
-
-                }
-            }
-        }
-        //set reels recycler view
-        binding.contentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.reels.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayoutNestedScrollView.visibility = View.VISIBLE
-                    binding.shimmerLayout.startShimmer()
-                }
-
-                DataStatus.Status.Success -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.VISIBLE
-                    it.data?.let { list ->
-                        youtubeContentViewRecyclerViewAdapter.setYoutubeContentViewList(list)
-                    }
-                    binding.contentsRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
-                }
-
-                DataStatus.Status.EmptyResult -> {
-                    binding.noInternetLinearLayout.visibility = View.GONE
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.VISIBLE
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    loadingReelsFailed = true
-                    binding.contentsRecyclerView.visibility = View.GONE
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayoutNestedScrollView.visibility = View.GONE
-                    binding.noSearchResultConstraintLayout.visibility = View.GONE
-                    binding.noInternetLinearLayout.visibility = View.VISIBLE
-                }
-
-                else -> {
-
-                }
-            }
-        }
-        //set search recycler view
-        binding.searchConstraintParentLayout.visibility = View.GONE
-        binding.searchViewRecyclerView.adapter = null
-        binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.searchResult.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Success -> {
-                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.GONE
-                    binding.searchViewRecyclerView.visibility = View.VISIBLE
-                    it.data?.let { list ->
-                        youtubeContentViewRecyclerViewAdapter.setYoutubeContentViewList(list)
-                    }
-                    binding.searchViewRecyclerView.adapter = youtubeContentViewRecyclerViewAdapter
-                }
-
-                DataStatus.Status.EmptyResult -> {
-                    binding.searchViewRecyclerView.visibility = View.GONE
-                    binding.searchViewNoSearchResultConstraintLayout.visibility = View.VISIBLE
-                }
-
-                else -> {
-
-                }
-            }
-        }
-
+        //for banner ads
+        binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
         binding.appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
             if (verticalOffset == 0) {
                 startAutoScroll()
@@ -360,16 +212,13 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             } else {
             }
         })
-
-        binding.infiniteViewPager.adapter = infiniteRecyclerAdapter
         viewModel.viewPagerBannerAds.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Success -> {
                     it.data?.let { banners ->
                         binding.appBarLayout.visibility = View.VISIBLE
-                        binding.infiniteViewPager.setBackgroundColor(requireContext().getColor(R.color.black))
-                        infiniteRecyclerAdapter.setViewPagerList(banners)
-                        binding.infiniteViewPager.currentItem = 1
+                        bannerViewPagerAdapter.setViewPagerList(banners)
+                        binding.bannerAdsViewPager.currentItem = 1
                         onInfinitePageChangeCallback(banners.size + 2)
                         startAutoScroll()
                     }
@@ -377,20 +226,160 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
                 DataStatus.Status.NoInternet -> {
                     binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
                     loadingBannersFailed = true
                 }
 
                 DataStatus.Status.Loading -> {
                     binding.appBarLayout.visibility = View.VISIBLE
-                    binding.infiniteViewPager.setBackgroundColor(requireContext().getColor(R.color.black_400))
+                    binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
+                    bannerViewPagerAdapter.setViewPagerList(dummyHomePageBannersList)
+                    binding.bannerAdsViewPager.currentItem = 1
+                }
+
+                DataStatus.Status.EmptyResult -> {
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
                 }
 
                 else -> {
                     binding.appBarLayout.visibility = View.GONE
+                    binding.bannerAdsViewPager.adapter = null
                 }
             }
         }
+        //for reel topics
+        val reelTopicsLayoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.reelTopicsRecyclerView.layoutManager = reelTopicsLayoutManager
+        binding.reelTopicsRecyclerView.adapter = reelTopicsChipRecyclerViewAdapter
+        viewModel.reelTopics.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    topicsLoadingFailed()
+                }
 
+                DataStatus.Status.Failed -> {
+                    topicsLoadingFailed()
+                }
+
+                DataStatus.Status.Loading -> {
+                    topicsLoading()
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingReelTopicsFailed = true
+                    topicsLoadingFailed()
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { list ->
+                        if (list.isNotEmpty()) {
+                            topicsLoaded()
+                            reelTopicsChipRecyclerViewAdapter.setReelTopics(list.subList(0, 5))
+                            val firstTopic = list.find { topic -> topic.displayIndex == 1 }
+                            if (firstTopic != null) {
+                                selectedReelTopic = firstTopic.topic
+                                selectedReelTopicId = firstTopic.topicId
+                                selectedReelTopicPosition = 0
+                                viewModel.getReels(firstTopic.topicId)
+                            }
+                        } else {
+                            topicsLoadingFailed()
+                        }
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    topicsLoadingFailed()
+                }
+
+                DataStatus.Status.UnKnownException -> {
+                    topicsLoadingFailed()
+                }
+
+                else -> {
+                    topicsLoadingFailed()
+                }
+            }
+        }
+        binding.reelTopicsRefreshButton.setOnClickListener {
+            viewModel.getReelTopics()
+        }
+        //for reels
+        val reelsLayoutManager = LinearLayoutManager(requireContext())
+        binding.reelsRecyclerView.layoutManager = reelsLayoutManager
+        binding.reelsRecyclerView.adapter = reelsRecyclerViewAdapter
+        viewModel.reels.observe(viewLifecycleOwner) {
+            if (!isSearchViewOpen) binding.mainContentParentNestedScrollView.visibility =
+                View.VISIBLE
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    emptyReels()
+                }
+
+                DataStatus.Status.Failed -> {
+                    reelsLoadingFailed()
+                }
+
+                DataStatus.Status.Loading -> {
+                    reelsLoading()
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    loadingReelsFailed = true
+                    reelsLoadingFailed()
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { list ->
+                        reelsLoaded()
+                        reelsRecyclerViewAdapter.setYoutubeContentViewList(list)
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    reelsLoadingFailed()
+                }
+
+                else -> {
+                    reelsLoadingFailed()
+                }
+            }
+        }
+        binding.reelsRefreshButton.setOnClickListener {
+            viewModel.getReels(selectedReelTopicId)
+        }
+        //for search result
+        val searchResultLayoutManager = LinearLayoutManager(requireContext())
+        binding.searchResultsRecyclerView.layoutManager = searchResultLayoutManager
+        binding.searchResultsRecyclerView.adapter = searchResultRecyclerViewAdapter
+        viewModel.searchResult.observe(viewLifecycleOwner) {
+            if (isSearchViewOpen) binding.searchResultsParentConstraintLayout.visibility =
+                View.VISIBLE
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    searchEmptyResult()
+                }
+
+                DataStatus.Status.Loading -> {
+                    searchResultSuccess()
+                    searchResultRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { list ->
+                        searchResultSuccess()
+                        searchResultRecyclerViewAdapter.setYoutubeContentViewList(list)
+                    }
+                }
+
+                else -> {
+                    searchEmptyResult()
+                }
+            }
+        }
+        //for connectivity listener
         connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
             when (isAvailable) {
                 true -> {
@@ -414,13 +403,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
             }
         }
 
-        binding.retryAfterNoResultButton.setOnClickListener {
-            viewModel.getReels(selectedReelTopicId)
-        }
 
-        binding.retryAfterNoInternetButton.setOnClickListener {
-            viewModel.getReels(selectedReelTopicId)
-        }
         mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
             it?.let { contentId ->
                 watchContentViaIntent(contentId)
@@ -436,14 +419,80 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
         }
     }
 
+    private fun topicsLoadingFailed() {
+        binding.reelTopicsRecyclerView.visibility = View.GONE
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.VISIBLE
+    }
+
+    private fun topicsLoading() {
+        binding.reelTopicsRecyclerView.visibility = View.VISIBLE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+        reelTopicsChipRecyclerViewAdapter.setReelTopics(dummyReelTopicsList)
+        reelsRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+    }
+
+    private fun topicsLoaded() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun emptyReels() {
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.noResultLinearLayout.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoading() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+        binding.reelsRecyclerView.adapter = null
+        reelsRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
+        binding.reelsRecyclerView.adapter = reelsRecyclerViewAdapter
+    }
+
+    private fun reelsLoaded() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun reelsLoadingFailed() {
+        binding.noResultLinearLayout.visibility = View.GONE
+        binding.reelTopicsRefreshButton.visibility = View.GONE
+        binding.reelsRecyclerView.visibility = View.GONE
+        binding.reelsRefreshButton.visibility = View.VISIBLE
+    }
+
+    private fun searchEmptyResult() {
+        binding.searchResultsRecyclerView.visibility = View.GONE
+        binding.searchResultsNoResultParentConstraintLayout.visibility = View.VISIBLE
+    }
+
+    private fun searchResultSuccess() {
+        binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+        binding.searchResultsRecyclerView.visibility = View.VISIBLE
+    }
+
     private fun startAutoScroll() {
         if (bannerRunnable == null) {
             bannerRunnable = object : Runnable {
                 override fun run() {
-                    if (currentPage == (binding.infiniteViewPager.adapter?.itemCount ?: 1)) {
+                    if (currentPage == (binding.bannerAdsViewPager.adapter?.itemCount ?: 1)) {
                         currentPage = 1
                     }
-                    binding.infiniteViewPager.setCurrentItem(currentPage++, true)
+                    binding.bannerAdsViewPager.setCurrentItem(currentPage++, true)
                     bannerHandler.postDelayed(this, delay3k)
                 }
             }
@@ -470,21 +519,19 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     private fun onInfinitePageChangeCallback(listSize: Int) {
-        binding.infiniteViewPager.adapter = null
-        binding.infiniteViewPager.adapter = infiniteRecyclerAdapter
-        binding.infiniteViewPager.registerOnPageChangeCallback(object :
+        binding.bannerAdsViewPager.registerOnPageChangeCallback(object :
             ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
 
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    when (binding.infiniteViewPager.currentItem) {
-                        listSize - 1 -> binding.infiniteViewPager.setCurrentItem(
+                    when (binding.bannerAdsViewPager.currentItem) {
+                        listSize - 1 -> binding.bannerAdsViewPager.setCurrentItem(
                             1,
                             false
                         )
 
-                        0 -> binding.infiniteViewPager.setCurrentItem(
+                        0 -> binding.bannerAdsViewPager.setCurrentItem(
                             listSize - 2,
                             false
                         )
@@ -511,7 +558,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onStop() {
         super.onStop()
-        if (infiniteRecyclerAdapter != null) {
+        if (bannerViewPagerAdapter != null) {
             bannerHandler.removeCallbacksAndMessages(null)
         }
         bannerRunnable = null
@@ -522,7 +569,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
 
     override fun onDestroy() {
         super.onDestroy()
-        if (infiniteRecyclerAdapter != null) {
+        if (bannerViewPagerAdapter != null) {
             bannerHandler.removeCallbacksAndMessages(null)
         }
         bannerRunnable = null
@@ -532,6 +579,7 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     }
 
     override fun onChipItemClicked(position: Int, remoteReelTopic: RemoteReelTopic) {
+        loadingReelsFailed = false
         selectedReelTopicPosition = position
         selectedReelTopicId = remoteReelTopic.topicId
         selectedReelTopic = remoteReelTopic.topic
@@ -545,8 +593,8 @@ class HomeFragment : Fragment(), HomeFragmentChipRecyclerViewAdapter.OnItemClick
     override fun onResume() {
         super.onResume()
         if (selectedReelTopicPosition != -1 && selectedReelTopicId.isNotBlank()) {
-            homeFragmentChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
-            homeFragmentChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)
+            reelTopicsChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
+            reelTopicsChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)
         }
         startAutoScroll()
         if (isSearchViewOpen) {

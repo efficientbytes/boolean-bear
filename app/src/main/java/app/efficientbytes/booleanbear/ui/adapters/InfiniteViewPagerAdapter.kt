@@ -21,7 +21,7 @@ class InfiniteViewPagerAdapter(
         listOf(itemList.last()) + itemList + listOf(itemList.first())
     }
 
-    fun setViewPagerList(itemList: List<RemoteHomePageBanner>){
+    fun setViewPagerList(itemList: List<RemoteHomePageBanner>) {
         this.itemList = emptyList()
         this.itemList = itemList
         this.updatedList = if (itemList.isEmpty()) {
@@ -36,13 +36,19 @@ class InfiniteViewPagerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RemoteHomePageBanner) {
-            binding.banner = item
-            binding.onClick = View.OnClickListener {
-                if (item.clickAble) {
-                    onItemClickListener.onBannerClicked(
-                        absoluteAdapterPosition,
-                        item
-                    )
+            if (item.createdOn == -1L && item.startingDate == -1L && item.closingDate == -1L && item.bannerId.isEmpty()) {
+                binding.banner = null
+                binding.shimmerLayout.startShimmer()
+            } else {
+                binding.shimmerLayout.stopShimmer()
+                binding.banner = item
+                binding.onClick = View.OnClickListener {
+                    if (item.clickAble) {
+                        onItemClickListener.onBannerClicked(
+                            absoluteAdapterPosition,
+                            item
+                        )
+                    }
                 }
             }
         }
