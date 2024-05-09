@@ -119,8 +119,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                         isSearchViewOpen = false
                         hintHandler.removeCallbacksAndMessages(null)
                         hintRunnable = null
-                        hideSearchResultView()
-                        showContents()
+                        binding.searchResultsParentConstraintLayout.visibility = View.GONE
+                        binding.appBarLayout.visibility = View.VISIBLE
+                        binding.mainContentParentNestedScrollView.visibility = View.VISIBLE
                         return true
                     }
 
@@ -142,8 +143,11 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     menu.findItem(R.id.discoverMenu).setVisible(false)
                     isSearchViewOpen = true
                     startAlternateHint()
-                    hideContents()
-                    showSearchResultView()
+                    binding.appBarLayout.visibility = View.GONE
+                    binding.mainContentParentNestedScrollView.visibility = View.GONE
+                    binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
+                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+                    binding.searchResultsRecyclerView.visibility = View.GONE
                     viewModel.getReelQueries(selectedReelTopicId)
                 }
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -307,6 +311,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelsRecyclerView.layoutManager = reelsLayoutManager
         binding.reelsRecyclerView.adapter = reelsRecyclerViewAdapter
         viewModel.reels.observe(viewLifecycleOwner) {
+            if (!isSearchViewOpen) binding.mainContentParentNestedScrollView.visibility =
+                View.VISIBLE
             when (it.status) {
                 DataStatus.Status.EmptyResult -> {
                     emptyReels()
@@ -326,8 +332,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 }
 
                 DataStatus.Status.Success -> {
-                    reelsLoaded()
                     it.data?.let { list ->
+                        reelsLoaded()
                         reelsRecyclerViewAdapter.setYoutubeContentViewList(list)
                     }
                 }
@@ -349,27 +355,27 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.searchResultsRecyclerView.layoutManager = searchResultLayoutManager
         binding.searchResultsRecyclerView.adapter = searchResultRecyclerViewAdapter
         viewModel.searchResult.observe(viewLifecycleOwner) {
+            if (isSearchViewOpen) binding.searchResultsParentConstraintLayout.visibility =
+                View.VISIBLE
             when (it.status) {
                 DataStatus.Status.EmptyResult -> {
-                    binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
-                    binding.searchResultsRecyclerView.visibility = View.GONE
-                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.VISIBLE
+                    searchEmptyResult()
                 }
 
                 DataStatus.Status.Loading -> {
+                    searchResultSuccess()
                     searchResultRecyclerViewAdapter.setYoutubeContentViewList(dummyReelsList)
                 }
 
                 DataStatus.Status.Success -> {
                     it.data?.let { list ->
-                        showSearchResultView()
+                        searchResultSuccess()
                         searchResultRecyclerViewAdapter.setYoutubeContentViewList(list)
                     }
                 }
 
                 else -> {
-                    binding.searchResultsRecyclerView.visibility = View.GONE
-                    binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+                    searchEmptyResult()
                 }
             }
         }
@@ -469,26 +475,14 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.reelsRefreshButton.visibility = View.VISIBLE
     }
 
-    private fun hideSearchResultView() {
-        binding.searchResultsParentConstraintLayout.visibility = View.GONE
-        binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
+    private fun searchEmptyResult() {
         binding.searchResultsRecyclerView.visibility = View.GONE
+        binding.searchResultsNoResultParentConstraintLayout.visibility = View.VISIBLE
     }
 
-    private fun showSearchResultView() {
-        binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
+    private fun searchResultSuccess() {
         binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
         binding.searchResultsRecyclerView.visibility = View.VISIBLE
-    }
-
-    private fun showContents() {
-        binding.appBarLayout.visibility = View.VISIBLE
-        binding.mainContentParentNestedScrollView.visibility = View.VISIBLE
-    }
-
-    private fun hideContents() {
-        binding.appBarLayout.visibility = View.GONE
-        binding.mainContentParentNestedScrollView.visibility = View.GONE
     }
 
     private fun startAutoScroll() {

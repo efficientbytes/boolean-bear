@@ -58,7 +58,7 @@ class ReelTopicsChipRecyclerViewAdapter(
                 //for shimmer
                 binding.topic = null
                 binding.chipCardView.strokeWidth = 0
-                binding.titleValueTextView.text = "                 "
+                binding.titleValueTextView.text = context.getString(R.string.empty_space)
                 binding.shimmerParentLayout.startShimmer()
             } else {
                 binding.shimmerParentLayout.stopShimmer()
