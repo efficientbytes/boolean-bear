@@ -133,5 +133,8 @@
     <string name="binge_on_free_contents">Binge on free contents</string>
     <string name="we_could_not_find_anything_under_the_selected_topic">We could not find anything under the selected topic</string>
     <string name="empty_space">\t\t\t\t\t\t\t</string>
+    <string name="hash_tags">Hash Tags</string>
+    <string name="mentioned_links">Mentioned Links</string>
+    <string name="description">Description</string>
 
 </resources>

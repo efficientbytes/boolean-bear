@@ -16,7 +16,7 @@
         android:paddingHorizontal="24dp"
         android:paddingTop="8dp"
         android:paddingBottom="24dp"
-        tools:context=".ui.fragments.ShuffledContentDescriptionFragment">
+        tools:context=".ui.fragments.ReelsDescriptionFragment">
 
         <View
             android:id="@+id/bottomSheetPullBarView"
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Description"
+            android:text="@string/description"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:fontFamily="@font/montserrat_medium">
@@ -58,11 +58,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Lorem ipsum dolor sit amet,at cupidatat non proident, ] qui officia deserunt mollit at laborum."
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:visibility="gone"
-                    app:fontFamily="@font/montserrat_medium">
+                    app:fontFamily="@font/montserrat_medium"
+                    tools:text="Lorem ipsum dolor sit amet,at cupidatat non proident, ] qui officia deserunt mollit at laborum.">
 
                 </com.google.android.material.textview.MaterialTextView>
 
@@ -119,13 +119,13 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:text="Anubhav.P.S"
                             android:textSize="14sp"
                             app:fontFamily="@font/montserrat"
                             app:layout_constraintBottom_toBottomOf="@id/instructorProfilePicImage"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@id/instructorProfilePicImage"
-                            app:layout_constraintTop_toTopOf="@id/instructorProfilePicImage">
+                            app:layout_constraintTop_toTopOf="@id/instructorProfilePicImage"
+                            tools:text="Anubhav.P.S">
 
                         </com.google.android.material.textview.MaterialTextView>
 
@@ -154,10 +154,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
-                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                     android:textSize="14sp"
                     android:visibility="gone"
-                    app:fontFamily="@font/montserrat">
+                    app:fontFamily="@font/montserrat"
+                    tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.">
 
                 </com.google.android.material.textview.MaterialTextView>
 
@@ -182,7 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Mentioned Links"
+                    android:text="@string/mentioned_links"
                     android:textColor="@color/white"
                     app:fontFamily="@font/montserrat_medium" />
 
@@ -219,7 +219,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Hash tags"
+                    android:text="@string/hash_tags"
                     android:textColor="@color/white"
                     app:fontFamily="@font/montserrat_medium" />
 
