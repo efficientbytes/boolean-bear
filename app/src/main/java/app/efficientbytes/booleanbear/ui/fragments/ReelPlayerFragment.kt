@@ -89,7 +89,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()
-    private var shuffledContentDescriptionFragment: ShuffledContentDescriptionFragment? = null
+    private var reelsDescriptionFragment: ReelsDescriptionFragment? = null
     private var contentTitle: String = ""
     private var isPlayerQualityOrSpeedDialogOpened: Boolean = false
     private var currentVideoQuality = VideoQualityType.AUTO
@@ -453,14 +453,14 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     }
 
     private fun openDescriptionFragment() {
-        if (shuffledContentDescriptionFragment == null) {
-            shuffledContentDescriptionFragment = ShuffledContentDescriptionFragment()
+        if (reelsDescriptionFragment == null) {
+            reelsDescriptionFragment = ReelsDescriptionFragment()
         }
-        if (!ShuffledContentDescriptionFragment.isOpened) {
-            ShuffledContentDescriptionFragment.isOpened = true
-            shuffledContentDescriptionFragment!!.show(
+        if (!ReelsDescriptionFragment.isOpened) {
+            ReelsDescriptionFragment.isOpened = true
+            reelsDescriptionFragment!!.show(
                 parentFragmentManager,
-                ShuffledContentDescriptionFragment.SHUFFLED_DESCRIPTION_FRAGMENT
+                ReelsDescriptionFragment.SHUFFLED_DESCRIPTION_FRAGMENT
             )
         }
     }

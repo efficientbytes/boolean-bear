@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.booleanbear.R
-import app.efficientbytes.booleanbear.databinding.FragmentShuffledContentDescriptionBinding
+import app.efficientbytes.booleanbear.databinding.FragmentReelsDescriptionBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.ui.adapters.MentionedLinkRecyclerViewAdapter
@@ -21,10 +21,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
 
-class ShuffledContentDescriptionFragment : BottomSheetDialogFragment(),
+class ReelsDescriptionFragment : BottomSheetDialogFragment(),
     MentionedLinkRecyclerViewAdapter.OnItemClickListener {
 
-    private lateinit var _binding: FragmentShuffledContentDescriptionBinding
+    private lateinit var _binding: FragmentReelsDescriptionBinding
     private val binding get() = _binding
     private lateinit var rootView: View
     private val instructorLiveListener: InstructorLiveListener by inject()
@@ -42,7 +42,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment(),
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentShuffledContentDescriptionBinding.inflate(inflater, container, false)
+        _binding = FragmentReelsDescriptionBinding.inflate(inflater, container, false)
         rootView = binding.root
         return rootView
     }
@@ -135,7 +135,7 @@ class ShuffledContentDescriptionFragment : BottomSheetDialogFragment(),
                             MentionedLinkRecyclerViewAdapter(
                                 list,
                                 requireContext(),
-                                this@ShuffledContentDescriptionFragment
+                                this@ReelsDescriptionFragment
                             )
                     }
                     binding.mentionedLinksRecyclerView.adapter = mentionedLinkRecyclerViewAdapter
