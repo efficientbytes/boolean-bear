@@ -216,6 +216,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             when (it.status) {
                 DataStatus.Status.Success -> {
                     it.data?.let { banners ->
+                        binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
                         binding.appBarLayout.visibility = View.VISIBLE
                         bannerViewPagerAdapter.setViewPagerList(banners)
                         binding.bannerAdsViewPager.currentItem = 1
@@ -231,8 +232,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.appBarLayout.visibility = View.VISIBLE
                     binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
+                    binding.appBarLayout.visibility = View.VISIBLE
                     bannerViewPagerAdapter.setViewPagerList(dummyHomePageBannersList)
                     binding.bannerAdsViewPager.currentItem = 1
                 }
