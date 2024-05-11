@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,6 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         super.onViewCreated(view, savedInstanceState)
 
         binding.refreshButton.visibility = View.GONE
-
         val reelTopicsManager = GridLayoutManager(context, 2)
         binding.reelTopicsRecyclerView.layoutManager = reelTopicsManager
         binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
@@ -114,6 +114,34 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
 
         binding.refreshButton.setOnClickListener {
             viewModel.getReelTopics()
+        }
+
+        viewModel.courseBundle.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+
+                }
+
+                DataStatus.Status.Failed -> {
+
+                }
+
+                DataStatus.Status.Loading -> {
+
+                }
+
+                DataStatus.Status.NoInternet -> {
+
+                }
+
+                DataStatus.Status.Success -> {
+
+                }
+
+                else -> {
+
+                }
+            }
         }
 
 
