@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -51,10 +52,37 @@ class DiscoverViewModel(
         }
     }
 
+    private val _courseBundle: MutableLiveData<DataStatus<List<RemoteCourseBundles>>> =
+        MutableLiveData()
+    val courseBundle: LiveData<DataStatus<List<RemoteCourseBundles>>> = _courseBundle
+
+    fun getCourseBundle() {
+        externalScope.launch {
+            assetsRepository.getCourseBundle().collect {
+                when (it.status) {
+                    DataStatus.Status.Loading -> {
+                        _courseBundle.postValue(it)
+                    }
+
+                    DataStatus.Status.Success -> {
+                        delay(1500)
+                        _courseBundle.postValue(it)
+                    }
+
+                    else -> {
+                        delay(4000)
+                        _courseBundle.postValue(it)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
                 getReelTopics()
+                getCourseBundle()
             }
 
             ON_START -> {
