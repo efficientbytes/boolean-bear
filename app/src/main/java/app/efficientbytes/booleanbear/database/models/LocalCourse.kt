@@ -8,7 +8,7 @@ import app.efficientbytes.booleanbear.utils.COURSE_TABLE_FTS
 import app.efficientbytes.booleanbear.utils.COURSE_TOPIC_TABLE
 
 @Entity(tableName = COURSE_TOPIC_TABLE)
-data class RemoteCourseTopic(
+data class LocalCourseTopic(
     @PrimaryKey(autoGenerate = false)
     val topicId: String,
     val topic: String,
@@ -17,7 +17,7 @@ data class RemoteCourseTopic(
 )
 
 @Entity(tableName = COURSE_TABLE)
-data class RemoteCourse(
+data class LocalCourse(
     @PrimaryKey(autoGenerate = false)
     val courseId: String,
     val title: String,
@@ -30,8 +30,8 @@ data class RemoteCourse(
 )
 
 @Entity(tableName = COURSE_TABLE_FTS)
-@Fts4(contentEntity = RemoteCourse::class)
-data class RemoteCourseFTS(
+@Fts4(contentEntity = LocalCourse::class)
+data class LocalCourseFTS(
     val courseId: String,
     val topicId: String,
     val title: String,
