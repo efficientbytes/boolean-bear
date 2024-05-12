@@ -39,6 +39,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private val viewModel: ListReelViewModel by inject()
     private lateinit var topicId: String
     private lateinit var topic: String
+    private var toolbar: MaterialToolbar? = null
     private val reelsRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(
             dummyReelsList,
@@ -169,13 +170,18 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
             }
         }, viewLifecycleOwner)
         val activity = requireActivity()
-        val toolbar = activity.findViewById<MaterialToolbar>(R.id.mainToolbar)
-        toolbar.setTitleTextAppearance(requireContext(), R.style.ListReelsToolbarTitleAppearance)
-        toolbar.title = this.topic
-        toolbar.setSubtitleTextAppearance(
-            requireContext(),
-            R.style.ListReelsToolbarSubTitleAppearance
-        )
+        if (toolbar == null) {
+            toolbar = activity.findViewById(R.id.mainToolbar)
+            toolbar?.setTitleTextAppearance(
+                requireContext(),
+                R.style.ListReelsToolbarTitleAppearance
+            )
+            toolbar?.title = this.topic
+            toolbar?.setSubtitleTextAppearance(
+                requireContext(),
+                R.style.ListReelsToolbarSubTitleAppearance
+            )
+        }
 
         binding.searchViewParentConstraintLayout.visibility = View.GONE
         binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
@@ -187,37 +193,37 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
             if (!isSearchViewOpen) binding.reelsViewParentConstraintLayout.visibility = View.VISIBLE
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    toolbar.subtitle = "Failed to fetch contents..."
+                    toolbar?.subtitle = "Failed to fetch contents..."
                     reelsLoadingFailed()
                 }
 
                 DataStatus.Status.Loading -> {
-                    toolbar.subtitle = "Loading..."
+                    toolbar?.subtitle = "Loading..."
                     reelsLoading()
                 }
 
                 DataStatus.Status.Success -> {
                     it.data?.let { list ->
                         reelsLoaded()
-                        toolbar.subtitle = "${list.size} contents"
+                        toolbar?.subtitle = "${list.size} contents"
                         binding.reelsRecyclerView.adapter = reelsRecyclerAdapter
                         reelsRecyclerAdapter.setYoutubeContentViewList(list)
                     }
                 }
 
                 DataStatus.Status.EmptyResult -> {
-                    toolbar.subtitle = "Currently no contents available..."
+                    toolbar?.subtitle = "Currently no contents available..."
                     emptyReels()
                 }
 
                 DataStatus.Status.NoInternet -> {
-                    toolbar.subtitle = "No internet!"
+                    toolbar?.subtitle = "No internet!"
                     loadingReelsFailed = true
                     reelsLoadingFailed()
                 }
 
                 DataStatus.Status.TimeOut -> {
-                    toolbar.subtitle = "Oops! Time out. Try again"
+                    toolbar?.subtitle = "Oops! Time out. Try again"
                     reelsLoadingFailed()
                 }
 
@@ -371,6 +377,9 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         super.onResume()
         if (isSearchViewOpen) {
             startAlternateHint()
+        }
+        if (toolbar == null) {
+            toolbar = requireActivity().findViewById(R.id.mainToolbar)
         }
     }
 
