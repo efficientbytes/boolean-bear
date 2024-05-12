@@ -1,7 +1,6 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import app.efficientbytes.booleanbear.databinding.FragmentDiscoverBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
+import app.efficientbytes.booleanbear.ui.adapters.CourseBundleRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsRecyclerViewAdapter
+import app.efficientbytes.booleanbear.utils.CustomLinearLayoutManager
+import app.efficientbytes.booleanbear.utils.dummyCourseBundle
+import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
@@ -21,18 +24,11 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
     private lateinit var _binding: FragmentDiscoverBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val dummyList = listOf<RemoteReelTopic>(
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-    )
     private val reelTopicsRecyclerViewAdapter: ReelTopicsRecyclerViewAdapter by lazy {
-        ReelTopicsRecyclerViewAdapter(dummyList, requireContext(), this@DiscoverFragment)
+        ReelTopicsRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@DiscoverFragment)
+    }
+    private val courseBundlesRecyclerViewAdapter: CourseBundleRecyclerViewAdapter by lazy {
+        CourseBundleRecyclerViewAdapter(dummyCourseBundle, requireContext())
     }
     private val viewModel: DiscoverViewModel by inject()
 
@@ -60,7 +56,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                 DataStatus.Status.Loading -> {
                     binding.reelTopicsRecyclerView.visibility = View.VISIBLE
                     binding.refreshButton.visibility = View.GONE
-                    reelTopicsRecyclerViewAdapter.setReelTopicList(dummyList)
+                    reelTopicsRecyclerViewAdapter.setReelTopicList(dummyReelTopicsList)
                 }
 
                 DataStatus.Status.Success -> {
@@ -115,6 +111,11 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         binding.refreshButton.setOnClickListener {
             viewModel.getReelTopics()
         }
+        val linearLayoutManager = CustomLinearLayoutManager(requireContext())
+        linearLayoutManager.setScrollEnabled(false)
+        binding.courseBundleRecyclerView.layoutManager = linearLayoutManager
+
+        binding.courseBundleRecyclerView.adapter = courseBundlesRecyclerViewAdapter
 
         viewModel.courseBundle.observe(viewLifecycleOwner) {
             when (it.status) {
@@ -127,7 +128,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                 }
 
                 DataStatus.Status.Loading -> {
-
+                    courseBundlesRecyclerViewAdapter.setCourseTopicList(dummyCourseBundle)
                 }
 
                 DataStatus.Status.NoInternet -> {
@@ -135,7 +136,9 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                 }
 
                 DataStatus.Status.Success -> {
-
+                    it.data?.let { list ->
+                        courseBundlesRecyclerViewAdapter.setCourseTopicList(list)
+                    }
                 }
 
                 else -> {

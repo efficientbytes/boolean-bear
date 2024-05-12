@@ -4,8 +4,10 @@ import android.content.Context
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
 import android.net.ConnectivityManager
+import android.util.AttributeSet
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
@@ -473,4 +475,32 @@ fun extractUsernameFromGitHubUrl(gitHubUrl: String): String? {
 fun sanitizeSearchQuery(query: String): String {
     val queryWithEscapedQuotes = query.replace("-", " ").replace("\"", " ").trim()
     return "*$queryWithEscapedQuotes*"
+}
+
+class CustomLinearLayoutManager : LinearLayoutManager {
+
+    private var isScrollEnabled = true
+
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, orientation: Int, reverseLayout: Boolean) : super(
+        context,
+        orientation,
+        reverseLayout
+    )
+
+    constructor(
+        context: Context?,
+        attrs: AttributeSet?,
+        defStyleAttr: Int,
+        defStyleRes: Int
+    ) : super(context, attrs, defStyleAttr, defStyleRes)
+
+    fun setScrollEnabled(flag: Boolean) {
+        isScrollEnabled = flag
+    }
+
+    override fun canScrollHorizontally(): Boolean {
+        //Similarly you can customize "canScrollHorizontally()" for managing horizontal scroll
+        return isScrollEnabled && super.canScrollHorizontally()
+    }
 }

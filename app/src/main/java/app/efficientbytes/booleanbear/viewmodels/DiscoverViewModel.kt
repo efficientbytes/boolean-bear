@@ -65,7 +65,7 @@ class DiscoverViewModel(
                     }
 
                     DataStatus.Status.Success -> {
-                        delay(1500)
+                        delay(1000)
                         _courseBundle.postValue(it)
                     }
 

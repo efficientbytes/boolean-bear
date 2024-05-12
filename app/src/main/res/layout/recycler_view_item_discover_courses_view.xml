@@ -26,7 +26,10 @@
             android:id="@+id/courseParentConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="@{(course==null)?View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -37,12 +40,12 @@
                 android:layout_width="170dp"
                 android:layout_height="0dp"
                 android:scaleType="fitXY"
-                tools:src="@tools:sample/backgrounds/scenic[10]"
                 app:layout_constraintDimensionRatio="5:3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/RoundedSquare5">
+                app:shapeAppearanceOverlay="@style/RoundedSquare5"
+                tools:src="@tools:sample/backgrounds/scenic[10]">
 
             </com.google.android.material.imageview.ShapeableImageView>
 
@@ -50,20 +53,18 @@
                 android:id="@+id/titleValueTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/montserrat"
-                android:gravity="start|center_vertical"
+                android:gravity="start"
                 android:lines="2"
                 android:maxLines="2"
                 android:paddingHorizontal="4dp"
                 android:text="@{course.title}"
                 android:textColor="@color/white"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/thumbnailImage"
                 tools:ignore="SmallSp"
                 tools:text="Android Compose">
@@ -76,8 +77,7 @@
             android:id="@+id/shimmerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="@{(course==null)?View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -86,23 +86,23 @@
             <LinearLayout
                 android:id="@+id/shimmerLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="90dp"
                     app:cardBackgroundColor="@color/black_400"
-                    app:cardCornerRadius="4dp"
+                    app:cardCornerRadius="12dp"
                     app:strokeWidth="0dp" />
 
-                <com.google.android.material.card.MaterialCardView
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="14dp"
-                    android:layout_marginTop="8dp"
-                    app:cardBackgroundColor="@color/black_400"
-                    app:cardCornerRadius="1dp"
-                    app:strokeWidth="0dp" />
+                    android:layout_height="18dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/black_400">
+
+                </View>
 
             </LinearLayout>
 
