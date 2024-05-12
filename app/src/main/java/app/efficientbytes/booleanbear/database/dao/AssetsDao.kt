@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalCourse
+import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
@@ -88,7 +89,10 @@ interface AssetsDao {
     suspend fun deleteAllMentionedLinks()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCourseTopics(courseTopic: List<RemoteCourseTopic>)
+    suspend fun insertCourseTopic(courseTopic: LocalCourseTopic)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourseTopic(courseTopic: List<LocalCourseTopic>)
 
     @Query("DELETE FROM $COURSE_TOPIC_TABLE ")
     suspend fun deleteCourseTopics()

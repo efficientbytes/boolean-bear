@@ -1,6 +1,8 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
+import app.efficientbytes.booleanbear.database.models.LocalCourse
+import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
@@ -13,6 +15,7 @@ import app.efficientbytes.booleanbear.services.models.ReelPlayLink
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
@@ -552,6 +555,7 @@ class AssetsRepository(
                                 emit(DataStatus.emptyResult())
                             } else {
                                 emit(DataStatus.success(courseBundle))
+                                insertCourseBundle(courseBundle)
                             }
                         } else {
                             emit(DataStatus.emptyResult())
@@ -573,6 +577,47 @@ class AssetsRepository(
             emit(DataStatus.timeOut())
         } catch (exception: IOException) {
             emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }
+
+    suspend fun insertCourseBundle(courseBundle: List<RemoteCourseBundles>) {
+        externalScope.launch {
+            courseBundle.forEach { remoteCourseBundles ->
+                val remoteTopic = remoteCourseBundles.topicDetails
+                val localTopic = LocalCourseTopic(
+                    remoteTopic.topicId,
+                    remoteTopic.topic,
+                    remoteTopic.displayIndex,
+                    remoteTopic.type1Thumbnail
+                )
+                assetsDao.insertCourseTopic(localTopic)
+                val remoteCourses = remoteCourseBundles.courseList
+                val localCourses = remoteCourses.map { remoteCourse ->
+                    LocalCourse(
+                        remoteCourse.courseId,
+                        remoteCourse.title,
+                        remoteCourse.type1Thumbnail,
+                        remoteCourse.isAvailable,
+                        remoteCourse.nonAvailabilityReason,
+                        remoteCourse.hashTags,
+                        remoteCourse.createdOn,
+                        remoteCourse.topicId
+                    )
+                }
+                assetsDao.insertCourses(localCourses)
+            }
+        }
+    }
+
+    suspend fun deleteCourses() {
+        externalScope.launch {
+            assetsDao.deleteCourses()
+        }
+    }
+
+    suspend fun deleteCourseTopics() {
+        externalScope.launch {
+            assetsDao.deleteCourseTopics()
         }
     }
 
