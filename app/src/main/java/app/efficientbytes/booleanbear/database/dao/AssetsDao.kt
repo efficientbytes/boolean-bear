@@ -4,14 +4,20 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import app.efficientbytes.booleanbear.database.models.LocalCourse
+import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.LocalReelTopic
+import app.efficientbytes.booleanbear.services.models.RemoteCourse
+import app.efficientbytes.booleanbear.services.models.RemoteCourseTopic
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
+import app.efficientbytes.booleanbear.utils.COURSE_TABLE
+import app.efficientbytes.booleanbear.utils.COURSE_TOPIC_TABLE
 import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
 import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
 import app.efficientbytes.booleanbear.utils.REELS_TABLE
@@ -81,5 +87,26 @@ interface AssetsDao {
 
     @Query("DELETE FROM $MENTIONED_LINKS_TABLE ")
     suspend fun deleteAllMentionedLinks()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourseTopic(courseTopic: LocalCourseTopic)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourseTopic(courseTopic: List<LocalCourseTopic>)
+
+    @Query("DELETE FROM $COURSE_TOPIC_TABLE ")
+    suspend fun deleteCourseTopics()
+
+    @Query("SELECT * FROM $COURSE_TOPIC_TABLE ORDER BY displayIndex")
+    fun getCourseTopics(): List<RemoteCourseTopic>?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourses(courses: List<LocalCourse>)
+
+    @Query("SELECT * FROM $COURSE_TABLE WHERE topicId = :topic")
+    suspend fun getCourses(topic: String): List<RemoteCourse>?
+
+    @Query("DELETE FROM $COURSE_TABLE")
+    suspend fun deleteCourses()
 
 }

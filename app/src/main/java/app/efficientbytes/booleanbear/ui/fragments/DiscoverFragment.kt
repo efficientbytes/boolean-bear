@@ -10,9 +10,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import app.efficientbytes.booleanbear.databinding.FragmentDiscoverBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
+import app.efficientbytes.booleanbear.ui.adapters.CourseBundleRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsRecyclerViewAdapter
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.CustomLinearLayoutManager
+import app.efficientbytes.booleanbear.utils.dummyCourseBundle
+import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
-import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 
 class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickListener {
@@ -20,20 +24,16 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
     private lateinit var _binding: FragmentDiscoverBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val dummyList = listOf<RemoteReelTopic>(
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-        RemoteReelTopic("", "", -1, ""),
-    )
     private val reelTopicsRecyclerViewAdapter: ReelTopicsRecyclerViewAdapter by lazy {
-        ReelTopicsRecyclerViewAdapter(dummyList, requireContext(), this@DiscoverFragment)
+        ReelTopicsRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@DiscoverFragment)
+    }
+    private val courseBundlesRecyclerViewAdapter: CourseBundleRecyclerViewAdapter by lazy {
+        CourseBundleRecyclerViewAdapter(dummyCourseBundle, requireContext())
     }
     private val viewModel: DiscoverViewModel by inject()
+    private val connectivityListener: ConnectivityListener by inject()
+    private var reelTopicsInternetIssue = false
+    private var courseBundleInternetIssue = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,8 +49,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.refreshButton.visibility = View.GONE
-
+        binding.refreshReelTopicButton.visibility = View.GONE
         val reelTopicsManager = GridLayoutManager(context, 2)
         binding.reelTopicsRecyclerView.layoutManager = reelTopicsManager
         binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
@@ -58,14 +57,12 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         viewModel.reelTopics.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Loading -> {
-                    binding.reelTopicsRecyclerView.visibility = View.VISIBLE
-                    binding.refreshButton.visibility = View.GONE
-                    reelTopicsRecyclerViewAdapter.setReelTopicList(dummyList)
+                    hideReelTopicsRefreshButton()
+                    reelTopicsRecyclerViewAdapter.setReelTopicList(dummyReelTopicsList)
                 }
 
                 DataStatus.Status.Success -> {
-                    binding.reelTopicsRecyclerView.visibility = View.VISIBLE
-                    binding.refreshButton.visibility = View.GONE
+                    hideReelTopicsRefreshButton()
                     it.data?.let { list ->
                         reelTopicsRecyclerViewAdapter.setReelTopicList(list)
                         reelTopicsManager.spanSizeLookup =
@@ -83,40 +80,94 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                     }
                 }
 
-                DataStatus.Status.TimeOut -> {
-                    binding.reelTopicsRecyclerView.visibility = View.INVISIBLE
-                    binding.refreshButton.visibility = View.VISIBLE
-                }
-
-                DataStatus.Status.Failed -> {
-                    binding.reelTopicsRecyclerView.visibility = View.INVISIBLE
-                    binding.refreshButton.visibility = View.VISIBLE
-                }
-
                 DataStatus.Status.NoInternet -> {
-                    binding.reelTopicsRecyclerView.visibility = View.INVISIBLE
-                    binding.refreshButton.visibility = View.VISIBLE
+                    reelTopicsInternetIssue = true
+                    failedToLoadReelTopics()
                 }
 
                 else -> {
-                    it.message?.let { message ->
-                        Snackbar.make(
-                            binding.parentScrollView,
-                            message,
-                            Snackbar.LENGTH_INDEFINITE
-                        ).show()
-                    }
-                    binding.reelTopicsRecyclerView.visibility = View.INVISIBLE
-                    binding.refreshButton.visibility = View.VISIBLE
+                    failedToLoadReelTopics()
                 }
             }
         }
 
-        binding.refreshButton.setOnClickListener {
+        binding.refreshReelTopicButton.setOnClickListener {
             viewModel.getReelTopics()
         }
+        val linearLayoutManager = CustomLinearLayoutManager(requireContext())
+        linearLayoutManager.setScrollEnabled(false)
+        binding.courseBundleRecyclerView.layoutManager = linearLayoutManager
 
+        binding.courseBundleRecyclerView.adapter = courseBundlesRecyclerViewAdapter
 
+        viewModel.courseBundle.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Loading -> {
+                    hideCourseBundleRefreshButton()
+                    courseBundlesRecyclerViewAdapter.setCourseTopicList(dummyCourseBundle)
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { list ->
+                        hideCourseBundleRefreshButton()
+                        courseBundlesRecyclerViewAdapter.setCourseTopicList(list)
+                    }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    courseBundleInternetIssue = true
+                    failedToLoadCourseBundle()
+                }
+
+                else -> {
+                    failedToLoadCourseBundle()
+                }
+            }
+        }
+
+        binding.refreshCourseTopicButton.setOnClickListener {
+            viewModel.getCourseBundle()
+        }
+        //connectivity listener
+        connectivityListener.observe(viewLifecycleOwner) { isAvailable ->
+            when (isAvailable) {
+                true -> {
+                    if (reelTopicsInternetIssue) {
+                        reelTopicsInternetIssue = false
+                        viewModel.getReelTopics()
+                    }
+                    if (courseBundleInternetIssue) {
+                        courseBundleInternetIssue = false
+                        viewModel.getCourseBundle()
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+
+    }
+
+    private fun failedToLoadCourseBundle() {
+        binding.courseBundleRecyclerView.visibility = View.INVISIBLE
+        binding.refreshCourseTopicButton.visibility = View.VISIBLE
+    }
+
+    private fun failedToLoadReelTopics() {
+        binding.reelTopicsRecyclerView.visibility = View.INVISIBLE
+        binding.refreshReelTopicButton.visibility = View.VISIBLE
+    }
+
+    private fun hideReelTopicsRefreshButton() {
+        binding.reelTopicsRecyclerView.visibility = View.VISIBLE
+        binding.refreshReelTopicButton.visibility = View.GONE
+    }
+
+    private fun hideCourseBundleRefreshButton() {
+        binding.courseBundleRecyclerView.visibility = View.VISIBLE
+        binding.refreshCourseTopicButton.visibility = View.GONE
     }
 
     override fun onReelTopicItemClicked(remoteReelTopic: RemoteReelTopic) {

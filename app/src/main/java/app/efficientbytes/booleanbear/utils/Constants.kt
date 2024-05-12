@@ -1,5 +1,8 @@
 package app.efficientbytes.booleanbear.utils
 
+import app.efficientbytes.booleanbear.services.models.RemoteCourse
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
+import app.efficientbytes.booleanbear.services.models.RemoteCourseTopic
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
@@ -18,12 +21,16 @@ const val AUTH_CUSTOM_COROUTINE_SCOPE = "auth-scope"
 const val USER_SCREEN_TIMING_TABLE = "user_screen_timing"
 const val REELS_TABLE = "reels"
 const val REELS_TABLE_FTS = "reels_fts"
+const val COURSE_TOPIC_TABLE = "course_topic"
+const val COURSE_TABLE = "course"
+const val COURSE_TABLE_FTS = "course_fts"
 const val INSTRUCTOR_PROFILE_TABLE = "instructor_profile"
 const val MENTIONED_LINKS_TABLE = "mentioned_links"
 const val HOME_PAGE_BANNER_AD_TABLE = "home_page_banner_ad"
 const val FCM_TOKEN_TABLE = "fcm_token"
 const val ID_TOKEN_TABLE = "id_token"
 val dummyReelTopicsList = listOf<RemoteReelTopic>(
+    RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
@@ -38,4 +45,42 @@ val dummyReelsList = listOf<RemoteReel>(
 )
 val dummyHomePageBannersList = listOf<RemoteHomePageBanner>(
     RemoteHomePageBanner("", "", "", false, "", -1L, -1L, -1L),
+)
+val dummyCourseBundle = listOf<RemoteCourseBundle>(
+    RemoteCourseBundle(
+        RemoteCourseTopic("", "", -1, ""),
+        listOf<RemoteCourse>(
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+        )
+    ),
+    RemoteCourseBundle(
+        RemoteCourseTopic("", "", -1, ""),
+        listOf<RemoteCourse>(
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+        )
+    ),
+    RemoteCourseBundle(
+        RemoteCourseTopic("", "", -1, ""),
+        listOf<RemoteCourse>(
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+        )
+    ),
+    RemoteCourseBundle(
+        RemoteCourseTopic("", "", -1, ""),
+        listOf<RemoteCourse>(
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+            RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
+        )
+    ),
 )

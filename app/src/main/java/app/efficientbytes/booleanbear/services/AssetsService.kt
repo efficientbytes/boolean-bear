@@ -6,6 +6,7 @@ import app.efficientbytes.booleanbear.services.models.ReelPlayLink
 import app.efficientbytes.booleanbear.services.models.ReelResponse
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -25,7 +26,7 @@ interface AssetsService {
     @GET("reels/{reelId}/reel-details")
     suspend fun getReel(
         @Path("reelId") reelId: String,
-        @Query("in_detailed") detailed : Int = 0
+        @Query("in_detailed") detailed: Int = 0
     ): Response<ReelResponse>
 
     @GET("reels/{reelId}/reel-details")
@@ -48,4 +49,7 @@ interface AssetsService {
     suspend fun getMentionedLinks(
         @Path("linkId") linkId: String,
     ): Response<RemoteMentionedLinkResponse>
+
+    @GET("courses/course-bundle")
+    suspend fun getCourseBundle(): Response<RemoteCourseBundleResponse>
 }

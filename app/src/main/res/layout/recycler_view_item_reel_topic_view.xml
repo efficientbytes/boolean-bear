@@ -22,12 +22,12 @@
         android:id="@+id/reelTopicParentCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp"
+        android:layout_margin="4dp"
         android:clickable="@{(topic!=null) ? true : false}"
         android:focusable="@{(topic!=null) ? true : false}"
         android:onClick="@{onClick}"
         app:cardBackgroundColor="@color/transparent"
-        app:cardCornerRadius="6dp"
+        app:cardCornerRadius="8dp"
         app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,7 +64,7 @@
                 android:fontFamily="@font/montserrat"
                 android:gravity="center"
                 android:lines="2"
-                android:paddingHorizontal="30dp"
+                android:paddingHorizontal="20dp"
                 android:paddingVertical="16dp"
                 android:text="@{topic.topic}"
                 android:textColor="@color/white"
