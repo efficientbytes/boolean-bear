@@ -1,7 +1,7 @@
 package app.efficientbytes.booleanbear.utils
 
 import app.efficientbytes.booleanbear.services.models.RemoteCourse
-import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 import app.efficientbytes.booleanbear.services.models.RemoteCourseTopic
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
@@ -46,8 +46,8 @@ val dummyReelsList = listOf<RemoteReel>(
 val dummyHomePageBannersList = listOf<RemoteHomePageBanner>(
     RemoteHomePageBanner("", "", "", false, "", -1L, -1L, -1L),
 )
-val dummyCourseBundle = listOf<RemoteCourseBundles>(
-    RemoteCourseBundles(
+val dummyCourseBundle = listOf<RemoteCourseBundle>(
+    RemoteCourseBundle(
         RemoteCourseTopic("", "", -1, ""),
         listOf<RemoteCourse>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
@@ -56,7 +56,7 @@ val dummyCourseBundle = listOf<RemoteCourseBundles>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
         )
     ),
-    RemoteCourseBundles(
+    RemoteCourseBundle(
         RemoteCourseTopic("", "", -1, ""),
         listOf<RemoteCourse>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
@@ -65,7 +65,7 @@ val dummyCourseBundle = listOf<RemoteCourseBundles>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
         )
     ),
-    RemoteCourseBundles(
+    RemoteCourseBundle(
         RemoteCourseTopic("", "", -1, ""),
         listOf<RemoteCourse>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
@@ -74,7 +74,7 @@ val dummyCourseBundle = listOf<RemoteCourseBundles>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),
         )
     ),
-    RemoteCourseBundles(
+    RemoteCourseBundle(
         RemoteCourseTopic("", "", -1, ""),
         listOf<RemoteCourse>(
             RemoteCourse("", "", "", false, null, listOf(""), -1L, ""),

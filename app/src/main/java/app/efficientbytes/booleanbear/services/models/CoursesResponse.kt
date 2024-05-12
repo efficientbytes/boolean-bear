@@ -23,13 +23,13 @@ data class RemoteCourse(
 )
 
 @JsonClass(generateAdapter = true)
-data class RemoteCourseBundles(
+data class RemoteCourseBundle(
     val topicDetails: RemoteCourseTopic,
     val courseList: List<RemoteCourse>
 )
 
 @JsonClass(generateAdapter = true)
 data class RemoteCourseBundleResponse(
-    val data: List<RemoteCourseBundles>? = null,
+    val data: List<RemoteCourseBundle>? = null,
     val message: String? = null
 )

@@ -15,7 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -52,9 +52,9 @@ class DiscoverViewModel(
         }
     }
 
-    private val _courseBundle: MutableLiveData<DataStatus<List<RemoteCourseBundles>>> =
+    private val _courseBundle: MutableLiveData<DataStatus<List<RemoteCourseBundle>>> =
         MutableLiveData()
-    val courseBundle: LiveData<DataStatus<List<RemoteCourseBundles>>> = _courseBundle
+    val courseBundle: LiveData<DataStatus<List<RemoteCourseBundle>>> = _courseBundle
 
     fun getCourseBundle() {
         externalScope.launch {

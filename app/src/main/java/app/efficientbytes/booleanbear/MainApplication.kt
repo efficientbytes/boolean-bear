@@ -67,6 +67,8 @@ class MainApplication : Application() {
         utilityDataRepository.deleteIssueCategories()
         assetsRepository.deleteAllInstructorDetails()
         assetsRepository.deleteAllMentionedLinks()
+        assetsRepository.deleteCourseTopics()
+        assetsRepository.deleteCourses()
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
             userProfileRepository.listenToUserProfileChange(currentUser.uid)

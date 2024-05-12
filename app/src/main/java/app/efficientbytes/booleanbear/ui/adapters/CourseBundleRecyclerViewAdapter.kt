@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemDiscoverCourseTopicsViewBinding
-import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 
 class CourseBundleRecyclerViewAdapter(
-    private var itemList: List<RemoteCourseBundles>,
+    private var itemList: List<RemoteCourseBundle>,
     private val context: Context,
 ) : RecyclerView.Adapter<CourseBundleRecyclerViewAdapter.ViewHolder>() {
 
-    fun setCourseTopicList(itemList: List<RemoteCourseBundles>) {
+    fun setCourseTopicList(itemList: List<RemoteCourseBundle>) {
         this.itemList = emptyList()
         this.itemList = itemList
         notifyDataSetChanged()
@@ -37,7 +37,7 @@ class CourseBundleRecyclerViewAdapter(
     inner class ViewHolder(private val binding: RecyclerViewItemDiscoverCourseTopicsViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: RemoteCourseBundles) {
+        fun bind(item: RemoteCourseBundle) {
             binding.recyclerView.visibility = View.VISIBLE
             binding.recyclerView.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

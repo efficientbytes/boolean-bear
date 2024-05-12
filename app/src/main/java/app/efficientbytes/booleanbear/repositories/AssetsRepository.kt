@@ -14,8 +14,8 @@ import app.efficientbytes.booleanbear.services.models.ReelDetailsResponse
 import app.efficientbytes.booleanbear.services.models.ReelPlayLink
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
+import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
-import app.efficientbytes.booleanbear.services.models.RemoteCourseBundles
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
@@ -542,45 +542,62 @@ class AssetsRepository(
 
     suspend fun getCourseBundle() = flow {
         emit(DataStatus.loading())
-        try {
-            val response = assetsService.getCourseBundle()
-            val responseCode = response.code()
-            when {
-                responseCode == 200 -> {
-                    val body = response.body()
-                    if (body != null) {
-                        val courseBundle = body.data
-                        if (courseBundle != null) {
-                            if (courseBundle.isEmpty()) {
-                                emit(DataStatus.emptyResult())
-                            } else {
-                                emit(DataStatus.success(courseBundle))
-                                insertCourseBundle(courseBundle)
-                            }
-                        } else {
-                            emit(DataStatus.emptyResult())
-                        }
-                    }
-                }
-
-                responseCode >= 400 -> {
-                    val errorResponse: RemoteCourseBundleResponse = gson.fromJson(
-                        response.errorBody()!!.string(),
-                        RemoteCourseBundleResponse::class.java
-                    )
-                    emit(DataStatus.failed(errorResponse.message.toString()))
+        val courseTopicResult = assetsDao.getCourseTopics()
+        if (!courseTopicResult.isNullOrEmpty()) {
+            val courseBundle = ArrayList<RemoteCourseBundle>()
+            courseTopicResult.forEach { courseTopic ->
+                val topicId = courseTopic.topicId
+                val courseList = assetsDao.getCourses(topicId)
+                if (!courseList.isNullOrEmpty()) {
+                    courseBundle.add(RemoteCourseBundle(courseTopic, courseList))
                 }
             }
-        } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet())
-        } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut())
-        } catch (exception: IOException) {
-            emit(DataStatus.unknownException(exception.message.toString()))
+            if (courseBundle.isNotEmpty()) emit(
+                DataStatus.success(
+                    courseBundle
+                )
+            )
+        } else {
+            try {
+                val response = assetsService.getCourseBundle()
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val body = response.body()
+                        if (body != null) {
+                            val courseBundle = body.data
+                            if (courseBundle != null) {
+                                if (courseBundle.isEmpty()) {
+                                    emit(DataStatus.emptyResult())
+                                } else {
+                                    emit(DataStatus.success(courseBundle.sortedBy { bundle -> bundle.topicDetails.displayIndex }))
+                                    insertCourseBundle(courseBundle)
+                                }
+                            } else {
+                                emit(DataStatus.emptyResult())
+                            }
+                        }
+                    }
+
+                    responseCode >= 400 -> {
+                        val errorResponse: RemoteCourseBundleResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            RemoteCourseBundleResponse::class.java
+                        )
+                        emit(DataStatus.failed(errorResponse.message.toString()))
+                    }
+                }
+            } catch (noInternet: NoInternetException) {
+                emit(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                emit(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                emit(DataStatus.unknownException(exception.message.toString()))
+            }
         }
     }
 
-    suspend fun insertCourseBundle(courseBundle: List<RemoteCourseBundles>) {
+    suspend fun insertCourseBundle(courseBundle: List<RemoteCourseBundle>) {
         externalScope.launch {
             courseBundle.forEach { remoteCourseBundles ->
                 val remoteTopic = remoteCourseBundles.topicDetails
@@ -609,13 +626,13 @@ class AssetsRepository(
         }
     }
 
-    suspend fun deleteCourses() {
+    fun deleteCourses() {
         externalScope.launch {
             assetsDao.deleteCourses()
         }
     }
 
-    suspend fun deleteCourseTopics() {
+    fun deleteCourseTopics() {
         externalScope.launch {
             assetsDao.deleteCourseTopics()
         }
