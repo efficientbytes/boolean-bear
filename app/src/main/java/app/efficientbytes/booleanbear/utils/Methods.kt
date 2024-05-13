@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.utils
 
 import android.content.Context
+import android.content.Intent
 import android.icu.util.Calendar
 import android.icu.util.TimeZone
 import android.net.ConnectivityManager
@@ -503,4 +504,14 @@ class CustomLinearLayoutManager : LinearLayoutManager {
         //Similarly you can customize "canScrollHorizontally()" for managing horizontal scroll
         return isScrollEnabled && super.canScrollHorizontally()
     }
+}
+
+fun createShareIntent(shareLink: String, message: String): Intent {
+    val intent = Intent()
+    intent.setAction(Intent.ACTION_SEND)
+    intent.setType("text/plain")
+    intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
+    val shareMessage = message + shareLink + "\n"
+    intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+    return intent
 }

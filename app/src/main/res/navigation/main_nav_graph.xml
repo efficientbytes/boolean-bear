@@ -226,12 +226,15 @@
     <fragment
         android:id="@+id/listReelsFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.ListReelsFragment"
-        android:label="" >
+        android:label="">
         <argument
             android:name="topicId"
             app:argType="string" />
         <action
             android:id="@+id/listReelsFragment_to_shuffledContentPlayerFragment"
             app:destination="@id/shuffledContentPlayerFragment" />
+
+        <deepLink app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}" />
+
     </fragment>
 </navigation>
