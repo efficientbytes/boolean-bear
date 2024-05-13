@@ -38,7 +38,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private lateinit var rootView: View
     private val viewModel: ListReelViewModel by inject()
     private lateinit var topicId: String
-    private var topic: String = "Topic"
+    private var topic: String = "Let's binge watch"
     private var toolbar: MaterialToolbar? = null
     private val reelsRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(
@@ -242,11 +242,12 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         viewModel.topicResult.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Loading -> {
-                    toolbar?.title = "Topic"
+                    toolbar?.title = topic
                 }
 
-                DataStatus.Status.NoInternet -> {
-                    toolbar?.title = "OOPS!"
+                DataStatus.Status.NoInternet, DataStatus.Status.TimeOut -> {
+                    loadingReelsFailed = true
+                    toolbar?.title = topic
                 }
 
                 DataStatus.Status.Success -> {
@@ -254,10 +255,6 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                         this@ListReelsFragment.topic = remoteReelTopic.topic
                         toolbar?.title = this@ListReelsFragment.topic
                     }
-                }
-
-                DataStatus.Status.TimeOut -> {
-                    toolbar?.title = "OOPS!"
                 }
 
                 else -> {
