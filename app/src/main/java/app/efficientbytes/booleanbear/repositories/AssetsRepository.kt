@@ -12,6 +12,7 @@ import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
 import app.efficientbytes.booleanbear.services.models.ReelDetailsResponse
 import app.efficientbytes.booleanbear.services.models.ReelPlayLink
+import app.efficientbytes.booleanbear.services.models.ReelTopicResponse
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
@@ -90,6 +91,39 @@ class AssetsRepository(
             } catch (exception: IOException) {
                 emit(DataStatus.unknownException(exception.message.toString()))
             }
+        }
+    }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
+
+    fun getReelTopicDetails(topicId: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = assetsService.getReelTopicDetails(topicId)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val body = response.body()
+                    if (body != null) {
+                        val reelTopics = body.data
+                        if (reelTopics != null) {
+                            emit(DataStatus.success(reelTopics))
+                        }
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ReelTopicResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ReelTopicResponse::class.java
+                    )
+                    emit(DataStatus.failed(errorResponse.message.toString()))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
