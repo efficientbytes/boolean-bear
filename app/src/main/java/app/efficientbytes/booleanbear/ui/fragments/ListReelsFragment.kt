@@ -38,7 +38,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private lateinit var rootView: View
     private val viewModel: ListReelViewModel by inject()
     private lateinit var topicId: String
-    private lateinit var topic: String
+    private var topic: String = "Let's binge watch"
     private var toolbar: MaterialToolbar? = null
     private val reelsRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(
@@ -70,7 +70,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         val bundle = arguments ?: return
         val args = ListReelsFragmentArgs.fromBundle(bundle)
         this.topicId = args.topicId
-        this.topic = args.topic
+        viewModel.getTopicDetail(topicId)
         viewModel.getReels(topicId)
     }
 
@@ -170,6 +170,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
             }
         }, viewLifecycleOwner)
         val activity = requireActivity()
+
         if (toolbar == null) {
             toolbar = activity.findViewById(R.id.mainToolbar)
             toolbar?.setTitleTextAppearance(
@@ -223,7 +224,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 }
 
                 DataStatus.Status.TimeOut -> {
-                    toolbar?.subtitle = "Oops! Time out. Try again"
+                    toolbar?.subtitle = "Time out. Try again"
                     reelsLoadingFailed()
                 }
 
@@ -234,7 +235,32 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         }
 
         binding.reelsRefreshButton.setOnClickListener {
+            viewModel.getTopicDetail(topicId)
             viewModel.getReels(topicId)
+        }
+
+        viewModel.topicResult.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Loading -> {
+                    toolbar?.title = topic
+                }
+
+                DataStatus.Status.NoInternet, DataStatus.Status.TimeOut -> {
+                    loadingReelsFailed = true
+                    toolbar?.title = topic
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { remoteReelTopic ->
+                        this@ListReelsFragment.topic = remoteReelTopic.topic
+                        toolbar?.title = this@ListReelsFragment.topic
+                    }
+                }
+
+                else -> {
+                    findNavController().popBackStack()
+                }
+            }
         }
         //search
         binding.searchViewRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -270,6 +296,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 true -> {
                     if (loadingReelsFailed) {
                         loadingReelsFailed = false
+                        viewModel.getTopicDetail(topicId)
                         viewModel.getReels(topicId)
                     }
                 }

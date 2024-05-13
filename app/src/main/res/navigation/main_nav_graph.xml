@@ -230,9 +230,6 @@
         <argument
             android:name="topicId"
             app:argType="string" />
-        <argument
-            android:name="topic"
-            app:argType="string" />
         <action
             android:id="@+id/listReelsFragment_to_shuffledContentPlayerFragment"
             app:destination="@id/shuffledContentPlayerFragment" />

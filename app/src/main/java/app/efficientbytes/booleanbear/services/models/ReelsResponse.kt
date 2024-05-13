@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RemoteReel(
-    val topicId: String?=null,
+    val topicId: String? = null,
     val reelId: String,
     val title: String,
     val instructorName: String,
@@ -41,6 +41,12 @@ data class ReelTopicsResponse(
 )
 
 @JsonClass(generateAdapter = true)
+data class ReelTopicResponse(
+    val message: String? = null,
+    val data: RemoteReelTopic? = null
+)
+
+@JsonClass(generateAdapter = true)
 data class ReelDetails(
     val reelId: String,
     val title: String,
@@ -55,10 +61,10 @@ data class ReelDetails(
     val instructorFirstName: String,
     val instructorLastName: String? = null,
     val instructorProfilePic: String,
-    val nextReelId: String?=null,
-    val hashTags: List<String>?=null,
-    val mentionedLinkIds: List<String>?=null,
-    val topicId: String?=null
+    val nextReelId: String? = null,
+    val hashTags: List<String>? = null,
+    val mentionedLinkIds: List<String>? = null,
+    val topicId: String? = null
 )
 
 @JsonClass(generateAdapter = true)

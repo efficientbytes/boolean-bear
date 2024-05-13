@@ -36,6 +36,9 @@ interface AssetsDao {
     @Query("SELECT * FROM $REEL_TOPICS_TABLE ORDER BY displayIndex")
     fun getReelTopics(): List<RemoteReelTopic>?
 
+    @Query("SELECT * FROM $REEL_TOPICS_TABLE WHERE topicId = :topic")
+    fun getReelTopicDetails(topic: String): RemoteReelTopic?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReels(contents: List<LocalReel>)
 
