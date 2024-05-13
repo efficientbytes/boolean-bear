@@ -172,10 +172,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
 
     override fun onReelTopicItemClicked(remoteReelTopic: RemoteReelTopic) {
         val directions =
-            DiscoverFragmentDirections.discoverFragmentToListReelsFragment(
-                remoteReelTopic.topicId,
-                remoteReelTopic.topic
-            )
+            DiscoverFragmentDirections.discoverFragmentToListReelsFragment(remoteReelTopic.topicId)
         findNavController().navigate(directions)
     }
 

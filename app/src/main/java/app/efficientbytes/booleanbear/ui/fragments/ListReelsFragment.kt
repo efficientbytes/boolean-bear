@@ -70,7 +70,6 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         val bundle = arguments ?: return
         val args = ListReelsFragmentArgs.fromBundle(bundle)
         this.topicId = args.topicId
-        this.topic = args.topic
         viewModel.getReels(topicId)
     }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReel
+import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,20 @@ class ListReelViewModel(
                 if (result.isNullOrEmpty()) _searchResult.postValue(DataStatus.emptyResult()) else _searchResult.postValue(
                     DataStatus.success(result)
                 )
+            }
+        }
+    }
+
+    private val _topicResult: MutableLiveData<DataStatus<List<RemoteReelTopic>>> =
+        MutableLiveData()
+    val topicResult: LiveData<DataStatus<List<RemoteReelTopic>>> = _topicResult
+
+    fun getTopicDetail(topicId: String) {
+        viewModelScope.launch {
+            if (topicId.isEmpty()){
+                _topicResult.postValue(DataStatus.emptyResult())
+            }else{
+
             }
         }
     }
