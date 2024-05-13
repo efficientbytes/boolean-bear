@@ -44,16 +44,18 @@ class ListReelViewModel(
         }
     }
 
-    private val _topicResult: MutableLiveData<DataStatus<List<RemoteReelTopic>>> =
+    private val _topicResult: MutableLiveData<DataStatus<RemoteReelTopic>> =
         MutableLiveData()
-    val topicResult: LiveData<DataStatus<List<RemoteReelTopic>>> = _topicResult
+    val topicResult: LiveData<DataStatus<RemoteReelTopic>> = _topicResult
 
     fun getTopicDetail(topicId: String) {
         viewModelScope.launch {
-            if (topicId.isEmpty()){
+            if (topicId.isEmpty()) {
                 _topicResult.postValue(DataStatus.emptyResult())
-            }else{
-
+            } else {
+                assetsRepository.getReelTopicDetails(topicId).collect {
+                    _topicResult.postValue(it)
+                }
             }
         }
     }
