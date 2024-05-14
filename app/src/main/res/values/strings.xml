@@ -136,5 +136,7 @@
     <string name="hash_tags">Hash Tags</string>
     <string name="mentioned_links">Mentioned Links</string>
     <string name="description">Description</string>
+    <string name="join_the_waiting_list">Join The Waiting List</string>
+    <string name="don_t_miss_out_join_the_queue_and_get_to_know_first">Don\'t miss out, join the queue and get to know first</string>
 
 </resources>
