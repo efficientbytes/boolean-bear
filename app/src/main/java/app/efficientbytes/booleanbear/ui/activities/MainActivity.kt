@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.icu.util.Calendar
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -533,6 +532,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
+                R.id.listReelsFragment -> {
+                    binding.mainToolbar.visibility = View.VISIBLE
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.ListReelsToolbarTitleAppearance
+                    )
+                    binding.mainToolbar.setSubtitleTextAppearance(
+                        this,
+                        R.style.ListReelsToolbarSubTitleAppearance
+                    )
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+
                 else -> {
                     binding.mainToolbar.subtitle = null
                     binding.mainToolbar.setTitleTextAppearance(
@@ -580,64 +595,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         processIntent(intent)
     }
 
-    private fun processIntent(intent: Intent?) {
-        if (intent != null) {
-            if (intent.getStringExtra("redirectLink") != null) {
-                val uri: Uri = Uri.parse(intent.getStringExtra("redirectLink"))
-                openAppLink(uri)
-            } else {
-                val extras = intent.extras
-                if (extras != null && intent.data == null) {
-                    val type = extras.getString("type")
-                    if (type == getString(R.string.watch_recommendations)) {
-                        val link = extras.getString("redirectLink")
-                        openAppLink(Uri.parse(link))
-                    }
-                } else if (intent.data != null) {
-                    val data: Uri = intent.data!!
-                    openAppLink(data)
-                }
-
-            }
-        }
-    }
-
-    private fun openAppLink(uri: Uri) {
-        val pathSegments = uri.pathSegments
-        if (pathSegments.size >= 2) {
-            val firstSegment = pathSegments[0].orEmpty()
-            when {
-                firstSegment == "account" -> {
-                    val secondSegment = pathSegments[1].orEmpty()
-                    when {
-                        secondSegment == "delete" -> {
-                            if (FirebaseAuth.getInstance().currentUser != null) {
-                                viewModel.deleteAccountIntent()
-                            } else {
-                                val snackBar = Snackbar.make(
-                                    binding.mainCoordinatorLayout,
-                                    "You need to be logged in to delete your account.",
-                                    Snackbar.LENGTH_INDEFINITE
-                                )
-                                snackBar.show()
-                            }
-                        }
-
-                        else -> {
-
+    private fun processIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_VIEW) {
+            val navDeepLink = intent.data
+            navDeepLink?.let { uri ->
+                val navController = findNavController(R.id.fragmentContainer)
+                when {
+                    uri.toString()
+                        .contentEquals("https://app.booleanbear.com/user/account/delete") || uri.toString()
+                        .contentEquals("https://app.booleanbear.com/user/account/delete/") -> {
+                        if (FirebaseAuth.getInstance().currentUser != null) {
+                            viewModel.deleteAccountIntent()
+                        } else {
+                            Snackbar.make(
+                                binding.mainCoordinatorLayout,
+                                "You need to be logged in to delete your account",
+                                Snackbar.LENGTH_LONG
+                            ).show()
                         }
                     }
-                }
 
-                else -> {
-                    val secondSegment = pathSegments[1].orEmpty()
-                    when {
-                        secondSegment == "v" -> {
-                            val contentId = pathSegments.lastOrNull()
-                            if (contentId != null) {
-                                viewModel.watchContentIntent(contentId)
+                    uri.toString()
+                        .startsWith("https://app.booleanbear.com/watch/content/") -> {
+                        val segments = uri.pathSegments
+                        if (segments.size == 3) {
+                            val reelId = segments.lastOrNull()
+                            if (reelId != null) {
+                                if (FirebaseAuth.getInstance().currentUser != null) {
+                                    viewModel.watchContentIntent(reelId)
+                                } else {
+                                    Snackbar.make(
+                                        binding.mainCoordinatorLayout,
+                                        "You need to be logged in to access the content",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
                             }
                         }
+                    }
+
+                    else -> {
+                        navController.navigate(navDeepLink)
                     }
                 }
             }

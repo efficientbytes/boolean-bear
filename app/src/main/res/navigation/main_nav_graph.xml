@@ -9,6 +9,9 @@
         android:name="app.efficientbytes.booleanbear.ui.fragments.HomeFragment"
         android:label=""
         tools:layout="@layout/fragment_home">
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://app.booleanbear.com/" />
         <action
             android:id="@+id/homeFragment_to_accountSettingsFragment"
             app:destination="@id/accountSettingsFragment"
@@ -200,7 +203,12 @@
         android:id="@+id/deleteUserAccountFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.DeleteUserAccountFragment"
         android:label="Delete Account"
-        tools:layout="@layout/fragment_delete_user_account" />
+        tools:layout="@layout/fragment_delete_user_account">
+
+        <action
+            android:id="@+id/deleteUserAccountFragment_to_loginOrSignUpFragment"
+            app:destination="@id/loginOrSignUpFragment" />
+    </fragment>
     <fragment
         android:id="@+id/shuffledContentPlayerFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.ReelPlayerFragment"
@@ -208,6 +216,9 @@
         <argument
             android:name="reelId"
             app:argType="string" />
+        <action
+            android:id="@+id/shuffledContentPlayerFragment_to_loginOrSignUpFragment"
+            app:destination="@id/loginOrSignUpFragment" />
     </fragment>
     <dialog
         android:id="@+id/loginToContinueFragment"
@@ -226,12 +237,21 @@
     <fragment
         android:id="@+id/listReelsFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.ListReelsFragment"
-        android:label="" >
+        android:label="">
         <argument
             android:name="topicId"
             app:argType="string" />
         <action
             android:id="@+id/listReelsFragment_to_shuffledContentPlayerFragment"
             app:destination="@id/shuffledContentPlayerFragment" />
+
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}" />
+
+        <deepLink
+            android:autoVerify="true"
+            app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}/" />
+
     </fragment>
 </navigation>

@@ -17,6 +17,7 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentListReelsBinding
@@ -24,6 +25,7 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.createShareIntent
 import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import com.google.android.material.appbar.MaterialToolbar
@@ -38,8 +40,9 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private lateinit var rootView: View
     private val viewModel: ListReelViewModel by inject()
     private lateinit var topicId: String
-    private var topic: String = "Let's binge watch"
+    private var topic: String = ""
     private var toolbar: MaterialToolbar? = null
+    private val safeArgs: ListReelsFragmentArgs by navArgs()
     private val reelsRecyclerAdapter: YoutubeContentViewRecyclerViewAdapter by lazy {
         YoutubeContentViewRecyclerViewAdapter(
             dummyReelsList,
@@ -65,15 +68,6 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private var isFirstHintText = false
     private var hintRunnable: Runnable? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val bundle = arguments ?: return
-        val args = ListReelsFragmentArgs.fromBundle(bundle)
-        this.topicId = args.topicId
-        viewModel.getTopicDetail(topicId)
-        viewModel.getReels(topicId)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -86,6 +80,10 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        this.topicId = safeArgs.topicId
+        viewModel.getTopicDetail(topicId)
+        viewModel.getReels(topicId)
 
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -163,6 +161,14 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                     }
 
                     R.id.listReelsShareMenu -> {
+                        if (topic.isNotEmpty()) {
+                            val shareLink =
+                                "https://app.booleanbear.com/binge-watch/topic/${topicId}"
+                            val message =
+                                "Experience the best of $topic learning with Boolean Bear, the Android-exclusive app! \uD83D\uDE80 \n"
+                            val shareIntent = createShareIntent(shareLink, message)
+                            startActivity(shareIntent)
+                        }
                         return true
                     }
                 }
@@ -177,7 +183,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 requireContext(),
                 R.style.ListReelsToolbarTitleAppearance
             )
-            toolbar?.title = this.topic
+            toolbar?.title = "Let's binge watch"
             toolbar?.setSubtitleTextAppearance(
                 requireContext(),
                 R.style.ListReelsToolbarSubTitleAppearance
@@ -242,12 +248,12 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
         viewModel.topicResult.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Loading -> {
-                    toolbar?.title = topic
+                    toolbar?.title = "Let's binge watch"
                 }
 
                 DataStatus.Status.NoInternet, DataStatus.Status.TimeOut -> {
                     loadingReelsFailed = true
-                    toolbar?.title = topic
+                    toolbar?.title = "Let's binge watch"
                 }
 
                 DataStatus.Status.Success -> {

@@ -25,11 +25,14 @@
             android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:theme="@style/Theme.CustomSplashScreen">
+            <nav-graph android:value="@navigation/main_nav_graph" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--for home page-->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -40,6 +43,7 @@
                     android:host="app.booleanbear.com"
                     android:scheme="https" />
             </intent-filter>
+            <!--for playing reels-->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -48,7 +52,18 @@
 
                 <data android:host="app.booleanbear.com" />
                 <data android:scheme="https" />
-                <data android:pathPattern="/watch/v/*" />
+                <data android:pathPattern="/watch/content/*" />
+            </intent-filter>
+            <!--for account deletion-->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="app.booleanbear.com" />
+                <data android:path="/user/account/delete" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -58,7 +73,18 @@
 
                 <data android:scheme="https" />
                 <data android:host="app.booleanbear.com" />
-                <data android:path="/account/delete" />
+                <data android:path="/user/account/delete/" />
+            </intent-filter>
+            <!-- for reels playlist-->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="app.booleanbear.com" />
+                <data android:path="/binge-watch/topic/" />
             </intent-filter>
         </activity>
         <service
