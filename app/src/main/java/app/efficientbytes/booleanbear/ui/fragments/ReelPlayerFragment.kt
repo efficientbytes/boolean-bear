@@ -1,7 +1,6 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
 import android.app.Dialog
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
@@ -37,6 +36,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentReelPlayerBinding
 import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
@@ -44,11 +44,13 @@ import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.createShareIntent
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import pl.droidsonroids.gif.AnimationListener
 import pl.droidsonroids.gif.GifDrawable
@@ -95,13 +97,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private var currentVideoQuality = VideoQualityType.AUTO
     private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
     private val customAuthStateListener: CustomAuthStateListener by inject()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val bundle = arguments ?: return
-        val args = ReelPlayerFragmentArgs.fromBundle(bundle)
-        this.reelId = args.reelId
-    }
+    private val safeArgs: ReelPlayerFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,6 +113,13 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        this.reelId = safeArgs.reelId
+
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            findNavController().popBackStack()
+            return
+        }
 
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
         gifDrawable.addAnimationListener(this@ReelPlayerFragment)
@@ -434,9 +437,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             }
         }
         binding.shareContentLabelTextView.setOnClickListener {
-            val shareLink = "https://app.booleanbear.com/watch/v/$reelId"
-            val title = this@ReelPlayerFragment.contentTitle
-            shareContent(shareLink, title)
+            val shareLink = "https://app.booleanbear.com/watch/content/$reelId"
+            val shareMessage = "$contentTitle \n\nWatch it on boolean bear.\n"
+            val shareIntent = createShareIntent(shareLink, shareMessage)
+            startActivity(shareIntent)
         }
 
         customAuthStateListener.liveData.observe(viewLifecycleOwner) {
@@ -835,20 +839,27 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     @OptIn(UnstableApi::class)
     override fun onStart() {
         super.onStart()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if (Util.SDK_INT > 23) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            if (Util.SDK_INT > 23) {
+                initializePlayer()
+                binding.videoPlayer.onResume()
+            }
         }
     }
 
     @OptIn(UnstableApi::class)
     override fun onResume() {
         super.onResume()
-        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer()
-            binding.videoPlayer.onResume()
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            if ((Util.SDK_INT <= 23 || player == null)) {
+                initializePlayer()
+                binding.videoPlayer.onResume()
+            }
+        } else {
+            findNavController().popBackStack()
+            return
         }
     }
 
@@ -938,18 +949,5 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-    }
-
-    private fun shareContent(shareLink: String, contentTitle: String) {
-        val intent = Intent()
-        intent.setAction(Intent.ACTION_SEND)
-        intent.setType("text/plain")
-        intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
-        var shareMessage =
-            "$contentTitle \n\nWatch it on boolean bear.\n"
-        shareMessage =
-            shareMessage + shareLink + "\n"
-        intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
-        startActivity(Intent.createChooser(intent, "Select One"))
     }
 }

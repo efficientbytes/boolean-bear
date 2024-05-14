@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.icu.util.Calendar
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -599,9 +598,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun processIntent(intent: Intent) {
         if (intent.action == Intent.ACTION_VIEW) {
             val navDeepLink = intent.data
-            navDeepLink?.let {
+            navDeepLink?.let { uri ->
                 val navController = findNavController(R.id.fragmentContainer)
-                navController.navigate(navDeepLink)
+                when {
+                    uri.toString()
+                        .contentEquals("https://app.booleanbear.com/user/account/delete") || uri.toString()
+                        .contentEquals("https://app.booleanbear.com/user/account/delete/") -> {
+                        if (FirebaseAuth.getInstance().currentUser != null) {
+                            viewModel.deleteAccountIntent()
+                        } else {
+                            Snackbar.make(
+                                binding.mainCoordinatorLayout,
+                                "You need to be logged in to delete your account",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    uri.toString()
+                        .startsWith("https://app.booleanbear.com/watch/content/") -> {
+                        val segments = uri.pathSegments
+                        if (segments.size == 3) {
+                            val reelId = segments.lastOrNull()
+                            if (reelId != null) {
+                                if (FirebaseAuth.getInstance().currentUser != null) {
+                                    viewModel.watchContentIntent(reelId)
+                                } else {
+                                    Snackbar.make(
+                                        binding.mainCoordinatorLayout,
+                                        "You need to be logged in to access the content",
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
+
+                    else -> {
+                        navController.navigate(navDeepLink)
+                    }
+                }
             }
         }
     }

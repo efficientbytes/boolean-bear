@@ -18,6 +18,7 @@ import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -147,4 +148,12 @@ class DeleteUserAccountFragment : Fragment() {
         }
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            findNavController().popBackStack()
+        }
+    }
+
 }
