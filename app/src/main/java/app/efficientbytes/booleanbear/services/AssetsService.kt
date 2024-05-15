@@ -9,7 +9,7 @@ import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
-import app.efficientbytes.booleanbear.services.models.WaitingListUserResponse
+import app.efficientbytes.booleanbear.services.models.WaitingListCourseResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -68,5 +68,5 @@ interface AssetsService {
     suspend fun joinCourseWaitingList(
         @Field("dummy") dummy: String = "",
         @Path("courseId") courseId: String
-    ): Response<WaitingListUserResponse>
+    ): Response<WaitingListCourseResponse>
 }

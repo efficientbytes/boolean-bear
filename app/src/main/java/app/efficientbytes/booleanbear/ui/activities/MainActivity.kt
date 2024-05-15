@@ -11,6 +11,7 @@ import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var singleDeviceLoginFailedToLoad = false
     private var serverTimeFailedToLoad = false
     private var accountDeletionFailed = false
+    private var waitingListCoursesFailedToLoad = false
     private val utilityDataRepository: UtilityDataRepository by inject()
     private var professionalAdapterFailedToLoad = false
     private var issueCategoriesFailedToLoad = false
@@ -178,6 +180,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             if (!isUserLoggedIn) {
                                 isUserLoggedIn = true
                                 userProfileRepository.getUserProfile()
+                                viewModel.getAllWaitingListCourses()
                                 userProfileRepository.listenToUserProfileChange(user.uid)
                                 authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
                             }
@@ -190,6 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.deleteFCMToken()
                         viewModel.deleteIDToken()
                         viewModel.deleteUserProfile()
+                        viewModel.deleteWaitingListCourses()
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
@@ -406,6 +410,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
+        viewModel.waitingListCourses.observe(this) {
+            when (it.status) {
+                DataStatus.Status.NoInternet -> {
+                    waitingListCoursesFailedToLoad = true
+                }
+
+                else -> {
+                    Log.i("MAIN ACTIVITY", "ERROR IS : ${it.message}")
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {
@@ -449,6 +464,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 accountDeletionFailed = false
                                 viewModel.signOutUser()
                             }
+                            if (waitingListCoursesFailedToLoad) {
+                                waitingListCoursesFailedToLoad = false
+                                viewModel.getAllWaitingListCourses()
+                            }
                         }
                     }
                     if (networkNotAvailableAtAppLoading) {
@@ -468,6 +487,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin()
+                            viewModel.getAllWaitingListCourses()
                         }
                     }
                 }

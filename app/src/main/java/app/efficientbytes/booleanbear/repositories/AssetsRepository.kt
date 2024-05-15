@@ -3,11 +3,11 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.models.LocalCourse
 import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
-import app.efficientbytes.booleanbear.database.models.LocalCourseWaitingList
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.LocalReelTopic
+import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
@@ -22,7 +22,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
 import app.efficientbytes.booleanbear.services.models.RemoteReel
-import app.efficientbytes.booleanbear.services.models.WaitingListUserResponse
+import app.efficientbytes.booleanbear.services.models.WaitingListCourseResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.sanitizeSearchQuery
 import com.google.gson.Gson
@@ -698,16 +698,16 @@ class AssetsRepository(
                             )
                             it.data
                         }?.let {
-                            LocalCourseWaitingList(it.courseId)
+                            LocalWaitingListCourse(it.courseId)
                         }?.let {
                             assetsDao.insertCourseWaitingList(it)
                         }
                     }
 
                     responseCode >= 400 -> {
-                        val errorResponse: WaitingListUserResponse = gson.fromJson(
+                        val errorResponse: WaitingListCourseResponse = gson.fromJson(
                             response.errorBody()!!.string(),
-                            WaitingListUserResponse::class.java
+                            WaitingListCourseResponse::class.java
                         )
                         courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
                             DataStatus.failed(errorResponse.message.toString())

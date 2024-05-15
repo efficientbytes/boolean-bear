@@ -6,11 +6,11 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalCourse
 import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
-import app.efficientbytes.booleanbear.database.models.LocalCourseWaitingList
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.LocalReelTopic
+import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.services.models.RemoteCourse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseTopic
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
@@ -24,6 +24,7 @@ import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
 import app.efficientbytes.booleanbear.utils.REELS_TABLE
 import app.efficientbytes.booleanbear.utils.REELS_TABLE_FTS
 import app.efficientbytes.booleanbear.utils.REEL_TOPICS_TABLE
+import app.efficientbytes.booleanbear.utils.WAITING_LIST_COURSE_TABLE
 
 @Dao
 interface AssetsDao {
@@ -114,12 +115,15 @@ interface AssetsDao {
     suspend fun deleteCourses()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCourseWaitingList(waitingList: LocalCourseWaitingList)
+    suspend fun insertCourseWaitingList(waitingList: LocalWaitingListCourse)
 
-    @Query("SELECT COUNT(*) > 0 FROM course_waiting_list WHERE courseId = :course")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourseWaitingList(waitingList: List<LocalWaitingListCourse>)
+
+    @Query("SELECT COUNT(*) > 0 FROM $WAITING_LIST_COURSE_TABLE WHERE courseId = :course")
     fun userHasJoinedWaitingList(course: String): Boolean
 
-    @Query("DELETE FROM course_waiting_list")
+    @Query("DELETE FROM $WAITING_LIST_COURSE_TABLE")
     suspend fun deleteCourseWaitingList()
 
 }

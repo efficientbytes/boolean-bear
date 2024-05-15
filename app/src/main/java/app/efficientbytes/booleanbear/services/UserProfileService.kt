@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.UserProfileResponse
+import app.efficientbytes.booleanbear.services.models.WaitingListCoursesResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -65,6 +66,9 @@ interface UserProfileService {
     @POST("user/notification/token/delete")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun deleteFCMToken(): Response<ResponseMessage>
+
+    @GET("user/courses/waiting-list")
+    suspend fun getWaitingListCourses(): Response<WaitingListCoursesResponse>
 
 
 }
