@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.di
 
 import app.efficientbytes.booleanbear.viewmodels.AccountSettingsViewModel
 import app.efficientbytes.booleanbear.viewmodels.CompleteProfileViewModel
+import app.efficientbytes.booleanbear.viewmodels.CourseWaitingListViewModel
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
@@ -41,4 +42,5 @@ val viewModelModule = module {
     viewModel { ReelPlayerViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { DiscoverViewModel(get(), get()) }
     viewModel { ListReelViewModel(get(), get()) }
+    viewModel { CourseWaitingListViewModel(get()) }
 }
