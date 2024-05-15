@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.ui.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.efficientbytes.booleanbear.databinding.RecyclerViewItemDiscoverCoursesViewBinding
@@ -10,6 +11,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteCourse
 class CourseRecyclerViewAdapter(
     private var itemList: List<RemoteCourse>,
     private val context: Context,
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<CourseRecyclerViewAdapter.ViewHolder>() {
 
     fun setCourseTopicList(itemList: List<RemoteCourse>) {
@@ -43,7 +45,16 @@ class CourseRecyclerViewAdapter(
                 binding.shimmerLayout.stopShimmer()
                 binding.course = item
             }
+            binding.onClick = View.OnClickListener {
+                onItemClickListener.onCourseItemClicked(item)
+            }
         }
+    }
+
+    interface OnItemClickListener {
+
+        fun onCourseItemClicked(remoteCourse: RemoteCourse)
+
     }
 
 }

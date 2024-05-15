@@ -12,6 +12,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 class CourseBundleRecyclerViewAdapter(
     private var itemList: List<RemoteCourseBundle>,
     private val context: Context,
+    private val courseClickListener: CourseRecyclerViewAdapter.OnItemClickListener
 ) : RecyclerView.Adapter<CourseBundleRecyclerViewAdapter.ViewHolder>() {
 
     fun setCourseTopicList(itemList: List<RemoteCourseBundle>) {
@@ -41,7 +42,8 @@ class CourseBundleRecyclerViewAdapter(
             binding.recyclerView.visibility = View.VISIBLE
             binding.recyclerView.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            binding.recyclerView.adapter = CourseRecyclerViewAdapter(item.courseList, context)
+            binding.recyclerView.adapter =
+                CourseRecyclerViewAdapter(item.courseList, context, courseClickListener)
             if (item.topicDetails.displayIndex == -1) {
                 binding.topic = null
                 binding.topicValueTextView.visibility = View.GONE

@@ -1,11 +1,18 @@
 package app.efficientbytes.booleanbear.ui.fragments
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCourseWaitingListBinding
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.viewmodels.CourseWaitingListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import org.koin.android.ext.android.inject
 
 class CourseWaitingListFragment : BottomSheetDialogFragment() {
 
@@ -13,11 +20,15 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
 
         const val COURSE_WAITING_LIST_FRAGMENT: String = "frag-course-wait-list"
         var isOpened: Boolean = false
+        var courseId: String? = null
+        var nonAvailabilityReason: String? = null
+        var isRegisteredUser: Boolean? = false
     }
 
     private lateinit var _binding: FragmentCourseWaitingListBinding
     private val binding get() = _binding
     private lateinit var rootView: View
+    private val viewModel: CourseWaitingListViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,9 +43,131 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.joinTheWaitingListButton.setOnClickListener {
+        isRegisteredUser = courseId?.let { viewModel.hasUserJoinedWaitList(it) }
+
+        binding.joinTheWaitingListButton.apply {
+            isRegisteredUser?.let { registered ->
+                text = if (registered) {
+                    "You have joined waiting list already"
+                } else {
+                    "Join The Waiting List"
+                }
+                isEnabled = !registered
+                if (isEnabled) {
+                    setBackgroundColor(requireContext().getColor(R.color.md_theme_onPrimary))
+                    setBackgroundColor(requireContext().getColor(R.color.violet_300))
+                } else {
+                    setBackgroundColor(requireContext().getColor(R.color.black_300))
+                    setTextColor(requireContext().getColor(R.color.black))
+                }
+            }
+            setOnClickListener {
+                if (FirebaseAuth.getInstance().currentUser != null) {
+                    courseId?.let { id ->
+                        isEnabled = false
+                        viewModel.joinCourseWaitingList(id)
+                    }
+                } else {
+                    Snackbar.make(
+                        binding.parentLinearLayout,
+                        "Please Sign up to join our waiting list.",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
 
+        nonAvailabilityReason?.let { message ->
+            binding.additionalMessageLabelTextView.text = message
+        }
+
+        viewModel.courseWaitingList.observe(viewLifecycleOwner) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.joinTheWaitingListButton.isEnabled = true
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text = it.message
+                    }
+
+                    DataStatus.Status.Loading -> {
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = "Please wait..."
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        binding.joinTheWaitingListButton.isEnabled = true
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text = "No Internet!"
+                    }
+
+                    DataStatus.Status.Success -> {
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text = it.message
+                        binding.joinTheWaitingListButton.isEnabled = false
+                        binding.joinTheWaitingListButton.setBackgroundColor(
+                            requireContext().getColor(
+                                R.color.black_300
+                            )
+                        )
+                        binding.joinTheWaitingListButton.setTextColor(requireContext().getColor(R.color.black))
+                        viewModel.resetWaitingList()
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        binding.joinTheWaitingListButton.isEnabled = true
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text =
+                            "Process is taking unusually long time. Please try again..."
+                    }
+
+                    else -> {
+                        binding.progressLinearLayout.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text =
+                            "There was some error. Try again later."
+                    }
+                }
+            }
+        }
+
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isOpened = false
+        courseId = null
+        nonAvailabilityReason = null
+        isRegisteredUser = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isOpened = false
+        courseId = null
+        nonAvailabilityReason = null
+        isRegisteredUser = false
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        isOpened = false
+        courseId = null
+        nonAvailabilityReason = null
+        isRegisteredUser = false
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        isOpened = false
+        courseId = null
+        nonAvailabilityReason = null
+        isRegisteredUser = false
     }
 
 }
