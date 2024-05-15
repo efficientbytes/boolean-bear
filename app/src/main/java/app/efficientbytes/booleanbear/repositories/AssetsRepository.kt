@@ -734,6 +734,12 @@ class AssetsRepository(
         return assetsDao.userHasJoinedWaitingList(courseId)
     }
 
+    fun deleteCourseWaitingList() {
+        externalScope.launch {
+            assetsDao.deleteCourseWaitingList()
+        }
+    }
+
     interface InstructorProfileListener {
 
         fun onInstructorProfileDataStatusChanged(status: DataStatus<RemoteInstructorProfile>)

@@ -119,4 +119,7 @@ interface AssetsDao {
     @Query("SELECT COUNT(*) > 0 FROM course_waiting_list WHERE courseId = :course")
     fun userHasJoinedWaitingList(course: String): Boolean
 
+    @Query("DELETE FROM course_waiting_list")
+    suspend fun deleteCourseWaitingList()
+
 }

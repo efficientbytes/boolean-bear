@@ -160,6 +160,7 @@ class MainViewModel(
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             SingletonPreviousUserId.setInstance(currentUser.uid)
+            assetsRepository.deleteCourseWaitingList()
             userProfileRepository.resetUserProfileScope()
             authenticationRepository.resetSingleDeviceScope()
             statisticsRepository.noteDownScreenClosingTime()

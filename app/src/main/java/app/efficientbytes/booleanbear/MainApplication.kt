@@ -78,6 +78,7 @@ class MainApplication : Application() {
             statisticsRepository.deleteUserScreenTime()
             userProfileRepository.deleteLocalNotificationToken()
             authenticationRepository.deleteIDToken()
+            assetsRepository.deleteCourseWaitingList()
         }
 
     }
