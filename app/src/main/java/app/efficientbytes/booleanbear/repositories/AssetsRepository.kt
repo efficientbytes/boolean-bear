@@ -7,6 +7,7 @@ import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.LocalReelTopic
+import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AssetsService
 import app.efficientbytes.booleanbear.services.models.InstructorProfileResponse
@@ -21,6 +22,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
 import app.efficientbytes.booleanbear.services.models.RemoteReel
+import app.efficientbytes.booleanbear.services.models.WaitingListCourseResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.sanitizeSearchQuery
 import com.google.gson.Gson
@@ -677,6 +679,67 @@ class AssetsRepository(
         }
     }
 
+    fun joinCourseWaitingList(
+        courseId: String,
+        courseWaitingListListener: JoinCourseWaitingListListener? = null
+    ) {
+        externalScope.launch {
+            courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                DataStatus.loading()
+            )
+            try {
+                val response = assetsService.joinCourseWaitingList(courseId = courseId)
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        response.body()?.let {
+                            courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                                DataStatus.success(true, it.message)
+                            )
+                            it.data
+                        }?.let {
+                            LocalWaitingListCourse(it.courseId)
+                        }?.let {
+                            assetsDao.insertCourseWaitingList(it)
+                        }
+                    }
+
+                    responseCode >= 400 -> {
+                        val errorResponse: WaitingListCourseResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            WaitingListCourseResponse::class.java
+                        )
+                        courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                            DataStatus.failed(errorResponse.message.toString())
+                        )
+                    }
+                }
+            } catch (noInternet: NoInternetException) {
+                courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                    DataStatus.noInternet()
+                )
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                    DataStatus.timeOut()
+                )
+            } catch (exception: IOException) {
+                courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                    DataStatus.unknownException(exception.message.toString())
+                )
+            }
+        }
+    }
+
+    fun userJoinedWaitingList(courseId: String): Boolean {
+        return assetsDao.userHasJoinedWaitingList(courseId)
+    }
+
+    fun deleteCourseWaitingList() {
+        externalScope.launch {
+            assetsDao.deleteCourseWaitingList()
+        }
+    }
+
     interface InstructorProfileListener {
 
         fun onInstructorProfileDataStatusChanged(status: DataStatus<RemoteInstructorProfile>)
@@ -686,6 +749,12 @@ class AssetsRepository(
     interface MentionedLinksListener {
 
         fun onMentionedLinkDataStatusChanged(status: DataStatus<List<RemoteMentionedLink>>)
+
+    }
+
+    interface JoinCourseWaitingListListener {
+
+        fun onJoinCourseWaitingListDataStatusChanged(status: DataStatus<Boolean>)
 
     }
 

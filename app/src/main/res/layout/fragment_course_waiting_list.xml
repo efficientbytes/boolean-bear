@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/parentLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner_top_radius_layout_background"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="30dp"
+        tools:context=".ui.fragments.CourseWaitingListFragment">
+
+        <ImageView
+            android:id="@+id/bakingIcon"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:src="@drawable/baking_icon">
+
+        </ImageView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/joinWaitListTitleLabelTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:gravity="center"
+            android:text="@string/don_t_miss_out_join_the_queue_and_get_to_know_first"
+            android:textColor="@color/white"
+            android:textSize="24sp">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/additionalMessageLabelTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="36dp"
+            android:fontFamily="@font/montserrat"
+            android:gravity="center"
+            android:text="@string/don_t_miss_out_join_the_queue_and_get_to_know_first"
+            android:textColor="@color/white"
+            android:textSize="14sp">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <LinearLayout
+            android:id="@+id/progressLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="4dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/progressStatusValueTextView"
+                app:layout_constraintStart_toEndOf="@id/guideline2"
+                app:layout_constraintTop_toTopOf="@id/progressStatusValueTextView" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/progressStatusValueTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:visibility="visible"
+                app:fontFamily="@font/montserrat"
+                app:layout_constraintEnd_toStartOf="@id/guideline3"
+                app:layout_constraintStart_toEndOf="@id/progressBar"
+                app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
+                tools:text="Please wait while we update your profile..." />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/joinTheWaitingListButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/join_the_waiting_list"
+            android:textColor="@color/md_theme_onPrimary"
+            app:backgroundTint="@color/violet_300"
+            app:cornerRadius="4dp"
+            app:rippleColor="@color/violet_300">
+
+        </com.google.android.material.button.MaterialButton>
+
+    </LinearLayout>
+</layout>

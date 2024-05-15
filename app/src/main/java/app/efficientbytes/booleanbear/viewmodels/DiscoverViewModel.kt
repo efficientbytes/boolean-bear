@@ -39,7 +39,6 @@ class DiscoverViewModel(
                     }
 
                     DataStatus.Status.Success -> {
-                        delay(1500)
                         _reelTopics.postValue(it)
                     }
 
@@ -65,7 +64,6 @@ class DiscoverViewModel(
                     }
 
                     DataStatus.Status.Success -> {
-                        delay(1000)
                         _courseBundle.postValue(it)
                     }
 

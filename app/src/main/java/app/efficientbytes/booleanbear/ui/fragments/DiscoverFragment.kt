@@ -9,8 +9,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import app.efficientbytes.booleanbear.databinding.FragmentDiscoverBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.RemoteCourse
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import app.efficientbytes.booleanbear.ui.adapters.CourseBundleRecyclerViewAdapter
+import app.efficientbytes.booleanbear.ui.adapters.CourseRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomLinearLayoutManager
@@ -19,7 +21,8 @@ import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import org.koin.android.ext.android.inject
 
-class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickListener {
+class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickListener,
+    CourseRecyclerViewAdapter.OnItemClickListener {
 
     private lateinit var _binding: FragmentDiscoverBinding
     private val binding get() = _binding
@@ -28,12 +31,13 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         ReelTopicsRecyclerViewAdapter(dummyReelTopicsList, requireContext(), this@DiscoverFragment)
     }
     private val courseBundlesRecyclerViewAdapter: CourseBundleRecyclerViewAdapter by lazy {
-        CourseBundleRecyclerViewAdapter(dummyCourseBundle, requireContext())
+        CourseBundleRecyclerViewAdapter(dummyCourseBundle, requireContext(), this@DiscoverFragment)
     }
     private val viewModel: DiscoverViewModel by inject()
     private val connectivityListener: ConnectivityListener by inject()
     private var reelTopicsInternetIssue = false
     private var courseBundleInternetIssue = false
+    private var courseWaitingListFragment: CourseWaitingListFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -174,6 +178,23 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         val directions =
             DiscoverFragmentDirections.discoverFragmentToListReelsFragment(remoteReelTopic.topicId)
         findNavController().navigate(directions)
+    }
+
+    override fun onCourseItemClicked(remoteCourse: RemoteCourse) {
+        if (!remoteCourse.isAvailable) {
+            if (courseWaitingListFragment == null) {
+                courseWaitingListFragment = CourseWaitingListFragment()
+            }
+            if (!CourseWaitingListFragment.isOpened) {
+                CourseWaitingListFragment.isOpened = true
+                CourseWaitingListFragment.courseId = remoteCourse.courseId
+                CourseWaitingListFragment.nonAvailabilityReason = remoteCourse.nonAvailabilityReason
+                courseWaitingListFragment!!.show(
+                    parentFragmentManager,
+                    CourseWaitingListFragment.COURSE_WAITING_LIST_FRAGMENT
+                )
+            }
+        }
     }
 
 }

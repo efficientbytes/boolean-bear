@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import app.efficientbytes.booleanbear.utils.COURSE_TABLE
 import app.efficientbytes.booleanbear.utils.COURSE_TABLE_FTS
 import app.efficientbytes.booleanbear.utils.COURSE_TOPIC_TABLE
+import app.efficientbytes.booleanbear.utils.WAITING_LIST_COURSE_TABLE
 
 @Entity(tableName = COURSE_TOPIC_TABLE)
 data class LocalCourseTopic(
@@ -36,4 +37,10 @@ data class LocalCourseFTS(
     val topicId: String,
     val title: String,
     val hashTags: List<String>
+)
+
+@Entity(tableName = WAITING_LIST_COURSE_TABLE)
+data class LocalWaitingListCourse(
+    @PrimaryKey(autoGenerate = false)
+    val courseId: String
 )

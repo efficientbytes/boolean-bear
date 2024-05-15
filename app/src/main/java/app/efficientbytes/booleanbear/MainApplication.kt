@@ -72,12 +72,14 @@ class MainApplication : Application() {
         if (currentUser != null) {
             authenticationRepository.listenForAuthStateChanges()
             userProfileRepository.listenToUserProfileChange(currentUser.uid)
+            userProfileRepository.getAllWaitingListCourses()
             authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
             statisticsRepository.uploadPendingScreenTiming()
         } else {
             statisticsRepository.deleteUserScreenTime()
             userProfileRepository.deleteLocalNotificationToken()
             authenticationRepository.deleteIDToken()
+            assetsRepository.deleteCourseWaitingList()
         }
 
     }

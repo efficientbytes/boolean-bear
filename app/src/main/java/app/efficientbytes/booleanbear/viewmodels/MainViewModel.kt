@@ -160,6 +160,7 @@ class MainViewModel(
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             SingletonPreviousUserId.setInstance(currentUser.uid)
+            assetsRepository.deleteCourseWaitingList()
             userProfileRepository.resetUserProfileScope()
             authenticationRepository.resetSingleDeviceScope()
             statisticsRepository.noteDownScreenClosingTime()
@@ -271,7 +272,7 @@ class MainViewModel(
         }
     }
 
-    fun resetDeleteUserAccountLiveData(){
+    fun resetDeleteUserAccountLiveData() {
         externalScope.launch {
             _deleteUserAccountStatus.postValue(null)
         }
@@ -397,5 +398,22 @@ class MainViewModel(
         if (token != null) {
             authenticationRepository.saveIDToken(IDToken(token = token))
         }
+    }
+
+    private val _waitingListCourses: MutableLiveData<DataStatus<List<String>?>> =
+        MutableLiveData()
+    val waitingListCourses: LiveData<DataStatus<List<String>?>> =
+        _waitingListCourses
+
+    fun getAllWaitingListCourses() {
+        externalScope.launch {
+            userProfileRepository.getAllWaitingListCourses().collect {
+                _waitingListCourses.postValue(it)
+            }
+        }
+    }
+
+    fun deleteWaitingListCourses() {
+        assetsRepository.deleteCourseWaitingList()
     }
 }

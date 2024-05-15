@@ -9,8 +9,12 @@ import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
+import app.efficientbytes.booleanbear.services.models.WaitingListCourseResponse
 import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -58,4 +62,11 @@ interface AssetsService {
 
     @GET("courses/course-bundle")
     suspend fun getCourseBundle(): Response<RemoteCourseBundleResponse>
+
+    @POST("courses/{courseId}/join-waiting-list")
+    @FormUrlEncoded
+    suspend fun joinCourseWaitingList(
+        @Field("dummy") dummy: String = "",
+        @Path("courseId") courseId: String
+    ): Response<WaitingListCourseResponse>
 }

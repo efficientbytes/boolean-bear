@@ -1,12 +1,15 @@
 package app.efficientbytes.booleanbear.repositories
 
+import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
+import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.UserProfileResponse
+import app.efficientbytes.booleanbear.services.models.WaitingListCoursesResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
@@ -33,7 +36,8 @@ class UserProfileRepository(
     private val userProfileDao: UserProfileDao,
     private val externalScope: CoroutineScope,
     private val userProfileCoroutineScope: UserAccountCoroutineScope,
-    private val userProfileListener: UserProfileListener
+    private val userProfileListener: UserProfileListener,
+    private val assetsDao: AssetsDao
 ) {
 
     val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
@@ -305,6 +309,40 @@ class UserProfileRepository(
             }
         }
     }
+
+    fun getAllWaitingListCourses() = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = userProfileService.getWaitingListCourses()
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val courses = response.body()?.data
+                    emit(DataStatus.success(courses))
+                    response.body()?.data?.let {
+                        val courseList =
+                            it.map { course -> LocalWaitingListCourse(course) }
+                        assetsDao.insertCourseWaitingList(courseList)
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: WaitingListCoursesResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        WaitingListCoursesResponse::class.java
+                    )
+                    emit(DataStatus.failed<List<String>>(errorResponse.message.toString()))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet<List<String>>())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut<List<String>>())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException<List<String>>(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
     interface NotificationUploadListener {
 
