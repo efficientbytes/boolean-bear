@@ -33,3 +33,15 @@ data class RemoteCourseBundleResponse(
     val data: List<RemoteCourseBundle>? = null,
     val message: String? = null
 )
+
+@JsonClass(generateAdapter = true)
+data class WaitingListUser(
+    val userId: String? = null,
+    val courseId: String
+)
+
+@JsonClass(generateAdapter = true)
+data class WaitingListUserResponse(
+    val data: WaitingListUser? = null,
+    val message: String? = null
+)

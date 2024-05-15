@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalCourse
 import app.efficientbytes.booleanbear.database.models.LocalCourseTopic
+import app.efficientbytes.booleanbear.database.models.LocalCourseWaitingList
 import app.efficientbytes.booleanbear.database.models.LocalInstructorProfile
 import app.efficientbytes.booleanbear.database.models.LocalMentionedLink
 import app.efficientbytes.booleanbear.database.models.LocalReel
@@ -111,5 +112,11 @@ interface AssetsDao {
 
     @Query("DELETE FROM $COURSE_TABLE")
     suspend fun deleteCourses()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCourseWaitingList(waitingList: LocalCourseWaitingList)
+
+    @Query("SELECT COUNT(*) > 0 FROM course_waiting_list WHERE courseId = :course")
+    fun userHasJoinedWaitingList(course: String): Boolean
 
 }
