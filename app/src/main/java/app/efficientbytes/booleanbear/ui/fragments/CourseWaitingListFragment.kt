@@ -89,12 +89,14 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text = it.message
+                        viewModel.resetWaitingList()
                     }
 
                     DataStatus.Status.Loading -> {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text = "Please wait..."
+                        viewModel.resetWaitingList()
                     }
 
                     DataStatus.Status.NoInternet -> {
@@ -102,6 +104,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text = "No Internet!"
+                        viewModel.resetWaitingList()
                     }
 
                     DataStatus.Status.Success -> {
@@ -124,6 +127,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text =
                             "Process is taking unusually long time. Please try again..."
+                        viewModel.resetWaitingList()
                     }
 
                     else -> {
@@ -131,6 +135,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text =
                             "There was some error. Try again later."
+                        viewModel.resetWaitingList()
                     }
                 }
             }
