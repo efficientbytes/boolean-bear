@@ -2,9 +2,10 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.VerificationService
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
-import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.LoginModeResponse
 import app.efficientbytes.booleanbear.services.models.PhoneOTP
+import app.efficientbytes.booleanbear.services.models.ResponseMessage
+import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import com.google.gson.Gson
@@ -18,6 +19,39 @@ import java.net.SocketTimeoutException
 class VerificationRepository(private val verificationService: VerificationService) {
 
     private val gson = Gson()
+
+    suspend fun getLoginMode(phoneNumber: String) = flow {
+        try {
+            emit(DataStatus.loading())
+            val response = verificationService.getLoginMode(phoneNumber)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val body = response.body()
+                    if (body != null) {
+                        val loginMode = body.data
+                        if (loginMode != null) emit(DataStatus.success(loginMode))
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: LoginModeResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        LoginModeResponse::class.java
+                    )
+                    emit(DataStatus.failed(errorResponse.message.toString()))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
     suspend fun sendOTPToPhoneNumber(phoneOTP: PhoneOTP) = flow {
         try {
             emit(DataStatus.loading())
