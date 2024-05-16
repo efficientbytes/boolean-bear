@@ -46,6 +46,9 @@
             app:destination="@id/discoverFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/homeFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -97,6 +100,9 @@
             android:name="userAccountId"
             app:argType="string"
             app:nullable="false" />
+        <action
+            android:id="@+id/completeProfileFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
@@ -108,6 +114,9 @@
             app:destination="@id/editProfileFieldFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/editProfileFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFieldFragment"
@@ -254,4 +263,8 @@
             app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}/" />
 
     </fragment>
+    <fragment
+        android:id="@+id/managePasswordFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ManagePasswordFragment"
+        android:label="Password" />
 </navigation>
