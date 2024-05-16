@@ -266,5 +266,10 @@
     <fragment
         android:id="@+id/managePasswordFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.ManagePasswordFragment"
-        android:label="Password" />
+        android:label="Password">
+        <argument
+            android:name="mode"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
 </navigation>
