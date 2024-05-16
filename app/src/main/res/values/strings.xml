@@ -138,5 +138,8 @@
     <string name="description">Description</string>
     <string name="join_the_waiting_list">Join The Waiting List</string>
     <string name="don_t_miss_out_join_the_queue_and_get_to_know_first">Don\'t miss out, join the queue and get to know first</string>
+    <string name="login">Login</string>
+    <string name="enter_your_login_credentials">Enter your login credentials</string>
+    <string name="password">Password</string>
 
 </resources>

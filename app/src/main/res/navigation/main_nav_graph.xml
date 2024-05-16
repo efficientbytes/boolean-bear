@@ -71,6 +71,9 @@
             app:destination="@id/OTPVerificationFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/loginOrSignUpFragment_to_passwordLoginFragment"
+            app:destination="@id/passwordLoginFragment" />
     </fragment>
     <fragment
         android:id="@+id/OTPVerificationFragment"
@@ -271,5 +274,16 @@
             android:name="mode"
             android:defaultValue="-1"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordLoginFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.PasswordLoginFragment"
+        android:label="Password Authentication">
+        <action
+            android:id="@+id/passwordLoginFragment_to_completeProfileFragment"
+            app:destination="@id/completeProfileFragment" />
+        <argument
+            android:name="userAccountId"
+            app:argType="string" />
     </fragment>
 </navigation>
