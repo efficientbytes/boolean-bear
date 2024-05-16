@@ -37,6 +37,9 @@ val dummyReelTopicsList = listOf<RemoteReelTopic>(
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
+    RemoteReelTopic("", "", -1, ""),
+    RemoteReelTopic("", "", -1, ""),
+    RemoteReelTopic("", "", -1, ""),
 )
 val dummyReelsList = listOf<RemoteReel>(
     RemoteReel("", "", "", "", -1, -1, "", emptyList()),
