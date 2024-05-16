@@ -89,7 +89,7 @@ class LoginOrSignUpFragment : Fragment() {
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                viewModel.sendOTPToPhoneNumber(input)
+                viewModel.getLoginMode(input)
             }
         }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
@@ -104,7 +104,7 @@ class LoginOrSignUpFragment : Fragment() {
             }
 
         })
-        viewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
+        viewModel.loginMode.observe(viewLifecycleOwner) {
             if (it != null) {
                 when (it.status) {
                     DataStatus.Status.Failed -> {
@@ -112,6 +112,7 @@ class LoginOrSignUpFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text = "${it.message}"
+                        viewModel.resetLoginMode()
                     }
 
                     DataStatus.Status.Loading -> {
@@ -120,18 +121,38 @@ class LoginOrSignUpFragment : Fragment() {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "Please wait while we send the OTP..."
+                            "Please wait..."
                     }
 
                     DataStatus.Status.Success -> {
                         binding.continueButton.isEnabled = false
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text = it.data?.message
+                        binding.progressStatusValueTextView.text = it.message
                         binding.phoneNumberTextInputEditText.text = null
-                        it.data?.phoneNumber?.also { phoneNumber ->
-                            navigateToOTPVerificationPage(phoneNumber)
-                            viewModel.resetLiveData()
+                        it.data?.let { loginMode ->
+                            when (loginMode.mode) {
+                                0 -> {
+                                    //send otp
+                                    navigateToOTPVerificationPage(loginMode.phoneNumber)
+                                    viewModel.resetLoginMode()
+                                }
+
+                                1 -> {
+                                    //password auth
+                                    loginMode.userAccountId?.let { phoneNumber ->
+                                        navigateToPasswordPage(phoneNumber)
+                                    }
+                                    viewModel.resetLoginMode()
+                                }
+
+                                else -> {
+                                    //there was an error
+                                    binding.progressStatusValueTextView.text =
+                                        "We encountered an error. Please try again."
+                                    viewModel.resetLoginMode()
+                                }
+                            }
                         }
                     }
 
@@ -142,6 +163,7 @@ class LoginOrSignUpFragment : Fragment() {
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
                             "No Internet Connection"
+                        viewModel.resetLoginMode()
                     }
 
                     DataStatus.Status.TimeOut -> {
@@ -151,14 +173,23 @@ class LoginOrSignUpFragment : Fragment() {
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
                             "The process is taking unusually long time. Please try again"
+                        viewModel.resetLoginMode()
                     }
 
                     else -> {
-
+                        viewModel.resetLoginMode()
                     }
                 }
             }
         }
+    }
+
+    private fun navigateToPasswordPage(userAccountId: String) {
+        val directions =
+            LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToPasswordLoginFragment(
+                userAccountId
+            )
+        rootView.findNavController().navigate(directions)
     }
 
     private fun navigateToOTPVerificationPage(phoneNumber: String) {

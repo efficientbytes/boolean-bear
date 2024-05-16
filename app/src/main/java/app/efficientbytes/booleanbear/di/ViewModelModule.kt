@@ -9,6 +9,7 @@ import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import app.efficientbytes.booleanbear.viewmodels.LoginOrSignUpViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import app.efficientbytes.booleanbear.viewmodels.PhoneNumberOTPVerificationViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import app.efficientbytes.booleanbear.viewmodels.ShareFeedbackViewModel
@@ -43,4 +44,5 @@ val viewModelModule = module {
     viewModel { DiscoverViewModel(get(), get()) }
     viewModel { ListReelViewModel(get(), get()) }
     viewModel { CourseWaitingListViewModel(get()) }
+    viewModel { ManagePasswordViewModel(get(), get()) }
 }
