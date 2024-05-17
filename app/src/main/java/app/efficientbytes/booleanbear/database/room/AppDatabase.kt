@@ -25,12 +25,32 @@ import app.efficientbytes.booleanbear.database.models.LocalReelTopic
 import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.models.IssueCategory
+import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.UserProfile
 
 @Database(
-    entities = [Dummy::class, UserProfile::class, SingleDeviceLogin::class, Profession::class, IssueCategory::class, ScreenTiming::class, LocalReelTopic::class, LocalReel::class, LocalReelFTS::class, LocalInstructorProfile::class, LocalMentionedLink::class, LocalHomePageBanner::class, LocalNotificationToken::class, IDToken::class, LocalCourse::class, LocalCourseTopic::class, LocalCourseFTS::class, LocalWaitingListCourse::class],
+    entities = [
+        Dummy::class,
+        UserProfile::class,
+        SingleDeviceLogin::class,
+        Profession::class,
+        IssueCategory::class,
+        ScreenTiming::class,
+        LocalReelTopic::class,
+        LocalReel::class,
+        LocalReelFTS::class,
+        LocalInstructorProfile::class,
+        LocalMentionedLink::class,
+        LocalHomePageBanner::class,
+        LocalNotificationToken::class,
+        IDToken::class,
+        LocalCourse::class,
+        LocalCourseTopic::class,
+        LocalCourseFTS::class,
+        LocalWaitingListCourse::class,
+        LocalBooleanFlag::class],
     version = 1,
     exportSchema = false
 )

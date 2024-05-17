@@ -3,21 +3,24 @@ package app.efficientbytes.booleanbear.ui.models
 enum class PASSWORD_MANAGE_MODE
     (
     val index: Int,
-    val title: String,
+    val toolbarTitle: String,
+    val prompt: String,
     val buttonText: String
 ) {
 
     CREATE(
         1,
-        "Create Password",
+        "  Create Password",
+        "Create your password*",
         "Continue",
     ),
     UPDATE(
         2,
-        "Update Password",
+        "  Update Password",
+        "Create a new password*",
         "Update",
     ),
-    DEFAULT(-1, "", "");
+    DEFAULT(-1, "", "", "");
 
     companion object {
 

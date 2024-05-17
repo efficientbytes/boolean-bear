@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.models.IDToken
+import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.repositories.models.AuthState
@@ -14,6 +15,7 @@ import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
+import app.efficientbytes.booleanbear.utils.PASSWORD_CREATED_FLAG
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
@@ -236,6 +238,29 @@ class AuthenticationRepository(
     fun saveIDToken(idToken: IDToken) {
         externalScope.launch {
             authenticationDao.insertIDToken(idToken)
+        }
+    }
+
+    fun insertPasswordCreated(value: Boolean) {
+        externalScope.launch {
+            authenticationDao.insertPasswordCreatedFlag(
+                LocalBooleanFlag(
+                    PASSWORD_CREATED_FLAG,
+                    value
+                )
+            )
+        }
+    }
+
+    fun isUserPasswordCreated() = flow {
+        val result = authenticationDao.getPasswordCreated(PASSWORD_CREATED_FLAG)
+        emit(result)
+    }.catch { emit(null) }
+        .flowOn(Dispatchers.IO)
+
+    fun deletePasswordCreated() {
+        externalScope.launch {
+            authenticationDao.deletePasswordCreatedFlag(PASSWORD_CREATED_FLAG)
         }
     }
 

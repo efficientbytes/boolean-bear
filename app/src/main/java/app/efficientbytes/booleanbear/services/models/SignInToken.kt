@@ -8,6 +8,7 @@ data class SignInToken(
     val token: String? = null,
     val basicProfileDetailsUpdated: Boolean? = null,
     val userAccountId: String? = null,
+    val passwordCreated: Boolean,
     val singleDeviceLogin: SingleDeviceLogin? = null
 )
 

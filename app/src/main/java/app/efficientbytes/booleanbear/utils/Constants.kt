@@ -30,6 +30,8 @@ const val MENTIONED_LINKS_TABLE = "mentioned_links"
 const val HOME_PAGE_BANNER_AD_TABLE = "home_page_banner_ad"
 const val FCM_TOKEN_TABLE = "fcm_token"
 const val ID_TOKEN_TABLE = "id_token"
+const val BOOLEAN_FLAG_TABLE = "boolean_flag"
+const val PASSWORD_CREATED_FLAG = "PasswordCreated"
 val dummyReelTopicsList = listOf<RemoteReelTopic>(
     RemoteReelTopic("", "", -1, ""),
     RemoteReelTopic("", "", -1, ""),
