@@ -8,6 +8,7 @@ import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AuthenticationService
+import app.efficientbytes.booleanbear.services.models.PasswordAuthenticationResponse
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
@@ -297,5 +298,40 @@ class AuthenticationRepository(
             authenticationDao.deletePasswordCreatedFlag(PASSWORD_CREATED_FLAG)
         }
     }
+
+    fun authenticateWithPassword(userAccountId: String, password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.authenticateWithPassword(userAccountId, password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val body = response.body()
+                    if (body != null) {
+                        val phoneNumber = body.data
+                        if (phoneNumber != null) {
+                            emit(DataStatus.success(phoneNumber))
+                        }
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: PasswordAuthenticationResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        PasswordAuthenticationResponse::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
 }

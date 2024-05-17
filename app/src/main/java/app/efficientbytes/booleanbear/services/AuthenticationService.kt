@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.services
 
 import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
+import app.efficientbytes.booleanbear.services.models.PasswordAuthenticationResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import retrofit2.Response
@@ -36,4 +37,12 @@ interface AuthenticationService {
     suspend fun createAccountPassword(
         @Field("password") password: String
     ): Response<ResponseMessage>
+
+    @FormUrlEncoded
+    @POST("user/sign-in/password")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    suspend fun authenticateWithPassword(
+        @Field("userAccountId") userAccountId: String,
+        @Field("password") password: String
+    ): Response<PasswordAuthenticationResponse>
 }
