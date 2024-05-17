@@ -30,6 +30,7 @@ class OTPVerificationFragment : Fragment() {
     private val mainViewModel: MainViewModel by inject()
     private var profileUpdated: Boolean? = false
     private var userAccountId: String? = null
+    private var passwordCreated: Boolean = false
     private var singleDeviceLogin: SingleDeviceLogin? = null
     private lateinit var timer: CountDownTimer
     private val statisticsRepository: StatisticsRepository by inject()
@@ -159,7 +160,9 @@ class OTPVerificationFragment : Fragment() {
                         singleDeviceLogin = signInToken.singleDeviceLogin
                         userAccountId = signInToken.userAccountId
                         profileUpdated = signInToken.basicProfileDetailsUpdated
+                        passwordCreated = signInToken.passwordCreated
                         mainViewModel.signInWithToken(signInToken)
+                        mainViewModel.updatePasswordCreatedFlag(passwordCreated)
                     }
                 }
 
@@ -206,18 +209,29 @@ class OTPVerificationFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             statisticsRepository.noteDownScreenOpeningTime()
-                            userAccountId?.let { userAccountId ->
-                                profileUpdated?.let { profileUpdated ->
-                                    if (profileUpdated) {
+                            when {
+                                userAccountId != null && profileUpdated != null && profileUpdated == false -> {
+                                    userAccountId?.let { userAccountId ->
+                                        val directions =
+                                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
+                                                phoneNumber,
+                                                userAccountId,
+                                                passwordCreated
+                                            )
+                                        findNavController().navigate(directions)
+                                    }
+                                }
+
+                                userAccountId != null && profileUpdated != null && profileUpdated == true -> {
+                                    if (passwordCreated) {
                                         findNavController().popBackStack(
                                             R.id.homeFragment,
                                             false
                                         )
                                     } else {
                                         val directions =
-                                            OTPVerificationFragmentDirections.otpVerificationFragmentToCompleteProfileFragment(
-                                                phoneNumber,
-                                                userAccountId
+                                            OTPVerificationFragmentDirections.otpVerificationFragmentToManagePasswordFragment(
+                                                1
                                             )
                                         findNavController().navigate(directions)
                                     }

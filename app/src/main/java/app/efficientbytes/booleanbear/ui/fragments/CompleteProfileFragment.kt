@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCompleteProfileBinding
 import app.efficientbytes.booleanbear.models.UserProfile
@@ -30,29 +31,14 @@ class CompleteProfileFragment : Fragment() {
     private lateinit var rootView: View
     private lateinit var phoneNumber: String
     private lateinit var userAccountId: String
+    private var passwordCreated: Boolean = false
     private var selectedProfessionCategoryPosition: Int = 0
     private var currentProfessionCategoryPosition: Int = 0
     private val viewModel: CompleteProfileViewModel by inject()
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private val connectivityListener: ConnectivityListener by inject()
     private var professionsListFailedToLoad = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val bundle = arguments ?: return
-        val args = CompleteProfileFragmentArgs.fromBundle(bundle)
-        val phoneNumber = args.phoneNumber
-        val userAccountId = args.userAccountId
-        this.phoneNumber = phoneNumber
-        this.userAccountId = userAccountId
-        val backPressedCallback: OnBackPressedCallback =
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    this.isEnabled = false
-                }
-            }
-        requireActivity().onBackPressedDispatcher.addCallback(backPressedCallback)
-    }
+    private val safeArgs: CompleteProfileFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +52,17 @@ class CompleteProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
+        this.phoneNumber = safeArgs.phoneNumber
+        this.userAccountId = safeArgs.userAccountId
+        this.passwordCreated = safeArgs.passwordCreated
+
         binding.phoneNumberTextInputEditText.setText(phoneNumber)
         mainViewModel.getProfessionalAdapterList()
         mainViewModel.professionalAdapterList.observe(viewLifecycleOwner) { it ->
@@ -191,8 +188,16 @@ class CompleteProfileFragment : Fragment() {
                     it.data?.let { userProfile ->
                         binding.progressStatusValueTextView.text = it.message.toString()
                         mainViewModel.saveUserProfile(userProfile)
+                        if (passwordCreated) {
+                            findNavController().popBackStack(R.id.homeFragment, false)
+                        } else {
+                            val directions =
+                                CompleteProfileFragmentDirections.completeProfileFragmentToManagePasswordFragment(
+                                    1
+                                )
+                            findNavController().navigate(directions)
+                        }
                     }
-                    findNavController().popBackStack(R.id.homeFragment, false)
                 }
 
                 DataStatus.Status.NoInternet -> {

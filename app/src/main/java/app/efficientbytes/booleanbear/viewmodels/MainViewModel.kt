@@ -162,6 +162,7 @@ class MainViewModel(
             SingletonPreviousUserId.setInstance(currentUser.uid)
             assetsRepository.deleteCourseWaitingList()
             userProfileRepository.resetUserProfileScope()
+            authenticationRepository.deletePasswordCreated()
             authenticationRepository.resetSingleDeviceScope()
             statisticsRepository.noteDownScreenClosingTime()
             statisticsRepository.forceUploadPendingScreenTiming()
@@ -415,5 +416,9 @@ class MainViewModel(
 
     fun deleteWaitingListCourses() {
         assetsRepository.deleteCourseWaitingList()
+    }
+
+    fun updatePasswordCreatedFlag(value: Boolean) {
+        authenticationRepository.insertPasswordCreated(value)
     }
 }

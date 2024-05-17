@@ -67,7 +67,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             setOf(
                 R.id.homeFragment,
                 R.id.completeProfileFragment,
-                R.id.reportSubmittedFragment
+                R.id.reportSubmittedFragment,
+                R.id.managePasswordFragment
             )
         )
     }
@@ -194,6 +195,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.deleteIDToken()
                         viewModel.deleteUserProfile()
                         viewModel.deleteWaitingListCourses()
+                        authenticationRepository.deletePasswordCreated()
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
