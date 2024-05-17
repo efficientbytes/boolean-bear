@@ -252,6 +252,40 @@ class AuthenticationRepository(
         }
     }
 
+    fun createAccountPassword(password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.createAccountPassword(password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    emit(DataStatus.success(true))
+                    authenticationDao.insertPasswordCreatedFlag(
+                        LocalBooleanFlag(
+                            PASSWORD_CREATED_FLAG, true
+                        )
+                    )
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ResponseMessage = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ResponseMessage::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
     fun isUserPasswordCreated() = flow {
         val result = authenticationDao.getPasswordCreated(PASSWORD_CREATED_FLAG)
         emit(result)

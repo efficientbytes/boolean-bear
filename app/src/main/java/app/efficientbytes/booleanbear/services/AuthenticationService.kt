@@ -30,4 +30,10 @@ interface AuthenticationService {
         @Field("userAccountId") userAccountId: String = ""
     ): Response<ResponseMessage>
 
+    @FormUrlEncoded
+    @POST("user/account/password/create")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    suspend fun createAccountPassword(
+        @Field("password") password: String
+    ): Response<ResponseMessage>
 }

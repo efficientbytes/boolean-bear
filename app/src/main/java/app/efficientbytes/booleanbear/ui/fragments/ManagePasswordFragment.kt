@@ -3,18 +3,21 @@ package app.efficientbytes.booleanbear.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentManagePasswordBinding
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.models.PASSWORD_MANAGE_MODE
+import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import com.google.android.material.appbar.MaterialToolbar
+import org.koin.android.ext.android.inject
 
 class ManagePasswordFragment : Fragment() {
 
@@ -24,6 +27,7 @@ class ManagePasswordFragment : Fragment() {
     private val safeArgs: ManagePasswordFragmentArgs by navArgs()
     private var mode: PASSWORD_MANAGE_MODE? = null
     private var toolbar: MaterialToolbar? = null
+    private val viewModel: ManagePasswordViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,8 +76,7 @@ class ManagePasswordFragment : Fragment() {
                     val password = binding.passwordTextInputEditText.text.toString()
                     val confirmPassword = binding.confirmPasswordTextInputEditText.text.toString()
                     if (validatePassword(password, confirmPassword)) {
-                        // send to server
-                        Log.i("Manage Password", "Passing password to server")
+                        viewModel.createAccountPassword(password)
                     }
                 }
             }
@@ -188,6 +191,69 @@ class ManagePasswordFragment : Fragment() {
 
             }
         })
+
+        viewModel.createPassword.observe(viewLifecycleOwner) {
+            it?.let { status ->
+                binding.progressLinearLayout.visibility = View.VISIBLE
+                when (status.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = status.message
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetCreatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = "Please wait..."
+                        binding.continueButton.isEnabled = false
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "No Internet Connection. Please Try again."
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetCreatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "Password has be set successfully."
+                        binding.continueButton.isEnabled = false
+                        Toast.makeText(
+                            requireContext(),
+                            "Password has be set successfully.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().popBackStack(R.id.homeFragment, false)
+                        viewModel.resetCreatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = "Time out. Please Try again."
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetCreatePasswordLiveData()
+                    }
+
+                    else -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            "We encountered an problem. Please Try again."
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetCreatePasswordLiveData()
+                    }
+                }
+            }
+        }
 
 
     }

@@ -51,8 +51,7 @@ class PasswordLoginFragment : Fragment() {
                 }
             }
             binding.loginButton.isEnabled = false
-            //send to server for authentication
-            viewModel.authenticateUserWithPassword(userAccountId, input)
+            //send password to server
         }
 
         binding.passwordTextInputEditText.addTextChangedListener(object : TextWatcher {
