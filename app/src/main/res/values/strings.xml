@@ -141,5 +141,13 @@
     <string name="login">Login</string>
     <string name="enter_your_login_credentials">Enter your login credentials</string>
     <string name="password">Password</string>
+    <string name="password_should_contain_minimum">Password should contain minimum</string>
+    <string name="your_password_is_securely_stored_using_industry_standard_hashing_techniques_to_ensure_your_privacy_and_protection_we_follow_best_practices_to_keep_your_information_safe">Your password is securely stored using industry-standard hashing techniques to ensure your privacy and protection. We follow best practices to keep your information safe.</string>
+    <string name="_12_characters">12 characters</string>
+    <string name="_1_number">1 number</string>
+    <string name="_1_lowercase">1 lowercase</string>
+    <string name="_1_uppercase">1 uppercase</string>
+    <string name="_1_special_character_from">1 special character from $#@_!</string>
+    <string name="confirm_password">Confirm password*</string>
 
 </resources>
