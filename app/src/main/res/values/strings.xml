@@ -149,5 +149,9 @@
     <string name="_1_uppercase">1 uppercase</string>
     <string name="_1_special_character_from">1 special character from $#@_!</string>
     <string name="confirm_password">Confirm password*</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="try_another_way">Try another way</string>
 
 </resources>

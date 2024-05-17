@@ -281,7 +281,7 @@ class ManagePasswordFragment : Fragment() {
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isDigit() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 digits."
+            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 digit."
             return false
         }
         binding.passwordTextInputLayout.error = null
