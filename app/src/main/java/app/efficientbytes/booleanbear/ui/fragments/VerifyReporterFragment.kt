@@ -200,6 +200,7 @@ class VerifyReporterFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.GONE
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
+                    timer.start()
                 }
 
                 DataStatus.Status.NoInternet -> {

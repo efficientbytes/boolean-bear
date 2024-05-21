@@ -87,7 +87,7 @@ class OTPVerificationFragment : Fragment() {
         }
 
         if (forceSendOTP) {
-            binding.otpSentToLabelTextView.visibility = View.GONE
+            binding.otpSentToLabelTextView.visibility = View.INVISIBLE
         } else {
             binding.otpSentToLabelTextView.visibility = View.VISIBLE
             binding.otpSentToLabelTextView.text =

@@ -87,8 +87,7 @@
         <action
             android:id="@+id/otpVerificationFragment_to_completeProfileFragment"
             app:destination="@id/completeProfileFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:enterAnim="@anim/slide_in_left" />
         <argument
             android:name="prefix"
             app:argType="string"
@@ -108,8 +107,7 @@
         <action
             android:id="@+id/otpVerificationFragment_to_managePasswordFragment"
             app:destination="@id/managePasswordFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:enterAnim="@anim/slide_in_left" />
     </fragment>
     <fragment
         android:id="@+id/completeProfileFragment"
