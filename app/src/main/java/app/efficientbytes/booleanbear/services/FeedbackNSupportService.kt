@@ -24,7 +24,8 @@ interface FeedbackNSupportService {
         @Field("title") title: String,
         @Field("description") description: String,
         @Field("category") category: Int,
-        @Field("completePhoneNumber") completePhoneNumber: String? = null,
+        @Field("prefix") prefix: String,
+        @Field("phoneNumber") phoneNumber: String,
         @Field("userAccountId") userAccountId: String? = null,
     ): Response<RequestSupportResponse>
 
