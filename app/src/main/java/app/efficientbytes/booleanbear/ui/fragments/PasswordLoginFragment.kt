@@ -8,9 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentPasswordLoginBinding
+import app.efficientbytes.booleanbear.repositories.StatisticsRepository
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import org.koin.android.ext.android.inject
 
@@ -21,6 +26,11 @@ class PasswordLoginFragment : Fragment() {
     private lateinit var rootView: View
     private val safeArgs: PasswordLoginFragmentArgs by navArgs()
     private val viewModel: ManagePasswordViewModel by inject()
+    private val statisticsRepository: StatisticsRepository by inject()
+    private val mainViewModel: MainViewModel by inject()
+
+    //response data
+    private lateinit var signInToken: SignInToken
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +45,7 @@ class PasswordLoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.forgotPasswordLinearLayout.visibility = View.GONE
         val userAccountId = safeArgs.userAccountId
 
         binding.passwordTextInputEditText.addTextChangedListener(object : TextWatcher {
@@ -132,9 +143,215 @@ class PasswordLoginFragment : Fragment() {
         binding.loginButton.setOnClickListener {
             val password = binding.passwordTextInputEditText.text.toString()
             if (validatePassword(password)) {
-                //send user account id and password to server
-                Toast.makeText(requireContext(), "Password sent to server", Toast.LENGTH_LONG)
-                    .show()
+                viewModel.authenticateUsingPassword(userAccountId, password)
+            }
+        }
+
+        binding.tryAnotherWayLabelTextView.setOnClickListener {
+            val directions =
+                PasswordLoginFragmentDirections.passwordLoginFragmentToOTPVerificationFragment(
+                    prefix = safeArgs.prefix,
+                    phoneNumber = safeArgs.phoneNumber,
+                    forceSendOTP = true,
+                    passwordAuthFailed = true,
+                )
+            findNavController().navigate(directions)
+        }
+
+        viewModel.authenticateUser.observe(viewLifecycleOwner) {
+            it?.let { status ->
+                binding.progressLinearLayout.visibility = View.VISIBLE
+                when (status.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = status.message
+                        binding.loginButton.isEnabled = true
+                        binding.forgotPasswordLinearLayout.visibility = View.VISIBLE
+                        viewModel.resetAuthenticateUserLiveData()
+                    }
+
+                    DataStatus.Status.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = getString(R.string.please_wait)
+                        binding.loginButton.isEnabled = false
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.no_internet_connection_please_try_again)
+                        binding.loginButton.isEnabled = true
+                        viewModel.resetAuthenticateUserLiveData()
+                    }
+
+                    DataStatus.Status.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.loginButton.isEnabled = false
+                        status.data?.let { phoneNumberData ->
+                            mainViewModel.getSignInToken(
+                                phoneNumberData.prefix,
+                                phoneNumberData.phoneNumber
+                            )
+                        }
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.time_out_please_try_again)
+                        binding.loginButton.isEnabled = true
+                        viewModel.resetAuthenticateUserLiveData()
+                    }
+
+                    else -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                        binding.loginButton.isEnabled = true
+                        viewModel.resetAuthenticateUserLiveData()
+                    }
+                }
+            }
+        }
+
+        mainViewModel.signInToken.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.message
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.please_wait_while_we_sign_you_in)
+                }
+
+                DataStatus.Status.Success -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    //sign the user with the received sign in token
+                    it.data?.let { signInToken ->
+                        this@PasswordLoginFragment.signInToken = signInToken
+                        mainViewModel.signInWithToken(signInToken)
+                        mainViewModel.updatePasswordCreatedFlag(signInToken.passwordCreated)
+                    }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.no_internet_connection_please_try_again)
+                    binding.loginButton.isEnabled = true
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.time_out_please_try_again)
+                    binding.loginButton.isEnabled = true
+                }
+
+                else -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                    binding.loginButton.isEnabled = true
+                }
+            }
+        }
+
+        mainViewModel.isUserSignedIn.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Failed -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text = it.message
+                    binding.loginButton.isEnabled = true
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.please_wait_while_we_sign_you_in)
+                }
+
+                DataStatus.Status.Success -> {
+                    when (it.data) {
+                        true -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.progressStatusValueTextView.visibility = View.VISIBLE
+                            binding.progressStatusValueTextView.text =
+                                getString(R.string.you_have_been_signed_in_successfully)
+                            mainViewModel.saveSingleDeviceLogin(signInToken.singleDeviceLogin)
+                            Toast.makeText(
+                                requireContext(),
+                                getString(R.string.signed_in_successfully),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            statisticsRepository.noteDownScreenOpeningTime()
+                            when (signInToken.basicProfileDetailsUpdated) {
+                                true -> {
+                                    findNavController().popBackStack(
+                                        R.id.homeFragment,
+                                        false
+                                    )
+                                }
+
+                                false -> {
+                                    val directions =
+                                        PasswordLoginFragmentDirections.passwordLoginFragmentToCompleteProfileFragment(
+                                            prefix = this@PasswordLoginFragment.signInToken.phoneNumberData.prefix,
+                                            phoneNumber = this@PasswordLoginFragment.signInToken.phoneNumberData.phoneNumber,
+                                            passwordCreated = this@PasswordLoginFragment.signInToken.passwordCreated,
+                                            userAccountId = this@PasswordLoginFragment.signInToken.userAccountId
+                                        )
+                                    findNavController().navigate(directions)
+                                }
+                            }
+                        }
+
+                        else -> {
+
+                        }
+                    }
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.no_internet_connection_please_try_again)
+                    binding.loginButton.isEnabled = true
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.time_out_please_try_again)
+                    binding.loginButton.isEnabled = true
+                }
+
+                else -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                    binding.loginButton.isEnabled = true
+                }
             }
         }
 
@@ -142,35 +359,38 @@ class PasswordLoginFragment : Fragment() {
 
     private fun validatePassword(password: String): Boolean {
         if (password.isEmpty()) {
-            binding.passwordTextInputLayout.error = "Password is required."
+            binding.passwordTextInputLayout.error = getString(R.string.password_is_required)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (password.length < 12) {
             binding.passwordTextInputLayout.error =
-                "Password needs to be minimum 12 characters wide."
+                getString(R.string.password_needs_to_be_minimum_12_characters_wide)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isUpperCase() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 uppercase."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_uppercase)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isLowerCase() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 lowercase."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_lowercase)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isDigit() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 digit."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_digit)
             return false
         }
         binding.passwordTextInputLayout.error = null
         val specialCharacters = "-$#@_!".toSet()
         if (!password.any { it in specialCharacters }) {
             binding.passwordTextInputLayout.error =
-                "Password needs to have minimum 1 one special character from : -\$#@_!."
+                getString(R.string.password_needs_to_have_minimum_1_one_special_character_from)
             return false
         }
         binding.passwordTextInputLayout.error = null

@@ -6,38 +6,38 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
-import app.efficientbytes.booleanbear.services.models.PhoneOTP
+import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PhoneNumberOTPVerificationViewModel(private val verificationRepository: VerificationRepository) :
     ViewModel() {
 
-    private val _verifyPhoneNumberOTPResponse: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
+    private val _verifyPhoneNumberOTPResponse: MutableLiveData<DataStatus<PhoneNumber>> =
         MutableLiveData()
-    val verifyPhoneNumberOTPResponse: LiveData<DataStatus<VerifyPhoneResponse?>> =
+    val verifyPhoneNumberOTPResponse: LiveData<DataStatus<PhoneNumber>> =
         _verifyPhoneNumberOTPResponse
 
-    fun verifyPhoneNumberOTP(phoneNumber: String, otp: String) {
+    fun verifyPhoneNumberOTP(prefix: String, phoneNumber: String, otp: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.verifyPhoneNumberOTP(PhoneOTP(phoneNumber, otp))
+            verificationRepository.verifyPhoneNumberOTP(prefix, phoneNumber, otp)
                 .collect {
                     _verifyPhoneNumberOTPResponse.postValue(it)
                 }
         }
     }
 
-    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumber>> =
         MutableLiveData()
-    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<VerifyPhoneResponse?>> =
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumber>> =
         _sendOTPToPhoneNumberResponse
 
-    fun sendOTPToPhoneNumber(phoneNumber: String) {
+    fun sendOTPToPhoneNumber(prefix: String, phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.sendOTPToPhoneNumber(PhoneOTP(phoneNumber)).collect {
-                _sendOTPToPhoneNumberResponse.postValue(it)
-            }
+            verificationRepository.sendOTPToPhoneNumber(prefix, phoneNumber)
+                .collect {
+                    _sendOTPToPhoneNumberResponse.postValue(it)
+                }
         }
     }
 

@@ -32,12 +32,10 @@ import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
-import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
-import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
@@ -75,9 +73,9 @@ class MainViewModel(
     }
     private val _signInToken: MutableLiveData<DataStatus<SignInToken?>> = MutableLiveData()
     val signInToken: LiveData<DataStatus<SignInToken?>> = _signInToken
-    fun getSignInToken(phoneNumber: PhoneNumber) {
+    fun getSignInToken(prefix: String, phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.getSignInToken(phoneNumber).collect {
+            authenticationRepository.getSignInToken(prefix, phoneNumber).collect {
                 _signInToken.postValue(it)
             }
         }
@@ -87,7 +85,7 @@ class MainViewModel(
     val isUserSignedIn: LiveData<DataStatus<Boolean>> = _isUserSignedIn
     fun signInWithToken(token: SignInToken) {
         viewModelScope.launch(Dispatchers.IO) {
-            token.token?.let {
+            token.token.let {
                 auth.signInWithCustomToken(it)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -221,14 +219,14 @@ class MainViewModel(
         utilityDataRepository.getIssueCategoriesAdapterList(this@MainViewModel)
     }
 
-    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
+    private val _sendOTPToPhoneNumberResponse: MutableLiveData<DataStatus<PhoneNumber>> =
         MutableLiveData()
-    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<VerifyPhoneResponse?>> =
+    val sendOTPToPhoneNumberResponse: LiveData<DataStatus<PhoneNumber>> =
         _sendOTPToPhoneNumberResponse
 
-    fun sendOTPToPhoneNumber(phoneNumber: String) {
+    fun sendOTPToPhoneNumber(prefix: String, phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.sendOTPToPhoneNumber(PhoneOTP(phoneNumber)).collect {
+            verificationRepository.sendOTPToPhoneNumber(phoneNumber, prefix).collect {
                 _sendOTPToPhoneNumberResponse.postValue(it)
             }
         }
@@ -247,14 +245,14 @@ class MainViewModel(
         }
     }
 
-    private val _verifyOtpStatus: MutableLiveData<DataStatus<VerifyPhoneResponse?>> =
+    private val _verifyOtpStatus: MutableLiveData<DataStatus<PhoneNumber>> =
         MutableLiveData()
-    val verifyOtpStatus: LiveData<DataStatus<VerifyPhoneResponse?>> =
+    val verifyOtpStatus: LiveData<DataStatus<PhoneNumber>> =
         _verifyOtpStatus
 
-    fun verifyPhoneNumberOTP(phoneOTP: PhoneOTP) {
+    fun verifyPhoneNumberOTP(prefix: String, phoneNumber: String, otp: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.verifyPhoneNumberOTP(phoneOTP).collect {
+            verificationRepository.verifyPhoneNumberOTP(prefix, phoneNumber, otp).collect {
                 _verifyOtpStatus.postValue(it)
             }
         }
