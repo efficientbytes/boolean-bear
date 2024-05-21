@@ -228,6 +228,10 @@
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <argument
+            android:name="prefix"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
             android:name="phoneNumber"
             app:argType="string"
             app:nullable="false" />

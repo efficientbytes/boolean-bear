@@ -213,6 +213,7 @@
                 app:endIconTint="@color/white"
                 app:expandedHintEnabled="false"
                 app:hintAnimationEnabled="false"
+                app:prefixTextColor="@color/white"
                 app:layout_constraintEnd_toStartOf="@id/guideline4"
                 app:layout_constraintStart_toEndOf="@id/guideline3"
                 app:layout_constraintTop_toBottomOf="@id/emailTextInputLayout">
