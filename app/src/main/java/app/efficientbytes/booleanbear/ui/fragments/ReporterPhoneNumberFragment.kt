@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentReporterPhoneNumberBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -38,10 +39,14 @@ class ReporterPhoneNumberFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val currentUser = FirebaseAuth.getInstance().currentUser
+
         if (currentUser != null) {
             binding.phoneNumberVerifiedMessageLabelTextView.visibility = View.VISIBLE
-            val phoneNumber = SingletonUserData.getInstance()?.completePhoneNumber
+
+            binding.phoneNumberTextInputLayout.prefixText =
+                SingletonUserData.getInstance()?.phoneNumberPrefix
             binding.phoneNumberInputEditText.setText(SingletonUserData.getInstance()?.phoneNumber)
+
             binding.phoneNumberTextInputLayout.isEnabled = false
             binding.phoneNumberTextInputLayout.isClickable = false
             binding.phoneNumberTextInputLayout.isLongClickable = false
@@ -50,11 +55,15 @@ class ReporterPhoneNumberFragment : Fragment() {
             binding.submitButton.visibility = View.VISIBLE
             binding.continueButton.visibility = View.GONE
             val requestSupport = SingletonRequestSupport.getInstance()
-            requestSupport?.apply {
-                userAccountId = currentUser.uid
-                completePhoneNumber = phoneNumber
+            SingletonUserData.getInstance()?.let { userProfile ->
+                requestSupport?.apply {
+                    userAccountId = userProfile.userAccountId
+                    prefix = userProfile.phoneNumberPrefix
+                    phoneNumber = userProfile.phoneNumber
+                }
             }
         } else {
+            binding.phoneNumberTextInputLayout.prefixText = "+91"
             binding.phoneNumberVerifiedMessageLabelTextView.visibility = View.GONE
             binding.continueButton.visibility = View.VISIBLE
             binding.submitButton.visibility = View.GONE
@@ -71,7 +80,7 @@ class ReporterPhoneNumberFragment : Fragment() {
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberInputEditText.text.toString()
             if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                mainViewModel.sendOTPToPhoneNumber(input)
+                mainViewModel.sendOTPToPhoneNumber(prefix = "+91", phoneNumber = input)
             }
         }
 
@@ -89,114 +98,117 @@ class ReporterPhoneNumberFragment : Fragment() {
         })
 
         mainViewModel.sendOTPToPhoneNumberResponse.observe(viewLifecycleOwner) {
+            binding.progressLinearLayout.visibility = View.VISIBLE
             when (it.status) {
                 DataStatus.Status.Failed -> {
                     binding.continueButton.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "${it.message}"
+                    binding.progressStatusValueTextView.text = it.message
                 }
 
                 DataStatus.Status.Loading -> {
                     binding.continueButton.isEnabled = false
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Please wait while we send the OTP..."
+                    binding.progressStatusValueTextView.text = getString(R.string.please_wait)
                 }
 
                 DataStatus.Status.Success -> {
-                    it.data?.phoneNumber?.also { phoneNumber ->
+                    it.data?.let { result ->
+                        binding.continueButton.isEnabled = false
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.text = it.message
+                        result
+                    }?.let { phoneNumberData ->
                         val directions =
                             ReporterPhoneNumberFragmentDirections.reporterPhoneNumberFragmentToVerifyReporterFragment(
-                                phoneNumber
+                                phoneNumberData.prefix, phoneNumberData.phoneNumber
                             )
                         rootView.findNavController().navigate(directions)
                     }
                 }
 
-                DataStatus.Status.NoInternet -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "No Internet Connection"
-                }
-
-                DataStatus.Status.TimeOut -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "The process is taking unusually long time. Please try again"
-                }
-
-                else -> {
-
-                }
+                DataStatus.Status.NoInternet -> noInternetResponse()
+                DataStatus.Status.TimeOut -> timeOutResponse()
+                else -> unknownExceptionResponse()
             }
         }
 
         mainViewModel.requestSupportResponse.observe(viewLifecycleOwner) {
+            binding.progressLinearLayout.visibility = View.VISIBLE
             when (it.status) {
                 DataStatus.Status.Failed -> {
+                    binding.submitButton.isEnabled = true
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "${it.message}"
+                    binding.progressStatusValueTextView.text = it.message
                 }
 
                 DataStatus.Status.Loading -> {
                     binding.submitButton.isEnabled = false
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
-                        "Please wait while we submit your issue."
+                        getString(R.string.please_wait)
                 }
 
                 DataStatus.Status.Success -> {
                     binding.submitButton.isEnabled = false
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "Successfully submitted."
-                    val responseBody = it.data
-                    responseBody?.let { requestSupportStatus ->
+                    binding.progressStatusValueTextView.text = it.message
+                    it.data?.let { result ->
                         val direction =
                             ReporterPhoneNumberFragmentDirections.reporterPhoneNumberFragmentToReportSubmittedFragment(
-                                requestSupportStatus.message,
-                                requestSupportStatus.ticketId
+                                result.message,
+                                result.ticketId
                             )
                         findNavController().navigate(direction)
                     }
                 }
 
                 DataStatus.Status.NoInternet -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "No Internet Connection"
+                    binding.submitButton.isEnabled = true
+                    noInternetResponse()
                 }
 
                 DataStatus.Status.TimeOut -> {
-                    binding.continueButton.isEnabled = true
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "The process is taking unusually long time. Please try again"
+                    binding.submitButton.isEnabled = true
+                    timeOutResponse()
                 }
 
                 else -> {
-
+                    binding.submitButton.isEnabled = true
+                    unknownExceptionResponse()
                 }
             }
         }
 
+    }
+
+    private fun noInternetResponse() {
+        binding.continueButton.isEnabled = true
+        binding.progressBar.visibility = View.GONE
+        binding.progressStatusValueTextView.visibility = View.VISIBLE
+        binding.progressStatusValueTextView.text =
+            getString(R.string.no_internet_connection_please_try_again)
+    }
+
+    private fun timeOutResponse() {
+        binding.continueButton.isEnabled = true
+        binding.progressBar.visibility = View.GONE
+        binding.progressStatusValueTextView.visibility = View.VISIBLE
+        binding.progressStatusValueTextView.text =
+            getString(R.string.time_out_please_try_again)
+    }
+
+    private fun unknownExceptionResponse() {
+        binding.continueButton.isEnabled = true
+        binding.progressBar.visibility = View.GONE
+        binding.progressStatusValueTextView.visibility = View.VISIBLE
+        binding.progressStatusValueTextView.text =
+            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
     }
 
 }
