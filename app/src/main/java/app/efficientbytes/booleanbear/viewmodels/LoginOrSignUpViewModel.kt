@@ -18,9 +18,9 @@ class LoginOrSignUpViewModel(private val verificationRepository: VerificationRep
     val loginMode: LiveData<DataStatus<LoginMode?>?> =
         _loginMode
 
-    fun getLoginMode(phoneNumber: String) {
+    fun getLoginMode(prefix: String, phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.getLoginMode(phoneNumber).collect {
+            verificationRepository.getLoginMode(prefix, phoneNumber).collect {
                 _loginMode.postValue(it)
             }
         }

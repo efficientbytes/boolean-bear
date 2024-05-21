@@ -40,7 +40,8 @@ class LoginOrSignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val policy = "By continuing, I agree to the Terms of Use & Privacy Policy"
+        //terms and policy ui render
+        val policy = getString(R.string.by_continuing_i_agree_to_the_terms_of_use_privacy_policy)
         val termsOfUseIndex = 30
         val privacyPolicyIndex = 45
         val spannableStringBuilder = SpannableStringBuilder(policy)
@@ -82,16 +83,9 @@ class LoginOrSignUpFragment : Fragment() {
             59,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
         binding.policyNConditionsLabelTextView.text = spannableStringBuilder
         binding.policyNConditionsLabelTextView.movementMethod = LinkMovementMethod.getInstance()
 
-        binding.continueButton.setOnClickListener {
-            val input = binding.phoneNumberTextInputEditText.text.toString()
-            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                viewModel.getLoginMode(input)
-            }
-        }
         binding.phoneNumberTextInputEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -104,8 +98,17 @@ class LoginOrSignUpFragment : Fragment() {
             }
 
         })
+
+        binding.continueButton.setOnClickListener {
+            val input = binding.phoneNumberTextInputEditText.text.toString()
+            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
+                viewModel.getLoginMode(prefix = "+91", phoneNumber = input)
+            }
+        }
+
         viewModel.loginMode.observe(viewLifecycleOwner) {
             if (it != null) {
+                binding.progressLinearLayout.visibility = View.VISIBLE
                 when (it.status) {
                     DataStatus.Status.Failed -> {
                         binding.continueButton.isEnabled = true
@@ -117,11 +120,10 @@ class LoginOrSignUpFragment : Fragment() {
 
                     DataStatus.Status.Loading -> {
                         binding.continueButton.isEnabled = false
-                        binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "Please wait..."
+                            getString(R.string.please_wait)
                     }
 
                     DataStatus.Status.Success -> {
@@ -134,14 +136,31 @@ class LoginOrSignUpFragment : Fragment() {
                             when (loginMode.mode) {
                                 0 -> {
                                     //send otp
-                                    navigateToOTPVerificationPage(loginMode.phoneNumber)
+                                    val phoneNumberData = loginMode.phoneNumberData
+                                    val phoneNumberPrefix = phoneNumberData.prefix
+                                    val phoneNumber = phoneNumberData.phoneNumber
+
+                                    navigateToOTPVerificationPage(
+                                        phoneNumber,
+                                        phoneNumberPrefix,
+                                        false,
+                                        false
+                                    )
                                     viewModel.resetLoginMode()
                                 }
 
                                 1 -> {
                                     //password auth
-                                    loginMode.userAccountId?.let { phoneNumber ->
-                                        navigateToPasswordPage(phoneNumber)
+                                    val phoneNumberData = loginMode.phoneNumberData
+                                    val userAccountId = loginMode.userAccountId
+                                    val phoneNumber = phoneNumberData.phoneNumber
+                                    val prefix = phoneNumberData.prefix
+                                    userAccountId?.let {
+                                        navigateToPasswordPage(
+                                            userAccountId,
+                                            phoneNumber,
+                                            prefix
+                                        )
                                     }
                                     viewModel.resetLoginMode()
                                 }
@@ -149,7 +168,7 @@ class LoginOrSignUpFragment : Fragment() {
                                 else -> {
                                     //there was an error
                                     binding.progressStatusValueTextView.text =
-                                        "We encountered an error. Please try again."
+                                        getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
                                     viewModel.resetLoginMode()
                                 }
                             }
@@ -158,25 +177,29 @@ class LoginOrSignUpFragment : Fragment() {
 
                     DataStatus.Status.NoInternet -> {
                         binding.continueButton.isEnabled = true
-                        binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "No Internet Connection"
+                            getString(R.string.no_internet_connection_please_try_again)
                         viewModel.resetLoginMode()
                     }
 
                     DataStatus.Status.TimeOut -> {
                         binding.continueButton.isEnabled = true
-                        binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "The process is taking unusually long time. Please try again"
+                            getString(R.string.time_out_please_try_again)
                         viewModel.resetLoginMode()
                     }
 
                     else -> {
+                        binding.continueButton.isEnabled = true
+
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
                         viewModel.resetLoginMode()
                     }
                 }
@@ -184,18 +207,32 @@ class LoginOrSignUpFragment : Fragment() {
         }
     }
 
-    private fun navigateToPasswordPage(userAccountId: String) {
+    private fun navigateToPasswordPage(
+        userAccountId: String,
+        phoneNumber: String,
+        prefix: String
+    ) {
         val directions =
             LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToPasswordLoginFragment(
-                userAccountId
+                userAccountId = userAccountId,
+                phoneNumber = phoneNumber,
+                prefix = prefix
             )
         rootView.findNavController().navigate(directions)
     }
 
-    private fun navigateToOTPVerificationPage(phoneNumber: String) {
+    private fun navigateToOTPVerificationPage(
+        phoneNumber: String,
+        prefix: String,
+        forceSendOTP: Boolean,
+        passwordAuthFailed: Boolean
+    ) {
         val directions =
             LoginOrSignUpFragmentDirections.loginOrSignUpFragmentToOTPVerificationFragment(
-                phoneNumber
+                phoneNumber = phoneNumber,
+                prefix = prefix,
+                forceSendOTP = forceSendOTP,
+                passwordAuthFailed = passwordAuthFailed
             )
         rootView.findNavController().navigate(directions)
     }
