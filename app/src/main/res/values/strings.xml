@@ -154,4 +154,28 @@
     <string name="forgot_password">Forgot password?</string>
     <string name="try_another_way">Try another way</string>
 
+
+    <string name="no_internet_connection_please_try_again">No Internet Connection. Please try again.</string>
+    <string name="time_out_please_try_again">Time out. Please try again.</string>
+    <string name="we_encountered_a_problem_please_try_again_after_some_time">We encountered a problem. Please try again after some time.</string>
+    <string name="please_wait_while_we_sign_you_in">Please wait while we sign you in…</string>
+    <string name="you_have_been_signed_in_successfully">You have been signed in successfully.</string>
+    <string name="signed_in_successfully">Signed in successfully.</string>
+    <string name="resend_otp_by_sms_in_secs">Resend OTP by SMS in %1$s secs</string>
+    <string name="otp_sent_to">OTP sent to %1$s%2$s</string>
+    <string name="please_wait_while_we_resend_the_otp">Please wait while we resend the OTP…</string>
+    <string name="please_wait_while_we_verify_the_entered_otp">Please wait while we verify the entered OTP…</string>
+    <string name="by_continuing_i_agree_to_the_terms_of_use_privacy_policy"><![CDATA[By continuing, I agree to the Terms of Use & Privacy Policy]]></string>
+    <string name="updating_your_profile">Updating your profile...</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="password_is_required">Password is required.</string>
+    <string name="password_needs_to_be_minimum_12_characters_wide">Password needs to be minimum 12 characters wide.</string>
+    <string name="password_needs_to_have_minimum_1_uppercase">Password needs to have minimum 1 uppercase.</string>
+    <string name="password_needs_to_have_minimum_1_lowercase">Password needs to have minimum 1 lowercase.</string>
+    <string name="password_needs_to_have_minimum_1_digit">Password needs to have minimum 1 digit.</string>
+    <string name="password_needs_to_have_minimum_1_one_special_character_from">Password needs to have minimum 1 one special character from : -$#@_!.</string>
+    <string name="please_confirm_your_password">Please confirm your password.</string>
+    <string name="password_does_not_match">Password does not match</string>
+    <string name="password_has_be_set_successfully">Password has be set successfully.</string>
+
 </resources>
