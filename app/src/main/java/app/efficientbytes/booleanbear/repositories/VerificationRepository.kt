@@ -3,7 +3,6 @@ package app.efficientbytes.booleanbear.repositories
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.VerificationService
 import app.efficientbytes.booleanbear.services.models.LoginModeResponse
-import app.efficientbytes.booleanbear.services.models.PhoneOTP
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.VerifyPhoneResponse
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
@@ -20,10 +19,10 @@ class VerificationRepository(private val verificationService: VerificationServic
 
     private val gson = Gson()
 
-    suspend fun getLoginMode(phoneNumber: String) = flow {
+    suspend fun getLoginMode(prefix: String, phoneNumber: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = verificationService.getLoginMode(phoneNumber)
+            val response = verificationService.getLoginMode(prefix, phoneNumber)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -52,18 +51,28 @@ class VerificationRepository(private val verificationService: VerificationServic
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun sendOTPToPhoneNumber(phoneOTP: PhoneOTP) = flow {
+    suspend fun sendOTPToPhoneNumber(prefix: String, phoneNumber: String) = flow {
         try {
             emit(DataStatus.loading())
             val response = verificationService.sendOtpToPhoneNumber(
-                phoneOTP.phoneNumber,
-                phoneOTP.otp
+                prefix,
+                phoneNumber
             )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val phoneNumberVerificationStatus = response.body()
-                    emit(DataStatus.success(phoneNumberVerificationStatus))
+                    val body = response.body()
+                    if (body != null) {
+                        val phoneNumberData = body.data
+                        if (phoneNumberData != null) {
+                            emit(
+                                DataStatus.success(
+                                    data = phoneNumberData,
+                                    message = body.message
+                                )
+                            )
+                        }
+                    }
                 }
 
                 responseCode >= 400 -> {
@@ -84,18 +93,29 @@ class VerificationRepository(private val verificationService: VerificationServic
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun verifyPhoneNumberOTP(phoneOTP: PhoneOTP) = flow {
+    suspend fun verifyPhoneNumberOTP(prefix: String, phoneNumber: String, otp: String) = flow {
         try {
             emit(DataStatus.loading())
             val response = verificationService.verifyPhoneNumberOTP(
-                phoneOTP.phoneNumber,
-                phoneOTP.otp
+                prefix,
+                phoneNumber,
+                otp
             )
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    val phoneNumberVerificationStatus = response.body()
-                    emit(DataStatus.success(phoneNumberVerificationStatus))
+                    val body = response.body()
+                    if (body != null) {
+                        val phoneNumberData = body.data
+                        if (phoneNumberData != null) {
+                            emit(
+                                DataStatus.success(
+                                    data = phoneNumberData,
+                                    message = body.message
+                                )
+                            )
+                        }
+                    }
                 }
 
                 responseCode >= 400 -> {

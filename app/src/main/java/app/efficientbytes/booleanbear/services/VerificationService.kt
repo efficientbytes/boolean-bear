@@ -15,24 +15,25 @@ interface VerificationService {
     @POST("verification/login-mode")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun getLoginMode(
-        @Field("phoneNumber") phoneNumber: String,
-        @Field("prefix") prefix: String? = null
+        @Field("prefix") prefix: String,
+        @Field("phoneNumber") phoneNumber: String
     ): Response<LoginModeResponse>
 
     @FormUrlEncoded
     @POST("verification/phone-number/send-otp")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun sendOtpToPhoneNumber(
+        @Field("prefix") prefix: String,
         @Field("phoneNumber") phoneNumber: String,
-        @Field("otp") otp: String? = null
     ): Response<VerifyPhoneResponse>
 
     @FormUrlEncoded
     @POST("verification/phone-number/verify-otp")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun verifyPhoneNumberOTP(
+        @Field("prefix") prefix: String,
         @Field("phoneNumber") phoneNumber: String,
-        @Field("otp") otp: String? = null
+        @Field("otp") otp: String
     ): Response<VerifyPhoneResponse>
 
     @FormUrlEncoded
