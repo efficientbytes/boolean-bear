@@ -9,7 +9,6 @@ import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AuthenticationService
 import app.efficientbytes.booleanbear.services.models.PasswordAuthenticationResponse
-import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
@@ -49,10 +48,10 @@ class AuthenticationRepository(
 ) {
 
     private val gson = Gson()
-    suspend fun getSignInToken(phoneNumber: PhoneNumber) = flow {
+    suspend fun getSignInToken(prefix: String, phoneNumber: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.getSignInToken(phoneNumber.phoneNumber)
+            val response = authenticationService.getSignInToken(prefix, phoneNumber)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -260,7 +259,41 @@ class AuthenticationRepository(
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
-                    emit(DataStatus.success(true))
+                    emit(DataStatus.success(true, message = response.body()?.message))
+                    authenticationDao.insertPasswordCreatedFlag(
+                        LocalBooleanFlag(
+                            PASSWORD_CREATED_FLAG, true
+                        )
+                    )
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ResponseMessage = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ResponseMessage::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    fun updateAccountPassword(password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.updateAccountPassword(password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    emit(DataStatus.success(data = true, message = response.body()?.message))
                     authenticationDao.insertPasswordCreatedFlag(
                         LocalBooleanFlag(
                             PASSWORD_CREATED_FLAG, true

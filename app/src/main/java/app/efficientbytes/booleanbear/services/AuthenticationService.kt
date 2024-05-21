@@ -17,8 +17,8 @@ interface AuthenticationService {
     @POST("user/sign-in/")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun getSignInToken(
+        @Field("prefix") prefix: String,
         @Field("phoneNumber") phoneNumber: String,
-        @Field("prefix") prefix: String = "+91"
     ): Response<SignInTokenResponse>
 
     @GET("user/single-device-login")
@@ -35,6 +35,13 @@ interface AuthenticationService {
     @POST("user/account/password/create")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun createAccountPassword(
+        @Field("password") password: String
+    ): Response<ResponseMessage>
+
+    @FormUrlEncoded
+    @POST("user/account/password/update")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    suspend fun updateAccountPassword(
         @Field("password") password: String
     ): Response<ResponseMessage>
 
