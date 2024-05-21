@@ -404,7 +404,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             }
         }
 
-
         mainViewModel.watchContentIntentInvoked.observe(viewLifecycleOwner) {
             it?.let { contentId ->
                 watchContentViaIntent(contentId)

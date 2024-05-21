@@ -128,4 +128,10 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="PasswordCriteriaChipTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="fontFamily">@font/montserrat_light</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>

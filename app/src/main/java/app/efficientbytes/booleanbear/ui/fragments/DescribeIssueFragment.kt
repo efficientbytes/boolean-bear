@@ -85,7 +85,9 @@ class DescribeIssueFragment : Fragment() {
                 val requestSupport = RequestSupport(
                     title = titleInput,
                     description = descriptionInput,
-                    category = selectedIssueCategoryPosition
+                    category = selectedIssueCategoryPosition,
+                    prefix = "",
+                    phoneNumber = ""
                 )
                 SingletonRequestSupport.setInstance(requestSupport)
                 findNavController().navigate(R.id.describeIssueFragment_to_reporterPhoneNumberFragment)

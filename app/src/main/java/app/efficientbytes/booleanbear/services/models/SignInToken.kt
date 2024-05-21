@@ -5,10 +5,12 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class SignInToken(
-    val token: String? = null,
-    val basicProfileDetailsUpdated: Boolean? = null,
-    val userAccountId: String? = null,
-    val singleDeviceLogin: SingleDeviceLogin? = null
+    val userAccountId: String,
+    val token: String,
+    val basicProfileDetailsUpdated: Boolean,
+    val passwordCreated: Boolean,
+    val phoneNumberData: PhoneNumber,
+    val singleDeviceLogin: SingleDeviceLogin
 )
 
 @JsonClass(generateAdapter = true)

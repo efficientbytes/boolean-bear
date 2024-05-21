@@ -138,5 +138,47 @@
     <string name="description">Description</string>
     <string name="join_the_waiting_list">Join The Waiting List</string>
     <string name="don_t_miss_out_join_the_queue_and_get_to_know_first">Don\'t miss out, join the queue and get to know first</string>
+    <string name="login">Login</string>
+    <string name="enter_your_login_credentials">Enter your login credentials</string>
+    <string name="password">Password</string>
+    <string name="password_should_contain_minimum">Password should contain minimum</string>
+    <string name="your_password_is_securely_stored_using_industry_standard_hashing_techniques_to_ensure_your_privacy_and_protection_we_follow_best_practices_to_keep_your_information_safe">Your password is securely stored using industry-standard hashing techniques to ensure your privacy and protection. We follow best practices to keep your information safe.</string>
+    <string name="_12_characters">12 characters</string>
+    <string name="_1_number">1 number</string>
+    <string name="_1_lowercase">1 lowercase</string>
+    <string name="_1_uppercase">1 uppercase</string>
+    <string name="_1_special_character_from">1 special character from $#@_!</string>
+    <string name="confirm_password">Confirm password*</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="try_another_way">Try another way</string>
+
+
+    <string name="no_internet_connection_please_try_again">No Internet Connection. Please try again.</string>
+    <string name="time_out_please_try_again">Time out. Please try again.</string>
+    <string name="we_encountered_a_problem_please_try_again_after_some_time">We encountered a problem. Please try again after some time.</string>
+    <string name="please_wait_while_we_sign_you_in">Please wait while we sign you in…</string>
+    <string name="you_have_been_signed_in_successfully">You have been signed in successfully.</string>
+    <string name="signed_in_successfully">Signed in successfully.</string>
+    <string name="resend_otp_by_sms_in_secs">Resend OTP by SMS in %1$s secs</string>
+    <string name="otp_sent_to">OTP sent to %1$s%2$s</string>
+    <string name="please_wait_while_we_resend_the_otp">Please wait while we resend the OTP…</string>
+    <string name="please_wait_while_we_verify_the_entered_otp">Please wait while we verify the entered OTP…</string>
+    <string name="by_continuing_i_agree_to_the_terms_of_use_privacy_policy"><![CDATA[By continuing, I agree to the Terms of Use & Privacy Policy]]></string>
+    <string name="updating_your_profile">Updating your profile...</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="password_is_required">Password is required.</string>
+    <string name="password_needs_to_be_minimum_12_characters_wide">Password needs to be minimum 12 characters wide.</string>
+    <string name="password_needs_to_have_minimum_1_uppercase">Password needs to have minimum 1 uppercase.</string>
+    <string name="password_needs_to_have_minimum_1_lowercase">Password needs to have minimum 1 lowercase.</string>
+    <string name="password_needs_to_have_minimum_1_digit">Password needs to have minimum 1 digit.</string>
+    <string name="password_needs_to_have_minimum_1_one_special_character_from">Password needs to have minimum 1 one special character from : -$#@_!.</string>
+    <string name="please_confirm_your_password">Please confirm your password.</string>
+    <string name="password_does_not_match">Password does not match</string>
+    <string name="password_has_be_set_successfully">Password has be set successfully.</string>
+    <string name="ticket_id">Ticket Id : %1$s</string>
+    <string name="boolean_bear_ticket_id">Boolean Bear Ticket ID</string>
+    <string name="copied_ticket_id">Copied ticket id</string>
 
 </resources>

@@ -202,6 +202,8 @@
     <color name="cell_chip_playlist_checked_color">@color/md_theme_primaryContainer</color>
     <color name="text_dark_transparent_background_200">#B90E0E0E</color>
     <color name="green_100">#89BF51</color>
+    <color name="green_200">#7CB342</color>
+    <color name="green_300">#87a330</color>
     <color name="transparent">#00000000</color>
 
 </resources>

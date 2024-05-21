@@ -46,6 +46,11 @@
             app:destination="@id/discoverFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/homeFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -68,6 +73,11 @@
             app:destination="@id/OTPVerificationFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/loginOrSignUpFragment_to_passwordLoginFragment"
+            app:destination="@id/passwordLoginFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/OTPVerificationFragment"
@@ -77,18 +87,37 @@
         <action
             android:id="@+id/otpVerificationFragment_to_completeProfileFragment"
             app:destination="@id/completeProfileFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:enterAnim="@anim/slide_in_left" />
+        <argument
+            android:name="prefix"
+            app:argType="string"
+            app:nullable="false" />
         <argument
             android:name="phoneNumber"
             app:argType="string"
             app:nullable="false" />
+        <argument
+            android:name="forceSendOTP"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="passwordAuthFailed"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/otpVerificationFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment"
+            app:enterAnim="@anim/slide_in_left" />
     </fragment>
     <fragment
         android:id="@+id/completeProfileFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.CompleteProfileFragment"
         android:label="Setup Profile"
         tools:layout="@layout/fragment_complete_profile">
+        <argument
+            android:name="prefix"
+            app:argType="string"
+            app:nullable="false" />
         <argument
             android:name="phoneNumber"
             app:argType="string"
@@ -97,6 +126,15 @@
             android:name="userAccountId"
             app:argType="string"
             app:nullable="false" />
+        <argument
+            android:name="passwordCreated"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/completeProfileFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
@@ -106,6 +144,11 @@
         <action
             android:id="@+id/editProfileFragment_to_editProfileFieldFragment"
             app:destination="@id/editProfileFieldFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/editProfileFragment_to_managePasswordFragment"
+            app:destination="@id/managePasswordFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
@@ -183,6 +226,10 @@
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <argument
+            android:name="prefix"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
             android:name="phoneNumber"
             app:argType="string"
             app:nullable="false" />
@@ -253,5 +300,37 @@
             android:autoVerify="true"
             app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}/" />
 
+    </fragment>
+    <fragment
+        android:id="@+id/managePasswordFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ManagePasswordFragment"
+        android:label="">
+        <argument
+            android:name="mode"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordLoginFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.PasswordLoginFragment"
+        android:label="Password Authentication">
+        <action
+            android:id="@+id/passwordLoginFragment_to_completeProfileFragment"
+            app:destination="@id/completeProfileFragment"
+            app:enterAnim="@anim/slide_in_left" />
+
+        <action
+            android:id="@+id/passwordLoginFragment_to_OTPVerificationFragment"
+            app:destination="@id/OTPVerificationFragment"
+            app:enterAnim="@anim/slide_in_left" />
+        <argument
+            android:name="userAccountId"
+            app:argType="string" />
+        <argument
+            android:name="prefix"
+            app:argType="string" />
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -2,18 +2,20 @@ package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.models.IDToken
+import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingleDeviceLoginResponse
 import app.efficientbytes.booleanbear.repositories.models.AuthState
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AuthenticationService
-import app.efficientbytes.booleanbear.services.models.PhoneNumber
+import app.efficientbytes.booleanbear.services.models.PasswordAuthenticationResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
+import app.efficientbytes.booleanbear.utils.PASSWORD_CREATED_FLAG
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
@@ -46,10 +48,10 @@ class AuthenticationRepository(
 ) {
 
     private val gson = Gson()
-    suspend fun getSignInToken(phoneNumber: PhoneNumber) = flow {
+    suspend fun getSignInToken(prefix: String, phoneNumber: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = authenticationService.getSignInToken(phoneNumber.phoneNumber)
+            val response = authenticationService.getSignInToken(prefix, phoneNumber)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {
@@ -238,5 +240,131 @@ class AuthenticationRepository(
             authenticationDao.insertIDToken(idToken)
         }
     }
+
+    fun insertPasswordCreated(value: Boolean) {
+        externalScope.launch {
+            authenticationDao.insertPasswordCreatedFlag(
+                LocalBooleanFlag(
+                    PASSWORD_CREATED_FLAG,
+                    value
+                )
+            )
+        }
+    }
+
+    fun createAccountPassword(password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.createAccountPassword(password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    emit(DataStatus.success(true, message = response.body()?.message))
+                    authenticationDao.insertPasswordCreatedFlag(
+                        LocalBooleanFlag(
+                            PASSWORD_CREATED_FLAG, true
+                        )
+                    )
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ResponseMessage = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ResponseMessage::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    fun updateAccountPassword(password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.updateAccountPassword(password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    emit(DataStatus.success(data = true, message = response.body()?.message))
+                    authenticationDao.insertPasswordCreatedFlag(
+                        LocalBooleanFlag(
+                            PASSWORD_CREATED_FLAG, true
+                        )
+                    )
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ResponseMessage = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ResponseMessage::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
+
+    fun isUserPasswordCreated() = flow {
+        val result = authenticationDao.getPasswordCreated(PASSWORD_CREATED_FLAG)
+        emit(result)
+    }.catch { emit(null) }
+        .flowOn(Dispatchers.IO)
+
+    fun deletePasswordCreated() {
+        externalScope.launch {
+            authenticationDao.deletePasswordCreatedFlag(PASSWORD_CREATED_FLAG)
+        }
+    }
+
+    fun authenticateWithPassword(userAccountId: String, password: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = authenticationService.authenticateWithPassword(userAccountId, password)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val body = response.body()
+                    if (body != null) {
+                        val phoneNumber = body.data
+                        if (phoneNumber != null) {
+                            emit(DataStatus.success(phoneNumber))
+                        }
+                    }
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: PasswordAuthenticationResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        PasswordAuthenticationResponse::class.java
+                    )
+                    val message = "Error Code $responseCode. ${errorResponse.message}"
+                    emit(DataStatus.failed(message))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
+        .flowOn(Dispatchers.IO)
 
 }

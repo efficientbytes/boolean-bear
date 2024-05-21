@@ -5,7 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.IDToken
+import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.utils.BOOLEAN_FLAG_TABLE
 import app.efficientbytes.booleanbear.utils.ID_TOKEN_TABLE
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_TABLE
 import kotlinx.coroutines.flow.Flow
@@ -30,5 +32,14 @@ interface AuthenticationDao {
 
     @Query("SELECT token FROM $ID_TOKEN_TABLE WHERE rowId = 1")
     fun getIDToken(): String?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPasswordCreatedFlag(localBooleanFlag: LocalBooleanFlag)
+
+    @Query(" DELETE FROM $BOOLEAN_FLAG_TABLE WHERE flagKey = :name")
+    suspend fun deletePasswordCreatedFlag(name: String)
+
+    @Query(" SELECT value FROM $BOOLEAN_FLAG_TABLE WHERE flagKey = :name")
+    suspend fun getPasswordCreated(name: String): Boolean?
 
 }

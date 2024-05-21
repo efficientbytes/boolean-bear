@@ -7,7 +7,8 @@ data class RequestSupport(
     var title: String,
     var description: String,
     var category: Int,
-    var completePhoneNumber: String? = null,
+    var prefix: String,
+    var phoneNumber: String,
     var userAccountId: String? = null,
 )
 
