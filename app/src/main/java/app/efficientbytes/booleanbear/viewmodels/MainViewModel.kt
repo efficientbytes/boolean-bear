@@ -226,9 +226,10 @@ class MainViewModel(
 
     fun sendOTPToPhoneNumber(prefix: String, phoneNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            verificationRepository.sendOTPToPhoneNumber(phoneNumber, prefix).collect {
-                _sendOTPToPhoneNumberResponse.postValue(it)
-            }
+            verificationRepository.sendOTPToPhoneNumber(prefix = prefix, phoneNumber = phoneNumber)
+                .collect {
+                    _sendOTPToPhoneNumberResponse.postValue(it)
+                }
         }
     }
 
