@@ -3,14 +3,13 @@ package app.efficientbytes.booleanbear.services.models
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class LoginMode(
-    val phoneNumberData: PhoneNumber,
-    val userAccountId: String? = null,
-    val mode: Int,
+data class PhoneNumber(
+    val prefix: String,
+    val phoneNumber: String
 )
 
 @JsonClass(generateAdapter = true)
-data class LoginModeResponse(
-    val data: LoginMode? = null,
+data class VerifyPhoneResponse(
+    val data: PhoneNumber? = null,
     val message: String? = null
 )

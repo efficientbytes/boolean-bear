@@ -16,9 +16,15 @@ enum class PASSWORD_MANAGE_MODE
     ),
     UPDATE(
         2,
-        "  Update Password",
+        "Update Password",
         "Create a new password*",
         "Update",
+    ),
+    RESET(
+        3,
+        "  Reset Password",
+        "Reset your password*",
+        "Reset",
     ),
     DEFAULT(-1, "", "", "");
 
@@ -27,6 +33,7 @@ enum class PASSWORD_MANAGE_MODE
         fun getField(index: Int) = when (index) {
             1 -> CREATE
             2 -> UPDATE
+            3 -> RESET
             else -> DEFAULT
         }
     }
