@@ -24,10 +24,10 @@ class ManagePasswordFragment : Fragment() {
     private lateinit var _binding: FragmentManagePasswordBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val safeArgs: ManagePasswordFragmentArgs by navArgs()
-    private var mode: PASSWORD_MANAGE_MODE? = null
-    private var toolbar: MaterialToolbar? = null
     private val viewModel: ManagePasswordViewModel by inject()
+    private val safeArgs: ManagePasswordFragmentArgs by navArgs()
+    private lateinit var mode: PASSWORD_MANAGE_MODE
+    private var toolbar: MaterialToolbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,11 +56,20 @@ class ManagePasswordFragment : Fragment() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 // Handle the back button event
-                if (mode == PASSWORD_MANAGE_MODE.CREATE) {
-                } else {
-                    // Otherwise, allow the back press to happen normally
-                    isEnabled = false
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                when (mode) {
+                    PASSWORD_MANAGE_MODE.CREATE, PASSWORD_MANAGE_MODE.RESET -> {
+
+                    }
+
+                    PASSWORD_MANAGE_MODE.UPDATE -> {
+                        // Otherwise, allow the back press to happen normally
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                    }
+
+                    else -> {
+
+                    }
                 }
             }
         }
@@ -89,7 +98,20 @@ class ManagePasswordFragment : Fragment() {
                     val password = binding.passwordTextInputEditText.text.toString()
                     val confirmPassword = binding.confirmPasswordTextInputEditText.text.toString()
                     if (validatePassword(password, confirmPassword)) {
-                        // send to server
+                        viewModel.updateAccountPassword(password)
+                    }
+                }
+            }
+
+            PASSWORD_MANAGE_MODE.RESET -> {
+                binding.passwordTextInputLayout.hint = PASSWORD_MANAGE_MODE.RESET.prompt
+                binding.continueButton.text = PASSWORD_MANAGE_MODE.RESET.buttonText
+                toolbar?.title = PASSWORD_MANAGE_MODE.RESET.toolbarTitle
+                binding.continueButton.setOnClickListener {
+                    val password = binding.passwordTextInputEditText.text.toString()
+                    val confirmPassword = binding.confirmPasswordTextInputEditText.text.toString()
+                    if (validatePassword(password, confirmPassword)) {
+                        viewModel.updateAccountPassword(password)
                     }
                 }
             }
@@ -207,7 +229,7 @@ class ManagePasswordFragment : Fragment() {
                     DataStatus.Status.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text = "Please wait..."
+                        binding.progressStatusValueTextView.text = getString(R.string.please_wait)
                         binding.continueButton.isEnabled = false
                     }
 
@@ -215,7 +237,7 @@ class ManagePasswordFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "No Internet Connection. Please Try again."
+                            getString(R.string.no_internet_connection_please_try_again)
                         binding.continueButton.isEnabled = true
                         viewModel.resetCreatePasswordLiveData()
                     }
@@ -223,12 +245,11 @@ class ManagePasswordFragment : Fragment() {
                     DataStatus.Status.Success -> {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text =
-                            "Password has be set successfully."
+                        binding.progressStatusValueTextView.text = it.message
                         binding.continueButton.isEnabled = false
                         Toast.makeText(
                             requireContext(),
-                            "Password has be set successfully.",
+                            it.message,
                             Toast.LENGTH_LONG
                         ).show()
                         findNavController().popBackStack(R.id.homeFragment, false)
@@ -238,7 +259,8 @@ class ManagePasswordFragment : Fragment() {
                     DataStatus.Status.TimeOut -> {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text = "Time out. Please Try again."
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.time_out_please_try_again)
                         binding.continueButton.isEnabled = true
                         viewModel.resetCreatePasswordLiveData()
                     }
@@ -247,7 +269,7 @@ class ManagePasswordFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "We encountered an problem. Please Try again."
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
                         binding.continueButton.isEnabled = true
                         viewModel.resetCreatePasswordLiveData()
                     }
@@ -255,50 +277,118 @@ class ManagePasswordFragment : Fragment() {
             }
         }
 
+        viewModel.updatePassword.observe(viewLifecycleOwner) {
+            it?.let { status ->
+                binding.progressLinearLayout.visibility = View.VISIBLE
+                when (status.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = status.message
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetUpdatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = getString(R.string.please_wait)
+                        binding.continueButton.isEnabled = false
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.no_internet_connection_please_try_again)
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetUpdatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            it.message
+                        binding.continueButton.isEnabled = false
+                        Toast.makeText(
+                            requireContext(),
+                            it.message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().popBackStack(R.id.homeFragment, false)
+                        viewModel.resetUpdatePasswordLiveData()
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.time_out_please_try_again)
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetUpdatePasswordLiveData()
+                    }
+
+                    else -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                        binding.continueButton.isEnabled = true
+                        viewModel.resetUpdatePasswordLiveData()
+                    }
+                }
+            }
+        }
 
     }
 
     private fun validatePassword(password: String, confirmPassword: String): Boolean {
         if (password.isEmpty()) {
-            binding.passwordTextInputLayout.error = "Password is required."
+            binding.passwordTextInputLayout.error = getString(R.string.password_is_required)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (password.length < 12) {
             binding.passwordTextInputLayout.error =
-                "Password needs to be minimum 12 characters wide."
+                getString(R.string.password_needs_to_be_minimum_12_characters_wide)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isUpperCase() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 uppercase."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_uppercase)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isLowerCase() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 lowercase."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_lowercase)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (!password.any { it.isDigit() }) {
-            binding.passwordTextInputLayout.error = "Password needs to have minimum 1 digit."
+            binding.passwordTextInputLayout.error =
+                getString(R.string.password_needs_to_have_minimum_1_digit)
             return false
         }
         binding.passwordTextInputLayout.error = null
         val specialCharacters = "-$#@_!".toSet()
         if (!password.any { it in specialCharacters }) {
             binding.passwordTextInputLayout.error =
-                "Password needs to have minimum 1 one special character from : -\$#@_!."
+                getString(R.string.password_needs_to_have_minimum_1_one_special_character_from)
             return false
         }
         binding.passwordTextInputLayout.error = null
         if (confirmPassword.isEmpty()) {
-            binding.confirmPasswordTextInputLayout.error = "Please confirm your password."
+            binding.confirmPasswordTextInputLayout.error =
+                getString(R.string.please_confirm_your_password)
             return false
         }
         binding.confirmPasswordTextInputLayout.error = null
         if (password != confirmPassword) {
-            binding.confirmPasswordTextInputLayout.error = "Password does not match"
+            binding.confirmPasswordTextInputLayout.error =
+                getString(R.string.password_does_not_match)
             return false
         }
         binding.confirmPasswordTextInputLayout.error = null

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -35,12 +36,32 @@ class ManagePasswordViewModel(
 
     fun updateAccountPassword(password: String) {
         externalScope.launch {
+            authenticationRepository.updateAccountPassword(password).collect {
+                _updatePassword.postValue(it)
+            }
         }
     }
 
     fun resetUpdatePasswordLiveData() {
         externalScope.launch {
             _updatePassword.postValue(null)
+        }
+    }
+
+    private val _authenticateUser: MutableLiveData<DataStatus<PhoneNumber>?> = MutableLiveData()
+    val authenticateUser: LiveData<DataStatus<PhoneNumber>?> = _authenticateUser
+
+    fun authenticateUsingPassword(userAccountId: String, password: String) {
+        externalScope.launch {
+            authenticationRepository.authenticateWithPassword(userAccountId, password).collect {
+                _authenticateUser.postValue(it)
+            }
+        }
+    }
+
+    fun resetAuthenticateUserLiveData() {
+        externalScope.launch {
+            _authenticateUser.postValue(null)
         }
     }
 
