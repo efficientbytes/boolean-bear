@@ -16,7 +16,7 @@ enum class PASSWORD_MANAGE_MODE
     ),
     UPDATE(
         2,
-        "Update Password",
+        "  Update Password",
         "Create a new password*",
         "Update",
     ),

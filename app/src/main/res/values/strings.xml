@@ -180,5 +180,6 @@
     <string name="ticket_id">Ticket Id : %1$s</string>
     <string name="boolean_bear_ticket_id">Boolean Bear Ticket ID</string>
     <string name="copied_ticket_id">Copied ticket id</string>
+    <string name="update_password">Update password</string>
 
 </resources>

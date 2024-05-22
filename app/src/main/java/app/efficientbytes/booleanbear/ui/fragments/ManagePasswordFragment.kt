@@ -316,7 +316,11 @@ class ManagePasswordFragment : Fragment() {
                             it.message,
                             Toast.LENGTH_LONG
                         ).show()
-                        findNavController().popBackStack(R.id.homeFragment, false)
+                        if (mode != PASSWORD_MANAGE_MODE.UPDATE) {
+                            findNavController().popBackStack(R.id.homeFragment, false)
+                        } else {
+                            findNavController().popBackStack()
+                        }
                         viewModel.resetUpdatePasswordLiveData()
                     }
 

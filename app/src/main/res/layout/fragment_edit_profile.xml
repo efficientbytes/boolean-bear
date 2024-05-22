@@ -34,8 +34,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/montserrat"
-                android:textColor="@color/white"
                 android:text="@string/provide_details_about_yourself_and_any_other_pertinent_information"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -214,26 +214,26 @@
 
                 </com.google.android.material.textview.MaterialTextView>
 
-              <!--  <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/universityNameLabelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                    android:focusable="true"
-                    android:fontFamily="@font/montserrat"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="8dp"
-                    android:text="@string/university_name"
-                    android:textAlignment="textStart"
-                    android:textColor="@color/white_1200"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/professionLabelTextView">
+                <!--  <com.google.android.material.textview.MaterialTextView
+                      android:id="@+id/universityNameLabelTextView"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:clickable="true"
+                      android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                      android:focusable="true"
+                      android:fontFamily="@font/montserrat"
+                      android:foreground="?android:attr/selectableItemBackground"
+                      android:paddingHorizontal="20dp"
+                      android:paddingVertical="8dp"
+                      android:text="@string/university_name"
+                      android:textAlignment="textStart"
+                      android:textColor="@color/white_1200"
+                      android:textSize="14sp"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintTop_toBottomOf="@id/professionLabelTextView">
 
-                </com.google.android.material.textview.MaterialTextView>-->
+                  </com.google.android.material.textview.MaterialTextView>-->
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/linkedInUsernameLabelTextView"
@@ -279,6 +279,57 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/securityLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="Security"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/onlineInformationConstraintLayout">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/updatePasswordConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/securityLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/updatePasswordLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:drawablePadding="8dp"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/update_password"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/signOutConstraintLayout"
                 android:layout_width="0dp"
@@ -289,26 +340,26 @@
                 android:paddingVertical="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/onlineInformationConstraintLayout">
+                app:layout_constraintTop_toBottomOf="@id/updatePasswordConstraintLayout">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/signOutLabelTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:drawableStart="@drawable/sign_out_icon"
                     android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                    android:focusable="true"
                     android:drawablePadding="8dp"
+                    android:focusable="true"
                     android:fontFamily="@font/montserrat"
                     android:foreground="?android:attr/selectableItemBackgroundBorderless"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="10dp"
                     android:text="@string/sign_out"
-                    android:drawableStart="@drawable/sign_out_icon"
-                    app:drawableTint="@color/white"
                     android:textAlignment="textStart"
                     android:textColor="@color/white_1200"
                     android:textSize="14sp"
+                    app:drawableTint="@color/white"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
