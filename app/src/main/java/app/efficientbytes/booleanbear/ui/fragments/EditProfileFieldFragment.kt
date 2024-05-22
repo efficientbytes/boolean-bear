@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentEditProfileFieldBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
@@ -25,7 +27,7 @@ import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.appbar.MaterialToolbar
 import org.koin.android.ext.android.inject
 
 class EditProfileFieldFragment : Fragment() {
@@ -41,15 +43,9 @@ class EditProfileFieldFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private val viewModel: EditProfileFieldViewModel by inject()
     private val connectivityListener: ConnectivityListener by inject()
+    private val safeArgs: EditProfileFieldFragmentArgs by navArgs()
     private var professionsListFailedToLoad = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val bundle = arguments ?: return
-        val args = EditProfileFieldFragmentArgs.fromBundle(bundle)
-        val index = args.index
-        this.index = index
-    }
+    private var toolbar: MaterialToolbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,6 +59,34 @@ class EditProfileFieldFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        this.index = safeArgs.index
+        val source = safeArgs.source
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (source) {
+                    1 -> {
+                        //opened via verify primary email
+                        findNavController().popBackStack(R.id.homeFragment, false)
+                    }
+
+                    2 -> {
+                        //opened from edit profile
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+        // Add the callback to the dispatcher
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
+        if (toolbar == null) {
+            toolbar = requireActivity().findViewById(R.id.mainToolbar)
+            toolbar?.setTitleTextAppearance(
+                requireContext(),
+                R.style.DefaultToolbarTitleAppearance
+            )
+        }
 
         binding.progressBar.visibility = View.GONE
         binding.progressStatusValueTextView.visibility = View.GONE
@@ -105,16 +129,9 @@ class EditProfileFieldFragment : Fragment() {
                 }
             }
         }
+        mainViewModel.getFirebaseUserToken()
         mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
-                DataStatus.Status.Loading -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     it.data?.let { token ->
                         val isEmailVerified = token.claims["emailVerified"]
@@ -124,72 +141,70 @@ class EditProfileFieldFragment : Fragment() {
                     }
                 }
 
-                DataStatus.Status.EmptyResult -> {}
+                else -> {
 
-                DataStatus.Status.NoInternet -> {}
-
-                DataStatus.Status.TimeOut -> {}
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
+                }
             }
         }
+        val fieldType = EDIT_PROFILE_FIELD.getField(index)
+        toolbar?.title = fieldType.toolbarTile
         mainViewModel.listenToUserProfileFromDB.observe(viewLifecycleOwner) { userProfile ->
             userProfile?.let {
                 SingletonUserData.setInstance(it)
-                when (index) {
-                    1 -> {
+                when (fieldType) {
+                    EDIT_PROFILE_FIELD.FIRST_NAME -> {
                         val firstName = it.firstName
                         currentValue = firstName ?: ""
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    2 -> {
+                    EDIT_PROFILE_FIELD.LAST_NAME -> {
                         currentValue = it.lastName.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    3 -> {
+                    EDIT_PROFILE_FIELD.EMAIL_ADDRESS -> {
                         currentValue = it.emailAddress.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                     }
 
-                    4 -> {
+                    EDIT_PROFILE_FIELD.PHONE_NUMBER -> {
                         currentValue = it.completePhoneNumber
                         phoneNumber = currentValue
                         binding.fieldTextInputEditText.setText(currentValue)
                     }
 
-                    5 -> {
+                    EDIT_PROFILE_FIELD.PROFESSION -> {
                         val profession = it.profession
                         currentProfessionCategoryPosition = profession ?: 0
                         binding.saveButton.isEnabled = false
                     }
 
-                    6 -> {
+                    EDIT_PROFILE_FIELD.UNIVERSITY_NAME -> {
                         binding.universityAutoCompleteTextView.setText(it.universityName)
                         binding.saveButton.isEnabled = false
                     }
 
-                    7 -> {
+                    EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> {
                         currentValue = it.linkedInUsername.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    8 -> {
+                    EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> {
                         currentValue = it.gitHubUsername.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
+
+                    EDIT_PROFILE_FIELD.DEFAULT -> {
+
+                    }
                 }
             }
         }
-        if (index == 0) findNavController().popBackStack(R.id.editProfileFragment, false)
-        val fieldType = EDIT_PROFILE_FIELD.getField(index)
         binding.field = fieldType
         binding.emailVerified = false
         if (fieldType == EDIT_PROFILE_FIELD.EMAIL_ADDRESS) {
@@ -211,7 +226,10 @@ class EditProfileFieldFragment : Fragment() {
                         binding.additionalMessageValueTextView.visibility = View.VISIBLE
                         binding.verifyButton.isEnabled = true
                         binding.additionalMessageValueTextView.text =
-                            "By verifying a new email address, $currentValue will no longer be associated with your account."
+                            getString(
+                                R.string.by_verifying_a_new_email_address_will_no_longer_be_associated_with_your_account,
+                                currentValue
+                            )
                     } else {
                         binding.additionalMessageValueTextView.visibility = View.GONE
                         if (emailVerified) {
@@ -275,13 +293,12 @@ class EditProfileFieldFragment : Fragment() {
                         VerifyPrimaryEmailAddress(input, profile.firstName)
                     viewModel.sendVerificationLinkToPrimaryEmailAddress(verifyPrimaryEmailAddress)
                 }
-
             }
         }
         viewModel.userProfileServerResponse.observe(viewLifecycleOwner) {
+            binding.progressLinearLayout.visibility = View.VISIBLE
             when (it.status) {
                 DataStatus.Status.Failed -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message.toString()
@@ -289,43 +306,46 @@ class EditProfileFieldFragment : Fragment() {
                 }
 
                 DataStatus.Status.Loading -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "Updating your profile..."
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.updating_your_profile)
                     binding.saveButton.isEnabled = false
                 }
 
                 DataStatus.Status.Success -> {
                     it.data?.let { userProfile ->
                         mainViewModel.saveUserProfile(userProfile)
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.profile_has_been_updated)
+                        binding.saveButton.isEnabled = false
                     }
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "Profile has been updated."
-                    binding.saveButton.isEnabled = false
                 }
 
                 DataStatus.Status.NoInternet -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "No Internet Connection."
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.no_internet_connection_please_try_again)
                     binding.saveButton.isEnabled = true
                 }
 
                 DataStatus.Status.TimeOut -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
-                        "Updating your profile is taking unusually long time. Please try again."
+                        getString(R.string.time_out_please_try_again)
                     binding.saveButton.isEnabled = true
                 }
 
                 else -> {
-
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                    binding.saveButton.isEnabled = true
                 }
             }
         }
@@ -339,61 +359,65 @@ class EditProfileFieldFragment : Fragment() {
             }
         }
         viewModel.primaryEmailAddressVerificationServerStatus.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = it.message.toString()
-                    binding.verifyButton.isEnabled = true
-                }
+            it?.let { result ->
+                binding.progressLinearLayout.visibility = View.VISIBLE
+                when (result.status) {
+                    DataStatus.Status.Failed -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text = it.message.toString()
+                        binding.verifyButton.isEnabled = true
+                        viewModel.resetPrimaryEmailAddress()
+                    }
 
-                DataStatus.Status.Loading -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "Sending verification link..."
-                    binding.verifyButton.isEnabled = false
-                }
+                    DataStatus.Status.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.sending_verification_link)
+                        binding.verifyButton.isEnabled = false
+                    }
 
-                DataStatus.Status.Success -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Verification link sent successfully.."
-                    binding.verifyButton.isEnabled = false
-                    MaterialAlertDialogBuilder(
-                        requireContext(),
-                        com.google.android.material.R.style.MaterialAlertDialog_Material3
-                    )
-                        .setTitle("Verification link sent")
-                        .setMessage("Your verification link has been sent. Please check your email and verify to proceed.")
-                        .setPositiveButton("ok") { _, _ ->
-                            findNavController().popBackStack(R.id.editProfileFragment, false)
-                        }.setCancelable(false)
-                        .show()
-                }
+                    DataStatus.Status.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.verification_link_sent_successfully)
+                        binding.verifyButton.isEnabled = false
+                        val directions =
+                            EditProfileFieldFragmentDirections.editProfileFieldFragmentToVerifyPrimaryEmailFragment(
+                                2
+                            )
+                        findNavController().navigate(directions)
+                        viewModel.resetPrimaryEmailAddress()
+                    }
 
-                DataStatus.Status.NoInternet -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text = "No Internet Connection."
-                    binding.verifyButton.isEnabled = true
-                }
+                    DataStatus.Status.NoInternet -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.no_internet_connection_please_try_again)
+                        binding.verifyButton.isEnabled = true
+                        viewModel.resetPrimaryEmailAddress()
+                    }
 
-                DataStatus.Status.TimeOut -> {
-                    binding.progressLinearLayout.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.progressStatusValueTextView.visibility = View.VISIBLE
-                    binding.progressStatusValueTextView.text =
-                        "Sending verification link is taking unusually long time. Please try again."
-                    binding.verifyButton.isEnabled = true
-                }
+                    DataStatus.Status.TimeOut -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.time_out_please_try_again)
+                        binding.verifyButton.isEnabled = true
+                        viewModel.resetPrimaryEmailAddress()
+                    }
 
-                else -> {
-
+                    else -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.progressStatusValueTextView.visibility = View.VISIBLE
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
+                        binding.verifyButton.isEnabled = true
+                        viewModel.resetPrimaryEmailAddress()
+                    }
                 }
             }
         }
@@ -486,6 +510,13 @@ class EditProfileFieldFragment : Fragment() {
             }
         }
         return false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (toolbar == null) {
+            toolbar = requireActivity().findViewById(R.id.mainToolbar)
+        }
     }
 
 }

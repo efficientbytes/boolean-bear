@@ -32,9 +32,9 @@ class EditProfileFieldViewModel(
         }
     }
 
-    private val _primaryEmailAddressVerificationServerResponse: MutableLiveData<DataStatus<ResponseMessage?>> =
+    private val _primaryEmailAddressVerificationServerResponse: MutableLiveData<DataStatus<ResponseMessage?>?> =
         MutableLiveData()
-    val primaryEmailAddressVerificationServerStatus: LiveData<DataStatus<ResponseMessage?>> =
+    val primaryEmailAddressVerificationServerStatus: LiveData<DataStatus<ResponseMessage?>?> =
         _primaryEmailAddressVerificationServerResponse
 
     fun sendVerificationLinkToPrimaryEmailAddress(verifyPrimaryEmailAddress: VerifyPrimaryEmailAddress) {
@@ -42,6 +42,12 @@ class EditProfileFieldViewModel(
             verificationRepository.verifyPrimaryEmailAddress(verifyPrimaryEmailAddress).collect {
                 _primaryEmailAddressVerificationServerResponse.postValue(it)
             }
+        }
+    }
+
+    fun resetPrimaryEmailAddress() {
+        viewModelScope.launch {
+            _primaryEmailAddressVerificationServerResponse.postValue(null)
         }
     }
 }

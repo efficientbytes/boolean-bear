@@ -166,8 +166,8 @@
     <string name="please_wait_while_we_resend_the_otp">Please wait while we resend the OTP…</string>
     <string name="please_wait_while_we_verify_the_entered_otp">Please wait while we verify the entered OTP…</string>
     <string name="by_continuing_i_agree_to_the_terms_of_use_privacy_policy"><![CDATA[By continuing, I agree to the Terms of Use & Privacy Policy]]></string>
-    <string name="updating_your_profile">Updating your profile...</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="updating_your_profile">Updating your profile…</string>
+    <string name="please_wait">Please wait…</string>
     <string name="password_is_required">Password is required.</string>
     <string name="password_needs_to_be_minimum_12_characters_wide">Password needs to be minimum 12 characters wide.</string>
     <string name="password_needs_to_have_minimum_1_uppercase">Password needs to have minimum 1 uppercase.</string>
@@ -181,5 +181,16 @@
     <string name="boolean_bear_ticket_id">Boolean Bear Ticket ID</string>
     <string name="copied_ticket_id">Copied ticket id</string>
     <string name="update_password">Update password</string>
+    <string name="didn_t_receive_email">Didn\'t receive email?.</string>
+    <string name="check_your_email">Check your email!</string>
+    <string name="open_mail_app">Open Mail App</string>
+    <string name="resend_email">Resend Email</string>
+    <string name="email_has_been_sent">Email has been sent.</string>
+    <string name="profile_has_been_updated">Profile has been updated.</string>
+    <string name="by_verifying_a_new_email_address_will_no_longer_be_associated_with_your_account">By verifying a new email address, %1$s will no longer be associated with your account.</string>
+    <string name="verification_link_sent_successfully">Verification link sent successfully..</string>
+    <string name="sending_verification_link">Sending verification link…</string>
+    <string name="we_ve_sent_an_email_to_your_registered_email_address_tap_on_the_verify_button_in_the_email_to_verify_your_account_you_can_change_your_email_here">We\'ve sent an email to your registered email address. Tap on the verify button in the email to verify your account. You can change your email here.</string>
+    <string name="we_ve_sent_an_email_to_your_registered_email_address_tap_on_the_verify_button_in_the_email_to_verify_your_account">We\'ve sent an email to your registered email address. Tap on the verify button in the email to verify your account.</string>
 
 </resources>
