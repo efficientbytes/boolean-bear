@@ -417,6 +417,25 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 mainViewModel.resetDeleteAccountIntentInvoked()
             }
         }
+        mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    it.data?.let { token ->
+                        val isEmailVerified = token.claims["emailVerified"]
+                        if (isEmailVerified is Boolean && isEmailVerified == false) {
+                            val directions =
+                                HomeFragmentDirections.homeFragmentToVerifyPrimaryEmailFragment(1)
+                            findNavController().navigate(directions)
+                        }
+                    }
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
     }
 
     private fun topicsLoadingFailed() {
@@ -672,5 +691,13 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 }
             }
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        bannerRunnable = null
+        bannerHandler.removeCallbacksAndMessages(null)
+        hintRunnable = null
+        hintHandler.removeCallbacksAndMessages(null)
     }
 }

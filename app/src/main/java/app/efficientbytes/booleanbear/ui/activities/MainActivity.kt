@@ -67,7 +67,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.homeFragment,
                 R.id.completeProfileFragment,
                 R.id.reportSubmittedFragment,
-                R.id.managePasswordFragment
+                R.id.managePasswordFragment,
+                R.id.verifyPrimaryEmailFragment
             )
         )
     }
@@ -275,10 +276,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         singleDeviceLoginListener.liveData.observe(this) {
             when (it.status) {
-                DataStatus.Status.Failed -> {
-
-                }
-
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser != null) {
@@ -286,19 +283,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
 
-                DataStatus.Status.Loading -> {
+                else -> {
 
                 }
-
-                DataStatus.Status.EmptyResult -> {}
-
-                DataStatus.Status.NoInternet -> {}
-
-                DataStatus.Status.TimeOut -> {}
-
-                DataStatus.Status.UnAuthorized -> {}
-
-                DataStatus.Status.UnKnownException -> {}
             }
         }
         viewModel.serverTime.observe(this) {
