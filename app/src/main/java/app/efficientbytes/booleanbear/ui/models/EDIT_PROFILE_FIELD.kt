@@ -12,7 +12,8 @@ enum class EDIT_PROFILE_FIELD
     val fieldType: String,
     val inputType: Int = InputType.TYPE_CLASS_TEXT,
     val enabled: Boolean = true,
-    val required: Boolean = true
+    val required: Boolean = true,
+    val toolbarTile: String,
 ) {
 
     FIRST_NAME(
@@ -22,7 +23,8 @@ enum class EDIT_PROFILE_FIELD
         "First name",
         "",
         "TEXT",
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME
+        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
+        toolbarTile = "First name"
     ),
     LAST_NAME(
         2,
@@ -32,7 +34,8 @@ enum class EDIT_PROFILE_FIELD
         "",
         "TEXT",
         InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-        required = false
+        required = false,
+        toolbarTile = "Last name"
     ),
     EMAIL_ADDRESS(
         3,
@@ -41,7 +44,8 @@ enum class EDIT_PROFILE_FIELD
         "Email address",
         "",
         "EMAIL",
-        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+        toolbarTile = "Email address"
     ),
     PHONE_NUMBER(
         4,
@@ -51,7 +55,8 @@ enum class EDIT_PROFILE_FIELD
         "",
         "PHONE",
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_TEXT_VARIATION_PHONETIC,
-        false
+        false,
+        toolbarTile = "Phone number"
     ),
     PROFESSION(
         5,
@@ -60,7 +65,8 @@ enum class EDIT_PROFILE_FIELD
         "",
         "",
         "DROP_DOWN",
-        InputType.TYPE_CLASS_TEXT
+        InputType.TYPE_CLASS_TEXT,
+        toolbarTile = "Profession"
     ),
     UNIVERSITY_NAME(
         6,
@@ -70,7 +76,8 @@ enum class EDIT_PROFILE_FIELD
         "",
         "AUTO",
         InputType.TYPE_CLASS_TEXT,
-        required = false
+        required = false,
+        toolbarTile = "University name"
     ),
     LINKED_IN_USER_NAME(
         7,
@@ -80,7 +87,8 @@ enum class EDIT_PROFILE_FIELD
         "",
         "TEXT",
         InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-        required = false
+        required = false,
+        toolbarTile = "LinkedIn username"
     ),
     GIT_HUB_USER_NAME(
         8,
@@ -90,9 +98,10 @@ enum class EDIT_PROFILE_FIELD
         "",
         "TEXT",
         InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME,
-        required = false
+        required = false,
+        toolbarTile = "GitHub username"
     ),
-    DEFAULT(9, "", "", "", "", "");
+    DEFAULT(9, "", "", "", "", "", toolbarTile = "");
 
     companion object {
 

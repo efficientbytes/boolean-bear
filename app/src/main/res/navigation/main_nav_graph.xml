@@ -55,7 +55,7 @@
             android:id="@+id/homeFragment_to_verifyPrimaryEmailFragment"
             app:destination="@id/verifyPrimaryEmailFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/accountSettingsFragment"
@@ -160,7 +160,7 @@
     <fragment
         android:id="@+id/editProfileFieldFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.EditProfileFieldFragment"
-        android:label="Edit"
+        android:label=""
         tools:layout="@layout/fragment_edit_profile_field">
         <argument
             android:name="index"
@@ -172,8 +172,8 @@
             app:popExitAnim="@anim/slide_out_right" />
         <argument
             android:name="source"
-            app:argType="integer"
-            android:defaultValue="2" />
+            android:defaultValue="2"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/contactUsFragment"
@@ -350,7 +350,7 @@
     <fragment
         android:id="@+id/verifyPrimaryEmailFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.VerifyPrimaryEmailFragment"
-        android:label="" >
+        android:label="">
         <argument
             android:name="source"
             app:argType="integer" />
@@ -358,6 +358,6 @@
             android:id="@+id/verifyPrimaryEmailFragment_to_editProfileFieldFragment"
             app:destination="@id/editProfileFieldFragment"
             app:enterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 </navigation>

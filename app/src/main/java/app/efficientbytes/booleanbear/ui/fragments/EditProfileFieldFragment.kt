@@ -27,6 +27,7 @@ import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.material.appbar.MaterialToolbar
 import org.koin.android.ext.android.inject
 
 class EditProfileFieldFragment : Fragment() {
@@ -44,6 +45,7 @@ class EditProfileFieldFragment : Fragment() {
     private val connectivityListener: ConnectivityListener by inject()
     private val safeArgs: EditProfileFieldFragmentArgs by navArgs()
     private var professionsListFailedToLoad = false
+    private var toolbar: MaterialToolbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,6 +79,14 @@ class EditProfileFieldFragment : Fragment() {
         }
         // Add the callback to the dispatcher
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
+        if (toolbar == null) {
+            toolbar = requireActivity().findViewById(R.id.mainToolbar)
+            toolbar?.setTitleTextAppearance(
+                requireContext(),
+                R.style.DefaultToolbarTitleAppearance
+            )
+        }
 
         binding.progressBar.visibility = View.GONE
         binding.progressStatusValueTextView.visibility = View.GONE
@@ -136,60 +146,65 @@ class EditProfileFieldFragment : Fragment() {
                 }
             }
         }
+        val fieldType = EDIT_PROFILE_FIELD.getField(index)
+        toolbar?.title = fieldType.toolbarTile
         mainViewModel.listenToUserProfileFromDB.observe(viewLifecycleOwner) { userProfile ->
             userProfile?.let {
                 SingletonUserData.setInstance(it)
-                when (index) {
-                    1 -> {
+                when (fieldType) {
+                    EDIT_PROFILE_FIELD.FIRST_NAME -> {
                         val firstName = it.firstName
                         currentValue = firstName ?: ""
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    2 -> {
+                    EDIT_PROFILE_FIELD.LAST_NAME -> {
                         currentValue = it.lastName.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    3 -> {
+                    EDIT_PROFILE_FIELD.EMAIL_ADDRESS -> {
                         currentValue = it.emailAddress.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                     }
 
-                    4 -> {
+                    EDIT_PROFILE_FIELD.PHONE_NUMBER -> {
                         currentValue = it.completePhoneNumber
                         phoneNumber = currentValue
                         binding.fieldTextInputEditText.setText(currentValue)
                     }
 
-                    5 -> {
+                    EDIT_PROFILE_FIELD.PROFESSION -> {
                         val profession = it.profession
                         currentProfessionCategoryPosition = profession ?: 0
                         binding.saveButton.isEnabled = false
                     }
 
-                    6 -> {
+                    EDIT_PROFILE_FIELD.UNIVERSITY_NAME -> {
                         binding.universityAutoCompleteTextView.setText(it.universityName)
                         binding.saveButton.isEnabled = false
                     }
 
-                    7 -> {
+                    EDIT_PROFILE_FIELD.LINKED_IN_USER_NAME -> {
                         currentValue = it.linkedInUsername.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
 
-                    8 -> {
+                    EDIT_PROFILE_FIELD.GIT_HUB_USER_NAME -> {
                         currentValue = it.gitHubUsername.orEmpty()
                         binding.fieldTextInputEditText.setText(currentValue)
                         binding.saveButton.isEnabled = false
                     }
+
+                    EDIT_PROFILE_FIELD.DEFAULT -> {
+
+                    }
                 }
             }
         }
-        val fieldType = EDIT_PROFILE_FIELD.getField(index)
         binding.field = fieldType
         binding.emailVerified = false
         if (fieldType == EDIT_PROFILE_FIELD.EMAIL_ADDRESS) {
@@ -495,6 +510,13 @@ class EditProfileFieldFragment : Fragment() {
             }
         }
         return false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (toolbar == null) {
+            toolbar = requireActivity().findViewById(R.id.mainToolbar)
+        }
     }
 
 }
