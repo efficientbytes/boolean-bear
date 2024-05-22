@@ -58,6 +58,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
         binding.professionLabelTextView.setOnClickListener(this)
         binding.linkedInUsernameLabelTextView.setOnClickListener(this)
         binding.githubUsernameLabelTextView.setOnClickListener(this)
+        binding.updatePasswordLabelTextView.setOnClickListener(this)
         binding.signOutLabelTextView.setOnClickListener {
             MaterialAlertDialogBuilder(
                 requireContext(),
@@ -111,6 +112,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
 
                 R.id.githubUsernameLabelTextView -> {
                     EditProfileFragmentDirections.editProfileFragmentToEditProfileFieldFragment(8)
+                }
+
+                R.id.updatePasswordLabelTextView -> {
+                    EditProfileFragmentDirections.editProfileFragmentToManagePasswordFragment(2)
                 }
 
                 else -> {
