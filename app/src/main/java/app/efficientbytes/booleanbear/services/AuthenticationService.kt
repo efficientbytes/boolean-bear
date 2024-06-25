@@ -21,11 +21,11 @@ interface AuthenticationService {
         @Field("phoneNumber") phoneNumber: String,
     ): Response<SignInTokenResponse>
 
-    @GET("user/single-device-login")
+    @GET("user/account/single-device-login")
     suspend fun getSingleDeviceLogin(): Response<SingleDeviceLoginResponse>
 
     @FormUrlEncoded
-    @POST("user/delete-account")
+    @POST("user/account/delete")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun deleteUserAccount(
         @Field("userAccountId") userAccountId: String = ""
