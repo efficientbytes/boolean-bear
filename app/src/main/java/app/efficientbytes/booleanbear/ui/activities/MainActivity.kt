@@ -475,6 +475,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
                             viewModel.getSingleDeviceLogin()
+                            viewModel.getFirebaseUserToken()
                             viewModel.getAllWaitingListCourses()
                         }
                     }

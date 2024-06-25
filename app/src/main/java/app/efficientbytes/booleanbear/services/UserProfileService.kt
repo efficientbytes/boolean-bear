@@ -13,7 +13,7 @@ import retrofit2.http.POST
 interface UserProfileService {
 
     @FormUrlEncoded
-    @POST("user/profile/update/basic-details")
+    @POST("user/account/profile/basic-details/update")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfileBasicDetails(
         @Field("firstName") firstName: String? = null,
@@ -33,7 +33,7 @@ interface UserProfileService {
     ): Response<UserProfileResponse>
 
     @FormUrlEncoded
-    @POST("user/profile/update")
+    @POST("user/account/profile/update")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfile(
         @Field("firstName") firstName: String? = null,
@@ -52,7 +52,7 @@ interface UserProfileService {
         @Field("lastUpdatedOn") lastUpdatedOn: Long? = null,
     ): Response<UserProfileResponse>
 
-    @GET("user/profile")
+    @GET("user/account/profile")
     suspend fun getUserProfile(): Response<UserProfileResponse>
 
     @FormUrlEncoded
