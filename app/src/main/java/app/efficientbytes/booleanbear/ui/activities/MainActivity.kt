@@ -33,7 +33,6 @@ import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
-import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -83,7 +82,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
-    private val statisticsRepository: StatisticsRepository by inject()
     private var userProfileFailedToLoad = false
     private var singleDeviceLoginFailedToLoad = false
     private var serverTimeFailedToLoad = false
@@ -200,7 +198,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
-                        statisticsRepository.deleteUserScreenTime()
                     }
                 }
             }
@@ -596,7 +593,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        statisticsRepository.noteDownScreenClosingTime()
     }
 
     override fun onNewIntent(intent: Intent) {

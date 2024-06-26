@@ -26,7 +26,6 @@ import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
-import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.VerificationRepository
@@ -59,7 +58,6 @@ class MainViewModel(
     private val utilityDataRepository: UtilityDataRepository,
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
-    private val statisticsRepository: StatisticsRepository,
     private val assetsRepository: AssetsRepository,
     private val externalScope: CoroutineScope,
     private val userAccountCoroutineScope: UserAccountCoroutineScope,
@@ -162,8 +160,6 @@ class MainViewModel(
             userProfileRepository.resetUserProfileScope()
             authenticationRepository.deletePasswordCreated()
             authenticationRepository.resetSingleDeviceScope()
-            statisticsRepository.noteDownScreenClosingTime()
-            statisticsRepository.forceUploadPendingScreenTiming()
             authenticationRepository.resetAuthScope()
             FirebaseAuth.getInstance().signOut()
         }
@@ -348,12 +344,11 @@ class MainViewModel(
 
             ON_RESUME -> {
                 generateIDToken()
-                statisticsRepository.noteDownScreenOpeningTime()
                 fetchServerTime()
             }
 
             ON_PAUSE -> {
-                statisticsRepository.noteDownScreenClosingTime()
+
             }
 
             ON_STOP -> {

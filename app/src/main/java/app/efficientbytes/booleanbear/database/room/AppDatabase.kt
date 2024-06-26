@@ -23,7 +23,6 @@ import app.efficientbytes.booleanbear.database.models.LocalReel
 import app.efficientbytes.booleanbear.database.models.LocalReelFTS
 import app.efficientbytes.booleanbear.database.models.LocalReelTopic
 import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
-import app.efficientbytes.booleanbear.database.models.ScreenTiming
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.Profession
@@ -37,7 +36,6 @@ import app.efficientbytes.booleanbear.models.UserProfile
         SingleDeviceLogin::class,
         Profession::class,
         IssueCategory::class,
-        ScreenTiming::class,
         LocalReelTopic::class,
         LocalReel::class,
         LocalReelFTS::class,
