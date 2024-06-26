@@ -221,7 +221,13 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     it.data?.let { list ->
                         if (list.isNotEmpty()) {
                             topicsLoaded()
-                            reelTopicsChipRecyclerViewAdapter.setReelTopics(list.subList(0, 5))
+                            val topicsToShow = if (list.size > 5) 5 else list.size
+                            reelTopicsChipRecyclerViewAdapter.setReelTopics(
+                                list.subList(
+                                    0,
+                                    topicsToShow
+                                )
+                            )
                             val firstTopic = list.find { topic -> topic.displayIndex == 1 }
                             if (firstTopic != null) {
                                 selectedReelTopic = firstTopic.topic
