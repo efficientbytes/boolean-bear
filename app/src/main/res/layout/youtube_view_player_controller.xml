@@ -19,7 +19,8 @@
             android:layout_marginStart="22dp"
             android:layout_marginTop="22dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/play_cancel_icon"
+            android:src="@drawable/home_icon"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -30,8 +31,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="@id/playerCancelAndGoBackImageButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/playerCancelAndGoBackImageButton">
@@ -40,9 +41,9 @@
                 android:id="@+id/playerQualityImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
                 android:src="@drawable/player_quality_icon"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:text="Quality">
 
             </ImageButton>
@@ -53,8 +54,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:text="720p"
-                android:textSize="12sp"
-                android:textColor="@color/white_600">
+                android:textColor="@color/white_600"
+                android:textSize="12sp">
 
             </com.google.android.material.textview.MaterialTextView>
 
@@ -63,9 +64,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
                 android:src="@drawable/player_speed_icon"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:text="Speed">
 
             </ImageButton>
@@ -76,8 +77,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:text="1x"
-                android:textSize="12sp"
-                android:textColor="@color/white_600">
+                android:textColor="@color/white_600"
+                android:textSize="12sp">
 
             </com.google.android.material.textview.MaterialTextView>
 
@@ -97,7 +98,7 @@
             app:fontFamily="@font/montserrat"
             app:layout_constraintBottom_toBottomOf="@id/playerCancelAndGoBackImageButton"
             app:layout_constraintEnd_toStartOf="@id/playerQualityMenuLinearLayout"
-            app:layout_constraintStart_toEndOf="@id/playerCancelAndGoBackImageButton"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/playerCancelAndGoBackImageButton">
 
         </com.google.android.material.textview.MaterialTextView>
@@ -139,19 +140,24 @@
         </LinearLayout>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/playerInstructorNameValueTextView"
+            android:id="@+id/playerGoToHomePage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/player_instructor_name_text_background"
+            android:clickable="true"
+            android:drawableStart="@drawable/home_icon"
+            android:drawablePadding="12dp"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingVertical="12dp"
             android:paddingStart="30dp"
             android:paddingEnd="30dp"
-            android:paddingVertical="12dp"
-            tools:text="Anubhav.P.S"
-            android:fontFamily="@font/montserrat"
+            android:text="@string/go_to_homepage"
             android:textColor="@color/white"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/durationLinearLayout">
+            app:layout_constraintBottom_toTopOf="@id/durationLinearLayout"
+            app:layout_constraintStart_toStartOf="parent">
 
         </com.google.android.material.textview.MaterialTextView>
 
