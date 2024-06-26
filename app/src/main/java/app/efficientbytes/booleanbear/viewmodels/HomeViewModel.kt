@@ -14,10 +14,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
@@ -26,11 +24,9 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val assetsRepository: AssetsRepository,
-    private val adsRepository: AdsRepository,
     private val externalScope: CoroutineScope
 ) : ViewModel(),
-    LifecycleEventObserver,
-    AdsRepository.HomePageAdsListener {
+    LifecycleEventObserver {
 
     private val _reelTopics: MutableLiveData<DataStatus<List<RemoteReelTopic>>> = MutableLiveData()
     val reelTopics: LiveData<DataStatus<List<RemoteReelTopic>>> = _reelTopics
@@ -58,15 +54,6 @@ class HomeViewModel(
         }
     }
 
-    private val _viewPagerBannerAds: MutableLiveData<DataStatus<List<RemoteHomePageBanner>>> =
-        MutableLiveData()
-    val viewPagerBannerAds: LiveData<DataStatus<List<RemoteHomePageBanner>>> =
-        _viewPagerBannerAds
-
-    fun getHomePageBannerAds() {
-        adsRepository.getHomePageBannerAds(this@HomeViewModel)
-    }
-
     private val _searchResult: MutableLiveData<DataStatus<List<RemoteReel>>> =
         MutableLiveData()
     val searchResult: LiveData<DataStatus<List<RemoteReel>>> = _searchResult
@@ -87,7 +74,6 @@ class HomeViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-                getHomePageBannerAds()
                 getReelTopics()
             }
 
@@ -115,9 +101,5 @@ class HomeViewModel(
 
             }
         }
-    }
-
-    override fun onHomePageAdsStatusChanged(status: DataStatus<List<RemoteHomePageBanner>>) {
-        _viewPagerBannerAds.postValue(status)
     }
 }

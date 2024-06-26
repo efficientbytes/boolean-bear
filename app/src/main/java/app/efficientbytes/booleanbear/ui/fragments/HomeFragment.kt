@@ -20,7 +20,6 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager2.widget.ViewPager2
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
@@ -37,12 +36,10 @@ import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
 import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
-import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Locale
-import kotlin.math.abs
 
 class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickListener,
     YoutubeContentViewRecyclerViewAdapter.OnItemClickListener,
@@ -53,9 +50,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private lateinit var rootView: View
     private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
-    private val bannerHandler = Handler(Looper.getMainLooper())
-    private var bannerRunnable: Runnable? = null
-    private var currentPage = 1
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()
@@ -120,7 +114,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                         hintHandler.removeCallbacksAndMessages(null)
                         hintRunnable = null
                         binding.searchResultsParentConstraintLayout.visibility = View.GONE
-                        binding.appBarLayout.visibility = View.VISIBLE
                         binding.mainContentParentNestedScrollView.visibility = View.VISIBLE
                         return true
                     }
@@ -143,7 +136,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     menu.findItem(R.id.discoverMenu).setVisible(false)
                     isSearchViewOpen = true
                     startAlternateHint()
-                    binding.appBarLayout.visibility = View.GONE
                     binding.mainContentParentNestedScrollView.visibility = View.GONE
                     binding.searchResultsParentConstraintLayout.visibility = View.VISIBLE
                     binding.searchResultsNoResultParentConstraintLayout.visibility = View.GONE
@@ -201,54 +193,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 return false
             }
         }, viewLifecycleOwner)
-        //for banner ads
-        binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
-        binding.appBarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            if (verticalOffset == 0) {
-                startAutoScroll()
-            } else if (abs(verticalOffset) >= appBarLayout.totalScrollRange) {
-                bannerRunnable = null
-                bannerHandler.removeCallbacksAndMessages(null)
-            } else {
-            }
-        })
-        viewModel.viewPagerBannerAds.observe(viewLifecycleOwner) {
-            when (it.status) {
-                DataStatus.Status.Success -> {
-                    it.data?.let { banners ->
-                        binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
-                        binding.appBarLayout.visibility = View.VISIBLE
-                        bannerViewPagerAdapter.setViewPagerList(banners)
-                        binding.bannerAdsViewPager.currentItem = 1
-                        onInfinitePageChangeCallback(banners.size + 2)
-                        startAutoScroll()
-                    }
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    binding.appBarLayout.visibility = View.GONE
-                    binding.bannerAdsViewPager.adapter = null
-                    loadingBannersFailed = true
-                }
-
-                DataStatus.Status.Loading -> {
-                    binding.bannerAdsViewPager.adapter = bannerViewPagerAdapter
-                    binding.appBarLayout.visibility = View.VISIBLE
-                    bannerViewPagerAdapter.setViewPagerList(dummyHomePageBannersList)
-                    binding.bannerAdsViewPager.currentItem = 1
-                }
-
-                DataStatus.Status.EmptyResult -> {
-                    binding.appBarLayout.visibility = View.GONE
-                    binding.bannerAdsViewPager.adapter = null
-                }
-
-                else -> {
-                    binding.appBarLayout.visibility = View.GONE
-                    binding.bannerAdsViewPager.adapter = null
-                }
-            }
-        }
         //for reel topics
         val reelTopicsLayoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -277,7 +221,13 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     it.data?.let { list ->
                         if (list.isNotEmpty()) {
                             topicsLoaded()
-                            reelTopicsChipRecyclerViewAdapter.setReelTopics(list.subList(0, 5))
+                            val topicsToShow = if (list.size > 5) 5 else list.size
+                            reelTopicsChipRecyclerViewAdapter.setReelTopics(
+                                list.subList(
+                                    0,
+                                    topicsToShow
+                                )
+                            )
                             val firstTopic = list.find { topic -> topic.displayIndex == 1 }
                             if (firstTopic != null) {
                                 selectedReelTopic = firstTopic.topic
@@ -394,7 +344,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     }
                     if (loadingBannersFailed) {
                         loadingBannersFailed = false
-                        viewModel.getHomePageBannerAds()
                     }
                 }
 
@@ -504,21 +453,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         binding.searchResultsRecyclerView.visibility = View.VISIBLE
     }
 
-    private fun startAutoScroll() {
-        if (bannerRunnable == null) {
-            bannerRunnable = object : Runnable {
-                override fun run() {
-                    if (currentPage == (binding.bannerAdsViewPager.adapter?.itemCount ?: 1)) {
-                        currentPage = 1
-                    }
-                    binding.bannerAdsViewPager.setCurrentItem(currentPage++, true)
-                    bannerHandler.postDelayed(this, delay3k)
-                }
-            }
-            bannerHandler.postDelayed(bannerRunnable!!, delay3k)
-        }
-    }
-
     private fun startAlternateHint() {
         if (hintRunnable == null) {
             hintRunnable = object : Runnable {
@@ -537,36 +471,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         }
     }
 
-    private fun onInfinitePageChangeCallback(listSize: Int) {
-        binding.bannerAdsViewPager.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrollStateChanged(state: Int) {
-                super.onPageScrollStateChanged(state)
-
-                if (state == ViewPager2.SCROLL_STATE_IDLE) {
-                    when (binding.bannerAdsViewPager.currentItem) {
-                        listSize - 1 -> binding.bannerAdsViewPager.setCurrentItem(
-                            1,
-                            false
-                        )
-
-                        0 -> binding.bannerAdsViewPager.setCurrentItem(
-                            listSize - 2,
-                            false
-                        )
-                    }
-                }
-            }
-
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                if (position != 0 && position != listSize - 1) {
-                    currentPage = position
-                }
-            }
-        })
-    }
-
     override fun onStart() {
         super.onStart()
         val currentUser = FirebaseAuth.getInstance().currentUser
@@ -577,22 +481,12 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onStop() {
         super.onStop()
-        if (bannerViewPagerAdapter != null) {
-            bannerHandler.removeCallbacksAndMessages(null)
-        }
-        bannerRunnable = null
-        bannerHandler.removeCallbacksAndMessages(null)
         hintRunnable = null
         hintHandler.removeCallbacksAndMessages(null)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (bannerViewPagerAdapter != null) {
-            bannerHandler.removeCallbacksAndMessages(null)
-        }
-        bannerRunnable = null
-        bannerHandler.removeCallbacksAndMessages(null)
         hintRunnable = null
         hintHandler.removeCallbacksAndMessages(null)
     }
@@ -615,7 +509,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             reelTopicsChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
             reelTopicsChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)
         }
-        startAutoScroll()
         if (isSearchViewOpen) {
             startAlternateHint()
         }
@@ -695,8 +588,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onDetach() {
         super.onDetach()
-        bannerRunnable = null
-        bannerHandler.removeCallbacksAndMessages(null)
         hintRunnable = null
         hintHandler.removeCallbacksAndMessages(null)
     }
