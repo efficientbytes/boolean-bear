@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentPasswordLoginBinding
-import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
@@ -26,7 +25,6 @@ class PasswordLoginFragment : Fragment() {
     private lateinit var rootView: View
     private val safeArgs: PasswordLoginFragmentArgs by navArgs()
     private val viewModel: ManagePasswordViewModel by inject()
-    private val statisticsRepository: StatisticsRepository by inject()
     private val mainViewModel: MainViewModel by inject()
 
     //response data
@@ -301,7 +299,6 @@ class PasswordLoginFragment : Fragment() {
                                 getString(R.string.signed_in_successfully),
                                 Toast.LENGTH_SHORT
                             ).show()
-                            statisticsRepository.noteDownScreenOpeningTime()
                             when (signInToken.basicProfileDetailsUpdated) {
                                 true -> {
                                     findNavController().popBackStack(

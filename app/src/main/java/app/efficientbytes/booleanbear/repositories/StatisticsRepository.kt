@@ -3,13 +3,9 @@ package app.efficientbytes.booleanbear.repositories
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import app.efficientbytes.booleanbear.database.dao.StatisticsDao
-import app.efficientbytes.booleanbear.database.models.ScreenTiming
-import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.StatisticsService
-import app.efficientbytes.booleanbear.services.models.ScreenTimingResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
-import app.efficientbytes.booleanbear.utils.getTodayDateComponent
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +13,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
 import java.io.IOException
@@ -31,135 +26,6 @@ class StatisticsRepository(
     private val statisticsDao: StatisticsDao,
     private val statisticsService: StatisticsService
 ) {
-
-    fun noteDownScreenOpeningTime() {
-        if (FirebaseAuth.getInstance().currentUser == null) return
-        externalScope.launch {
-            val currentDate = getServerTime()
-            currentDate?.let {
-                val today = getTodayDateComponent(it)
-                statisticsDao.noteDownScreenOpeningTime(
-                    ScreenTiming(
-                        date = today.time,
-                        opened = it
-                    )
-                )
-            }
-        }
-    }
-
-    fun noteDownScreenClosingTime() {
-        if (FirebaseAuth.getInstance().currentUser == null) return
-        externalScope.launch {
-            val currentDate = getServerTime()
-            currentDate?.let {
-                val today = getTodayDateComponent(it)
-                statisticsDao.noteDownScreenClosingTime(today.time, it)
-            }
-        }
-    }
-
-    fun uploadPendingScreenTiming() {
-        externalScope.launch {
-            try {
-                val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
-                if (!isEmpty) {
-                    val currentDate = getServerTime() ?: return@launch
-                    val today = currentDate.let {
-                        val today = getTodayDateComponent(it)
-                        today
-                    }
-                    val list =
-                        statisticsDao.getTotalScreenTimePerDayBasisForAllDayExceptFor(today.time)
-                    if (list.isNotEmpty()) {
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        val userId = when {
-                            currentUser != null -> {
-                                currentUser.uid
-                            }
-
-                            SingletonPreviousUserId.getInstance() != null -> {
-                                SingletonPreviousUserId.getInstance()
-                            }
-
-                            else -> {
-                                null
-                            }
-                        }
-                        if (userId != null) {
-                            val response = statisticsService.uploadScreenTimings(
-                                ScreenTimingResponse(list, userId)
-                            )
-                            val responseCode = response.code()
-                            SingletonPreviousUserId.setInstance(null)
-                            when {
-                                responseCode == 200 -> {
-                                    statisticsDao.deleteScreenTimingForAllDayExceptFor(currentDate)
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (noInternet: NoInternetException) {
-                SingletonPreviousUserId.setInstance(null)
-            } catch (socketTimeOutException: SocketTimeoutException) {
-                SingletonPreviousUserId.setInstance(null)
-            } catch (exception: IOException) {
-                SingletonPreviousUserId.setInstance(null)
-            }
-        }
-    }
-
-    fun forceUploadPendingScreenTiming() {
-        try {
-            externalScope.launch {
-                val isEmpty = statisticsDao.screenTimingIsEmpty().isEmpty()
-                if (!isEmpty) {
-                    val list = statisticsDao.getTotalScreenTimePerDayBasisForAllDay()
-                    if (list.isNotEmpty()) {
-                        val currentUser = FirebaseAuth.getInstance().currentUser
-                        val userId = when {
-                            currentUser != null -> {
-                                currentUser.uid
-                            }
-
-                            SingletonPreviousUserId.getInstance() != null -> {
-                                SingletonPreviousUserId.getInstance()
-                            }
-
-                            else -> {
-                                null
-                            }
-                        }
-                        if (userId != null) {
-                            val response = statisticsService.uploadScreenTimings(
-                                ScreenTimingResponse(list, userId)
-                            )
-                            val responseCode = response.code()
-                            SingletonPreviousUserId.setInstance(null)
-                            when {
-                                responseCode == 200 -> {
-                                    statisticsDao.deleteScreenTimingForAllDay()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (noInternet: NoInternetException) {
-            SingletonPreviousUserId.setInstance(null)
-        } catch (socketTimeOutException: SocketTimeoutException) {
-            SingletonPreviousUserId.setInstance(null)
-        } catch (exception: IOException) {
-            SingletonPreviousUserId.setInstance(null)
-        }
-    }
-
-    fun deleteUserScreenTime() {
-        externalScope.launch {
-            statisticsDao.deleteScreenTimingForAllDay()
-        }
-    }
 
     private suspend fun getServerTime(): Long? {
         val result = externalScope.async {

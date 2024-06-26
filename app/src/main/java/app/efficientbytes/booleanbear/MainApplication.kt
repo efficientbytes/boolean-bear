@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import app.efficientbytes.booleanbear.di.appModule
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
-import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
@@ -19,7 +18,6 @@ class MainApplication : Application() {
 
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
-    private val statisticsRepository: StatisticsRepository by inject()
     private val utilityDataRepository: UtilityDataRepository by inject()
     private val assetsRepository: AssetsRepository by inject()
 
@@ -70,9 +68,7 @@ class MainApplication : Application() {
             authenticationRepository.listenForAuthStateChanges()
             userProfileRepository.listenToUserProfileChange(currentUser.uid)
             authenticationRepository.listenToSingleDeviceLoginChange(currentUser.uid)
-            statisticsRepository.uploadPendingScreenTiming()
         } else {
-            statisticsRepository.deleteUserScreenTime()
             userProfileRepository.deleteLocalNotificationToken()
             authenticationRepository.deleteIDToken()
             assetsRepository.deleteCourseWaitingList()

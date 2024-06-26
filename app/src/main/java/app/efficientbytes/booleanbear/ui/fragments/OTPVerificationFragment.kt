@@ -12,7 +12,6 @@ import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentOTPVerificationBinding
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
-import app.efficientbytes.booleanbear.repositories.StatisticsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.utils.validateOTPFormat
@@ -28,7 +27,6 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var rootView: View
     private val viewModel: PhoneNumberOTPVerificationViewModel by inject()
     private val mainViewModel: MainViewModel by inject()
-    private val statisticsRepository: StatisticsRepository by inject()
     private val safeArgs: OTPVerificationFragmentArgs by navArgs()
     private lateinit var timer: CountDownTimer
 
@@ -232,8 +230,6 @@ class OTPVerificationFragment : Fragment() {
                                 getString(R.string.signed_in_successfully),
                                 Toast.LENGTH_SHORT
                             ).show()
-
-                            statisticsRepository.noteDownScreenOpeningTime()
 
                             when (passwordAuthFailed) {
                                 true -> {
