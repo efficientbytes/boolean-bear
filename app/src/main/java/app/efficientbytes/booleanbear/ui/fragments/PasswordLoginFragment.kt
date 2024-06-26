@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -77,57 +78,87 @@ class PasswordLoginFragment : Fragment() {
                     val newHasUppercase = text.any { it.isUpperCase() }
                     if (newHasUppercase && !hasUppercase) {
                         hasUppercase = true
-                        binding.uppercaseChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.md_theme_primaryContainer)
+                        binding.uppercaseChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_tick_icon
+                            )
                     } else if (!newHasUppercase && hasUppercase) {
                         hasUppercase = false
-                        binding.uppercaseChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.black_1200)
+                        binding.uppercaseChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_cross_icon
+                            )
                     }
                     // Check for lowercase
                     val newHasLowercase = text.any { it.isLowerCase() }
                     if (newHasLowercase && !hasLowercase) {
                         hasLowercase = true
-                        binding.lowerCaseChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.md_theme_primaryContainer)
+                        binding.lowerCaseChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_tick_icon
+                            )
                     } else if (!newHasLowercase && hasLowercase) {
                         hasLowercase = false
-                        binding.lowerCaseChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.black_1200)
+                        binding.lowerCaseChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_cross_icon
+                            )
                     }
                     // Check for digit
                     val newHasDigit = text.any { it.isDigit() }
                     if (newHasDigit && !hasDigit) {
                         hasDigit = true
-                        binding.numbersChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.md_theme_primaryContainer)
+                        binding.numbersChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_tick_icon
+                            )
                     } else if (!newHasDigit && hasDigit) {
                         hasDigit = false
-                        binding.numbersChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.black_1200)
+                        binding.numbersChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_cross_icon
+                            )
                     }
                     // Check for special character
                     val specialCharacters = "-$#@_!".toSet()
                     val newHasSpecialChar = text.any { it in specialCharacters }
                     if (newHasSpecialChar && !hasSpecialChar) {
                         hasSpecialChar = true
-                        binding.specialCharacterChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.md_theme_primaryContainer)
+                        binding.specialCharacterChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_tick_icon
+                            )
                     } else if (!newHasSpecialChar && hasSpecialChar) {
                         hasSpecialChar = false
-                        binding.specialCharacterChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.black_1200)
+                        binding.specialCharacterChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_cross_icon
+                            )
                     }
                     // Check for minimum length
                     val newHasMinLength = text.length >= 12
                     if (newHasMinLength && !hasMinLength) {
                         hasMinLength = true
-                        binding.characterLimitChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.md_theme_primaryContainer)
+                        binding.characterLimitChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_tick_icon
+                            )
                     } else if (!newHasMinLength && hasMinLength) {
                         hasMinLength = false
-                        binding.characterLimitChip.chipBackgroundColor =
-                            requireContext().getColorStateList(R.color.black_1200)
+                        binding.characterLimitChip.checkedIcon =
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.password_cross_icon
+                            )
                     } else {
                     }
                 }
