@@ -77,4 +77,38 @@ class StatisticsRepository(
     }.catch { t -> emit(DataStatus.unknownException<Unit>(t.message.toString())) }
         .flowOn(Dispatchers.IO)
 
+    suspend fun addReelToWatchHistory(contentId: String) {
+        /*val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            try {
+                val startOfDayTimestamp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    val calendar = Calendar.getInstance()
+                    calendar.set(Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0)
+                    calendar.timeInMillis
+                } else {
+                    val today = LocalDate.now()
+                    val startOfDay = today.atStartOfDay(ZoneId.systemDefault())
+                    startOfDay.toInstant().toEpochMilli()
+                }
+                val timestamp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    System.currentTimeMillis()
+                } else {
+                    Instant.now().toEpochMilli()
+                }
+                statisticsService.addReelToWatchHistory(
+                    contentId,
+                    startOfDayTimestamp,
+                    timestamp
+                )
+            } catch (noInternet: NoInternetException) {
+            } catch (socketTimeOutException: SocketTimeoutException) {
+            } catch (exception: IOException) {
+            }
+        }*/
+    }
+
+
 }

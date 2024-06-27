@@ -97,6 +97,12 @@ class ReelPlayerViewModel(
         }
     }
 
+    fun addToWatchHistory(contentId: String) {
+        /* viewModelScope.launch(Dispatchers.IO) {
+             statisticsRepository.addReelToWatchHistory(contentId)
+         }*/
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event.targetState) {
             Lifecycle.State.DESTROYED -> {
