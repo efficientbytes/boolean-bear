@@ -564,6 +564,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     if (!ReelPlayerViewModel.countRecorded) {
                         ReelPlayerViewModel.countRecorded = true
                         viewModel.increaseContentViewCount(this@ReelPlayerFragment.reelId)
+                        viewModel.addToWatchHistory(this@ReelPlayerFragment.reelId)
                     }
                     binding.videoPlayer.showController()
                     binding.noNetworkLinearLayout.visibility = View.GONE

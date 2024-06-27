@@ -17,5 +17,13 @@ interface StatisticsService {
         @Path("contentId") contentId: String,
         @Field("message") message: String? = null
     ): Response<ResponseMessage>
+    /* @FormUrlEncoded
+     @POST("statistics/reels/watch-history/")
+     @Headers("Content-Type: application/x-www-form-urlencoded")
+     suspend fun addReelToWatchHistory(
+         @Field("contentId") contentId: String,
+         @Field("startOfDayTimestamp") startOfDayTimestamp: Long,
+         @Field("timestamp") timestamp: Long,
+     ): Response<ResponseMessage>*/
 
 }
