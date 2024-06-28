@@ -116,4 +116,6 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:23.4.1")
     //crashlytics
     implementation("com.google.firebase:firebase-crashlytics:18.6.4")
+    //admob
+    implementation ("com.google.android.gms:play-services-ads:23.1.0")
 }

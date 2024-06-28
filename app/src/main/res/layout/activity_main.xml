@@ -154,6 +154,14 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:navGraph="@navigation/main_nav_graph" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/adButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ad Button">
+
+            </com.google.android.material.button.MaterialButton>
+
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/noInternetLabelTextView"
                 android:layout_width="match_parent"

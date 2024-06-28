@@ -11,6 +11,7 @@ import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -42,16 +43,28 @@ import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.OnUserEarnedRewardListener
+import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Arrays
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -92,6 +105,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var issueCategoriesFailedToLoad = false
     private var dialog: Dialog? = null
     private var isDialogOpened: Boolean = false
+
+    //for ad mob rewarded ad
+    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
+    private var rewardedAd: RewardedAd? = null
+    private val testAdUnitId = "ca-app-pub-3940256099942544/5224354917"
+    private var isLoading = false
+    private var adsToShow = 3
+    private var adsShown = 0
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -129,7 +150,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupConnectivityListener()
         askNotificationPermission()
         setUpLiveDataObserver()
+        setUpAdMob()
         processIntent(intent)
+        binding.adButton.setOnClickListener {
+            showRewardedAds(3)
+            loadRewardedAd()
+        }
+    }
+
+    private fun setUpAdMob() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return
+        }
+
+       /* // Set your test devices.
+        MobileAds.setRequestConfiguration(
+            RequestConfiguration.Builder().setTestDeviceIds(listOf("66A5C81099D40CBA1C639D1FC4181ECC")).build()
+        )*/
+
+        val backgroundScope = CoroutineScope(Dispatchers.IO)
+        backgroundScope.launch {
+            MobileAds.initialize(this@MainActivity) {}
+            runOnUiThread{
+                loadRewardedAd()
+            }
+        }
     }
 
     private fun setUpLiveDataObserver() {
@@ -491,6 +536,70 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.mainCoordinatorLayout.visibility = View.GONE
                 networkNotAvailable = true
             }
+        }
+    }
+
+    private fun loadRewardedAd() {
+        if (isLoading) return
+
+        isLoading = true
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(this, testAdUnitId, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                rewardedAd = null
+                isLoading = false
+                Log.i("AD MOB","Ad request failed - ${adError.message}")
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                rewardedAd = ad
+                isLoading = false
+                Log.i("AD MOB","Ad request success")
+            }
+        })
+    }
+
+    private fun showRewardedAds(count: Int) {
+        if (count <= 0) return
+
+        rewardedAd?.let { ad ->
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    // Called when ad is dismissed.
+                    rewardedAd = null
+                }
+
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    // Called when ad fails to show.
+                    rewardedAd = null
+                    Log.i("AD MOB",adError.message)
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    Log.i("AD MOB","Showing ad")
+                    loadRewardedAd()
+                    // Called when ad is shown.
+                    // This is the place to pause any background processes if needed.
+                }
+            }
+
+            ad.show(this, OnUserEarnedRewardListener { rewardItem ->
+                // Handle the reward.
+                val rewardAmount = rewardItem.amount
+                val rewardType = rewardItem.type
+                adsShown++
+                if (adsShown < adsToShow) {
+                    loadRewardedAd()
+                    showRewardedAds(count - 1)
+                } else {
+                    adsShown = 0
+                    // All ads shown, you can proceed with other actions.
+                    Toast.makeText(this@MainActivity, "Completed all ads", Toast.LENGTH_LONG)
+                        .show()
+                }
+            })
+        } ?: run {
+            Log.i("AD MOB","Failed to load")
         }
     }
 
