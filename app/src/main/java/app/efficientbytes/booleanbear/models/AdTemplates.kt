@@ -1,6 +1,6 @@
 package app.efficientbytes.booleanbear.models
 
-enum class AdTemplates(templateName: String, templateId: String, pauseTime: Long, adsToShow: Int) {
+enum class AdTemplates(val templateName: String,val templateId: String,val pauseTime: Long,val adsToShow: Int) {
 
     TEMPLATE_20(templateName = "Template20", templateId =  "t20", pauseTime =  20, adsToShow =  3),
     TEMPLATE_40(templateName = "Template40", templateId =  "t40", pauseTime =  40, adsToShow =  5),

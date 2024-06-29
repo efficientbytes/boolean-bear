@@ -18,6 +18,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
+import app.efficientbytes.booleanbear.models.AdTemplates
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
@@ -320,6 +321,48 @@ class MainViewModel(
 
     private fun generateIDToken() {
         authenticationRepository.generateIDToken(this@MainViewModel)
+    }
+
+    private val _preLoadRewardedAdRequested: MutableLiveData<Boolean?> = MutableLiveData()
+    val preLoadRewardedAdRequested: LiveData<Boolean?> = _preLoadRewardedAdRequested
+
+    fun preLoadRewardedAd() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadRewardedAdRequested.postValue(true)
+        }
+    }
+
+    fun resetPreLoadRewardedAd() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadRewardedAdRequested.postValue(null)
+        }
+    }
+
+    private val _preLoadingRewardedAdStatus: MutableLiveData<Boolean?> = MutableLiveData()
+    val preLoadingRewardedAdStatus: LiveData<Boolean?> = _preLoadingRewardedAdStatus
+
+    fun onPreLoadingRewardedAdStatusChanged(isSuccess: Boolean?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadingRewardedAdStatus.postValue(isSuccess)
+        }
+    }
+
+    private val _adDisplayCompleted: MutableLiveData<Boolean?> = MutableLiveData()
+    val adDisplayCompleted: LiveData<Boolean?> = _adDisplayCompleted
+
+    fun adDisplayCompleted(isSuccess: Boolean?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _adDisplayCompleted.postValue(isSuccess)
+        }
+    }
+
+    private val _showRewardedAds: MutableLiveData<AdTemplates?> = MutableLiveData()
+    val showRewardedAds: LiveData<AdTemplates?> = _showRewardedAds
+
+    fun showRewardedAds(adTemplates: AdTemplates?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _showRewardedAds.postValue(adTemplates)
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

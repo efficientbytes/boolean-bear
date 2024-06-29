@@ -22,6 +22,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -39,12 +40,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentReelPlayerBinding
+import app.efficientbytes.booleanbear.models.AdTemplates
 import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
+import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -100,6 +103,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
     private val customAuthStateListener: CustomAuthStateListener by inject()
     private val safeArgs: ReelPlayerFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -462,6 +466,48 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 }
             }
         }
+
+        mainViewModel.preLoadRewardedAd()
+
+        mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    binding.videoPlayer.onPause()
+                    releasePlayer()
+                    showWatchAdPromptDialog()
+                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
+                }
+
+                false -> {
+                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
+                }
+
+                null -> {
+
+                }
+            }
+        }
+
+        mainViewModel.adDisplayCompleted.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    dialog?.dismiss()
+                    binding.videoPlayer.onResume()
+                    initializePlayer()
+                    mainViewModel.adDisplayCompleted(null)
+                }
+
+                false -> {
+                    dialog?.dismiss()
+                    mainViewModel.adDisplayCompleted(null)
+                }
+
+                null -> {
+
+                }
+            }
+        }
+
     }
 
     private fun openDescriptionFragment() {
@@ -567,8 +613,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                         viewModel.increaseContentViewCount(this@ReelPlayerFragment.reelId)
                         viewModel.addToWatchHistory(this@ReelPlayerFragment.reelId)
                     }
-                    //check if the ads have been shown
-                    showWatchAdPromptDialog()
                     binding.videoPlayer.showController()
                     binding.noNetworkLinearLayout.visibility = View.GONE
                     playerQualityMenu.visibility = View.VISIBLE
@@ -649,9 +693,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 dialog!!.findViewById<MaterialButton>(R.id.fortyMinutesAdFreeButton)
 
             twentyMinuteAdFreeWatch.setOnClickListener {
+                mainViewModel.showRewardedAds(AdTemplates.TEMPLATE_20)
             }
 
             fortyMinuteAdFreeWatch.setOnClickListener {
+                mainViewModel.showRewardedAds(AdTemplates.TEMPLATE_40)
             }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
