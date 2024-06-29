@@ -29,6 +29,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.AdTemplate
@@ -40,6 +43,7 @@ import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.PauseRewardedAdWorker
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -63,6 +67,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.absoluteValue
 
@@ -104,12 +109,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var issueCategoriesFailedToLoad = false
     private var dialog: Dialog? = null
     private var isDialogOpened: Boolean = false
+    private val workManager: WorkManager by inject()
 
     //for ad mob rewarded ad
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)
     private var rewardedAd: RewardedAd? = null
     private var adsToShow = 0
     private var adsShown = 0
+    private var pauseRewardedAdWorkerRequest: OneTimeWorkRequest? = null
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -137,6 +144,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val testAdUnitId = "ca-app-pub-3940256099942544/5224354917"
         var isAdLoading = false
         var isAdTemplateActive = false
+        var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_20
+        var adPauseOverMessageDisplayed = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -233,6 +242,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
+                        cancelRewardedAdWorker()
+                        viewModel.deleteActiveAdsTemplate()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
                 }
@@ -462,25 +473,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 AdTemplate.TEMPLATE_20 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow,it)
+                    showRewardedAds(adsToShow, it)
                     viewModel.showRewardedAds(null)
                 }
 
                 AdTemplate.TEMPLATE_40 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow,it)
+                    showRewardedAds(adsToShow, it)
                     viewModel.showRewardedAds(null)
                 }
 
                 AdTemplate.TEMPLATE_60 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow,it)
+                    showRewardedAds(adsToShow, it)
                     viewModel.showRewardedAds(null)
                 }
             }
         }
-        viewModel.getActiveAdTemplate.observe(this){
-            isAdTemplateActive = it?.isActive ?: false
+        viewModel.getActiveAdTemplate.observe(this) {
+            if (it != null) {
+                val template = AdTemplate.getPauseTimeFor(it.templateId)
+                val startTimestamp = it.enabledAt
+                val currentTimeStamp = System.currentTimeMillis()
+                val difference = currentTimeStamp - startTimestamp
+                val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
+                if (difference > checkTimeInMillis) {
+                    adPauseOverMessageDisplayed = true
+                    viewModel.deleteActiveAdsTemplate()
+                } else {
+                    adPauseOverMessageDisplayed = false
+                    isAdTemplateActive = true
+                    currentAdTemplate = AdTemplate.getPauseTimeFor(it.templateId)
+                }
+            } else {
+                isAdTemplateActive = false
+                if (!adPauseOverMessageDisplayed) {
+                    adPauseOverMessageDisplayed = true
+                    Snackbar.make(
+                        binding.parentConstraintLayout,
+                        currentAdTemplate?.completionMessage
+                            ?: "Your ad-free period has concluded. We appreciate your support!",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .show()
+                }
+            }
         }
     }
 
@@ -601,7 +638,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     // Called when ad is dismissed.
                     rewardedAd = null
                     adsShown = 0
-                    Log.i("MAIN ACTIVITY", "Ad dismissed by cancel press")
                 }
 
                 override fun onAdFailedToShowFullScreenContent(adError: AdError) {
@@ -610,6 +646,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     adsShown = 0
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(false)
+                    pauseRewardedAdWorker(adTemplate)
                     Log.i("AD MOB", adError.message)
                 }
 
@@ -625,11 +662,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 adsShown++
                 if (adsShown < adsToShow) {
                     preloadRewardedAd()
-                    showRewardedAds(count - 1,adTemplate)
+                    showRewardedAds(count - 1, adTemplate)
                 } else {
                     adsShown = 0
+                    currentAdTemplate = adTemplate
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(true)
+                    pauseRewardedAdWorker(adTemplate)
                     Toast.makeText(this@MainActivity, "Completed all ads", Toast.LENGTH_LONG)
                         .show()
                 }
@@ -638,6 +677,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             adsShown = 0
             viewModel.adDisplayCompleted(false)
             Log.i("AD MOB", "Failed to load run block")
+        }
+    }
+
+    fun pauseRewardedAdWorker(adTemplate: AdTemplate) {
+        if (pauseRewardedAdWorkerRequest != null) return
+        pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<PauseRewardedAdWorker>()
+            .setInitialDelay(adTemplate.pauseTime, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueue(pauseRewardedAdWorkerRequest!!)
+    }
+
+    fun cancelRewardedAdWorker() {
+        pauseRewardedAdWorkerRequest?.let {
+            workManager.cancelWorkById(it.id)
+            pauseRewardedAdWorkerRequest = null
         }
     }
 

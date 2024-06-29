@@ -130,12 +130,15 @@ class AdsRepository(
         }
     }
 
-
     val getActiveAdTemplate: LiveData<ActiveAdTemplate?> = adsDao.getActiveAdTemplate()
 
     suspend fun insertActiveAdTemplate(activeAdTemplate: ActiveAdTemplate) {
         adsDao.deleteActiveAdTemplate()
         adsDao.insertActiveAdTemplate(activeAdTemplate)
+    }
+
+    suspend fun deleteActiveAdsTemplate() {
+        adsDao.deleteActiveAdTemplate()
     }
 
     interface HomePageAdsListener {

@@ -117,5 +117,7 @@ dependencies {
     //crashlytics
     implementation("com.google.firebase:firebase-crashlytics:18.6.4")
     //admob
-    implementation ("com.google.android.gms:play-services-ads:23.1.0")
+    implementation("com.google.android.gms:play-services-ads:23.1.0")
+    //work manager
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 }

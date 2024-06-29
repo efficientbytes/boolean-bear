@@ -370,10 +370,10 @@ class MainViewModel(
         }
     }
 
-    val getActiveAdTemplate : LiveData<ActiveAdTemplate?> = adsRepository.getActiveAdTemplate
+    val getActiveAdTemplate: LiveData<ActiveAdTemplate?> = adsRepository.getActiveAdTemplate
 
     fun insertActiveAdTemplate(adTemplate: AdTemplate) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val timestamp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 System.currentTimeMillis()
             } else {
@@ -386,6 +386,12 @@ class MainViewModel(
                     timestamp
                 )
             )
+        }
+    }
+
+    fun deleteActiveAdsTemplate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            adsRepository.deleteActiveAdsTemplate()
         }
     }
 

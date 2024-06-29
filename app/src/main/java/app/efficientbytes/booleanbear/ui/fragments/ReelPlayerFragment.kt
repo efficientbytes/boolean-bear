@@ -471,7 +471,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
-                    if (!MainActivity.isAdTemplateActive) {
+                    if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
                         binding.videoPlayer.onPause()
                         releasePlayer()
                         showWatchAdPromptDialog()
@@ -511,6 +511,30 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
+        mainViewModel.getActiveAdTemplate.observe(viewLifecycleOwner) {
+            if (it == null && connectivityListener.isInternetAvailable()) {
+                mainViewModel.preLoadRewardedAd()
+            }
+        }
+
+        connectivityListener.observe(viewLifecycleOwner) {
+            when (it) {
+                null -> {
+
+                }
+
+                true -> {
+                    if (!MainActivity.isAdTemplateActive) {
+                        mainViewModel.preLoadRewardedAd()
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+
     }
 
     private fun openDescriptionFragment() {
@@ -528,7 +552,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
-        if (!MainActivity.isAdTemplateActive){
+        if (!MainActivity.isAdTemplateActive) {
             mainViewModel.preLoadRewardedAd()
         }
         if (player == null) {
@@ -668,6 +692,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     }
                 }
             }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
         }
 
         @OptIn(UnstableApi::class)

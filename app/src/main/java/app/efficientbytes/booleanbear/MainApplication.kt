@@ -12,9 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 
-class MainApplication : Application() {
+class MainApplication : Application(), KoinComponent {
 
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()

@@ -1,10 +1,34 @@
 package app.efficientbytes.booleanbear.models
 
-enum class AdTemplate(val templateName: String, val templateId: String, val pauseTime: Long, val adsToShow: Int) {
+enum class AdTemplate(
+    val templateName: String,
+    val templateId: String,
+    val pauseTime: Long,
+    val adsToShow: Int,
+    val completionMessage: String,
+) {
 
-    TEMPLATE_20(templateName = "Template20", templateId =  "t20", pauseTime =  20, adsToShow =  3),
-    TEMPLATE_40(templateName = "Template40", templateId =  "t40", pauseTime =  40, adsToShow =  5),
-    TEMPLATE_60(templateName = "Template60", templateId = "t60", pauseTime = 60, adsToShow =  7);
+    TEMPLATE_20(
+        templateName = "Template20",
+        templateId = "t20",
+        pauseTime = 4,
+        adsToShow = 2,
+        completionMessage = "Your 20-minute ad-free period has concluded. We appreciate your support!",
+    ),
+    TEMPLATE_40(
+        templateName = "Template40",
+        templateId = "t40",
+        pauseTime = 40,
+        adsToShow = 5,
+        completionMessage = "Your 40-minute ad-free period has concluded. We appreciate your support!",
+    ),
+    TEMPLATE_60(
+        templateName = "Template60",
+        templateId = "t60",
+        pauseTime = 60,
+        adsToShow = 7,
+        completionMessage = "Your 1 hour ad-free period has concluded. We appreciate your support!",
+    );
 
     companion object {
 
