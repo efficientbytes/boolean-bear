@@ -1,6 +1,8 @@
 package app.efficientbytes.booleanbear.repositories
 
+import androidx.lifecycle.LiveData
 import app.efficientbytes.booleanbear.database.dao.AdsDao
+import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AdsService
@@ -128,10 +130,12 @@ class AdsRepository(
         }
     }
 
-    fun deleteAllHomePageBanner() {
-        externalScope.launch {
-            adsDao.deleteHomePageBannerAds()
-        }
+
+    val getActiveAdTemplate: LiveData<ActiveAdTemplate?> = adsDao.getActiveAdTemplate()
+
+    suspend fun insertActiveAdTemplate(activeAdTemplate: ActiveAdTemplate) {
+        adsDao.deleteActiveAdTemplate()
+        adsDao.insertActiveAdTemplate(activeAdTemplate)
     }
 
     interface HomePageAdsListener {

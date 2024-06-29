@@ -40,10 +40,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentReelPlayerBinding
-import app.efficientbytes.booleanbear.models.AdTemplates
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
@@ -467,14 +468,14 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
-        mainViewModel.preLoadRewardedAd()
-
         mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
-                    binding.videoPlayer.onPause()
-                    releasePlayer()
-                    showWatchAdPromptDialog()
+                    if (!MainActivity.isAdTemplateActive) {
+                        binding.videoPlayer.onPause()
+                        releasePlayer()
+                        showWatchAdPromptDialog()
+                    }
                     mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
                 }
 
@@ -499,6 +500,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
                 false -> {
                     dialog?.dismiss()
+                    binding.videoPlayer.onResume()
+                    initializePlayer()
                     mainViewModel.adDisplayCompleted(null)
                 }
 
@@ -525,6 +528,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
+        if (!MainActivity.isAdTemplateActive){
+            mainViewModel.preLoadRewardedAd()
+        }
         if (player == null) {
             trackSelector = DefaultTrackSelector(requireContext(), AdaptiveTrackSelection.Factory())
             val loadControl = DefaultLoadControl()
@@ -693,11 +699,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 dialog!!.findViewById<MaterialButton>(R.id.fortyMinutesAdFreeButton)
 
             twentyMinuteAdFreeWatch.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplates.TEMPLATE_20)
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_20)
             }
 
             fortyMinuteAdFreeWatch.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplates.TEMPLATE_40)
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_40)
             }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

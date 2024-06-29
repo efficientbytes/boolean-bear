@@ -31,7 +31,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
-import app.efficientbytes.booleanbear.models.AdTemplates
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
@@ -136,6 +136,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var hasListenedToIntent = false
         val testAdUnitId = "ca-app-pub-3940256099942544/5224354917"
         var isAdLoading = false
+        var isAdTemplateActive = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -459,24 +460,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 }
 
-                AdTemplates.TEMPLATE_20 -> {
+                AdTemplate.TEMPLATE_20 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow)
+                    showRewardedAds(adsToShow,it)
                     viewModel.showRewardedAds(null)
                 }
 
-                AdTemplates.TEMPLATE_40 -> {
+                AdTemplate.TEMPLATE_40 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow)
+                    showRewardedAds(adsToShow,it)
                     viewModel.showRewardedAds(null)
                 }
 
-                AdTemplates.TEMPLATE_60 -> {
+                AdTemplate.TEMPLATE_60 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow)
+                    showRewardedAds(adsToShow,it)
                     viewModel.showRewardedAds(null)
                 }
             }
+        }
+        viewModel.getActiveAdTemplate.observe(this){
+            isAdTemplateActive = it?.isActive ?: false
         }
     }
 
@@ -588,7 +592,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun showRewardedAds(count: Int) {
+    private fun showRewardedAds(count: Int, adTemplate: AdTemplate) {
         if (count <= 0) return
 
         rewardedAd?.let { ad ->
@@ -596,12 +600,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 override fun onAdDismissedFullScreenContent() {
                     // Called when ad is dismissed.
                     rewardedAd = null
+                    adsShown = 0
                     Log.i("MAIN ACTIVITY", "Ad dismissed by cancel press")
                 }
 
                 override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                     // Called when ad fails to show.
                     rewardedAd = null
+                    adsShown = 0
+                    viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(false)
                     Log.i("AD MOB", adError.message)
                 }
@@ -618,17 +625,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 adsShown++
                 if (adsShown < adsToShow) {
                     preloadRewardedAd()
-                    showRewardedAds(count - 1)
+                    showRewardedAds(count - 1,adTemplate)
                 } else {
                     adsShown = 0
+                    viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(true)
                     Toast.makeText(this@MainActivity, "Completed all ads", Toast.LENGTH_LONG)
                         .show()
                 }
             })
         } ?: run {
+            adsShown = 0
             viewModel.adDisplayCompleted(false)
-            Log.i("AD MOB", "Failed to load")
+            Log.i("AD MOB", "Failed to load run block")
         }
     }
 

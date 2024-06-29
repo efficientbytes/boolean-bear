@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.viewmodels
 
 import android.app.Application
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
@@ -16,14 +17,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
-import app.efficientbytes.booleanbear.models.AdTemplates
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
@@ -51,6 +54,7 @@ import org.apache.commons.net.ntp.TimeInfo
 import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.time.Instant
 
 class MainViewModel(
     private val application: Application,
@@ -60,6 +64,7 @@ class MainViewModel(
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
     private val assetsRepository: AssetsRepository,
+    private val adsRepository: AdsRepository,
     private val externalScope: CoroutineScope,
     private val userAccountCoroutineScope: UserAccountCoroutineScope,
     private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
@@ -356,12 +361,31 @@ class MainViewModel(
         }
     }
 
-    private val _showRewardedAds: MutableLiveData<AdTemplates?> = MutableLiveData()
-    val showRewardedAds: LiveData<AdTemplates?> = _showRewardedAds
+    private val _showRewardedAds: MutableLiveData<AdTemplate?> = MutableLiveData()
+    val showRewardedAds: LiveData<AdTemplate?> = _showRewardedAds
 
-    fun showRewardedAds(adTemplates: AdTemplates?) {
+    fun showRewardedAds(adTemplate: AdTemplate?) {
         viewModelScope.launch(Dispatchers.IO) {
-            _showRewardedAds.postValue(adTemplates)
+            _showRewardedAds.postValue(adTemplate)
+        }
+    }
+
+    val getActiveAdTemplate : LiveData<ActiveAdTemplate?> = adsRepository.getActiveAdTemplate
+
+    fun insertActiveAdTemplate(adTemplate: AdTemplate) {
+        viewModelScope.launch {
+            val timestamp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                System.currentTimeMillis()
+            } else {
+                Instant.now().toEpochMilli()
+            }
+            adsRepository.insertActiveAdTemplate(
+                ActiveAdTemplate(
+                    adTemplate.templateId,
+                    true,
+                    timestamp
+                )
+            )
         }
     }
 
