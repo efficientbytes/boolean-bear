@@ -46,6 +46,7 @@ import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
@@ -566,6 +567,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                         viewModel.increaseContentViewCount(this@ReelPlayerFragment.reelId)
                         viewModel.addToWatchHistory(this@ReelPlayerFragment.reelId)
                     }
+                    //check if the ads have been shown
+                    showWatchAdPromptDialog()
                     binding.videoPlayer.showController()
                     binding.noNetworkLinearLayout.visibility = View.GONE
                     playerQualityMenu.visibility = View.VISIBLE
@@ -620,6 +623,45 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         @OptIn(UnstableApi::class)
         override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
+        }
+    }
+
+    private var isWatchAdPromptDialogOpened = false
+    private fun showWatchAdPromptDialog() {
+        if (dialog == null) {
+            dialog = Dialog(requireContext())
+        }
+
+        if (!isWatchAdPromptDialogOpened) {
+            isWatchAdPromptDialogOpened = true
+
+            dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setContentView(R.layout.dialog_watch_ad_prompt)
+            dialog!!.setCanceledOnTouchOutside(false)
+            dialog!!.setCancelable(false)
+            dialog!!.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            val twentyMinuteAdFreeWatch =
+                dialog!!.findViewById<MaterialButton>(R.id.twentyMinutesAdFreeButton)
+            val fortyMinuteAdFreeWatch =
+                dialog!!.findViewById<MaterialButton>(R.id.fortyMinutesAdFreeButton)
+
+            twentyMinuteAdFreeWatch.setOnClickListener {
+            }
+
+            fortyMinuteAdFreeWatch.setOnClickListener {
+            }
+
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.setOnDismissListener {
+                isWatchAdPromptDialogOpened = false
+                dialog = null
+            }
+
+            dialog!!.show()
+
         }
     }
 
