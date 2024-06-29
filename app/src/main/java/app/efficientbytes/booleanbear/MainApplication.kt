@@ -56,6 +56,21 @@ class MainApplication : Application(), KoinComponent {
             getString(R.string.engagement_description),
             enableVibration = true
         )
+        NotificationsHelper.createNotificationChannel(
+            this,
+            getString(R.string.ad_free_content_countdown),
+            getString(R.string.notifications_showing_the_remaining_time_for_ad_free_content_this_notification_cannot_be_dismissed_until_the_ad_free_period_ends),
+            false,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        NotificationsHelper.createNotificationChannel(
+            this,
+            getString(R.string.ad_free_content_conclusion),
+            getString(R.string.notifications_indicating_the_end_of_the_ad_free_content_period_this_notification_will_alert_you_when_your_ad_free_time_has_expired),
+            false,
+            NotificationManager.IMPORTANCE_HIGH,
+            enableVibration = true
+        )
         val currentUser = FirebaseAuth.getInstance().currentUser
         assetsRepository.deleteReelTopics()
         assetsRepository.deleteReels()

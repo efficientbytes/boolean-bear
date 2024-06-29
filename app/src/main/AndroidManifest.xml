@@ -16,6 +16,8 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
@@ -97,6 +99,7 @@
                 <data android:path="/binge-watch/topic/" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".services.PushNotificationService"
             android:exported="false">
@@ -104,12 +107,17 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.PauseRewardedAdForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="shortService" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="app.efficientbytes.booleanbear-Engagement" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 
 </manifest>

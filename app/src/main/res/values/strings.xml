@@ -192,5 +192,9 @@
     <string name="sending_verification_link">Sending verification link…</string>
     <string name="we_ve_sent_an_email_to_your_registered_email_address_tap_on_the_verify_button_in_the_email_to_verify_your_account_you_can_change_your_email_here">We\'ve sent an email to your registered email address. Tap on the verify button in the email to verify your account. You can change your email here.</string>
     <string name="we_ve_sent_an_email_to_your_registered_email_address_tap_on_the_verify_button_in_the_email_to_verify_your_account">We\'ve sent an email to your registered email address. Tap on the verify button in the email to verify your account.</string>
+    <string name="ad_free_content_countdown">Ad-free Content Countdown</string>
+    <string name="ad_free_content_conclusion">Ad-free Content Conclusion</string>
+    <string name="notifications_showing_the_remaining_time_for_ad_free_content_this_notification_cannot_be_dismissed_until_the_ad_free_period_ends">Notifications showing the remaining time for ad-free content. This notification cannot be dismissed until the ad-free period ends.</string>
+    <string name="notifications_indicating_the_end_of_the_ad_free_content_period_this_notification_will_alert_you_when_your_ad_free_time_has_expired">Notifications indicating the end of the ad-free content period. This notification will alert you when your ad-free time has expired.</string>
 
 </resources>

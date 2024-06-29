@@ -41,6 +41,7 @@ import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.PauseRewardedAdForegroundService
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.PauseRewardedAdWorker
@@ -243,6 +244,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
                         cancelRewardedAdWorker()
+                        cancelRewardedAdForegroundService()
                         viewModel.deleteActiveAdsTemplate()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
@@ -647,6 +649,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(false)
                     pauseRewardedAdWorker(adTemplate)
+                    startPauseRewardedAdForegroundService(adTemplate)
                     Log.i("AD MOB", adError.message)
                 }
 
@@ -669,6 +672,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(true)
                     pauseRewardedAdWorker(adTemplate)
+                    startPauseRewardedAdForegroundService(adTemplate)
                     Toast.makeText(this@MainActivity, "Completed all ads", Toast.LENGTH_LONG)
                         .show()
                 }
@@ -693,6 +697,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             workManager.cancelWorkById(it.id)
             pauseRewardedAdWorkerRequest = null
         }
+    }
+
+    fun startPauseRewardedAdForegroundService(adTemplate: AdTemplate) {
+        val intent = Intent(this@MainActivity, PauseRewardedAdForegroundService::class.java).apply {
+            putExtra(
+                PauseRewardedAdForegroundService.EXTRA_PAUSE_DURATION,
+                adTemplate.pauseTime
+            )
+            putExtra(
+                PauseRewardedAdForegroundService.EXTRA_CONCLUSION_MESSAGE,
+                adTemplate.completionMessage
+            )
+        }
+        ContextCompat.startForegroundService(this@MainActivity, intent)
+    }
+
+    private fun cancelRewardedAdForegroundService() {
+        val intent = Intent(this, PauseRewardedAdForegroundService::class.java).apply {
+            action = PauseRewardedAdForegroundService.ACTION_STOP_SERVICE
+        }
+        startService(intent)
     }
 
     private fun setupNavigation() {
