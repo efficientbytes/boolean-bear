@@ -22,9 +22,9 @@
 
             <ImageView
                 android:id="@+id/appLogoImageView"
-                android:layout_width="160dp"
-                android:layout_height="180dp"
-                android:src="@drawable/racoon_outline"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:src="@drawable/app_logo_type_no_shape_no_name_no_black_background_svg_format"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guideline1" />
@@ -156,8 +156,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textSize="11sp"
                 android:paddingHorizontal="8dp"
+                android:textSize="11sp"
                 app:layout_constraintEnd_toEndOf="@id/phoneNumberTextInputLayout"
                 app:layout_constraintStart_toStartOf="@id/phoneNumberTextInputLayout"
                 app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
