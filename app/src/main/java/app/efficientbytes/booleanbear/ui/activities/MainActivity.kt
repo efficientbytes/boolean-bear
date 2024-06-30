@@ -11,7 +11,6 @@ import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -32,6 +31,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import app.efficientbytes.booleanbear.BuildConfig
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.AdTemplate
@@ -511,13 +511,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isAdTemplateActive = false
                 if (!adPauseOverMessageDisplayed) {
                     adPauseOverMessageDisplayed = true
-                    Snackbar.make(
-                        binding.parentConstraintLayout,
-                        currentAdTemplate?.completionMessage
-                            ?: "Your ad-free period has concluded. We appreciate your support!",
-                        Snackbar.LENGTH_LONG
-                    )
-                        .show()
+                    if (FirebaseAuth.getInstance().currentUser != null) {
+                        Snackbar.make(
+                            binding.parentConstraintLayout,
+                            currentAdTemplate?.completionMessage
+                                ?: "Your ad-free period has concluded. We appreciate your support!",
+                            Snackbar.LENGTH_LONG
+                        )
+                            .show()
+                    }
                 }
             }
         }
@@ -613,19 +615,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (isAdLoading) return
         isAdLoading = true
         val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(this, testAdUnitId, adRequest, object : RewardedAdLoadCallback() {
+        val adUnitId = BuildConfig.AD_MOB_UNIT_ID
+        RewardedAd.load(this, adUnitId, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
                 isAdLoading = false
                 viewModel.onPreLoadingRewardedAdStatusChanged(false)
-                Log.i("AD MOB", "Ad request failed - ${adError.message}")
             }
 
             override fun onAdLoaded(ad: RewardedAd) {
                 rewardedAd = ad
                 isAdLoading = false
                 viewModel.onPreLoadingRewardedAdStatusChanged(true)
-                Log.i("AD MOB", "Ad request success")
             }
         })
 
@@ -633,7 +634,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun showRewardedAds(count: Int, adTemplate: AdTemplate) {
         if (count <= 0) return
-
         rewardedAd?.let { ad ->
             ad.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
@@ -650,11 +650,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.adDisplayCompleted(false)
                     pauseRewardedAdWorker(adTemplate)
                     startPauseRewardedAdForegroundService(adTemplate)
-                    Log.i("AD MOB", adError.message)
+                    val rewardMessage = getString(
+                        R.string.enjoy_ad_free_contents_for_next_minutes,
+                        adTemplate.pauseTime.toString()
+                    )
+                    Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
+                        .show()
                 }
 
                 override fun onAdShowedFullScreenContent() {
-                    Log.i("AD MOB", "Showing ad")
                     preloadRewardedAd()
                     // Called when ad is shown.
                     // This is the place to pause any background processes if needed.
@@ -673,19 +677,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     viewModel.adDisplayCompleted(true)
                     pauseRewardedAdWorker(adTemplate)
                     startPauseRewardedAdForegroundService(adTemplate)
-                    Toast.makeText(this@MainActivity, "Completed all ads", Toast.LENGTH_LONG)
+                    val rewardMessage = getString(
+                        R.string.enjoy_ad_free_contents_for_next_minutes,
+                        adTemplate.pauseTime.toString()
+                    )
+                    Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
                         .show()
                 }
             })
         } ?: run {
             adsShown = 0
             viewModel.adDisplayCompleted(false)
-            Log.i("AD MOB", "Failed to load run block")
         }
     }
 
     fun pauseRewardedAdWorker(adTemplate: AdTemplate) {
-        if (pauseRewardedAdWorkerRequest != null) return
         pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<PauseRewardedAdWorker>()
             .setInitialDelay(adTemplate.pauseTime, TimeUnit.MINUTES)
             .build()

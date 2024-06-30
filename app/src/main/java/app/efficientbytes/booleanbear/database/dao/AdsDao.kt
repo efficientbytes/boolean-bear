@@ -32,4 +32,7 @@ interface AdsDao {
     @Query("SELECT * FROM $ACTIVE_AD_TEMPLATE")
     fun getActiveAdTemplate(): LiveData<ActiveAdTemplate?>
 
+    @Query("SELECT * FROM $ACTIVE_AD_TEMPLATE")
+    suspend fun isAdTemplateActive(): ActiveAdTemplate?
+
 }

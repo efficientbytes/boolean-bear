@@ -196,5 +196,6 @@
     <string name="ad_free_content_conclusion">Ad-free Content Conclusion</string>
     <string name="notifications_showing_the_remaining_time_for_ad_free_content_this_notification_cannot_be_dismissed_until_the_ad_free_period_ends">Notifications showing the remaining time for ad-free content. This notification cannot be dismissed until the ad-free period ends.</string>
     <string name="notifications_indicating_the_end_of_the_ad_free_content_period_this_notification_will_alert_you_when_your_ad_free_time_has_expired">Notifications indicating the end of the ad-free content period. This notification will alert you when your ad-free time has expired.</string>
+    <string name="enjoy_ad_free_contents_for_next_minutes">Enjoy Ad-free contents for next %1$s minutes.</string>
 
 </resources>

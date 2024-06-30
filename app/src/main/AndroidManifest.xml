@@ -117,7 +117,7 @@
             android:value="app.efficientbytes.booleanbear-Engagement" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${AD_MOB_PUB_ID}" />
     </application>
 
 </manifest>

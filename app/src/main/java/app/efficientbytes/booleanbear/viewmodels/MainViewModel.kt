@@ -39,6 +39,7 @@ import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
@@ -55,6 +56,7 @@ import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class MainViewModel(
     private val application: Application,
@@ -395,6 +397,24 @@ class MainViewModel(
         }
     }
 
+    private fun crossCheckRewardedAdPauseTime() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val activeAdTemplate = adsRepository.isAdTemplateActive()
+            activeAdTemplate?.let {
+                val template = AdTemplate.getPauseTimeFor(it.templateId)
+                val startTimestamp = it.enabledAt
+                val currentTimeStamp = System.currentTimeMillis()
+                val difference = currentTimeStamp - startTimestamp
+                val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
+                if (difference > checkTimeInMillis) {
+                    deleteActiveAdsTemplate()
+                } else {
+                    MainActivity.isAdTemplateActive = true
+                }
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
@@ -418,6 +438,7 @@ class MainViewModel(
             ON_RESUME -> {
                 generateIDToken()
                 fetchServerTime()
+                crossCheckRewardedAdPauseTime()
             }
 
             ON_PAUSE -> {

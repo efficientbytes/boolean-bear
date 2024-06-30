@@ -3,6 +3,7 @@ package app.efficientbytes.booleanbear.services
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -31,6 +32,8 @@ class PauseRewardedAdForegroundService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         if (intent?.action == ACTION_STOP_SERVICE) {
+            stopForeground(true)
+            NotificationManagerCompat.from(this).cancel(123)
             stopService()
             return START_NOT_STICKY
         }
@@ -74,9 +77,15 @@ class PauseRewardedAdForegroundService : LifecycleService() {
             this,
             NotificationsHelper.channelId(this, getString(R.string.ad_free_content_countdown))
         )
-            .setContentTitle("Ad-Free Content Countdown")
-            .setContentText("Time left: ${pauseDurationInMillis / 1000 / 60} minutes")
+            .setLargeIcon(
+                BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.app_logo_type_rounded_corners_no_name_black_backgroundboolean_bear_logo
+                )
+            )
             .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setContentTitle("Ad-Free session remaining")
+            .setContentText("${pauseDurationInMillis / 1000 / 60} minutes remaining")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOnlyAlertOnce(true)
             .setOngoing(true)
@@ -87,7 +96,7 @@ class PauseRewardedAdForegroundService : LifecycleService() {
     private fun updateCountdownNotification(timeLeftMillis: Long) {
         val minutesLeft = TimeUnit.MILLISECONDS.toMinutes(timeLeftMillis)
         val notification = showCountdownNotification()
-            .setContentText("Ad-free content: $minutesLeft minutes remaining")
+            .setContentText("$minutesLeft minutes remaining")
             .setProgress(pauseDurationInMillis.toInt(), timeLeftMillis.toInt(), false)
             .build()
         if (ActivityCompat.checkSelfPermission(
@@ -105,9 +114,15 @@ class PauseRewardedAdForegroundService : LifecycleService() {
             this,
             NotificationsHelper.channelId(this, getString(R.string.ad_free_content_conclusion))
         )
-            .setContentTitle("Ad-Free Session Has Concluded")
-            .setContentText(endMessage)
+            .setLargeIcon(
+                BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.app_logo_type_rounded_corners_no_name_black_backgroundboolean_bear_logo
+                )
+            )
             .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setContentTitle("Ad-Free session is over")
+            .setContentText(endMessage)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()

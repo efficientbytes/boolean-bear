@@ -141,6 +141,10 @@ class AdsRepository(
         adsDao.deleteActiveAdTemplate()
     }
 
+    suspend fun isAdTemplateActive(): ActiveAdTemplate? {
+        return adsDao.isAdTemplateActive()
+    }
+
     interface HomePageAdsListener {
 
         fun onHomePageAdsStatusChanged(status: DataStatus<List<RemoteHomePageBanner>>)
