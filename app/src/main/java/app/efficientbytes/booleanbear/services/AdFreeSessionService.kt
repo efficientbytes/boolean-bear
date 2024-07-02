@@ -84,7 +84,7 @@ class AdFreeSessionService : LifecycleService() {
             var timeLeft = pauseDurationInMillis
             while (timeLeft > 0) {
                 updateTimeRemainingNotification(timeLeft)
-                delay(1000)
+                delay(950)
                 timeLeft -= 1000
             }
             NotificationManagerCompat.from(this@AdFreeSessionService)
