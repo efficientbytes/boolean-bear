@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.di
 
+import androidx.work.WorkManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -17,4 +18,5 @@ val utilsModule = module {
     single { provideInstructorLiveListener() }
     single { provideMentionedLinksLiveListener() }
     single { provideContentDetailsLiveListener() }
+    single { WorkManager.getInstance(get()) }
 }

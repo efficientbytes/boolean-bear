@@ -22,6 +22,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -39,13 +40,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentReelPlayerBinding
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
+import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
@@ -99,6 +104,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
     private val customAuthStateListener: CustomAuthStateListener by inject()
     private val safeArgs: ReelPlayerFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -398,6 +404,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         binding.suggestedContentCardView.setOnClickListener {
             nextSuggestedContentId?.let { reelId ->
+                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
+                    mainViewModel.preLoadRewardedAd()
+                }
                 clearStartPosition()
                 isPlayingSuggested = true
                 this@ReelPlayerFragment.reelId = reelId
@@ -461,6 +470,74 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 }
             }
         }
+
+        mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
+                        binding.videoPlayer.onPause()
+                        releasePlayer()
+                        showWatchAdPromptDialog()
+                    }
+                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
+                }
+
+                false -> {
+                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
+                }
+
+                null -> {
+
+                }
+            }
+        }
+
+        mainViewModel.adDisplayCompleted.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    dialog?.dismiss()
+                    binding.videoPlayer.onResume()
+                    initializePlayer()
+                    mainViewModel.adDisplayCompleted(null)
+                }
+
+                false -> {
+                    dialog?.dismiss()
+                    binding.videoPlayer.onResume()
+                    initializePlayer()
+                    mainViewModel.adDisplayCompleted(null)
+                }
+
+                null -> {
+
+                }
+            }
+        }
+
+        mainViewModel.getActiveAdTemplate.observe(viewLifecycleOwner) {
+            if (it == null && connectivityListener.isInternetAvailable()) {
+                mainViewModel.preLoadRewardedAd()
+            }
+        }
+
+        connectivityListener.observe(viewLifecycleOwner) {
+            when (it) {
+                null -> {
+
+                }
+
+                true -> {
+                    if (!MainActivity.isAdTemplateActive) {
+                        mainViewModel.preLoadRewardedAd()
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+
     }
 
     private fun openDescriptionFragment() {
@@ -478,6 +555,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
+        if (!MainActivity.isAdTemplateActive) {
+            mainViewModel.preLoadRewardedAd()
+        }
         if (player == null) {
             trackSelector = DefaultTrackSelector(requireContext(), AdaptiveTrackSelection.Factory())
             val loadControl = DefaultLoadControl()
@@ -617,9 +697,54 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+        }
+
         @OptIn(UnstableApi::class)
         override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
+        }
+    }
+
+    private var isWatchAdPromptDialogOpened = false
+    private fun showWatchAdPromptDialog() {
+        if (dialog == null) {
+            dialog = Dialog(requireContext())
+        }
+
+        if (!isWatchAdPromptDialogOpened) {
+            isWatchAdPromptDialogOpened = true
+
+            dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setContentView(R.layout.dialog_watch_ad_prompt)
+            dialog!!.setCanceledOnTouchOutside(false)
+            dialog!!.setCancelable(false)
+            dialog!!.window!!.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            val twentyMinuteAdFreeWatch =
+                dialog!!.findViewById<MaterialButton>(R.id.twentyMinutesAdFreeButton)
+            val fortyMinuteAdFreeWatch =
+                dialog!!.findViewById<MaterialButton>(R.id.fortyMinutesAdFreeButton)
+
+            twentyMinuteAdFreeWatch.setOnClickListener {
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_20)
+            }
+
+            fortyMinuteAdFreeWatch.setOnClickListener {
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_40)
+            }
+
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.setOnDismissListener {
+                isWatchAdPromptDialogOpened = false
+                dialog = null
+            }
+
+            dialog!!.show()
+
         }
     }
 

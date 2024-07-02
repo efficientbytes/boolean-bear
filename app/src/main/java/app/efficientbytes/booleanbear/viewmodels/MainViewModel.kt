@@ -1,6 +1,7 @@
 package app.efficientbytes.booleanbear.viewmodels
 
 import android.app.Application
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event.ON_ANY
@@ -16,13 +17,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
 import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository
@@ -35,6 +39,7 @@ import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.RequestSupportResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
@@ -50,6 +55,8 @@ import org.apache.commons.net.ntp.TimeInfo
 import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class MainViewModel(
     private val application: Application,
@@ -59,6 +66,7 @@ class MainViewModel(
     private val verificationRepository: VerificationRepository,
     private val feedbackNSupportRepository: FeedbackNSupportRepository,
     private val assetsRepository: AssetsRepository,
+    private val adsRepository: AdsRepository,
     private val externalScope: CoroutineScope,
     private val userAccountCoroutineScope: UserAccountCoroutineScope,
     private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
@@ -322,6 +330,91 @@ class MainViewModel(
         authenticationRepository.generateIDToken(this@MainViewModel)
     }
 
+    private val _preLoadRewardedAdRequested: MutableLiveData<Boolean?> = MutableLiveData()
+    val preLoadRewardedAdRequested: LiveData<Boolean?> = _preLoadRewardedAdRequested
+
+    fun preLoadRewardedAd() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadRewardedAdRequested.postValue(true)
+        }
+    }
+
+    fun resetPreLoadRewardedAd() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadRewardedAdRequested.postValue(null)
+        }
+    }
+
+    private val _preLoadingRewardedAdStatus: MutableLiveData<Boolean?> = MutableLiveData()
+    val preLoadingRewardedAdStatus: LiveData<Boolean?> = _preLoadingRewardedAdStatus
+
+    fun onPreLoadingRewardedAdStatusChanged(isSuccess: Boolean?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _preLoadingRewardedAdStatus.postValue(isSuccess)
+        }
+    }
+
+    private val _adDisplayCompleted: MutableLiveData<Boolean?> = MutableLiveData()
+    val adDisplayCompleted: LiveData<Boolean?> = _adDisplayCompleted
+
+    fun adDisplayCompleted(isSuccess: Boolean?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _adDisplayCompleted.postValue(isSuccess)
+        }
+    }
+
+    private val _showRewardedAds: MutableLiveData<AdTemplate?> = MutableLiveData()
+    val showRewardedAds: LiveData<AdTemplate?> = _showRewardedAds
+
+    fun showRewardedAds(adTemplate: AdTemplate?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _showRewardedAds.postValue(adTemplate)
+        }
+    }
+
+    val getActiveAdTemplate: LiveData<ActiveAdTemplate?> = adsRepository.getActiveAdTemplate
+
+    fun insertActiveAdTemplate(adTemplate: AdTemplate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val timestamp = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                System.currentTimeMillis()
+            } else {
+                Instant.now().toEpochMilli()
+            }
+            adsRepository.insertActiveAdTemplate(
+                ActiveAdTemplate(
+                    adTemplate.templateId,
+                    true,
+                    timestamp
+                )
+            )
+        }
+    }
+
+    fun deleteActiveAdsTemplate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            adsRepository.deleteActiveAdsTemplate()
+        }
+    }
+
+    private fun crossCheckRewardedAdPauseTime() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val activeAdTemplate = adsRepository.isAdTemplateActive()
+            activeAdTemplate?.let {
+                val template = AdTemplate.getPauseTimeFor(it.templateId)
+                val startTimestamp = it.enabledAt
+                val currentTimeStamp = System.currentTimeMillis()
+                val difference = currentTimeStamp - startTimestamp
+                val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
+                if (difference > checkTimeInMillis) {
+                    deleteActiveAdsTemplate()
+                } else {
+                    MainActivity.isAdTemplateActive = true
+                }
+            }
+        }
+    }
+
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
@@ -345,6 +438,7 @@ class MainViewModel(
             ON_RESUME -> {
                 generateIDToken()
                 fetchServerTime()
+                crossCheckRewardedAdPauseTime()
             }
 
             ON_PAUSE -> {

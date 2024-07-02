@@ -9,6 +9,7 @@ import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.dao.StatisticsDao
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
+import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.Dummy
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.database.models.ListConverter
@@ -48,7 +49,8 @@ import app.efficientbytes.booleanbear.models.UserProfile
         LocalCourseTopic::class,
         LocalCourseFTS::class,
         LocalWaitingListCourse::class,
-        LocalBooleanFlag::class],
+        LocalBooleanFlag::class,
+        ActiveAdTemplate::class],
     version = 1,
     exportSchema = false
 )

@@ -12,9 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
 
-class MainApplication : Application() {
+class MainApplication : Application(), KoinComponent {
 
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
@@ -53,6 +54,21 @@ class MainApplication : Application() {
         NotificationsHelper.createNotificationChannel(
             this, getString(R.string.engagements),
             getString(R.string.engagement_description),
+            enableVibration = true
+        )
+        NotificationsHelper.createNotificationChannel(
+            this,
+            getString(R.string.ad_free_content_countdown),
+            getString(R.string.notifications_showing_the_remaining_time_for_ad_free_content_this_notification_cannot_be_dismissed_until_the_ad_free_period_ends),
+            false,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        NotificationsHelper.createNotificationChannel(
+            this,
+            getString(R.string.ad_free_content_conclusion),
+            getString(R.string.notifications_indicating_the_end_of_the_ad_free_content_period_this_notification_will_alert_you_when_your_ad_free_time_has_expired),
+            false,
+            NotificationManager.IMPORTANCE_HIGH,
             enableVibration = true
         )
         val currentUser = FirebaseAuth.getInstance().currentUser

@@ -28,30 +28,47 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import app.efficientbytes.booleanbear.BuildConfig
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
+import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.AdFreeSessionService
+import app.efficientbytes.booleanbear.utils.AdFreeSessionWorker
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.absoluteValue
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -92,6 +109,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var issueCategoriesFailedToLoad = false
     private var dialog: Dialog? = null
     private var isDialogOpened: Boolean = false
+    private val workManager: WorkManager by inject()
+
+    //for ad mob rewarded ad
+    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
+    private var rewardedAd: RewardedAd? = null
+    private var adsToShow = 0
+    private var adsShown = 0
+    private var pauseRewardedAdWorkerRequest: OneTimeWorkRequest? = null
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
@@ -116,6 +141,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var isUserLoggedIn = false
         var hasListenedToIntent = false
+        var isAdLoading = false
+        var isAdTemplateActive = false
+        var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_20
+        var adPauseOverMessageDisplayed = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,7 +158,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupConnectivityListener()
         askNotificationPermission()
         setUpLiveDataObserver()
+        setUpAdMob()
         processIntent(intent)
+    }
+
+    private fun setUpAdMob() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return
+        }
+        /* // Set your test devices.
+         MobileAds.setRequestConfiguration(
+             RequestConfiguration.Builder().setTestDeviceIds(listOf("66A5C81099D40CBA1C639D1FC4181ECC")).build()
+         )*/
+        val backgroundScope = CoroutineScope(Dispatchers.IO)
+        backgroundScope.launch {
+            MobileAds.initialize(this@MainActivity) {}
+        }
     }
 
     private fun setUpLiveDataObserver() {
@@ -197,6 +241,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
+                        cancelAdFreeSessionWorker()
+                        cancelAdFreeSessionService()
+                        viewModel.deleteActiveAdsTemplate()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
                 }
@@ -217,7 +264,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
-                    currentUser?.let { user ->
+                    currentUser?.let {
                         userProfileRepository.getUserProfile()
                         viewModel.getFirebaseUserToken()
                     }
@@ -406,6 +453,79 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
+        viewModel.preLoadRewardedAdRequested.observe(this) {
+            when (it) {
+                true -> {
+                    preloadRewardedAd()
+                    viewModel.resetPreLoadRewardedAd()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+        viewModel.showRewardedAds.observe(this) {
+            when (it) {
+                null -> {
+
+                }
+
+                AdTemplate.TEMPLATE_20 -> {
+                    adsToShow = it.adsToShow
+                    showRewardedAds(adsToShow, it)
+                    viewModel.showRewardedAds(null)
+                }
+
+                AdTemplate.TEMPLATE_40 -> {
+                    adsToShow = it.adsToShow
+                    showRewardedAds(adsToShow, it)
+                    viewModel.showRewardedAds(null)
+                }
+
+                AdTemplate.TEMPLATE_60 -> {
+                    adsToShow = it.adsToShow
+                    showRewardedAds(adsToShow, it)
+                    viewModel.showRewardedAds(null)
+                }
+            }
+        }
+        viewModel.getActiveAdTemplate.observe(this) {
+            if (it != null) {
+                if (!it.isActive) {
+                    cancelAdFreeSessionWorker()
+                    cancelAdFreeSessionService()
+                } else {
+                    val template = AdTemplate.getPauseTimeFor(it.templateId)
+                    val startTimestamp = it.enabledAt
+                    val currentTimeStamp = System.currentTimeMillis()
+                    val difference = currentTimeStamp - startTimestamp
+                    val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
+                    if (difference > checkTimeInMillis) {
+                        adPauseOverMessageDisplayed = true
+                        viewModel.deleteActiveAdsTemplate()
+                    } else {
+                        adPauseOverMessageDisplayed = false
+                        isAdTemplateActive = true
+                        currentAdTemplate = AdTemplate.getPauseTimeFor(it.templateId)
+                    }
+                }
+            } else {
+                isAdTemplateActive = false
+                if (!adPauseOverMessageDisplayed) {
+                    adPauseOverMessageDisplayed = true
+                    if (FirebaseAuth.getInstance().currentUser != null) {
+                        Snackbar.make(
+                            binding.parentConstraintLayout,
+                            currentAdTemplate?.completionMessage
+                                ?: "Your ad-free period has concluded. We appreciate your support!",
+                            Snackbar.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupConnectivityListener() {
@@ -491,6 +611,124 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 binding.mainCoordinatorLayout.visibility = View.GONE
                 networkNotAvailable = true
             }
+        }
+    }
+
+    private fun preloadRewardedAd() {
+        if (isAdLoading) return
+        isAdLoading = true
+        val adRequest = AdRequest.Builder().build()
+        val adUnitId = BuildConfig.AD_MOB_UNIT_ID
+        RewardedAd.load(this, adUnitId, adRequest, object : RewardedAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                rewardedAd = null
+                isAdLoading = false
+                viewModel.onPreLoadingRewardedAdStatusChanged(false)
+            }
+
+            override fun onAdLoaded(ad: RewardedAd) {
+                rewardedAd = ad
+                isAdLoading = false
+                viewModel.onPreLoadingRewardedAdStatusChanged(true)
+            }
+        })
+
+    }
+
+    private fun showRewardedAds(count: Int, adTemplate: AdTemplate) {
+        if (count <= 0) return
+        rewardedAd?.let { ad ->
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    // Called when ad is dismissed.
+                    rewardedAd = null
+                    adsShown = 0
+                }
+
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    // Called when ad fails to show.
+                    rewardedAd = null
+                    adsShown = 0
+                    viewModel.insertActiveAdTemplate(adTemplate)
+                    viewModel.adDisplayCompleted(false)
+                    activateAdFreeSessionWorker(adTemplate)
+                    activateAdFreeSessionService(adTemplate)
+                    val rewardMessage = getString(
+                        R.string.enjoy_ad_free_contents_for_next_minutes,
+                        adTemplate.pauseTime.toString()
+                    )
+                    Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
+                        .show()
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    preloadRewardedAd()
+                    // Called when ad is shown.
+                    // This is the place to pause any background processes if needed.
+                }
+            }
+
+            ad.show(this) { _ ->
+                adsShown++
+                if (adsShown < adsToShow) {
+                    preloadRewardedAd()
+                    showRewardedAds(count - 1, adTemplate)
+                } else {
+                    adsShown = 0
+                    currentAdTemplate = adTemplate
+                    viewModel.insertActiveAdTemplate(adTemplate)
+                    viewModel.adDisplayCompleted(true)
+                    activateAdFreeSessionWorker(adTemplate)
+                    activateAdFreeSessionService(adTemplate)
+                    val rewardMessage = getString(
+                        R.string.enjoy_ad_free_contents_for_next_minutes,
+                        adTemplate.pauseTime.toString()
+                    )
+                    Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+        } ?: run {
+            adsShown = 0
+            viewModel.adDisplayCompleted(false)
+        }
+    }
+
+    private fun activateAdFreeSessionWorker(adTemplate: AdTemplate) {
+        viewModel.deleteActiveAdsTemplate()
+        cancelAdFreeSessionWorker()
+        pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<AdFreeSessionWorker>()
+            .setInitialDelay(adTemplate.pauseTime, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueue(pauseRewardedAdWorkerRequest!!)
+    }
+
+    private fun cancelAdFreeSessionWorker() {
+        pauseRewardedAdWorkerRequest?.let {
+            workManager.cancelWorkById(it.id)
+            pauseRewardedAdWorkerRequest = null
+        }
+    }
+
+    private fun activateAdFreeSessionService(adTemplate: AdTemplate) {
+        Intent(this@MainActivity, AdFreeSessionService::class.java).also {
+            it.action = AdFreeSessionService.IntentAction.START_SERVICE.toString()
+            it.putExtra(
+                AdFreeSessionService.EXTRA_PAUSE_DURATION_IN_MINUTES,
+                adTemplate.pauseTime
+            )
+            it.putExtra(
+                AdFreeSessionService.EXTRA_CONCLUSION_MESSAGE,
+                adTemplate.completionMessage
+            )
+            ContextCompat.startForegroundService(this@MainActivity, it)
+        }
+    }
+
+    private fun cancelAdFreeSessionService() {
+        Intent(this, AdFreeSessionService::class.java).also {
+            it.action = AdFreeSessionService.IntentAction.STOP_SERVICE.toString()
+            startService(it)
         }
     }
 
