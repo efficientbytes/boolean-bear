@@ -107,9 +107,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <service
             android:name=".services.PauseRewardedAdForegroundService"
-            android:exported="false"
             android:foregroundServiceType="shortService" />
 
         <meta-data

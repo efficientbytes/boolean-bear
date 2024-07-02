@@ -1,10 +1,13 @@
 package app.efficientbytes.booleanbear.services
 
 import android.Manifest
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.IBinder
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,58 +24,82 @@ class PauseRewardedAdForegroundService : LifecycleService() {
 
     companion object {
 
-        const val ACTION_STOP_SERVICE = "stop_countdown_service"
-        const val EXTRA_PAUSE_DURATION = "extra_pause_duration"
+        const val EXTRA_PAUSE_DURATION_IN_MILLIS = "extra_pause_duration_in_millis"
         const val EXTRA_CONCLUSION_MESSAGE = "extra_conclusion_message"
+        const val EXTRA_PAUSE_DURATION_IN_MINUTES = "extra_pause_duration_in_minutes"
+        const val PROGRESS_NOTIFICATION_ID = 1
+        const val CONCLUSION_NOTIFICATION_ID = 2
+
     }
 
-    private var pauseDurationInMillis = 0L
-    private var endMessage = ""
+    enum class IntentAction {
+        START_SERVICE,
+        STOP_SERVICE
+    }
 
+    private var isServiceRunning = false
+    private var pauseDurationInMinutes: Long = 0L
+    private var pauseDurationInMillis: Long = 0L
+    private var conclusionMessage: String? = null
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        if (intent?.action == ACTION_STOP_SERVICE) {
-            stopForeground(true)
-            NotificationManagerCompat.from(this).cancel(123)
-            stopService()
-            return START_NOT_STICKY
-        }
-        val pauseDurationInMinutes = intent?.getLongExtra(EXTRA_PAUSE_DURATION, 0L)
-        endMessage = intent?.getStringExtra(EXTRA_CONCLUSION_MESSAGE)
-            ?: "Your ad-free period has concluded. We appreciate your support!"
-
-        if (pauseDurationInMinutes == null || pauseDurationInMinutes <= 0) {
-            stopService()
-            return START_NOT_STICKY
-        }
-
-        pauseDurationInMillis = TimeUnit.MINUTES.toMillis(pauseDurationInMinutes)
-
-        startForeground(123, showCountdownNotification().build())
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            var timeLeft = pauseDurationInMillis
-            while (timeLeft > 0) {
-                updateCountdownNotification(timeLeft)
-                delay(1000)
-                timeLeft -= 1000
+        when (intent?.action) {
+            IntentAction.START_SERVICE.toString() -> {
+                if (isServiceRunning) {
+                    isServiceRunning = false
+                    NotificationManagerCompat.from(this).cancel(PROGRESS_NOTIFICATION_ID)
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+                pauseDurationInMinutes = intent.getLongExtra(EXTRA_PAUSE_DURATION_IN_MINUTES, 0L)
+                conclusionMessage = intent.getStringExtra(EXTRA_CONCLUSION_MESSAGE)
+                pauseDurationInMillis = TimeUnit.MINUTES.toMillis(pauseDurationInMinutes)
+                try {
+                    startCountdown()
+                    startForeground(
+                        PROGRESS_NOTIFICATION_ID,
+                        createTimeRemainingNotification().build()
+                    )
+                } catch (e: Exception) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && e is ForegroundServiceStartNotAllowedException
+                    ) {
+                    }
+                }
             }
-            showConclusionNotification()
-            stopService()
+
+            IntentAction.STOP_SERVICE.toString() -> {
+                NotificationManagerCompat.from(this).cancel(PROGRESS_NOTIFICATION_ID)
+                isServiceRunning = false
+                stopSelf()
+                return START_NOT_STICKY
+            }
         }
         return START_STICKY
     }
 
+    private fun startCountdown() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            var timeLeft = pauseDurationInMillis
+            while (timeLeft > 0) {
+                updateTimeRemainingNotification(timeLeft)
+                delay(1000)
+                timeLeft -= 1000
+            }
+            NotificationManagerCompat.from(this@PauseRewardedAdForegroundService)
+                .cancel(PROGRESS_NOTIFICATION_ID)
+            showConclusionNotification()
+            stopSelf()
+        }
+    }
+
     override fun onBind(intent: Intent): IBinder? {
-        return super.onBind(intent)
+        super.onBind(intent)
+        return null
     }
 
-    private fun stopService() {
-        stopForeground(true)
-        stopSelf()
-    }
-
-    private fun showCountdownNotification(): NotificationCompat.Builder {
+    private fun createTimeRemainingNotification(): NotificationCompat.Builder {
         return NotificationCompat.Builder(
             this,
             NotificationsHelper.channelId(this, getString(R.string.ad_free_content_countdown))
@@ -93,9 +120,9 @@ class PauseRewardedAdForegroundService : LifecycleService() {
 
     }
 
-    private fun updateCountdownNotification(timeLeftMillis: Long) {
+    private fun updateTimeRemainingNotification(timeLeftMillis: Long) {
         val minutesLeft = TimeUnit.MILLISECONDS.toMinutes(timeLeftMillis)
-        val notification = showCountdownNotification()
+        val notification = createTimeRemainingNotification()
             .setContentText("$minutesLeft minutes remaining")
             .setProgress(pauseDurationInMillis.toInt(), timeLeftMillis.toInt(), false)
             .build()
@@ -106,7 +133,7 @@ class PauseRewardedAdForegroundService : LifecycleService() {
         ) {
             return
         }
-        NotificationManagerCompat.from(this).notify(123, notification)
+        NotificationManagerCompat.from(this).notify(PROGRESS_NOTIFICATION_ID, notification)
     }
 
     private fun showConclusionNotification() {
@@ -122,7 +149,7 @@ class PauseRewardedAdForegroundService : LifecycleService() {
             )
             .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentTitle("Ad-Free session is over")
-            .setContentText(endMessage)
+            .setContentText(conclusionMessage)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
@@ -134,8 +161,7 @@ class PauseRewardedAdForegroundService : LifecycleService() {
         ) {
             return
         }
-        NotificationManagerCompat.from(this).notify(124, notification)
+        NotificationManagerCompat.from(this).notify(CONCLUSION_NOTIFICATION_ID, notification)
     }
-
 
 }

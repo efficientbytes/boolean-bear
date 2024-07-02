@@ -11,8 +11,8 @@ enum class AdTemplate(
     TEMPLATE_20(
         templateName = "Template20",
         templateId = "t20",
-        pauseTime = 20,
-        adsToShow = 3,
+        pauseTime = 2,
+        adsToShow = 1,
         completionMessage = "Your 20-minute ad-free session has concluded.",
     ),
     TEMPLATE_40(

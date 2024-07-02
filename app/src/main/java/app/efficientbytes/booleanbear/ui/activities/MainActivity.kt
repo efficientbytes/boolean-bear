@@ -142,7 +142,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         var isUserLoggedIn = false
         var hasListenedToIntent = false
-        val testAdUnitId = "ca-app-pub-3940256099942544/5224354917"
         var isAdLoading = false
         var isAdTemplateActive = false
         var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_20
@@ -494,18 +493,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         viewModel.getActiveAdTemplate.observe(this) {
             if (it != null) {
-                val template = AdTemplate.getPauseTimeFor(it.templateId)
-                val startTimestamp = it.enabledAt
-                val currentTimeStamp = System.currentTimeMillis()
-                val difference = currentTimeStamp - startTimestamp
-                val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
-                if (difference > checkTimeInMillis) {
-                    adPauseOverMessageDisplayed = true
-                    viewModel.deleteActiveAdsTemplate()
+                if (!it.isActive) {
+                    cancelRewardedAdWorker()
+                    cancelRewardedAdForegroundService()
                 } else {
-                    adPauseOverMessageDisplayed = false
-                    isAdTemplateActive = true
-                    currentAdTemplate = AdTemplate.getPauseTimeFor(it.templateId)
+                    val template = AdTemplate.getPauseTimeFor(it.templateId)
+                    val startTimestamp = it.enabledAt
+                    val currentTimeStamp = System.currentTimeMillis()
+                    val difference = currentTimeStamp - startTimestamp
+                    val checkTimeInMillis = TimeUnit.MINUTES.toMillis(template.pauseTime)
+                    if (difference > checkTimeInMillis) {
+                        adPauseOverMessageDisplayed = true
+                        viewModel.deleteActiveAdsTemplate()
+                    } else {
+                        adPauseOverMessageDisplayed = false
+                        isAdTemplateActive = true
+                        currentAdTemplate = AdTemplate.getPauseTimeFor(it.templateId)
+                    }
                 }
             } else {
                 isAdTemplateActive = false
@@ -692,6 +696,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun pauseRewardedAdWorker(adTemplate: AdTemplate) {
+        viewModel.deleteActiveAdsTemplate()
+        cancelRewardedAdWorker()
         pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<PauseRewardedAdWorker>()
             .setInitialDelay(adTemplate.pauseTime, TimeUnit.MINUTES)
             .build()
@@ -706,24 +712,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun startPauseRewardedAdForegroundService(adTemplate: AdTemplate) {
-        val intent = Intent(this@MainActivity, PauseRewardedAdForegroundService::class.java).apply {
-            putExtra(
-                PauseRewardedAdForegroundService.EXTRA_PAUSE_DURATION,
+        Intent(this@MainActivity, PauseRewardedAdForegroundService::class.java).also {
+            it.action = PauseRewardedAdForegroundService.IntentAction.START_SERVICE.toString()
+            it.putExtra(
+                PauseRewardedAdForegroundService.EXTRA_PAUSE_DURATION_IN_MINUTES,
                 adTemplate.pauseTime
             )
-            putExtra(
+            it.putExtra(
                 PauseRewardedAdForegroundService.EXTRA_CONCLUSION_MESSAGE,
                 adTemplate.completionMessage
             )
+            ContextCompat.startForegroundService(this@MainActivity, it)
         }
-        ContextCompat.startForegroundService(this@MainActivity, intent)
     }
 
     private fun cancelRewardedAdForegroundService() {
-        val intent = Intent(this, PauseRewardedAdForegroundService::class.java).apply {
-            action = PauseRewardedAdForegroundService.ACTION_STOP_SERVICE
+        Intent(this, PauseRewardedAdForegroundService::class.java).also {
+            it.action = PauseRewardedAdForegroundService.IntentAction.STOP_SERVICE.toString()
+            startService(it)
         }
-        startService(intent)
     }
 
     private fun setupNavigation() {
