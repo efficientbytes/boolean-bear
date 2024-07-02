@@ -41,10 +41,10 @@ import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.PauseRewardedAdForegroundService
+import app.efficientbytes.booleanbear.services.AdFreeSessionService
+import app.efficientbytes.booleanbear.utils.AdFreeSessionWorker
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
-import app.efficientbytes.booleanbear.utils.PauseRewardedAdWorker
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -54,7 +54,6 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.material.button.MaterialButton
@@ -242,8 +241,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()
-                        cancelRewardedAdWorker()
-                        cancelRewardedAdForegroundService()
+                        cancelAdFreeSessionWorker()
+                        cancelAdFreeSessionService()
                         viewModel.deleteActiveAdsTemplate()
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
@@ -265,7 +264,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
-                    currentUser?.let { user ->
+                    currentUser?.let {
                         userProfileRepository.getUserProfile()
                         viewModel.getFirebaseUserToken()
                     }
@@ -494,8 +493,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         viewModel.getActiveAdTemplate.observe(this) {
             if (it != null) {
                 if (!it.isActive) {
-                    cancelRewardedAdWorker()
-                    cancelRewardedAdForegroundService()
+                    cancelAdFreeSessionWorker()
+                    cancelAdFreeSessionService()
                 } else {
                     val template = AdTemplate.getPauseTimeFor(it.templateId)
                     val startTimestamp = it.enabledAt
@@ -652,8 +651,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     adsShown = 0
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(false)
-                    pauseRewardedAdWorker(adTemplate)
-                    startPauseRewardedAdForegroundService(adTemplate)
+                    activateAdFreeSessionWorker(adTemplate)
+                    activateAdFreeSessionService(adTemplate)
                     val rewardMessage = getString(
                         R.string.enjoy_ad_free_contents_for_next_minutes,
                         adTemplate.pauseTime.toString()
@@ -669,7 +668,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            ad.show(this, OnUserEarnedRewardListener { _ ->
+            ad.show(this) { _ ->
                 adsShown++
                 if (adsShown < adsToShow) {
                     preloadRewardedAd()
@@ -679,8 +678,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     currentAdTemplate = adTemplate
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(true)
-                    pauseRewardedAdWorker(adTemplate)
-                    startPauseRewardedAdForegroundService(adTemplate)
+                    activateAdFreeSessionWorker(adTemplate)
+                    activateAdFreeSessionService(adTemplate)
                     val rewardMessage = getString(
                         R.string.enjoy_ad_free_contents_for_next_minutes,
                         adTemplate.pauseTime.toString()
@@ -688,47 +687,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
                         .show()
                 }
-            })
+            }
         } ?: run {
             adsShown = 0
             viewModel.adDisplayCompleted(false)
         }
     }
 
-    fun pauseRewardedAdWorker(adTemplate: AdTemplate) {
+    private fun activateAdFreeSessionWorker(adTemplate: AdTemplate) {
         viewModel.deleteActiveAdsTemplate()
-        cancelRewardedAdWorker()
-        pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<PauseRewardedAdWorker>()
+        cancelAdFreeSessionWorker()
+        pauseRewardedAdWorkerRequest = OneTimeWorkRequestBuilder<AdFreeSessionWorker>()
             .setInitialDelay(adTemplate.pauseTime, TimeUnit.MINUTES)
             .build()
         workManager.enqueue(pauseRewardedAdWorkerRequest!!)
     }
 
-    fun cancelRewardedAdWorker() {
+    private fun cancelAdFreeSessionWorker() {
         pauseRewardedAdWorkerRequest?.let {
             workManager.cancelWorkById(it.id)
             pauseRewardedAdWorkerRequest = null
         }
     }
 
-    fun startPauseRewardedAdForegroundService(adTemplate: AdTemplate) {
-        Intent(this@MainActivity, PauseRewardedAdForegroundService::class.java).also {
-            it.action = PauseRewardedAdForegroundService.IntentAction.START_SERVICE.toString()
+    private fun activateAdFreeSessionService(adTemplate: AdTemplate) {
+        Intent(this@MainActivity, AdFreeSessionService::class.java).also {
+            it.action = AdFreeSessionService.IntentAction.START_SERVICE.toString()
             it.putExtra(
-                PauseRewardedAdForegroundService.EXTRA_PAUSE_DURATION_IN_MINUTES,
+                AdFreeSessionService.EXTRA_PAUSE_DURATION_IN_MINUTES,
                 adTemplate.pauseTime
             )
             it.putExtra(
-                PauseRewardedAdForegroundService.EXTRA_CONCLUSION_MESSAGE,
+                AdFreeSessionService.EXTRA_CONCLUSION_MESSAGE,
                 adTemplate.completionMessage
             )
             ContextCompat.startForegroundService(this@MainActivity, it)
         }
     }
 
-    private fun cancelRewardedAdForegroundService() {
-        Intent(this, PauseRewardedAdForegroundService::class.java).also {
-            it.action = PauseRewardedAdForegroundService.IntentAction.STOP_SERVICE.toString()
+    private fun cancelAdFreeSessionService() {
+        Intent(this, AdFreeSessionService::class.java).also {
+            it.action = AdFreeSessionService.IntentAction.STOP_SERVICE.toString()
             startService(it)
         }
     }

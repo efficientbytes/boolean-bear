@@ -109,7 +109,7 @@
         </service>
 
         <service
-            android:name=".services.PauseRewardedAdForegroundService"
+            android:name=".services.AdFreeSessionService"
             android:foregroundServiceType="shortService" />
 
         <meta-data

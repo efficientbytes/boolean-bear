@@ -20,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class PauseRewardedAdForegroundService : LifecycleService() {
+class AdFreeSessionService : LifecycleService() {
 
     companion object {
 
@@ -87,7 +87,7 @@ class PauseRewardedAdForegroundService : LifecycleService() {
                 delay(1000)
                 timeLeft -= 1000
             }
-            NotificationManagerCompat.from(this@PauseRewardedAdForegroundService)
+            NotificationManagerCompat.from(this@AdFreeSessionService)
                 .cancel(PROGRESS_NOTIFICATION_ID)
             showConclusionNotification()
             stopSelf()
