@@ -404,6 +404,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         binding.suggestedContentCardView.setOnClickListener {
             nextSuggestedContentId?.let { reelId ->
+                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
+                    mainViewModel.preLoadRewardedAd()
+                }
                 clearStartPosition()
                 isPlayingSuggested = true
                 this@ReelPlayerFragment.reelId = reelId
