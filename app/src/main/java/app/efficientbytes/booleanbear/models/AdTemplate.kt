@@ -1,5 +1,7 @@
 package app.efficientbytes.booleanbear.models
 
+import app.efficientbytes.booleanbear.BuildConfig
+
 enum class AdTemplate(
     val templateName: String,
     val templateId: String,
@@ -11,22 +13,22 @@ enum class AdTemplate(
     TEMPLATE_20(
         templateName = "Template20",
         templateId = "t20",
-        pauseTime = 2,
-        adsToShow = 1,
+        pauseTime = BuildConfig.t20PauseTime,
+        adsToShow = BuildConfig.t20AdsToShow,
         completionMessage = "Your 20-minute ad-free session has concluded.",
     ),
     TEMPLATE_40(
         templateName = "Template40",
         templateId = "t40",
-        pauseTime = 40,
-        adsToShow = 5,
+        pauseTime = BuildConfig.t40PauseTime,
+        adsToShow = BuildConfig.t40AdsToShow,
         completionMessage = "Your 40-minute ad-free session has concluded.",
     ),
     TEMPLATE_60(
         templateName = "Template60",
         templateId = "t60",
-        pauseTime = 60,
-        adsToShow = 7,
+        pauseTime = BuildConfig.t60PauseTime,
+        adsToShow = BuildConfig.t60AdsToShow,
         completionMessage = "Your 1 hour ad-free session has concluded.",
     );
 

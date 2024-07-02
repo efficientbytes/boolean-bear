@@ -23,12 +23,56 @@ android {
     }
 
     buildTypes {
+        val debugT20PauseTime = 2L
+        val debugT20AdsToShow = 1
+        val debugT40PauseTime = 3L
+        val debugT40AdsToShow = 2
+        val debugT60PauseTime = 4L
+        val debugT60AdsToShow = 3
+        val releaseT20PauseTime = 20L
+        val releaseT20AdsToShow = 3
+        val releaseT40PauseTime = 40L
+        val releaseT40AdsToShow = 5
+        val releaseT60PauseTime = 60L
+        val releaseT60AdsToShow = 7
+
+
         release {
             manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
             buildConfigField(
                 "String",
                 "AD_MOB_UNIT_ID",
                 "\"ca-app-pub-2509573406487029/9481911106\""
+            )
+            buildConfigField(
+                "long",
+                "t20PauseTime",
+                "$releaseT20PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t20AdsToShow",
+                "$releaseT20AdsToShow"
+            )
+            buildConfigField(
+                "long",
+                "t40PauseTime",
+                "$releaseT40PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t40AdsToShow",
+                "$releaseT40AdsToShow"
+            )
+            buildConfigField(
+                "long",
+                "t60PauseTime",
+                "$releaseT60PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t60AdsToShow",
+                "$releaseT60AdsToShow"
             )
             isMinifyEnabled = false
             proguardFiles(
@@ -43,12 +87,42 @@ android {
                 "AD_MOB_UNIT_ID",
                 "\"ca-app-pub-3940256099942544/5224354917\""
             )
-          /*  manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
             buildConfigField(
-                "String",
-                "AD_MOB_UNIT_ID",
-                "\"ca-app-pub-2509573406487029/9481911106\""
-            )*/
+                "long",
+                "t20PauseTime",
+                "$debugT20PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t20AdsToShow",
+                "$debugT20AdsToShow"
+            )
+            buildConfigField(
+                "long",
+                "t40PauseTime",
+                "$debugT40PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t40AdsToShow",
+                "$debugT40AdsToShow"
+            )
+            buildConfigField(
+                "long",
+                "t60PauseTime",
+                "$debugT60PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t60AdsToShow",
+                "$debugT60AdsToShow"
+            )
+            /*  manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
+              buildConfigField(
+                  "String",
+                  "AD_MOB_UNIT_ID",
+                  "\"ca-app-pub-2509573406487029/9481911106\""
+              )*/
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
