@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
@@ -83,6 +84,12 @@ object NotificationsHelper {
         val builder = when (bigTextStyle) {
             true -> {
                 NotificationCompat.Builder(context, channelId)
+                    .setLargeIcon(
+                        BitmapFactory.decodeResource(
+                            context.resources,
+                            R.drawable.app_logo_type_rounded_corners_no_name_black_backgroundboolean_bear_logo
+                        )
+                    )
                     .setSmallIcon(R.mipmap.ic_launcher_round)
                     .setContentTitle(title)
                     .setContentText(body)
