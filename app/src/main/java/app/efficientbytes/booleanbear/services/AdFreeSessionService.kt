@@ -2,6 +2,7 @@ package app.efficientbytes.booleanbear.services
 
 import android.Manifest
 import android.app.ForegroundServiceStartNotAllowedException
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -14,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import app.efficientbytes.booleanbear.R
+import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -125,6 +127,7 @@ class AdFreeSessionService : LifecycleService() {
         val notification = createTimeRemainingNotification()
             .setContentText("$minutesLeft minutes remaining")
             .setProgress(pauseDurationInMillis.toInt(), timeLeftMillis.toInt(), false)
+            .setContentIntent(getMainActivityPendingIntent())
             .build()
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -163,5 +166,21 @@ class AdFreeSessionService : LifecycleService() {
         }
         NotificationManagerCompat.from(this).notify(CONCLUSION_NOTIFICATION_ID, notification)
     }
+
+    private fun getMainActivityPendingIntent() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            )
+        } else {
+            PendingIntent.getActivity(
+                this,
+                0, Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
 
 }
