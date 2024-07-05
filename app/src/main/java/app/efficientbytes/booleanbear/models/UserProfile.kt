@@ -8,6 +8,9 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 @Entity(tableName = USER_PROFILE_TABLE)
 data class UserProfile(
+    val username: String? = null,
+    val profileImage: String? = null,
+    val coverImage: String? = null,
     var firstName: String? = null,
     var phoneNumber: String,
     var phoneNumberPrefix: String,

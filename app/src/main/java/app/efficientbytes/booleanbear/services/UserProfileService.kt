@@ -16,6 +16,9 @@ interface UserProfileService {
     @POST("user/account/profile/basic-details/update")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfileBasicDetails(
+        @Field("username") username: String? = null,
+        @Field("profileImage") profileImage: String? = null,
+        @Field("coverImage") coverImage: String? = null,
         @Field("firstName") firstName: String? = null,
         @Field("phoneNumber") phoneNumber: String,
         @Field("phoneNumberPrefix") phoneNumberPrefix: String,
@@ -36,6 +39,9 @@ interface UserProfileService {
     @POST("user/account/profile/update")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     suspend fun updateUserPrivateProfile(
+        @Field("username") username: String? = null,
+        @Field("profileImage") profileImage: String? = null,
+        @Field("coverImage") coverImage: String? = null,
         @Field("firstName") firstName: String? = null,
         @Field("phoneNumber") phoneNumber: String,
         @Field("phoneNumberPrefix") phoneNumberPrefix: String,

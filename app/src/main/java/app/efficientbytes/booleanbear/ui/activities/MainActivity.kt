@@ -556,6 +556,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.fetchServerTime()
                         }
                         if (currentUser != null) {
+                            viewModel.getFirebaseUserToken()
                             viewModel.getSingleDeviceLogin()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
