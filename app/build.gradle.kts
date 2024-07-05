@@ -38,11 +38,11 @@ android {
 
 
         release {
-            manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
+            manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-3322823953213363~4274273300"
             buildConfigField(
                 "String",
                 "AD_MOB_UNIT_ID",
-                "\"ca-app-pub-2509573406487029/9481911106\""
+                "\"ca-app-pub-3322823953213363/7349661652\""
             )
             buildConfigField(
                 "long",
