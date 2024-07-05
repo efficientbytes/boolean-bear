@@ -54,6 +54,7 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
                 category = requestSupport.category,
                 prefix = requestSupport.prefix,
                 phoneNumber = requestSupport.phoneNumber,
+                completePhoneNumber = requestSupport.completePhoneNumber,
                 userAccountId = requestSupport.userAccountId
             )
             val responseCode = response.code()

@@ -212,4 +212,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.1.0")
     //work manager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    //country code picker
+    implementation ("com.hbb20:ccp:2.5.0")
 }

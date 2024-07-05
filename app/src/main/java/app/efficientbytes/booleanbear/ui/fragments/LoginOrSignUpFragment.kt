@@ -18,7 +18,6 @@ import androidx.navigation.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.utils.validatePhoneNumberFormat
 import app.efficientbytes.booleanbear.viewmodels.LoginOrSignUpViewModel
 import org.koin.android.ext.android.inject
 
@@ -28,6 +27,7 @@ class LoginOrSignUpFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val viewModel: LoginOrSignUpViewModel by inject()
+    private var pageOpenedForFirstTime = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,7 +91,9 @@ class LoginOrSignUpFragment : Fragment() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                binding.phoneNumberTextInputLayout.error = null
+                if (binding.phoneNumberTextInputEditText.text?.isEmpty() == true) {
+                    binding.phoneNumberTextInputLayout.error = null
+                }
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -99,11 +101,42 @@ class LoginOrSignUpFragment : Fragment() {
 
         })
 
+        binding.countryCodePicker.registerCarrierNumberEditText(binding.phoneNumberTextInputEditText)
+
+        binding.countryCodePicker.setPhoneNumberValidityChangeListener {
+            when (it) {
+                true -> {
+                    binding.phoneNumberTextInputLayout.error = null
+                }
+
+                false -> {
+                    if (pageOpenedForFirstTime) {
+                        pageOpenedForFirstTime = false
+                    } else {
+                        if (binding.phoneNumberTextInputEditText.text?.isEmpty() == false) binding.phoneNumberTextInputLayout.error =
+                            "Invalid phone number format"
+                    }
+                }
+            }
+        }
+
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberTextInputEditText.text.toString()
-            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                viewModel.getLoginMode(prefix = "+91", phoneNumber = input)
+            if (input.isBlank()) {
+                binding.phoneNumberTextInputLayout.error = "Please enter phone number to continue."
+                return@setOnClickListener
             }
+            if (!binding.countryCodePicker.isValidFullNumber) {
+                binding.phoneNumberTextInputLayout.error = "Invalid phone number format"
+                return@setOnClickListener
+            }
+            val prefix = binding.countryCodePicker.selectedCountryCode
+            val prefixWithPlus = "+".plus(prefix)
+            val fullPhoneNumber = binding.countryCodePicker.fullNumber
+            viewModel.getLoginMode(
+                prefix = prefixWithPlus,
+                phoneNumber = fullPhoneNumber.removeRange(0, prefix.length)
+            )
         }
 
         viewModel.loginMode.observe(viewLifecycleOwner) {

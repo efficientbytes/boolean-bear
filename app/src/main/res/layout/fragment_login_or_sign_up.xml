@@ -114,17 +114,45 @@
 
             </com.google.android.material.textview.MaterialTextView>
 
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/countryCodePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                app:ccpDialog_allowSearch="true"
+                app:ccpDialog_backgroundColor="@color/white"
+                app:ccpDialog_cornerRadius="6dp"
+                app:ccpDialog_fastScroller_handleColor="@color/md_theme_primary"
+                app:ccpDialog_searchEditTextTint="@color/black_1200"
+                app:ccpDialog_showFastScroller="true"
+                app:ccpDialog_showFlag="false"
+                app:ccpDialog_showTitle="false"
+                app:ccpDialog_textColor="@color/black_1200"
+                app:ccp_arrowColor="@color/white"
+                app:ccp_autoFormatNumber="true"
+                app:ccp_contentColor="@color/white"
+                app:ccp_showArrow="true"
+                app:ccp_showFlag="false"
+                app:ccp_showNameCode="false"
+                app:layout_constraintBottom_toBottomOf="@id/phoneNumberTextInputLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/phoneNumberTextInputLayout">
+
+            </com.hbb20.CountryCodePicker>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/phoneNumberTextInputLayout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
                 android:fontFamily="@font/montserrat"
                 android:longClickable="false"
-                android:maxLength="10"
                 android:paddingHorizontal="4dp"
+                android:scrollbarSize="0dp"
+                android:scrollbars="horizontal"
                 app:boxCornerRadiusBottomEnd="4dp"
                 app:boxCornerRadiusBottomStart="4dp"
                 app:boxCornerRadiusTopEnd="4dp"
@@ -133,18 +161,16 @@
                 app:hintAnimationEnabled="false"
                 app:hintEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/enterPhoneNumberLabelTextView"
-                app:prefixText="+ 91"
-                app:prefixTextColor="@color/white">
+                app:layout_constraintStart_toEndOf="@id/countryCodePicker"
+                app:layout_constraintTop_toBottomOf="@id/enterPhoneNumberLabelTextView">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/phoneNumberTextInputEditText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:inputType="phone"
                     android:longClickable="false"
-                    android:maxLength="10"
                     android:textColor="@color/white">
 
                 </com.google.android.material.textfield.TextInputEditText>
@@ -156,11 +182,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
                 android:paddingHorizontal="8dp"
                 android:textSize="11sp"
-                app:layout_constraintEnd_toEndOf="@id/phoneNumberTextInputLayout"
-                app:layout_constraintStart_toStartOf="@id/phoneNumberTextInputLayout"
-                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
+                app:layout_constraintEnd_toEndOf="@id/continueButton"
+                app:layout_constraintStart_toStartOf="@id/continueButton"
+                app:layout_constraintTop_toBottomOf="@id/continueButton">
 
             </com.google.android.material.textview.MaterialTextView>
 
@@ -175,7 +202,7 @@
                 app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/policyNConditionsLabelTextView">
+                app:layout_constraintTop_toBottomOf="@id/phoneNumberTextInputLayout">
 
             </com.google.android.material.button.MaterialButton>
 

@@ -108,6 +108,7 @@ class VerifyReporterFragment : Fragment() {
                             userAccountId = null
                             prefix = phoneNumberData.prefix
                             phoneNumber = phoneNumberData.phoneNumber
+                            completePhoneNumber = prefix+phoneNumber
                         }
                     }
                     singletonRequestSupport?.let { requestSupport ->

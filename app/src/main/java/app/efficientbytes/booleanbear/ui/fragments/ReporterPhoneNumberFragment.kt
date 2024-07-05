@@ -14,7 +14,6 @@ import app.efficientbytes.booleanbear.databinding.FragmentReporterPhoneNumberBin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SingletonRequestSupport
-import app.efficientbytes.booleanbear.utils.validatePhoneNumberFormat
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
@@ -25,6 +24,7 @@ class ReporterPhoneNumberFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val mainViewModel: MainViewModel by inject()
+    private var pageOpenedForFirstTime = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +41,7 @@ class ReporterPhoneNumberFragment : Fragment() {
         val currentUser = FirebaseAuth.getInstance().currentUser
 
         if (currentUser != null) {
+            binding.countryCodePicker.visibility = View.GONE
             binding.phoneNumberVerifiedMessageLabelTextView.visibility = View.VISIBLE
 
             binding.phoneNumberTextInputLayout.prefixText =
@@ -60,13 +61,33 @@ class ReporterPhoneNumberFragment : Fragment() {
                     userAccountId = userProfile.userAccountId
                     prefix = userProfile.phoneNumberPrefix
                     phoneNumber = userProfile.phoneNumber
+                    completePhoneNumber = prefix + phoneNumber
                 }
             }
         } else {
-            binding.phoneNumberTextInputLayout.prefixText = "+91"
+            binding.countryCodePicker.visibility = View.VISIBLE
             binding.phoneNumberVerifiedMessageLabelTextView.visibility = View.GONE
             binding.continueButton.visibility = View.VISIBLE
             binding.submitButton.visibility = View.GONE
+
+            binding.countryCodePicker.registerCarrierNumberEditText(binding.phoneNumberInputEditText)
+            binding.countryCodePicker.setPhoneNumberValidityChangeListener {
+                when (it) {
+                    true -> {
+                        binding.phoneNumberTextInputLayout.error = null
+                    }
+
+                    false -> {
+                        if (pageOpenedForFirstTime) {
+                            pageOpenedForFirstTime = false
+                        } else {
+                            if (binding.phoneNumberInputEditText.text?.isEmpty() == false) binding.phoneNumberTextInputLayout.error =
+                                "Invalid phone number format"
+                        }
+                    }
+                }
+            }
+
         }
 
         binding.submitButton.setOnClickListener {
@@ -79,9 +100,21 @@ class ReporterPhoneNumberFragment : Fragment() {
 
         binding.continueButton.setOnClickListener {
             val input = binding.phoneNumberInputEditText.text.toString()
-            if (validatePhoneNumberFormat(binding.phoneNumberTextInputLayout, input)) {
-                mainViewModel.sendOTPToPhoneNumber(prefix = "+91", phoneNumber = input)
+            if (input.isBlank()) {
+                binding.phoneNumberTextInputLayout.error = "Please enter phone number to continue."
+                return@setOnClickListener
             }
+            if (!binding.countryCodePicker.isValidFullNumber) {
+                binding.phoneNumberTextInputLayout.error = "Invalid phone number format"
+                return@setOnClickListener
+            }
+            val prefix = binding.countryCodePicker.selectedCountryCode
+            val prefixWithPlus = "+".plus(prefix)
+            val fullPhoneNumber = binding.countryCodePicker.fullNumber
+            mainViewModel.sendOTPToPhoneNumber(
+                prefix = prefixWithPlus,
+                phoneNumber = fullPhoneNumber.removeRange(0, prefix.length)
+            )
         }
 
         binding.phoneNumberInputEditText.addTextChangedListener(object : TextWatcher {
@@ -89,7 +122,9 @@ class ReporterPhoneNumberFragment : Fragment() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                binding.phoneNumberTextInputLayout.error = null
+                if (binding.phoneNumberInputEditText.text?.isEmpty() == true) {
+                    binding.phoneNumberTextInputLayout.error = null
+                }
             }
 
             override fun afterTextChanged(p0: Editable?) {
