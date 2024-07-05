@@ -84,6 +84,9 @@ class UserProfileRepository(
         try {
             emit(DataStatus.loading<UserProfile>())
             val response = userProfileService.updateUserPrivateProfileBasicDetails(
+                userProfile.username,
+                userProfile.profileImage,
+                userProfile.coverImage,
                 userProfile.firstName,
                 userProfile.phoneNumber,
                 userProfile.phoneNumberPrefix,
@@ -133,6 +136,9 @@ class UserProfileRepository(
         try {
             emit(DataStatus.loading())
             val response = userProfileService.updateUserPrivateProfile(
+                userProfile.username,
+                userProfile.profileImage,
+                userProfile.coverImage,
                 userProfile.firstName,
                 userProfile.phoneNumber,
                 userProfile.phoneNumberPrefix,

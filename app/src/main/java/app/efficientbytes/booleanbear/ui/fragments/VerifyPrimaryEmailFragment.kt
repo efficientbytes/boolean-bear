@@ -22,8 +22,10 @@ import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
+import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class VerifyPrimaryEmailFragment : Fragment() {
 
@@ -32,6 +34,7 @@ class VerifyPrimaryEmailFragment : Fragment() {
     private lateinit var rootView: View
     private val safeArgs: VerifyPrimaryEmailFragmentArgs by navArgs()
     private val viewModel: EditProfileFieldViewModel by inject()
+    private val mainViewModel by activityViewModel<MainViewModel>()
     private var emailSentMessage: String = ""
 
     override fun onCreateView(
@@ -217,6 +220,25 @@ class VerifyPrimaryEmailFragment : Fragment() {
                 emailAppLauncherIntents.toTypedArray()
             )
             startActivity(chooserIntent)
+        }
+
+        mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    it.data?.let { token ->
+                        if (source != 2) {
+                            val isEmailVerified = token.claims["emailVerified"]
+                            if (isEmailVerified is Boolean && isEmailVerified == true) {
+                                findNavController().popBackStack(R.id.homeFragment, false)
+                            }
+                        }
+                    }
+                }
+
+                else -> {
+
+                }
+            }
         }
 
     }

@@ -73,7 +73,7 @@
     <string name="we_collect_your_phone_number_so_that_we_can_give_you_a_call_back_to_effectively_resolve_the_issue_you_ve_raised">We collect your phone number so that we can give you a call back to effectively resolve the issue you\'ve raised.</string>
     <string name="your_issue_has_been_submitted">Your issue has been submitted.</string>
     <string name="go_to_homepage">Go to homepage</string>
-    <string name="your_phone_number_has_been_verified_and_you_can_now_proceed_to_submit_your_issue">Your phone number has been verified, and you can now proceed to submit your issue.</string>
+    <string name="your_phone_number_has_been_verified_and_you_can_now_proceed_to_submit_your_issue">Your phone number has been verified, you can proceed to submit your issue.</string>
     <string name="step_3">Step 3</string>
     <string name="by_verifying_your_phone_number_you_help_us_maintain_a_secure_and_trustworthy_environment_by_preventing_abuse_and_spamming_of_our_platform">By verifying your phone number, you help us maintain a secure and trustworthy environment by preventing abuse and spamming of our platform.</string>
     <string name="this_cannot_be_undone">This cannot be undone</string>

@@ -87,7 +87,8 @@ class DescribeIssueFragment : Fragment() {
                     description = descriptionInput,
                     category = selectedIssueCategoryPosition,
                     prefix = "",
-                    phoneNumber = ""
+                    phoneNumber = "",
+                    completePhoneNumber = ""
                 )
                 SingletonRequestSupport.setInstance(requestSupport)
                 findNavController().navigate(R.id.describeIssueFragment_to_reporterPhoneNumberFragment)

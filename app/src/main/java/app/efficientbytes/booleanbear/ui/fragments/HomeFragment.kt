@@ -366,6 +366,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 mainViewModel.resetDeleteAccountIntentInvoked()
             }
         }
+        mainViewModel.getFirebaseUserToken()
         mainViewModel.firebaseUserToken.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Success -> {

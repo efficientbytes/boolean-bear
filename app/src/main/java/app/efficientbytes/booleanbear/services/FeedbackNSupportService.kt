@@ -26,6 +26,7 @@ interface FeedbackNSupportService {
         @Field("category") category: Int,
         @Field("prefix") prefix: String,
         @Field("phoneNumber") phoneNumber: String,
+        @Field("completePhoneNumber") completePhoneNumber: String,
         @Field("userAccountId") userAccountId: String? = null,
     ): Response<RequestSupportResponse>
 

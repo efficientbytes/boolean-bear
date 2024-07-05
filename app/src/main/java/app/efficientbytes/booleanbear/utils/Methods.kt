@@ -92,12 +92,12 @@ fun validatePhoneNumberFormat(
         phoneNumberTextInputLayout.error = "Please enter phone number to continue."
         return false
     }
-    phoneNumberTextInputLayout.error = null
-    if (!input.matches(Regex("^[1-9]\\d{9}$"))) {
-        phoneNumberTextInputLayout.error = "Invalid phone number format."
-        return false
-    }
-    phoneNumberTextInputLayout.error = null
+    /*phoneNumberTextInputLayout.error = null
+     if (!input.matches(Regex("^[1-9]\\d{9}$"))) {
+         phoneNumberTextInputLayout.error = "Invalid phone number format."
+         return false
+     }
+     phoneNumberTextInputLayout.error = null*/
     return true
 }
 

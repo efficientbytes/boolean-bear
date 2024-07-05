@@ -38,11 +38,11 @@ android {
 
 
         release {
-            manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
+            manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-3322823953213363~4274273300"
             buildConfigField(
                 "String",
                 "AD_MOB_UNIT_ID",
-                "\"ca-app-pub-2509573406487029/9481911106\""
+                "\"ca-app-pub-3322823953213363/7349661652\""
             )
             buildConfigField(
                 "long",
@@ -212,4 +212,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.1.0")
     //work manager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    //country code picker
+    implementation ("com.hbb20:ccp:2.5.0")
 }
