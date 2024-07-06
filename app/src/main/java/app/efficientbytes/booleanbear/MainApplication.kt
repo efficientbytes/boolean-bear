@@ -8,7 +8,11 @@ import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.initialize
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -24,6 +28,11 @@ class MainApplication : Application(), KoinComponent {
 
     override fun onCreate() {
         super.onCreate()
+
+        Firebase.initialize(context = this)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance(),
+        )
 
         startKoin {
             androidLogger()
