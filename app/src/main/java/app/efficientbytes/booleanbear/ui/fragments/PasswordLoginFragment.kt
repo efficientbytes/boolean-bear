@@ -126,7 +126,7 @@ class PasswordLoginFragment : Fragment() {
                             )
                     }
                     // Check for special character
-                    val specialCharacters = "-$#@_!".toSet()
+                    val specialCharacters = "$#@_!".toSet()
                     val newHasSpecialChar = text.any { it in specialCharacters }
                     if (newHasSpecialChar && !hasSpecialChar) {
                         hasSpecialChar = true
@@ -415,7 +415,7 @@ class PasswordLoginFragment : Fragment() {
             return false
         }
         binding.passwordTextInputLayout.error = null
-        val specialCharacters = "-$#@_!".toSet()
+        val specialCharacters = "$#@_!".toSet()
         if (!password.any { it in specialCharacters }) {
             binding.passwordTextInputLayout.error =
                 getString(R.string.password_needs_to_have_minimum_1_one_special_character_from)

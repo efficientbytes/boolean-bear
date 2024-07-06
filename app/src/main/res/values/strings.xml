@@ -173,7 +173,7 @@
     <string name="password_needs_to_have_minimum_1_uppercase">Password needs to have minimum 1 uppercase.</string>
     <string name="password_needs_to_have_minimum_1_lowercase">Password needs to have minimum 1 lowercase.</string>
     <string name="password_needs_to_have_minimum_1_digit">Password needs to have minimum 1 digit.</string>
-    <string name="password_needs_to_have_minimum_1_one_special_character_from">Password needs to have minimum 1 one special character from : -$#@_!.</string>
+    <string name="password_needs_to_have_minimum_1_one_special_character_from">Password needs to have minimum 1 one special character from : $#@_!.</string>
     <string name="please_confirm_your_password">Please confirm your password.</string>
     <string name="password_does_not_match">Password does not match</string>
     <string name="password_has_be_set_successfully">Password has be set successfully.</string>
