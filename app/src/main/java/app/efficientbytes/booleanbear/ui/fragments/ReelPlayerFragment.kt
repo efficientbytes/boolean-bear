@@ -15,6 +15,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.OptIn
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
@@ -127,6 +128,29 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             findNavController().popBackStack()
             return
         }
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (isFullScreen) {
+                    true -> {
+                        requireActivity().requestedOrientation =
+                            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        fullScreenButton.setImageDrawable(
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.full_screen_player_icon
+                            )
+                        )
+                        isFullScreen = false
+                    }
+
+                    false -> {
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+        // Add the callback to the dispatcher
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
         gifDrawable.addAnimationListener(this@ReelPlayerFragment)
