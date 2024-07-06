@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="8dp"
     android:background="@drawable/rounded_constraint_layout_background"
@@ -34,10 +34,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_weight="1"
-            tools:text="Auto"
             android:textColor="@color/white_800"
             android:textSize="15sp"
-            app:fontFamily="@font/montserrat">
+            app:fontFamily="@font/montserrat"
+            tools:text="Auto">
 
         </com.google.android.material.textview.MaterialTextView>
 
@@ -53,8 +53,8 @@
             android:id="@+id/qualityChipGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:selectionRequired="true"
             app:chipSpacingVertical="0dp"
+            app:selectionRequired="true"
             app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
@@ -99,17 +99,21 @@
                 app:iconEndPadding="20dp">
 
             </com.google.android.material.chip.Chip>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/quality1080pChip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:elevation="0dp"
+                android:text="@string/_1080p"
+                app:checkedIconEnabled="true"
+                app:chipBackgroundColor="@color/black_1200"
+                app:chipStrokeWidth="0dp"
+                app:iconEndPadding="20dp">
+
+            </com.google.android.material.chip.Chip>
         </com.google.android.material.chip.ChipGroup>
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/for_better_experience_select_auto"
-            android:textColor="@color/white"
-            app:fontFamily="@font/montserrat_light">
-
-        </com.google.android.material.textview.MaterialTextView>
 
     </LinearLayout>
 

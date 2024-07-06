@@ -15,6 +15,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.OptIn
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
@@ -127,6 +128,29 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             findNavController().popBackStack()
             return
         }
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (isFullScreen) {
+                    true -> {
+                        requireActivity().requestedOrientation =
+                            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        fullScreenButton.setImageDrawable(
+                            AppCompatResources.getDrawable(
+                                requireContext(),
+                                R.drawable.full_screen_player_icon
+                            )
+                        )
+                        isFullScreen = false
+                    }
+
+                    false -> {
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
+        // Add the callback to the dispatcher
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
         gifDrawable.addAnimationListener(this@ReelPlayerFragment)
@@ -561,6 +585,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (player == null) {
             trackSelector = DefaultTrackSelector(requireContext(), AdaptiveTrackSelection.Factory())
             val loadControl = DefaultLoadControl()
+            changePlayerQuality(VideoQualityType.AUTO)
             player = ExoPlayer.Builder(requireContext())
                 .setLoadControl(loadControl)
                 .setTrackSelector(trackSelector)
@@ -789,6 +814,12 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                         true
                 }
 
+                VideoQualityType._1080P -> {
+                    playerCurrentQualityText.text = VideoQualityType._1080P.label
+                    dialog!!.findViewById<Chip>(R.id.quality1080pChip).isChecked =
+                        true
+                }
+
                 else -> {
 
                 }
@@ -806,6 +837,14 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
                     R.id.quality720pChip -> {
                         currentVideoQuality = VideoQualityType._720P
+                        playerQualityPortraitText.text = currentVideoQuality.label
+                        playerCurrentQualityText.text = currentVideoQuality.label
+                        changePlayerQuality(currentVideoQuality)
+                        dialog!!.dismiss()
+                    }
+
+                    R.id.quality1080pChip -> {
+                        currentVideoQuality = VideoQualityType._1080P
                         playerQualityPortraitText.text = currentVideoQuality.label
                         playerCurrentQualityText.text = currentVideoQuality.label
                         changePlayerQuality(currentVideoQuality)
@@ -952,15 +991,17 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
     @UnstableApi
     private fun changePlayerQuality(videoQualityType: VideoQualityType) {
-        trackSelector = trackSelector.apply {
-            setParameters(
-                buildUponParameters().setMaxVideoSize(
-                    videoQualityType.width,
-                    videoQualityType.height
-                ).setAllowVideoNonSeamlessAdaptiveness(true)
+        val parametersBuilder = trackSelector.parameters.buildUpon()
+        if (videoQualityType != VideoQualityType.AUTO) {
+            parametersBuilder.setMaxVideoSize(
+                videoQualityType.width,
+                videoQualityType.height
             )
+        } else {
+            parametersBuilder.clearVideoSizeConstraints()
         }
-        player!!.prepare()
+        parametersBuilder.setAllowVideoNonSeamlessAdaptiveness(false)
+        trackSelector.parameters = parametersBuilder.build()
     }
 
     @UnstableApi

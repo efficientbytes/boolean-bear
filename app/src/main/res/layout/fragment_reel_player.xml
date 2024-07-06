@@ -132,7 +132,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:resize_mode="zoom"
+                app:resize_mode="fit"
                 app:show_buffering="never"
                 app:show_shuffle_button="false"
                 app:show_subtitle_button="false"
