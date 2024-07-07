@@ -16,8 +16,8 @@ android {
         applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -213,9 +213,9 @@ dependencies {
     //work manager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     //country code picker
-    implementation ("com.hbb20:ccp:2.5.0")
+    implementation("com.hbb20:ccp:2.5.0")
     //play integrity
-    implementation ("com.google.android.play:integrity:1.3.0")
+    implementation("com.google.android.play:integrity:1.3.0")
     //app check play integrity
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
 }
