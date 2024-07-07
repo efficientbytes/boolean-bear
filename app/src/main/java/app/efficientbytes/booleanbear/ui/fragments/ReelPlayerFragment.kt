@@ -79,7 +79,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     //all view late init
     private lateinit var rootView: View
     private lateinit var playerTitleText: MaterialTextView
-    private lateinit var playerGoToHomePageText: MaterialTextView
     private lateinit var playerQualityMenu: LinearLayout
     private lateinit var fullScreenButton: ImageButton
     private lateinit var gifDrawable: GifDrawable
@@ -155,7 +154,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         gifDrawable = binding.booleanBearLoadingGif.drawable as GifDrawable
         gifDrawable.addAnimationListener(this@ReelPlayerFragment)
         playerTitleText = rootView.findViewById(R.id.playerTitleValueTextView)
-        playerGoToHomePageText = rootView.findViewById(R.id.playerGoToHomePage)
         playerQualityMenu = rootView.findViewById(R.id.playerQualityMenuLinearLayout)
         playerCloseButton =
             rootView.findViewById<ImageButton>(R.id.playerCancelAndGoBackImageButton)
@@ -394,17 +392,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             findNavController().popBackStack()
         }
 
-        playerGoToHomePageText.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         if (isFullScreen) {
             playerTitleText.visibility = View.VISIBLE
-            playerGoToHomePageText.visibility = View.VISIBLE
             playerCloseButton.visibility = View.INVISIBLE
         } else {
             playerTitleText.visibility = View.GONE
-            playerGoToHomePageText.visibility = View.GONE
             playerCloseButton.visibility = View.VISIBLE
         }
 
@@ -453,6 +445,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         }
 
         binding.descriptionLinearLayout.setOnClickListener {
+            openDescriptionFragment()
+        }
+
+        playerTitleText.setOnClickListener {
             openDescriptionFragment()
         }
 
@@ -1080,7 +1076,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     )
                 )
                 playerTitleText.visibility = View.VISIBLE
-                playerGoToHomePageText.visibility = View.VISIBLE
                 playerCloseButton.visibility = View.INVISIBLE
             }
 
@@ -1104,7 +1099,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     )
                 )
                 playerTitleText.visibility = View.GONE
-                playerGoToHomePageText.visibility = View.GONE
                 playerCloseButton.visibility = View.VISIBLE
             }
         }
