@@ -37,8 +37,6 @@
             android:launchMode="singleTask"
             android:resizeableActivity="false"
             android:theme="@style/Theme.CustomSplashScreen">
-            <nav-graph android:value="@navigation/main_nav_graph" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
