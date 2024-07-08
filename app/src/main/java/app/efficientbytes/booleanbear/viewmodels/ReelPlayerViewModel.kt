@@ -20,16 +20,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ReelPlayerViewModel(
-    private val assetsRepository: AssetsRepository,
-    private val externalScope: CoroutineScope,
-    private val instructorLiveListener: InstructorLiveListener,
-    private val mentionedLinksLiveListener: MentionedLinksLiveListener,
-    private val contentDetailsLiveListener: ContentDetailsLiveListener,
-    private val statisticsRepository: StatisticsRepository
-) : ViewModel(), LifecycleEventObserver, AssetsRepository.InstructorProfileListener,
+class ReelPlayerViewModel : ViewModel(), KoinComponent, LifecycleEventObserver,
+    AssetsRepository.InstructorProfileListener,
     AssetsRepository.MentionedLinksListener {
+
+    private val assetsRepository: AssetsRepository by inject()
+    private val externalScope: CoroutineScope by inject()
+    private val instructorLiveListener: InstructorLiveListener by inject()
+    private val mentionedLinksLiveListener: MentionedLinksLiveListener by inject()
+    private val contentDetailsLiveListener: ContentDetailsLiveListener by inject()
+    private val statisticsRepository: StatisticsRepository by inject()
 
     companion object {
 

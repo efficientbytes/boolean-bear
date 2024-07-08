@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import app.efficientbytes.booleanbear.databinding.FragmentDiscoverBinding
@@ -33,7 +34,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
     private val courseBundlesRecyclerViewAdapter: CourseBundleRecyclerViewAdapter by lazy {
         CourseBundleRecyclerViewAdapter(dummyCourseBundle, requireContext(), this@DiscoverFragment)
     }
-    private val viewModel: DiscoverViewModel by inject()
+    private val viewModel: DiscoverViewModel by viewModels()
     private val connectivityListener: ConnectivityListener by inject()
     private var reelTopicsInternetIssue = false
     private var courseBundleInternetIssue = false

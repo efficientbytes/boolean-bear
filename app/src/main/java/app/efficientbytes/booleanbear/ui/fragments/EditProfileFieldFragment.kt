@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -41,7 +42,7 @@ class EditProfileFieldFragment : Fragment() {
     private var selectedProfessionCategoryPosition: Int = 0
     private var currentProfessionCategoryPosition: Int = 0
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
-    private val viewModel: EditProfileFieldViewModel by inject()
+    private val viewModel: EditProfileFieldViewModel by viewModels()
     private val connectivityListener: ConnectivityListener by inject()
     private val safeArgs: EditProfileFieldFragmentArgs by navArgs()
     private var professionsListFailedToLoad = false

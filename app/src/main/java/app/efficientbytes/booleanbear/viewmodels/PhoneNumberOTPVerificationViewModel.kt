@@ -9,10 +9,13 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class PhoneNumberOTPVerificationViewModel(private val verificationRepository: VerificationRepository) :
-    ViewModel() {
+class PhoneNumberOTPVerificationViewModel :
+    ViewModel(), KoinComponent {
 
+    private val verificationRepository: VerificationRepository by inject()
     private val _verifyPhoneNumberOTPResponse: MutableLiveData<DataStatus<PhoneNumber>> =
         MutableLiveData()
     val verifyPhoneNumberOTPResponse: LiveData<DataStatus<PhoneNumber>> =

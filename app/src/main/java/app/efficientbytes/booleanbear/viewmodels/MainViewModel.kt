@@ -52,6 +52,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
 import org.apache.commons.net.ntp.TimeInfo
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -59,21 +61,21 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 class MainViewModel(
-    private val application: Application,
-    private val authenticationRepository: AuthenticationRepository,
-    private val userProfileRepository: UserProfileRepository,
-    private val utilityDataRepository: UtilityDataRepository,
-    private val verificationRepository: VerificationRepository,
-    private val feedbackNSupportRepository: FeedbackNSupportRepository,
-    private val assetsRepository: AssetsRepository,
-    private val adsRepository: AdsRepository,
-    private val externalScope: CoroutineScope,
-    private val userAccountCoroutineScope: UserAccountCoroutineScope,
-    private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
-) : AndroidViewModel(application),
+    application: Application
+) : AndroidViewModel(application), KoinComponent,
     LifecycleEventObserver, UtilityDataRepository.UtilityListener,
     UserProfileRepository.NotificationUploadListener, IDTokenListener {
 
+    private val authenticationRepository: AuthenticationRepository by inject()
+    private val userProfileRepository: UserProfileRepository by inject()
+    private val utilityDataRepository: UtilityDataRepository by inject()
+    private val verificationRepository: VerificationRepository by inject()
+    private val feedbackNSupportRepository: FeedbackNSupportRepository by inject()
+    private val assetsRepository: AssetsRepository by inject()
+    private val adsRepository: AdsRepository by inject()
+    private val externalScope: CoroutineScope by inject()
+    private val userAccountCoroutineScope: UserAccountCoroutineScope by inject()
+    private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope by inject()
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }

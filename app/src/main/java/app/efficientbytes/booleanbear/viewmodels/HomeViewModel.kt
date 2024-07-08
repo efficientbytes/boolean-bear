@@ -21,13 +21,14 @@ import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class HomeViewModel(
-    private val assetsRepository: AssetsRepository,
-    private val externalScope: CoroutineScope
-) : ViewModel(),
+class HomeViewModel : ViewModel(), KoinComponent,
     LifecycleEventObserver {
 
+    private val assetsRepository: AssetsRepository by inject()
+    private val externalScope: CoroutineScope by inject()
     private val _reelTopics: MutableLiveData<DataStatus<List<RemoteReelTopic>>> = MutableLiveData()
     val reelTopics: LiveData<DataStatus<List<RemoteReelTopic>>> = _reelTopics
 

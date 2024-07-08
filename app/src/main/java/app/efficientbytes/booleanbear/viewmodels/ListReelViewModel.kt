@@ -10,12 +10,13 @@ import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ListReelViewModel(
-    private val assetsRepository: AssetsRepository,
-    private val externalScope: CoroutineScope
-) : ViewModel() {
+class ListReelViewModel : ViewModel(), KoinComponent {
 
+    private val assetsRepository: AssetsRepository by inject()
+    private val externalScope: CoroutineScope by inject()
     private val _reels: MutableLiveData<DataStatus<List<RemoteReel>>> = MutableLiveData()
     val reels: LiveData<DataStatus<List<RemoteReel>>> = _reels
 

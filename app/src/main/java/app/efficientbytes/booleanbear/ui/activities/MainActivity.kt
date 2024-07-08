@@ -233,11 +233,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     false -> {
                         isUserLoggedIn = false
                         viewModel.deleteSingleDeviceLogin()
-                        viewModel.deleteFCMToken()
-                        viewModel.deleteIDToken()
                         viewModel.deleteUserProfile()
-                        viewModel.deleteWaitingListCourses()
+                        viewModel.deleteIDToken()
+                        viewModel.deleteFCMToken()
                         authenticationRepository.deletePasswordCreated()
+                        viewModel.deleteWaitingListCourses()
                         userProfileRepository.resetUserProfileScope()
                         authenticationRepository.resetSingleDeviceScope()
                         authenticationRepository.resetAuthScope()

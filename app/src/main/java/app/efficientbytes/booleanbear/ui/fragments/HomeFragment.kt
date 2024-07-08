@@ -18,6 +18,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.efficientbytes.booleanbear.R
@@ -48,8 +49,8 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: HomeViewModel by inject()
     private val mainViewModel by activityViewModel<MainViewModel>()
+    private val viewModel: HomeViewModel by viewModels()
     private val delay3k: Long = 3000 // Delay in milliseconds
     private val delay5k: Long = 5000 // Delay in milliseconds
     private val authenticationRepository: AuthenticationRepository by inject()

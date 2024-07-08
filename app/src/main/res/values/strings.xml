@@ -198,5 +198,7 @@
     <string name="notifications_indicating_the_end_of_the_ad_free_content_period_this_notification_will_alert_you_when_your_ad_free_time_has_expired">Notifications indicating the end of the ad-free content period. This notification will alert you when your ad-free time has expired.</string>
     <string name="enjoy_ad_free_contents_for_next_minutes">Enjoy Ad-free contents for next %1$s minutes.</string>
     <string name="_1080p">1080p</string>
+    <string name="please_wait_while_we_submit_your_feedback">Please wait while we submit your feedback...</string>
+    <string name="hi">Hi %1$s</string>
 
 </resources>

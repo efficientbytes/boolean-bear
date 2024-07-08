@@ -36,8 +36,6 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val versionName = "version " + getVersionCode()
-        binding.appVersionLabelTextView.text = versionName
         customAuthStateListener.liveData.observe(viewLifecycleOwner) {
             it?.let { authState ->
                 when (authState) {
@@ -72,14 +70,6 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
                 .setCancelable(true)
                 .show()
         }
-    }
-
-    private fun getVersionCode(): String {
-        var version: String = ""
-        activity?.let {
-            version = it.packageManager.getPackageInfo(it.packageName, 0).versionName
-        }
-        return version
     }
 
     override fun onClick(view: View?) {

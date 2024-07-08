@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -24,7 +25,6 @@ import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class VerifyPrimaryEmailFragment : Fragment() {
@@ -33,7 +33,7 @@ class VerifyPrimaryEmailFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val safeArgs: VerifyPrimaryEmailFragmentArgs by navArgs()
-    private val viewModel: EditProfileFieldViewModel by inject()
+    private val viewModel: EditProfileFieldViewModel by viewModels()
     private val mainViewModel by activityViewModel<MainViewModel>()
     private var emailSentMessage: String = ""
 
