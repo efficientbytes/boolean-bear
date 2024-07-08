@@ -135,20 +135,40 @@ class MainViewModel(
         }
     }
 
-    val singleDeviceLoginResponseFromDB: LiveData<SingleDeviceLogin?> =
-        authenticationRepository.singleDeviceLoginResponseFromDB.asLiveData()
     private val _singleDeviceLoginResponseFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
         MutableLiveData()
     val singleDeviceLoginResponseFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
         _singleDeviceLoginResponseFromServer
 
-    fun getSingleDeviceLogin() {
+    fun getRemoteSingleDeviceLogin() {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.getSingleDeviceLogin().collect {
+            authenticationRepository.getRemoteSingleDeviceLogin().collect {
                 _singleDeviceLoginResponseFromServer.postValue(it)
             }
         }
     }
+
+    private val _singleDeviceLoginFromDB: MutableLiveData<Boolean?> = MutableLiveData()
+    val singleDeviceLoginFromDB: LiveData<Boolean?> = _singleDeviceLoginFromDB
+    private fun getLocalSingleDeviceLogin() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            val singleDeviceLogin = authenticationRepository.getLocalSingleDeviceLogin()
+            if (currentUser != null && singleDeviceLogin == null) {
+                signOutUser()
+                _singleDeviceLoginFromDB.postValue(false)
+            }
+        }
+    }
+
+    fun resetSingleDeviceLoginFromDB() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _singleDeviceLoginFromDB.postValue(null)
+        }
+    }
+
+    val liveSingleDeviceLoginFromDB: LiveData<SingleDeviceLogin?> =
+        authenticationRepository.getLiveLocalSingleDeviceLoginStatus()
 
     fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -425,6 +445,7 @@ class MainViewModel(
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
+                    getLocalSingleDeviceLogin()
                 }
             }
 
