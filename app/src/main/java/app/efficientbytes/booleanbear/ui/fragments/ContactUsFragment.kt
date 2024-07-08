@@ -39,6 +39,8 @@ class ContactUsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val versionName = "version " + getVersionCode()
+        binding.appVersionLabelTextView.text = versionName
 
         binding.rateUsLabelTextView.setOnClickListener {
             val request = reviewManager.requestReviewFlow()
@@ -93,6 +95,14 @@ class ContactUsFragment : Fragment() {
         val uri = Uri.parse(link)
         val intent = Intent(Intent.ACTION_VIEW, uri)
         requireContext().startActivity(intent)
+    }
+
+    private fun getVersionCode(): String {
+        var version: String = ""
+        activity?.let {
+            version = it.packageManager.getPackageInfo(it.packageName, 0).versionName
+        }
+        return version
     }
 
 }

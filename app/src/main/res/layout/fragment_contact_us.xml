@@ -13,245 +13,268 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
-        android:paddingHorizontal="22dp"
-        tools:context=".ui.fragments.ContactUsFragment">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/collaborateWithUsLabelTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="42dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:text="@string/collaborate"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </com.google.android.material.textview.MaterialTextView>
+        android:scrollbarSize="0dp"
+        android:scrollbars="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/collaborateConstraintLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/rounded_constraint_layout_background"
-            android:paddingVertical="18dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/collaborateWithUsLabelTextView">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:paddingHorizontal="22dp"
+            tools:context=".ui.fragments.ContactUsFragment">
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/hostUsLabelTextView"
+                android:id="@+id/collaborateWithUsLabelTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/host_boolean_bear_workshops"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
+                android:layout_marginTop="42dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/collaborate"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
             </com.google.android.material.textview.MaterialTextView>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/collaborateConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingVertical="18dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/collaborateWithUsLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/hostUsLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/host_boolean_bear_workshops"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/feedbackNSupportLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="42dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/feedback_support"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/collaborateConstraintLayout">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/feedbackNSupportConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingVertical="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feedbackNSupportLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/shareFeedbackLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/share_feedback"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/rateUsLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/rate_us"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/shareFeedbackLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/contactSupportLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/contact_support"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rateUsLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/deleteAccountLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/delete_your_account"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/contactSupportLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/privacyPolicyNTermsConditionLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="42dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/privacy_amp_terms_of_use"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feedbackNSupportConstraintLayout">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/privacyNConditionConstraintLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/rounded_constraint_layout_background"
+                android:paddingVertical="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/privacyPolicyNTermsConditionLabelTextView">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/privacyPolicyLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/privacy_amp_policy"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/termsNConditionLabelTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+                    android:focusable="true"
+                    android:fontFamily="@font/montserrat"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp"
+                    android:text="@string/terms_of_use"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/white_1200"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/privacyPolicyLabelTextView">
+
+                </com.google.android.material.textview.MaterialTextView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/appVersionLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="22dp"
+                android:fontFamily="@font/montserrat"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/privacyNConditionConstraintLayout"
+                tools:text="Version 4.5.60">
+
+            </com.google.android.material.textview.MaterialTextView>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/feedbackNSupportLabelTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="42dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:text="@string/feedback_support"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/collaborateConstraintLayout">
-
-        </com.google.android.material.textview.MaterialTextView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/feedbackNSupportConstraintLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/rounded_constraint_layout_background"
-            android:paddingVertical="18dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/feedbackNSupportLabelTextView">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/shareFeedbackLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/share_feedback"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/rateUsLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/rate_us"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/shareFeedbackLabelTextView">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/contactSupportLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/contact_support"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rateUsLabelTextView">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/deleteAccountLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp"
-                android:text="@string/delete_your_account"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                android:visibility="@{(customAuthState.liveData==true) ? View.VISIBLE : View.GONE}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/contactSupportLabelTextView">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/privacyPolicyNTermsConditionLabelTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="42dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:text="@string/privacy_amp_terms_of_use"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/feedbackNSupportConstraintLayout">
-
-        </com.google.android.material.textview.MaterialTextView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/privacyNConditionConstraintLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/rounded_constraint_layout_background"
-            android:paddingVertical="18dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/privacyPolicyNTermsConditionLabelTextView">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/privacyPolicyLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/privacy_amp_policy"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/termsNConditionLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
-                android:focusable="true"
-                android:fontFamily="@font/montserrat"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="8dp"
-                android:text="@string/terms_of_use"
-                android:textAlignment="textStart"
-                android:textColor="@color/white_1200"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/privacyPolicyLabelTextView">
-
-            </com.google.android.material.textview.MaterialTextView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>
