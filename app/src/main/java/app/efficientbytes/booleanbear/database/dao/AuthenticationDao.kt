@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,7 +11,6 @@ import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.utils.BOOLEAN_FLAG_TABLE
 import app.efficientbytes.booleanbear.utils.ID_TOKEN_TABLE
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_TABLE
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AuthenticationDao {
@@ -22,7 +22,10 @@ interface AuthenticationDao {
     suspend fun delete()
 
     @Query("SELECT * FROM $SINGLE_DEVICE_LOGIN_TABLE ")
-    fun getSingleDeviceLogin(): Flow<SingleDeviceLogin>
+    suspend fun getSingleDeviceLogin(): SingleDeviceLogin?
+
+    @Query("SELECT * FROM $SINGLE_DEVICE_LOGIN_TABLE ")
+    fun getLiveSingleDeviceLoginStatus(): LiveData<SingleDeviceLogin?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIDToken(idToken: IDToken)

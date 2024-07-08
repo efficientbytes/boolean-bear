@@ -275,13 +275,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.singleDeviceLoginResponseFromDB.observe(this) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
+        viewModel.liveSingleDeviceLoginFromDB.observe(this) {
             this.singleDeviceLogin = it
-            if (currentUser != null && it == null) {
-                //show device id does not exist , please login again.
-                viewModel.signOutUser()
-                multipleDeviceLoginDetectedDialog()
+        }
+        viewModel.singleDeviceLoginFromDB.observe(this) {
+            when (it) {
+                true -> {
+
+                }
+
+                false -> {
+                    multipleDeviceLoginDetectedDialog()
+                    viewModel.resetSingleDeviceLoginFromDB()
+                }
+
+                null -> {
+
+                }
             }
         }
         viewModel.singleDeviceLoginResponseFromServer.observe(this) {
@@ -323,7 +333,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DataStatus.Status.Success -> {
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser != null) {
-                        viewModel.getSingleDeviceLogin()
+                        viewModel.getRemoteSingleDeviceLogin()
                     }
                 }
 
@@ -557,14 +567,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         if (currentUser != null) {
                             viewModel.getFirebaseUserToken()
-                            viewModel.getSingleDeviceLogin()
+                            viewModel.getRemoteSingleDeviceLogin()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
                                 userProfileRepository.getUserProfile()
                             }
                             if (singleDeviceLoginFailedToLoad) {
                                 singleDeviceLoginFailedToLoad = false
-                                viewModel.getSingleDeviceLogin()
+                                viewModel.getRemoteSingleDeviceLogin()
                             }
                             if (accountDeletionFailed) {
                                 accountDeletionFailed = false
@@ -592,7 +602,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
-                            viewModel.getSingleDeviceLogin()
+                            viewModel.getRemoteSingleDeviceLogin()
                             viewModel.getFirebaseUserToken()
                             viewModel.getAllWaitingListCourses()
                         }

@@ -28,7 +28,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -81,7 +80,7 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun getSingleDeviceLogin() = flow {
+    suspend fun getRemoteSingleDeviceLogin() = flow {
         try {
             emit(DataStatus.loading())
             val response = authenticationService.getSingleDeviceLogin()
@@ -116,8 +115,10 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    val singleDeviceLoginResponseFromDB: Flow<SingleDeviceLogin> =
-        authenticationDao.getSingleDeviceLogin()
+    suspend fun getLocalSingleDeviceLogin() = authenticationDao.getSingleDeviceLogin()
+
+    fun getLiveLocalSingleDeviceLoginStatus() =
+        authenticationDao.getLiveSingleDeviceLoginStatus()
 
     suspend fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
         authenticationDao.insertSingleDeviceLogin(singleDeviceLogin)
