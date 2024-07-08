@@ -14,19 +14,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.viewmodels.LoginOrSignUpViewModel
-import org.koin.android.ext.android.inject
 
 class LoginOrSignUpFragment : Fragment() {
 
     private lateinit var _binding: FragmentLoginOrSignUpBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: LoginOrSignUpViewModel by inject()
+    private val viewModel: LoginOrSignUpViewModel by viewModels()
     private var pageOpenedForFirstTime = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +35,7 @@ class LoginOrSignUpFragment : Fragment() {
         _binding = FragmentLoginOrSignUpBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
+        lifecycle.addObserver(viewModel)
         return rootView
     }
 

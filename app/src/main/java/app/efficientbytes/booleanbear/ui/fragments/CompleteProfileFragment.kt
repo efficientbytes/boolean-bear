@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -36,7 +37,7 @@ class CompleteProfileFragment : Fragment() {
     private var passwordCreated: Boolean = false
     private var selectedProfessionCategoryPosition: Int = 0
     private var currentProfessionCategoryPosition: Int = 0
-    private val viewModel: CompleteProfileViewModel by inject()
+    private val viewModel: CompleteProfileViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
     private val connectivityListener: ConnectivityListener by inject()
     private var professionsListFailedToLoad = false

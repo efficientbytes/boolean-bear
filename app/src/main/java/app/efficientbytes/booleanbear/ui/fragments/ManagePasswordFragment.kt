@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -18,14 +19,13 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.models.PASSWORD_MANAGE_MODE
 import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import com.google.android.material.appbar.MaterialToolbar
-import org.koin.android.ext.android.inject
 
 class ManagePasswordFragment : Fragment() {
 
     private lateinit var _binding: FragmentManagePasswordBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: ManagePasswordViewModel by inject()
+    private val viewModel: ManagePasswordViewModel by viewModels()
     private val safeArgs: ManagePasswordFragmentArgs by navArgs()
     private lateinit var mode: PASSWORD_MANAGE_MODE
     private var toolbar: MaterialToolbar? = null

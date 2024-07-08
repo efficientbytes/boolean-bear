@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -25,7 +26,7 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var _binding: FragmentOTPVerificationBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: PhoneNumberOTPVerificationViewModel by inject()
+    private val viewModel: PhoneNumberOTPVerificationViewModel by viewModels()
     private val mainViewModel: MainViewModel by inject()
     private val safeArgs: OTPVerificationFragmentArgs by navArgs()
     private lateinit var timer: CountDownTimer

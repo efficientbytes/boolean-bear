@@ -12,13 +12,14 @@ import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class EditProfileFieldViewModel(
-    private val userProfileRepository: UserProfileRepository,
-    private val verificationRepository: VerificationRepository
-) :
-    ViewModel() {
+class EditProfileFieldViewModel :
+    ViewModel(), KoinComponent {
 
+    private val userProfileRepository: UserProfileRepository by inject()
+    private val verificationRepository: VerificationRepository by inject()
     private val _userProfileServerResponse: MutableLiveData<DataStatus<UserProfile?>> =
         MutableLiveData()
     val userProfileServerResponse: LiveData<DataStatus<UserProfile?>> =

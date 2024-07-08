@@ -8,12 +8,13 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ManagePasswordViewModel(
-    private val authenticationRepository: AuthenticationRepository,
-    private val externalScope: CoroutineScope
-) : ViewModel() {
+class ManagePasswordViewModel : ViewModel(), KoinComponent {
 
+    private val authenticationRepository: AuthenticationRepository by inject()
+    private val externalScope: CoroutineScope by inject()
     private val _createPassword: MutableLiveData<DataStatus<Boolean>?> = MutableLiveData()
     val createPassword: LiveData<DataStatus<Boolean>?> = _createPassword
 

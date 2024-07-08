@@ -7,10 +7,13 @@ import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CourseWaitingListViewModel(private val assetsRepository: AssetsRepository) :
-    ViewModel(), AssetsRepository.JoinCourseWaitingListListener {
+class CourseWaitingListViewModel :
+    ViewModel(), KoinComponent, AssetsRepository.JoinCourseWaitingListListener {
 
+    private val assetsRepository: AssetsRepository by inject()
     private val _courseWaitingList: MutableLiveData<DataStatus<Boolean>?> = MutableLiveData()
     val courseWaitingList: LiveData<DataStatus<Boolean>?> = _courseWaitingList
 
@@ -24,7 +27,7 @@ class CourseWaitingListViewModel(private val assetsRepository: AssetsRepository)
         }
     }
 
-    fun resetWaitingList(){
+    fun resetWaitingList() {
         viewModelScope.launch {
             _courseWaitingList.postValue(null)
         }

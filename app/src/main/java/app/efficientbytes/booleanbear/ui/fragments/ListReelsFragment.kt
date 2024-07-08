@@ -16,6 +16,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +39,7 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     private lateinit var _binding: FragmentListReelsBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: ListReelViewModel by inject()
+    private val viewModel: ListReelViewModel by viewModels()
     private lateinit var topicId: String
     private var topic: String = ""
     private var toolbar: MaterialToolbar? = null

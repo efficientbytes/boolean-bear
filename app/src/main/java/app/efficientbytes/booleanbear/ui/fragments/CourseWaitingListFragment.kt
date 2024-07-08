@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCourseWaitingListBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -12,7 +13,6 @@ import app.efficientbytes.booleanbear.viewmodels.CourseWaitingListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import org.koin.android.ext.android.inject
 
 class CourseWaitingListFragment : BottomSheetDialogFragment() {
 
@@ -28,7 +28,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
     private lateinit var _binding: FragmentCourseWaitingListBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: CourseWaitingListViewModel by inject()
+    private val viewModel: CourseWaitingListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -95,7 +95,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                     DataStatus.Status.Loading -> {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text = "Please wait..."
+                        binding.progressStatusValueTextView.text = getString(R.string.please_wait)
                         viewModel.resetWaitingList()
                     }
 
@@ -103,7 +103,8 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.joinTheWaitingListButton.isEnabled = true
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
-                        binding.progressStatusValueTextView.text = "No Internet!"
+                        binding.progressStatusValueTextView.text =
+                            getString(R.string.no_internet_connection_please_try_again)
                         viewModel.resetWaitingList()
                     }
 
@@ -126,7 +127,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text =
-                            "Process is taking unusually long time. Please try again..."
+                            getString(R.string.time_out_please_try_again)
                         viewModel.resetWaitingList()
                     }
 
@@ -134,7 +135,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                         binding.progressLinearLayout.visibility = View.VISIBLE
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.text =
-                            "There was some error. Try again later."
+                            getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
                         viewModel.resetWaitingList()
                     }
                 }

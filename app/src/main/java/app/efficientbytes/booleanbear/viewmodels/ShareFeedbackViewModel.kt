@@ -9,10 +9,13 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class ShareFeedbackViewModel(private val feedbackNSupportRepository: FeedbackNSupportRepository) :
-    ViewModel() {
+class ShareFeedbackViewModel :
+    ViewModel(), KoinComponent {
 
+    private val feedbackNSupportRepository: FeedbackNSupportRepository by inject()
     private val _feedbackUploadStatus: MutableLiveData<DataStatus<ResponseMessage?>> =
         MutableLiveData()
     val feedbackUploadStatus: LiveData<DataStatus<ResponseMessage?>> = _feedbackUploadStatus

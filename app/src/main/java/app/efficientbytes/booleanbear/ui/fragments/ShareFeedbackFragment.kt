@@ -7,20 +7,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShareFeedbackBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.viewmodels.ShareFeedbackViewModel
-import org.koin.android.ext.android.inject
 
 class ShareFeedbackFragment : Fragment() {
 
     private lateinit var _binding: FragmentShareFeedbackBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: ShareFeedbackViewModel by inject()
+    private val viewModel: ShareFeedbackViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +60,7 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
-                        "Please wait while we submit your feedback..."
+                        getString(R.string.please_wait_while_we_submit_your_feedback)
                     binding.submitButton.isEnabled = false
                 }
 
@@ -80,7 +80,7 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
-                        "No Internet Connection"
+                        getString(R.string.no_internet_connection_please_try_again)
                     binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
@@ -90,7 +90,7 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
-                        "The process is taking unusually long time. Please try again"
+                        getString(R.string.time_out_please_try_again)
                     binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 

@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -93,7 +94,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     //flags
     private var isFullScreen = false
     private var isPlayingSuggested = false
-    private val viewModel: ReelPlayerViewModel by inject()
+    private val viewModel: ReelPlayerViewModel by viewModels()
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
     private val connectivityListener: ConnectivityListener by inject()

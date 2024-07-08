@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentAccountSettingsBinding
@@ -29,7 +30,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val customAuthStateListener: CustomAuthStateListener by inject()
-    private val viewModel: AccountSettingsViewModel by inject()
+    private val viewModel: AccountSettingsViewModel by viewModels()
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }
@@ -59,7 +60,8 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
                 it?.let { userProfile ->
-                    binding.firstNameValueTextView.text = "Hi ${userProfile.firstName}"
+                    binding.firstNameValueTextView.text =
+                        getString(R.string.hi, userProfile.firstName)
                 }
             }
         }
