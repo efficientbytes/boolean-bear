@@ -149,9 +149,8 @@ class EditProfileFieldFragment : Fragment() {
         }
         val fieldType = EDIT_PROFILE_FIELD.getField(index)
         toolbar?.title = fieldType.toolbarTile
-        mainViewModel.listenToUserProfileFromDB.observe(viewLifecycleOwner) { userProfile ->
+        mainViewModel.liveUserProfileFromLocal.observe(viewLifecycleOwner) { userProfile ->
             userProfile?.let {
-                SingletonUserData.setInstance(it)
                 when (fieldType) {
                     EDIT_PROFILE_FIELD.FIRST_NAME -> {
                         val firstName = it.firstName
@@ -316,7 +315,6 @@ class EditProfileFieldFragment : Fragment() {
 
                 DataStatus.Status.Success -> {
                     it.data?.let { userProfile ->
-                        mainViewModel.saveUserProfile(userProfile)
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =

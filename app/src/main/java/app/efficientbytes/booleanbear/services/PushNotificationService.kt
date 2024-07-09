@@ -6,8 +6,6 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
-import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
@@ -16,8 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.koin.android.ext.android.inject
 
-class PushNotificationService : FirebaseMessagingService(),
-    UserProfileRepository.NotificationUploadListener {
+class PushNotificationService : FirebaseMessagingService() {
 
     private val userProfileRepository: UserProfileRepository by inject()
     private val connectivityListener: ConnectivityListener by inject()
@@ -165,22 +162,6 @@ class PushNotificationService : FirebaseMessagingService(),
                 NotificationsHelper.getManager(this).notify(0, builder.build())
             }
         }
-    }
-
-    override fun onTokenStatusChanged(status: DataStatus<ResponseMessage>) {
-        when (status.status) {
-            DataStatus.Status.NoInternet -> {
-                tokenFailedToUpdate = true
-            }
-
-            else -> {
-
-            }
-        }
-    }
-
-    override fun onTokenGenerated(token: String) {
-
     }
 
     override fun onDestroy() {

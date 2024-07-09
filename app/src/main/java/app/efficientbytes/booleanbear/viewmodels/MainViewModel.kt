@@ -15,17 +15,14 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.IDToken
-import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
-import app.efficientbytes.booleanbear.models.SingletonPreviousUserId
-import app.efficientbytes.booleanbear.models.UserProfile
+import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
@@ -41,8 +38,6 @@ import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.IDTokenListener
-import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
-import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
@@ -63,8 +58,7 @@ import java.util.concurrent.TimeUnit
 class MainViewModel(
     application: Application
 ) : AndroidViewModel(application), KoinComponent,
-    LifecycleEventObserver, UtilityDataRepository.UtilityListener,
-    UserProfileRepository.NotificationUploadListener, IDTokenListener {
+    LifecycleEventObserver, UtilityDataRepository.UtilityListener, IDTokenListener {
 
     private val authenticationRepository: AuthenticationRepository by inject()
     private val userProfileRepository: UserProfileRepository by inject()
@@ -74,8 +68,6 @@ class MainViewModel(
     private val assetsRepository: AssetsRepository by inject()
     private val adsRepository: AdsRepository by inject()
     private val externalScope: CoroutineScope by inject()
-    private val userAccountCoroutineScope: UserAccountCoroutineScope by inject()
-    private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope by inject()
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
     }
@@ -121,18 +113,14 @@ class MainViewModel(
         }
     }
 
-    val listenToUserProfileFromDB = userProfileRepository.userProfile.asLiveData()
+    val liveUserProfileFromLocal = userProfileRepository.liveUserProfileFromLocal
 
-    fun saveUserProfile(userProfile: UserProfile) {
-        viewModelScope.launch(Dispatchers.IO) {
-            userProfileRepository.saveUserProfile(userProfile)
-        }
+    fun getLiveUserProfileFromRemote(userAccountId: String) {
+        userProfileRepository.getLiveUserProfileFromRemote(userAccountId)
     }
 
-    fun deleteUserProfile() {
-        viewModelScope.launch(Dispatchers.IO) {
-            userProfileRepository.deleteUserProfile()
-        }
+    fun getUserProfileFromRemote() {
+        userProfileRepository.getUserProfileFromRemote()
     }
 
     private val _singleDeviceLoginResponseFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
@@ -176,22 +164,45 @@ class MainViewModel(
         }
     }
 
-    fun deleteSingleDeviceLogin() {
+    fun signOutUser() {
+        resetUser()
+        resetSingleDeviceLogin()
+        resetAuth()
+        resetAssets()
+        FirebaseAuth.getInstance().signOut()
+    }
+    fun resetUser() {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.deleteSingleDeviceLogin()
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null) {
+                SingletonUserData.resetInstance()
+                userProfileRepository.resetUserProfileScope()
+                userProfileRepository.resetUserProfileListener()
+                userProfileRepository.resetUserProfileInLocal()
+            }
         }
     }
-
-    fun signOutUser() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            SingletonPreviousUserId.setInstance(currentUser.uid)
-            assetsRepository.deleteCourseWaitingList()
-            userProfileRepository.resetUserProfileScope()
-            authenticationRepository.deletePasswordCreated()
+    fun resetSingleDeviceLogin() {
+        viewModelScope.launch(Dispatchers.IO) {
+            authenticationRepository.deleteSingleDeviceLogin()
             authenticationRepository.resetSingleDeviceScope()
+        }
+    }
+    fun resetAuth() {
+        viewModelScope.launch(Dispatchers.IO) {
             authenticationRepository.resetAuthScope()
-            FirebaseAuth.getInstance().signOut()
+            authenticationRepository.deletePasswordCreated()
+        }
+    }
+    fun resetAssets() {
+        viewModelScope.launch(Dispatchers.IO) {
+            assetsRepository.deleteCourseWaitingList()
+        }
+    }
+    fun resetFCMToken() {
+        viewModelScope.launch(Dispatchers.IO) {
+            userProfileRepository.resetLocalNotificationToken()
+            userProfileRepository.resetRemoteNotificationToken()
         }
     }
 
@@ -330,18 +341,8 @@ class MainViewModel(
         _deleteAccountIntentInvoked.postValue(null)
     }
 
-    private val _notificationStatusChanged: MutableLiveData<DataStatus<ResponseMessage>> =
-        MutableLiveData()
-    val notificationStatusChanged: LiveData<DataStatus<ResponseMessage>> =
-        _notificationStatusChanged
-
     fun generateFCMToken() {
-        userProfileRepository.generateFCMToken(this@MainViewModel)
-    }
-
-    fun deleteFCMToken() {
-        userProfileRepository.deleteLocalNotificationToken()
-        userProfileRepository.deleteRemoteNotificationToken()
+        userProfileRepository.generateFCMToken()
     }
 
     fun deleteIDToken() {
@@ -489,23 +490,6 @@ class MainViewModel(
         _issueCategoriesAdapter.postValue(status)
     }
 
-    override fun onTokenStatusChanged(status: DataStatus<ResponseMessage>) {
-        _notificationStatusChanged.postValue(status)
-    }
-
-    override fun onTokenGenerated(token: String) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            userProfileRepository.saveNotificationToken(
-                LocalNotificationToken(
-                    token,
-                    currentUser.uid
-                )
-            )
-            userProfileRepository.uploadNotificationsToken(token, this@MainViewModel)
-        }
-    }
-
     override fun onIDTokenGenerated(token: String?) {
         if (token != null) {
             authenticationRepository.saveIDToken(IDToken(token = token))
@@ -523,10 +507,6 @@ class MainViewModel(
                 _waitingListCourses.postValue(it)
             }
         }
-    }
-
-    fun deleteWaitingListCourses() {
-        assetsRepository.deleteCourseWaitingList()
     }
 
     fun updatePasswordCreatedFlag(value: Boolean) {

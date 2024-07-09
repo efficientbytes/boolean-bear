@@ -38,7 +38,6 @@ import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
-import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AdFreeSessionService
@@ -95,9 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var singleDeviceLogin: SingleDeviceLogin? = null
     private val userProfileListener: UserProfileListener by inject()
     private val singleDeviceLoginListener: SingleDeviceLoginListener by inject()
-    private val externalScope: CoroutineScope by inject()
     private val authenticationRepository: AuthenticationRepository by inject()
-    private val userProfileRepository: UserProfileRepository by inject()
     private val customAuthStateListener: CustomAuthStateListener by inject()
     private var userProfileFailedToLoad = false
     private var singleDeviceLoginFailedToLoad = false
@@ -177,40 +174,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setUpLiveDataObserver() {
-        viewModel.listenToUserProfileFromDB.observe(this) { userProfile ->
+        viewModel.liveUserProfileFromLocal.observe(this) { userProfile ->
             userProfile?.let {
                 SingletonUserData.setInstance(it)
             }
         }
-        userProfileListener.userProfile.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    it.message?.let { message ->
-                        val snackBar = Snackbar.make(
-                            binding.mainCoordinatorLayout,
-                            message,
-                            Snackbar.LENGTH_LONG
-                        )
-                        snackBar.show()
+        userProfileListener.userProfileFromRemote.observe(this) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.NoInternet -> userProfileFailedToLoad = true
+                    DataStatus.Status.TimeOut -> userProfileFailedToLoad = true
+
+                    DataStatus.Status.Failed -> {
+                        it.message?.let { message ->
+                            val snackBar = Snackbar.make(
+                                binding.mainCoordinatorLayout,
+                                message,
+                                Snackbar.LENGTH_LONG
+                            )
+                            snackBar.show()
+                        }
                     }
-                }
 
-                DataStatus.Status.Success -> {
-                    it.data?.let { userProfile ->
-                        viewModel.saveUserProfile(userProfile)
+                    else -> {
+
                     }
-                }
-
-                DataStatus.Status.NoInternet -> {
-                    userProfileFailedToLoad = true
-                }
-
-                DataStatus.Status.TimeOut -> {
-                    userProfileFailedToLoad = true
-                }
-
-                else -> {
-
                 }
             }
         }
@@ -222,56 +210,59 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.generateFCMToken()
                             if (!isUserLoggedIn) {
                                 isUserLoggedIn = true
-                                userProfileRepository.getUserProfile()
+                                viewModel.getUserProfileFromRemote()
                                 viewModel.getAllWaitingListCourses()
-                                userProfileRepository.listenToUserProfileChange(user.uid)
+                                viewModel.getLiveUserProfileFromRemote(user.uid)
                                 authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
                             }
                         }
                     }
 
                     false -> {
-                        isUserLoggedIn = false
-                        viewModel.deleteSingleDeviceLogin()
-                        viewModel.deleteUserProfile()
-                        viewModel.deleteIDToken()
-                        viewModel.deleteFCMToken()
-                        authenticationRepository.deletePasswordCreated()
-                        viewModel.deleteWaitingListCourses()
-                        userProfileRepository.resetUserProfileScope()
-                        authenticationRepository.resetSingleDeviceScope()
-                        authenticationRepository.resetAuthScope()
-                        cancelAdFreeSessionWorker()
-                        cancelAdFreeSessionService()
-                        viewModel.deleteActiveAdsTemplate()
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            isUserLoggedIn = false
+                            viewModel.resetUser()
+                            viewModel.resetSingleDeviceLogin()
+                            viewModel.resetAuth()
+                            viewModel.resetAssets()
+
+                            viewModel.deleteIDToken()
+                            viewModel.resetFCMToken()
+
+                            cancelAdFreeSessionWorker()
+                            cancelAdFreeSessionService()
+                            viewModel.deleteActiveAdsTemplate()
+                        }
                         Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
                 }
             }
         }
-        userProfileListener.userProfileLiveListener.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    if (it.message?.contains("PERMISSION_DENIED") == false) {
-                        val snackBar = Snackbar.make(
-                            binding.mainCoordinatorLayout,
-                            it.message,
-                            Snackbar.LENGTH_INDEFINITE
-                        )
-                        snackBar.show()
+        userProfileListener.liveUserProfileFromRemote.observe(this) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+                        if (it.message?.contains("PERMISSION_DENIED") == false) {
+                            val snackBar = Snackbar.make(
+                                binding.mainCoordinatorLayout,
+                                it.message,
+                                Snackbar.LENGTH_INDEFINITE
+                            )
+                            snackBar.show()
+                        }
                     }
-                }
 
-                DataStatus.Status.Success -> {
-                    val currentUser = FirebaseAuth.getInstance().currentUser
-                    currentUser?.let {
-                        userProfileRepository.getUserProfile()
-                        viewModel.getFirebaseUserToken()
+                    DataStatus.Status.Success -> {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        currentUser?.let {
+                            viewModel.getUserProfileFromRemote()
+                            viewModel.getFirebaseUserToken()
+                        }
                     }
-                }
 
-                else -> {
+                    else -> {
 
+                    }
                 }
             }
         }
@@ -441,17 +432,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        viewModel.notificationStatusChanged.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Success -> {
-
-                }
-
-                else -> {
-
-                }
-            }
-        }
         viewModel.waitingListCourses.observe(this) {
             when (it.status) {
                 DataStatus.Status.NoInternet -> {
@@ -570,7 +550,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             viewModel.getRemoteSingleDeviceLogin()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
-                                userProfileRepository.getUserProfile()
+                                viewModel.getUserProfileFromRemote()
                             }
                             if (singleDeviceLoginFailedToLoad) {
                                 singleDeviceLoginFailedToLoad = false

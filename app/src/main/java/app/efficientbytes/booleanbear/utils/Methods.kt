@@ -145,18 +145,37 @@ fun formatMillisecondToDateString(timestampInMillisecond: Long): String {
 
 object UserProfileListener {
 
-    private val _userProfileLiveListener: MutableLiveData<DataStatus<DocumentSnapshot?>> =
+    //from server (snapshot listener)
+    private val _liveUserProfileFromRemote: MutableLiveData<DataStatus<DocumentSnapshot?>?> =
         MutableLiveData()
-    val userProfileLiveListener: LiveData<DataStatus<DocumentSnapshot?>> = _userProfileLiveListener
-    private val _userProfile: MutableLiveData<DataStatus<UserProfile?>> = MutableLiveData()
-    val userProfile: LiveData<DataStatus<UserProfile?>> = _userProfile
+    val liveUserProfileFromRemote: LiveData<DataStatus<DocumentSnapshot?>?> =
+        _liveUserProfileFromRemote
 
-    fun postLatestValue(value: DataStatus<DocumentSnapshot?>) {
-        _userProfileLiveListener.postValue(value)
+    //from server
+    private val _userProfileFromRemote: MutableLiveData<DataStatus<UserProfile>?> =
+        MutableLiveData()
+    val userProfileFromRemote: LiveData<DataStatus<UserProfile>?> = _userProfileFromRemote
+
+    //from local storage
+    private val _userProfileFromLocal: MutableLiveData<UserProfile?> = MutableLiveData()
+    val userProfileFromLocal: LiveData<UserProfile?> = _userProfileFromLocal
+
+    fun updateLiveUserProfileFromRemote(latestValue: DataStatus<DocumentSnapshot?>?) {
+        _liveUserProfileFromRemote.postValue(latestValue)
     }
 
-    fun postValue(value: DataStatus<UserProfile?>) {
-        _userProfile.postValue(value)
+    fun updateUserProfileFromRemote(value: DataStatus<UserProfile>?) {
+        _userProfileFromRemote.postValue(value)
+    }
+
+    fun updateUserProfileFromLocal(value: UserProfile?) {
+        _userProfileFromLocal.postValue(value)
+    }
+
+    fun resetAll() {
+        _liveUserProfileFromRemote.postValue(null)
+        _userProfileFromRemote.postValue(null)
+        _userProfileFromLocal.postValue(null)
     }
 
 }

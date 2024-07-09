@@ -35,7 +35,6 @@ class LoginOrSignUpFragment : Fragment() {
         _binding = FragmentLoginOrSignUpBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
-        lifecycle.addObserver(viewModel)
         return rootView
     }
 
