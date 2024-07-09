@@ -22,6 +22,7 @@ import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingletonSingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AdsRepository
 import app.efficientbytes.booleanbear.repositories.AssetsRepository
@@ -123,45 +124,20 @@ class MainViewModel(
         userProfileRepository.getUserProfileFromRemote()
     }
 
-    private val _singleDeviceLoginResponseFromServer: MutableLiveData<DataStatus<SingleDeviceLogin?>> =
-        MutableLiveData()
-    val singleDeviceLoginResponseFromServer: LiveData<DataStatus<SingleDeviceLogin?>> =
-        _singleDeviceLoginResponseFromServer
+    val liveSingleDeviceLoginFromLocal = authenticationRepository.liveSingleDeviceLoginFromLocal
 
-    fun getRemoteSingleDeviceLogin() {
-        viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.getRemoteSingleDeviceLogin().collect {
-                _singleDeviceLoginResponseFromServer.postValue(it)
-            }
-        }
+    fun getSingleDeviceLoginFromLocal() = authenticationRepository.getSingleDeviceLoginFromLocal()
+
+    fun getLiveSingleDeviceLoginFromRemote(userAccountId: String) {
+        authenticationRepository.getLiveSingleDeviceLoginFromRemote(userAccountId)
     }
 
-    private val _singleDeviceLoginFromDB: MutableLiveData<Boolean?> = MutableLiveData()
-    val singleDeviceLoginFromDB: LiveData<Boolean?> = _singleDeviceLoginFromDB
-    private fun getLocalSingleDeviceLogin() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            val singleDeviceLogin = authenticationRepository.getLocalSingleDeviceLogin()
-            if (currentUser != null && singleDeviceLogin == null) {
-                signOutUser()
-                _singleDeviceLoginFromDB.postValue(false)
-            }
-        }
+    fun getSingleDeviceLoginFromRemote() {
+        authenticationRepository.getSingleDeviceLoginFromRemote()
     }
-
-    fun resetSingleDeviceLoginFromDB() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _singleDeviceLoginFromDB.postValue(null)
-        }
-    }
-
-    val liveSingleDeviceLoginFromDB: LiveData<SingleDeviceLogin?> =
-        authenticationRepository.getLiveLocalSingleDeviceLoginStatus()
 
     fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
-        viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.saveSingleDeviceLogin(singleDeviceLogin)
-        }
+        authenticationRepository.saveSingleDeviceLogin(singleDeviceLogin)
     }
 
     fun signOutUser() {
@@ -171,34 +147,41 @@ class MainViewModel(
         resetAssets()
         FirebaseAuth.getInstance().signOut()
     }
+
     fun resetUser() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentUser = FirebaseAuth.getInstance().currentUser
             if (currentUser != null) {
                 SingletonUserData.resetInstance()
+                userProfileRepository.resetUserProfileInLocal()
                 userProfileRepository.resetUserProfileScope()
                 userProfileRepository.resetUserProfileListener()
-                userProfileRepository.resetUserProfileInLocal()
             }
         }
     }
+
     fun resetSingleDeviceLogin() {
         viewModelScope.launch(Dispatchers.IO) {
-            authenticationRepository.deleteSingleDeviceLogin()
+            SingletonSingleDeviceLogin.resetInstance()
+            authenticationRepository.resetSingleDeviceLoginInLocal()
             authenticationRepository.resetSingleDeviceScope()
+            authenticationRepository.resetSingleDeviceLoginListener()
         }
     }
+
     fun resetAuth() {
         viewModelScope.launch(Dispatchers.IO) {
             authenticationRepository.resetAuthScope()
             authenticationRepository.deletePasswordCreated()
         }
     }
+
     fun resetAssets() {
         viewModelScope.launch(Dispatchers.IO) {
             assetsRepository.deleteCourseWaitingList()
         }
     }
+
     fun resetFCMToken() {
         viewModelScope.launch(Dispatchers.IO) {
             userProfileRepository.resetLocalNotificationToken()
@@ -446,7 +429,6 @@ class MainViewModel(
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
-                    getLocalSingleDeviceLogin()
                 }
             }
 
@@ -463,6 +445,10 @@ class MainViewModel(
                 generateIDToken()
                 fetchServerTime()
                 crossCheckRewardedAdPauseTime()
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    getSingleDeviceLoginFromLocal()
+                }
             }
 
             ON_PAUSE -> {

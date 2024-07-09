@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.repositories
 
+import androidx.lifecycle.LiveData
 import app.efficientbytes.booleanbear.database.dao.AuthenticationDao
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.LocalBooleanFlag
@@ -19,7 +20,6 @@ import app.efficientbytes.booleanbear.utils.PASSWORD_CREATED_FLAG
 import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
-import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow
 import app.efficientbytes.booleanbear.utils.authStateFlow
 import com.google.firebase.auth.FirebaseAuth
@@ -40,13 +40,13 @@ class AuthenticationRepository(
     private val authenticationDao: AuthenticationDao,
     private val externalScope: CoroutineScope,
     private val authStateCoroutineScope: AuthStateCoroutineScope,
-    private val userAccountCoroutineScope: UserAccountCoroutineScope,
     private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
     private val singleDeviceLoginListener: SingleDeviceLoginListener,
     private val customAuthStateListener: CustomAuthStateListener
 ) {
 
     private val gson = Gson()
+
     suspend fun getSignInToken(prefix: String, phoneNumber: String) = flow {
         try {
             emit(DataStatus.loading())
@@ -80,55 +80,66 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun getRemoteSingleDeviceLogin() = flow {
-        try {
-            emit(DataStatus.loading())
-            val response = authenticationService.getSingleDeviceLogin()
-            val responseCode = response.code()
-            when {
-                responseCode == 200 -> {
-                    val body = response.body()
-                    if (body != null) {
-                        val singleDeviceLogin = body.data
-                        if (singleDeviceLogin != null) {
-                            emit(DataStatus.success(singleDeviceLogin))
+    val liveSingleDeviceLoginFromLocal: LiveData<SingleDeviceLogin?> =
+        authenticationDao.getLiveSingleDeviceLogin()
+
+    fun getSingleDeviceLoginFromRemote() {
+        singleDeviceLoginCoroutineScope.getScope().launch {
+            try {
+                singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(DataStatus.loading())
+                val response = authenticationService.getSingleDeviceLogin()
+                val responseCode = response.code()
+                when {
+                    responseCode == 200 -> {
+                        val body = response.body()
+                        if (body != null) {
+                            val singleDeviceLogin = body.data
+                            if (singleDeviceLogin != null) {
+                                singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(
+                                    DataStatus.success(
+                                        singleDeviceLogin
+                                    )
+                                )
+                            }
                         }
                     }
-                }
 
-                responseCode >= 400 -> {
-                    val errorResponse: SingleDeviceLoginResponse = gson.fromJson(
-                        response.errorBody()!!.string(),
-                        SingleDeviceLoginResponse::class.java
+                    responseCode >= 400 -> {
+                        val errorResponse: SingleDeviceLoginResponse = gson.fromJson(
+                            response.errorBody()!!.string(),
+                            SingleDeviceLoginResponse::class.java
+                        )
+                        val message = "Error Code $responseCode. ${errorResponse.message}"
+                        singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(
+                            DataStatus.failed(
+                                message
+                            )
+                        )
+                    }
+                }
+            } catch (noInternet: NoInternetException) {
+                singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(DataStatus.noInternet())
+            } catch (socketTimeOutException: SocketTimeoutException) {
+                singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(DataStatus.timeOut())
+            } catch (exception: IOException) {
+                singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(
+                    DataStatus.unknownException(
+                        exception.message.toString()
                     )
-                    val message = "Error Code $responseCode. ${errorResponse.message}"
-                    emit(DataStatus.failed(message))
-                }
+                )
             }
-        } catch (noInternet: NoInternetException) {
-            emit(DataStatus.noInternet())
-        } catch (socketTimeOutException: SocketTimeoutException) {
-            emit(DataStatus.timeOut())
-        } catch (exception: IOException) {
-            emit(DataStatus.unknownException(exception.message.toString()))
         }
-    }.catch { emit(DataStatus.unknownException(it.message.toString())) }
-        .flowOn(Dispatchers.IO)
-
-    suspend fun getLocalSingleDeviceLogin() = authenticationDao.getSingleDeviceLogin()
-
-    fun getLiveLocalSingleDeviceLoginStatus() =
-        authenticationDao.getLiveSingleDeviceLoginStatus()
-
-    suspend fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
-        authenticationDao.insertSingleDeviceLogin(singleDeviceLogin)
     }
 
-    suspend fun deleteSingleDeviceLogin() {
-        authenticationDao.delete()
+    fun getSingleDeviceLoginFromLocal() = authenticationDao.getSingleDeviceLogin()
+
+    fun saveSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin) {
+        singleDeviceLoginCoroutineScope.getScope().launch {
+            authenticationDao.insertSingleDeviceLogin(singleDeviceLogin)
+        }
     }
 
-    fun listenToSingleDeviceLoginChange(userAccountId: String) {
+    fun getLiveSingleDeviceLoginFromRemote(userAccountId: String) {
         if (singleDeviceLoginCoroutineScope.scopeStatus() == null) {
             singleDeviceLoginCoroutineScope.getScope().launch {
                 try {
@@ -139,20 +150,24 @@ class AuthenticationRepository(
                     singleDeviceLoginSnapshot.addSnapshotListenerFlow().collect {
                         when {
                             it.status == DataStatus.Status.Failed -> {
-                                singleDeviceLoginListener.postValue(it)
+                                singleDeviceLoginListener.updateLiveSingleDeviceLoginFromRemote(it)
                             }
 
                             it.status == DataStatus.Status.Success -> {
-                                singleDeviceLoginListener.postValue(it)
+                                singleDeviceLoginListener.updateLiveSingleDeviceLoginFromRemote(it)
                             }
                         }
                     }
                 } catch (noInternet: NoInternetException) {
-                    singleDeviceLoginListener.postValue(DataStatus.noInternet())
+                    singleDeviceLoginListener.updateLiveSingleDeviceLoginFromRemote(DataStatus.noInternet())
                 } catch (socketTimeOutException: SocketTimeoutException) {
-                    singleDeviceLoginListener.postValue(DataStatus.timeOut())
+                    singleDeviceLoginListener.updateLiveSingleDeviceLoginFromRemote(DataStatus.timeOut())
                 } catch (exception: IOException) {
-                    singleDeviceLoginListener.postValue(DataStatus.unknownException(exception.message.toString()))
+                    singleDeviceLoginListener.updateLiveSingleDeviceLoginFromRemote(
+                        DataStatus.unknownException(
+                            exception.message.toString()
+                        )
+                    )
                 }
             }
         }
@@ -162,6 +177,14 @@ class AuthenticationRepository(
         if (singleDeviceLoginCoroutineScope.scopeStatus() != null) {
             singleDeviceLoginCoroutineScope.resetScope()
         }
+    }
+
+    fun resetSingleDeviceLoginListener() {
+        singleDeviceLoginListener.resetAll()
+    }
+
+    suspend fun resetSingleDeviceLoginInLocal() {
+        authenticationDao.deleteSingleDeviceLogin()
     }
 
     suspend fun deleteUserAccount() = flow {

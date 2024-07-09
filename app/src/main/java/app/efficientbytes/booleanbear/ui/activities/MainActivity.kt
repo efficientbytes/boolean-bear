@@ -35,7 +35,7 @@ import app.efficientbytes.booleanbear.BuildConfig
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.AdTemplate
-import app.efficientbytes.booleanbear.models.SingleDeviceLogin
+import app.efficientbytes.booleanbear.models.SingletonSingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
@@ -91,7 +91,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var networkNotAvailable: Boolean = false
     private var networkNotAvailableAtAppLoading: Boolean = false
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
-    private var singleDeviceLogin: SingleDeviceLogin? = null
     private val userProfileListener: UserProfileListener by inject()
     private val singleDeviceLoginListener: SingleDeviceLoginListener by inject()
     private val authenticationRepository: AuthenticationRepository by inject()
@@ -174,68 +173,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setUpLiveDataObserver() {
+        //user profile process
         viewModel.liveUserProfileFromLocal.observe(this) { userProfile ->
             userProfile?.let {
                 SingletonUserData.setInstance(it)
-            }
-        }
-        userProfileListener.userProfileFromRemote.observe(this) {
-            it?.let {
-                when (it.status) {
-                    DataStatus.Status.NoInternet -> userProfileFailedToLoad = true
-                    DataStatus.Status.TimeOut -> userProfileFailedToLoad = true
-
-                    DataStatus.Status.Failed -> {
-                        it.message?.let { message ->
-                            val snackBar = Snackbar.make(
-                                binding.mainCoordinatorLayout,
-                                message,
-                                Snackbar.LENGTH_LONG
-                            )
-                            snackBar.show()
-                        }
-                    }
-
-                    else -> {
-
-                    }
-                }
-            }
-        }
-        customAuthStateListener.liveData.observe(this) {
-            it.let {
-                when (it) {
-                    true -> {
-                        FirebaseAuth.getInstance().currentUser?.let { user ->
-                            viewModel.generateFCMToken()
-                            if (!isUserLoggedIn) {
-                                isUserLoggedIn = true
-                                viewModel.getUserProfileFromRemote()
-                                viewModel.getAllWaitingListCourses()
-                                viewModel.getLiveUserProfileFromRemote(user.uid)
-                                authenticationRepository.listenToSingleDeviceLoginChange(user.uid)
-                            }
-                        }
-                    }
-
-                    false -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            isUserLoggedIn = false
-                            viewModel.resetUser()
-                            viewModel.resetSingleDeviceLogin()
-                            viewModel.resetAuth()
-                            viewModel.resetAssets()
-
-                            viewModel.deleteIDToken()
-                            viewModel.resetFCMToken()
-
-                            cancelAdFreeSessionWorker()
-                            cancelAdFreeSessionService()
-                            viewModel.deleteActiveAdsTemplate()
-                        }
-                        Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
-                    }
-                }
             }
         }
         userProfileListener.liveUserProfileFromRemote.observe(this) {
@@ -266,70 +207,125 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.liveSingleDeviceLoginFromDB.observe(this) {
-            this.singleDeviceLogin = it
-        }
-        viewModel.singleDeviceLoginFromDB.observe(this) {
-            when (it) {
-                true -> {
+        userProfileListener.userProfileFromRemote.observe(this) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.NoInternet -> userProfileFailedToLoad = true
+                    DataStatus.Status.TimeOut -> userProfileFailedToLoad = true
 
-                }
+                    DataStatus.Status.Failed -> {
+                        it.message?.let { message ->
+                            val snackBar = Snackbar.make(
+                                binding.mainCoordinatorLayout,
+                                message,
+                                Snackbar.LENGTH_LONG
+                            )
+                            snackBar.show()
+                        }
+                    }
 
-                false -> {
-                    multipleDeviceLoginDetectedDialog()
-                    viewModel.resetSingleDeviceLoginFromDB()
-                }
+                    else -> {
 
-                null -> {
-
+                    }
                 }
             }
         }
-        viewModel.singleDeviceLoginResponseFromServer.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Failed -> {
-                    singleDeviceLoginFailedToLoad = true
-                }
+        //single device login process
+        viewModel.liveSingleDeviceLoginFromLocal.observe(this) { singleDeviceLogin ->
+            if (FirebaseAuth.getInstance().currentUser != null && singleDeviceLogin == null) {
+                multipleDeviceLoginDetectedDialog()
+                viewModel.signOutUser()
+            } else if (FirebaseAuth.getInstance().currentUser != null && singleDeviceLogin != null) {
+                SingletonSingleDeviceLogin.setInstance(singleDeviceLogin)
+            }
+        }
+        singleDeviceLoginListener.liveSingleDeviceLoginFromRemote.observe(this) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Success -> {
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser != null) {
+                            viewModel.getSingleDeviceLoginFromRemote()
+                        }
+                    }
 
-                DataStatus.Status.Success -> {
-                    it.data?.let { singleDeviceLoginFromServer ->
-                        this@MainActivity.singleDeviceLogin?.let { singleDeviceLoginFromDB ->
-                            if (!compareDeviceId(
-                                    singleDeviceLoginFromDB,
-                                    singleDeviceLoginFromServer
-                                )
-                            ) {
-                                viewModel.signOutUser()
-                                multipleDeviceLoginDetectedDialog()
+                    else -> {
+
+                    }
+                }
+            }
+        }
+        singleDeviceLoginListener.singleDeviceLoginFromRemote.observe(this) {
+            it?.let {
+                when (it.status) {
+                    DataStatus.Status.Failed -> {
+                        singleDeviceLoginFailedToLoad = true
+                    }
+
+                    DataStatus.Status.Success -> {
+                        it.data?.let { singleDeviceLoginFromServer ->
+                            SingletonSingleDeviceLogin.getInstance()
+                                ?.let { singleDeviceLoginFromDB ->
+                                    if (!compareDeviceId(
+                                            singleDeviceLoginFromDB,
+                                            singleDeviceLoginFromServer
+                                        )
+                                    ) {
+                                        viewModel.signOutUser()
+                                        multipleDeviceLoginDetectedDialog()
+                                    }
+                                }
+                        }
+                    }
+
+                    DataStatus.Status.NoInternet -> {
+                        singleDeviceLoginFailedToLoad = true
+                    }
+
+                    DataStatus.Status.TimeOut -> {
+                        singleDeviceLoginFailedToLoad = true
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+        }
+
+        customAuthStateListener.liveData.observe(this) {
+            it.let {
+                when (it) {
+                    true -> {
+                        FirebaseAuth.getInstance().currentUser?.let { user ->
+                            viewModel.generateFCMToken()
+                            if (!isUserLoggedIn) {
+                                isUserLoggedIn = true
+                                viewModel.getUserProfileFromRemote()
+                                viewModel.getAllWaitingListCourses()
+                                viewModel.getLiveUserProfileFromRemote(user.uid)
+                                authenticationRepository.getLiveSingleDeviceLoginFromRemote(user.uid)
                             }
                         }
                     }
-                }
 
-                DataStatus.Status.NoInternet -> {
-                    singleDeviceLoginFailedToLoad = true
-                }
+                    false -> {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            isUserLoggedIn = false
+                            viewModel.resetUser()
+                            viewModel.resetSingleDeviceLogin()
+                            viewModel.resetAuth()
+                            viewModel.resetAssets()
 
-                DataStatus.Status.TimeOut -> {
-                    singleDeviceLoginFailedToLoad = true
-                }
+                            viewModel.deleteIDToken()
+                            viewModel.resetFCMToken()
 
-                else -> {
-
-                }
-            }
-        }
-        singleDeviceLoginListener.liveData.observe(this) {
-            when (it.status) {
-                DataStatus.Status.Success -> {
-                    val currentUser = FirebaseAuth.getInstance().currentUser
-                    if (currentUser != null) {
-                        viewModel.getRemoteSingleDeviceLogin()
+                            cancelAdFreeSessionWorker()
+                            cancelAdFreeSessionService()
+                            viewModel.deleteActiveAdsTemplate()
+                        }
+                        Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
                     }
-                }
-
-                else -> {
-
                 }
             }
         }
@@ -408,7 +404,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-
         viewModel.issueCategoriesAdapter.observe(this) {
             when (it.status) {
                 DataStatus.Status.TimeOut -> {
@@ -547,14 +542,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         if (currentUser != null) {
                             viewModel.getFirebaseUserToken()
-                            viewModel.getRemoteSingleDeviceLogin()
+                            viewModel.getSingleDeviceLoginFromRemote()
                             if (userProfileFailedToLoad) {
                                 userProfileFailedToLoad = false
                                 viewModel.getUserProfileFromRemote()
                             }
                             if (singleDeviceLoginFailedToLoad) {
                                 singleDeviceLoginFailedToLoad = false
-                                viewModel.getRemoteSingleDeviceLogin()
+                                viewModel.getSingleDeviceLoginFromRemote()
                             }
                             if (accountDeletionFailed) {
                                 accountDeletionFailed = false
@@ -582,7 +577,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         if (currentUser != null) {
-                            viewModel.getRemoteSingleDeviceLogin()
+                            viewModel.getSingleDeviceLoginFromRemote()
                             viewModel.getFirebaseUserToken()
                             viewModel.getAllWaitingListCourses()
                         }

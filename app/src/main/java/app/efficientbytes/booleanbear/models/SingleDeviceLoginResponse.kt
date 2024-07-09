@@ -18,3 +18,17 @@ data class SingleDeviceLoginResponse(
     val data: SingleDeviceLogin? = null,
     val message: String? = null,
 )
+
+object SingletonSingleDeviceLogin {
+
+    private var singleDeviceLogin: SingleDeviceLogin? = null
+    fun getInstance() = singleDeviceLogin
+
+    fun setInstance(singleDeviceLogin: SingleDeviceLogin) {
+        this.singleDeviceLogin = singleDeviceLogin
+    }
+
+    fun resetInstance() {
+        this.singleDeviceLogin = null
+    }
+}

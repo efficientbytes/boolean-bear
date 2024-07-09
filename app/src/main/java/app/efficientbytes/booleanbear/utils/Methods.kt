@@ -156,10 +156,6 @@ object UserProfileListener {
         MutableLiveData()
     val userProfileFromRemote: LiveData<DataStatus<UserProfile>?> = _userProfileFromRemote
 
-    //from local storage
-    private val _userProfileFromLocal: MutableLiveData<UserProfile?> = MutableLiveData()
-    val userProfileFromLocal: LiveData<UserProfile?> = _userProfileFromLocal
-
     fun updateLiveUserProfileFromRemote(latestValue: DataStatus<DocumentSnapshot?>?) {
         _liveUserProfileFromRemote.postValue(latestValue)
     }
@@ -168,25 +164,38 @@ object UserProfileListener {
         _userProfileFromRemote.postValue(value)
     }
 
-    fun updateUserProfileFromLocal(value: UserProfile?) {
-        _userProfileFromLocal.postValue(value)
-    }
-
     fun resetAll() {
         _liveUserProfileFromRemote.postValue(null)
         _userProfileFromRemote.postValue(null)
-        _userProfileFromLocal.postValue(null)
     }
 
 }
 
 object SingleDeviceLoginListener {
 
-    private val _mutableLiveData: MutableLiveData<DataStatus<DocumentSnapshot?>> = MutableLiveData()
-    val liveData: LiveData<DataStatus<DocumentSnapshot?>> = _mutableLiveData
+    //from server (snapshot listener)
+    private val _liveSingleDeviceLoginFromRemote: MutableLiveData<DataStatus<DocumentSnapshot?>?> =
+        MutableLiveData()
+    val liveSingleDeviceLoginFromRemote: LiveData<DataStatus<DocumentSnapshot?>?> =
+        _liveSingleDeviceLoginFromRemote
 
-    fun postValue(value: DataStatus<DocumentSnapshot?>) {
-        _mutableLiveData.postValue(value)
+    //from server
+    private val _singleDeviceLoginFromRemote: MutableLiveData<DataStatus<SingleDeviceLogin>?> =
+        MutableLiveData()
+    val singleDeviceLoginFromRemote: LiveData<DataStatus<SingleDeviceLogin>?> =
+        _singleDeviceLoginFromRemote
+
+    fun updateLiveSingleDeviceLoginFromRemote(latestValue: DataStatus<DocumentSnapshot?>?) {
+        _liveSingleDeviceLoginFromRemote.postValue(latestValue)
+    }
+
+    fun updateSingleDeviceLoginFromRemote(value: DataStatus<SingleDeviceLogin>?) {
+        _singleDeviceLoginFromRemote.postValue(value)
+    }
+
+    fun resetAll() {
+        _liveSingleDeviceLoginFromRemote.postValue(null)
+        _singleDeviceLoginFromRemote.postValue(null)
     }
 
 }

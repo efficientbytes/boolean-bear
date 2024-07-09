@@ -19,13 +19,13 @@ interface AuthenticationDao {
     suspend fun insertSingleDeviceLogin(singleDeviceLogin: SingleDeviceLogin)
 
     @Query("DELETE FROM $SINGLE_DEVICE_LOGIN_TABLE ")
-    suspend fun delete()
+    suspend fun deleteSingleDeviceLogin()
 
     @Query("SELECT * FROM $SINGLE_DEVICE_LOGIN_TABLE ")
-    suspend fun getSingleDeviceLogin(): SingleDeviceLogin?
+    fun getSingleDeviceLogin(): SingleDeviceLogin?
 
     @Query("SELECT * FROM $SINGLE_DEVICE_LOGIN_TABLE ")
-    fun getLiveSingleDeviceLoginStatus(): LiveData<SingleDeviceLogin?>
+    fun getLiveSingleDeviceLogin(): LiveData<SingleDeviceLogin?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIDToken(idToken: IDToken)
@@ -43,6 +43,6 @@ interface AuthenticationDao {
     suspend fun deletePasswordCreatedFlag(name: String)
 
     @Query(" SELECT value FROM $BOOLEAN_FLAG_TABLE WHERE flagKey = :name")
-    suspend fun getPasswordCreated(name: String): Boolean?
+    fun getPasswordCreated(name: String): Boolean?
 
 }
