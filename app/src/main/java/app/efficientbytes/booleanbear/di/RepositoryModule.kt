@@ -13,7 +13,7 @@ import org.koin.dsl.module
 val repositoryModule = module {
     factory { VerificationRepository(get()) }
     factory { UserProfileRepository(get(), get(), get(), get(), get()) }
-    factory { AuthenticationRepository(get(), get(), get(), get(), get(), get(), get()) }
+    factory { AuthenticationRepository(get(), get(), get(), get(), get(), get()) }
     factory { UtilityDataRepository(get(), get(), get()) }
     factory { FeedbackNSupportRepository(get()) }
     factory { AssetsRepository(get(), get(), get()) }

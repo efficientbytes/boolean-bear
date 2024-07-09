@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentAccountSettingsBinding
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.viewmodels.AccountSettingsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -29,7 +29,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
     private lateinit var _binding: FragmentAccountSettingsBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val appAuthStateListener: AppAuthStateListener by inject()
     private val viewModel: AccountSettingsViewModel by viewModels()
     private val auth: FirebaseAuth by lazy {
         Firebase.auth
@@ -42,7 +42,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         _binding = FragmentAccountSettingsBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.customAuthState = customAuthStateListener
+        binding.customAuthState = appAuthStateListener
         return rootView
     }
 

@@ -260,13 +260,17 @@ object SingleDeviceLoginCoroutineScope {
     }
 }
 
-object CustomAuthStateListener {
+object AppAuthStateListener {
 
-    private val _mutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
-    val liveData: LiveData<Boolean> = _mutableLiveData
+    private val _liveAuthStateFromRemote: MutableLiveData<Boolean?> = MutableLiveData()
+    val liveAuthStateFromRemote: LiveData<Boolean?> = _liveAuthStateFromRemote
 
-    fun postValue(value: Boolean) {
-        _mutableLiveData.postValue(value)
+    fun updateLiveAuthStateFromRemote(latestValue: Boolean) {
+        _liveAuthStateFromRemote.postValue(latestValue)
+    }
+
+    fun resetAll() {
+        _liveAuthStateFromRemote.postValue(null)
     }
 
 }

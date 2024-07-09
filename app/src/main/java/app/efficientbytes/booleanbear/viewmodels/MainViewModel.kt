@@ -114,6 +114,10 @@ class MainViewModel(
         }
     }
 
+    fun saveIDToken(token : String){
+        authenticationRepository.saveIDToken(IDToken(token = token))
+    }
+
     val liveUserProfileFromLocal = userProfileRepository.liveUserProfileFromLocal
 
     fun getLiveUserProfileFromRemote(userAccountId: String) {
@@ -145,18 +149,17 @@ class MainViewModel(
         resetSingleDeviceLogin()
         resetAuth()
         resetAssets()
+        resetIDToken()
+        resetFCMToken()
         FirebaseAuth.getInstance().signOut()
     }
 
     fun resetUser() {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser != null) {
-                SingletonUserData.resetInstance()
-                userProfileRepository.resetUserProfileInLocal()
-                userProfileRepository.resetUserProfileScope()
-                userProfileRepository.resetUserProfileListener()
-            }
+            SingletonUserData.resetInstance()
+            userProfileRepository.resetUserProfileInLocal()
+            userProfileRepository.resetUserProfileScope()
+            userProfileRepository.resetUserProfileListener()
         }
     }
 
@@ -328,8 +331,10 @@ class MainViewModel(
         userProfileRepository.generateFCMToken()
     }
 
-    fun deleteIDToken() {
-        authenticationRepository.deleteIDToken()
+    fun resetIDToken() {
+        viewModelScope.launch(Dispatchers.IO) {
+            authenticationRepository.deleteIDToken()
+        }
     }
 
     private fun generateIDToken() {

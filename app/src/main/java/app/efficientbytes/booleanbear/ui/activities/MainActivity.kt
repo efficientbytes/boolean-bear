@@ -37,13 +37,11 @@ import app.efficientbytes.booleanbear.databinding.ActivityMainBinding
 import app.efficientbytes.booleanbear.models.AdTemplate
 import app.efficientbytes.booleanbear.models.SingletonSingleDeviceLogin
 import app.efficientbytes.booleanbear.models.SingletonUserData
-import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
-import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.AdFreeSessionService
 import app.efficientbytes.booleanbear.utils.AdFreeSessionWorker
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.compareDeviceId
@@ -87,25 +85,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             )
         )
     }
-    private val connectivityListener: ConnectivityListener by inject()
-    private var networkNotAvailable: Boolean = false
-    private var networkNotAvailableAtAppLoading: Boolean = false
+
+    //property injection
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
+    private val connectivityListener: ConnectivityListener by inject()
+    private val workManager: WorkManager by inject()
+
+    // live data listener
     private val userProfileListener: UserProfileListener by inject()
     private val singleDeviceLoginListener: SingleDeviceLoginListener by inject()
-    private val authenticationRepository: AuthenticationRepository by inject()
-    private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val appAuthStateListener: AppAuthStateListener by inject()
+
+    //flags
+    private var networkNotAvailable = false
+    private var networkNotAvailableAtAppLoading = false
     private var userProfileFailedToLoad = false
     private var singleDeviceLoginFailedToLoad = false
     private var serverTimeFailedToLoad = false
     private var accountDeletionFailed = false
     private var waitingListCoursesFailedToLoad = false
-    private val utilityDataRepository: UtilityDataRepository by inject()
     private var professionalAdapterFailedToLoad = false
     private var issueCategoriesFailedToLoad = false
-    private var dialog: Dialog? = null
     private var isDialogOpened: Boolean = false
-    private val workManager: WorkManager by inject()
+
+    //dialog
+    private var dialog: Dialog? = null
 
     //for ad mob rewarded ad
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)
@@ -119,7 +123,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             } else {
                 Snackbar.make(
                     binding.mainCoordinatorLayout,
-                    "You have denied the permission to show notifications. To show notifications you can enable it in settings.",
+                    getString(R.string.you_have_denied_the_permission_to_show_notifications_to_show_notifications_you_can_enable_it_in_settings),
                     Snackbar.LENGTH_INDEFINITE
                 ).setAction("Open Settings") {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -136,11 +140,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     companion object {
 
         var isUserLoggedIn = false
-        var hasListenedToIntent = false
         var isAdLoading = false
         var isAdTemplateActive = false
         var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_20
         var adPauseOverMessageDisplayed = true
+        private val isSingleDeviceLoginLaunched = AtomicBoolean(false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,7 +187,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             it?.let {
                 when (it.status) {
                     DataStatus.Status.Failed -> {
-                        if (it.message?.contains("PERMISSION_DENIED") == false) {
+                        if (it.message?.contains(getString(R.string.permission_denied)) == false) {
                             val snackBar = Snackbar.make(
                                 binding.mainCoordinatorLayout,
                                 it.message,
@@ -232,10 +236,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         //single device login process
         viewModel.liveSingleDeviceLoginFromLocal.observe(this) { singleDeviceLogin ->
-            if (FirebaseAuth.getInstance().currentUser != null && singleDeviceLogin == null) {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null && singleDeviceLogin == null) {
                 multipleDeviceLoginDetectedDialog()
                 viewModel.signOutUser()
-            } else if (FirebaseAuth.getInstance().currentUser != null && singleDeviceLogin != null) {
+            } else if (currentUser != null && singleDeviceLogin != null) {
                 SingletonSingleDeviceLogin.setInstance(singleDeviceLogin)
             }
         }
@@ -292,40 +297,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-
-        customAuthStateListener.liveData.observe(this) {
-            it.let {
-                when (it) {
-                    true -> {
-                        FirebaseAuth.getInstance().currentUser?.let { user ->
-                            viewModel.generateFCMToken()
-                            if (!isUserLoggedIn) {
-                                isUserLoggedIn = true
-                                viewModel.getUserProfileFromRemote()
-                                viewModel.getAllWaitingListCourses()
-                                viewModel.getLiveUserProfileFromRemote(user.uid)
-                                authenticationRepository.getLiveSingleDeviceLoginFromRemote(user.uid)
-                            }
+        //auth state listener
+        appAuthStateListener.liveAuthStateFromRemote.observe(this) {
+            when (it) {
+                true -> {
+                    FirebaseAuth.getInstance().currentUser?.let { user ->
+                        viewModel.generateFCMToken()
+                        if (!isUserLoggedIn) {
+                            isUserLoggedIn = true
+                            viewModel.getFirebaseUserToken()
+                            viewModel.getLiveUserProfileFromRemote(user.uid)
+                            viewModel.getLiveSingleDeviceLoginFromRemote(user.uid)
                         }
                     }
+                }
 
-                    false -> {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            isUserLoggedIn = false
-                            viewModel.resetUser()
-                            viewModel.resetSingleDeviceLogin()
-                            viewModel.resetAuth()
-                            viewModel.resetAssets()
+                false -> {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        isUserLoggedIn = false
+                        viewModel.resetUser()
+                        viewModel.resetSingleDeviceLogin()
+                        viewModel.resetAuth()
+                        viewModel.resetAssets()
 
-                            viewModel.deleteIDToken()
-                            viewModel.resetFCMToken()
+                        viewModel.resetIDToken()
+                        viewModel.resetFCMToken()
 
-                            cancelAdFreeSessionWorker()
-                            cancelAdFreeSessionService()
-                            viewModel.deleteActiveAdsTemplate()
-                        }
-                        Toast.makeText(this, "You have been signed out.", Toast.LENGTH_LONG).show()
+                        cancelAdFreeSessionWorker()
+                        cancelAdFreeSessionService()
+                        viewModel.deleteActiveAdsTemplate()
                     }
+                    Toast.makeText(
+                        this,
+                        getString(R.string.you_have_been_signed_out), Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                null -> {
+
+                }
+            }
+        }
+        //firebase user token
+        viewModel.firebaseUserToken.observe(this) {
+            when (it.status) {
+                DataStatus.Status.Success -> {
+                    it.data?.let { token ->
+                        token.token?.let { idToken ->
+                            viewModel.saveIDToken(idToken)
+                        }
+                    }
+                }
+
+                else -> {
+
                 }
             }
         }
@@ -340,9 +365,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 this@MainActivity,
                                 com.google.android.material.R.style.MaterialAlertDialog_Material3
                             )
-                                .setTitle("Time Not Synced")
-                                .setMessage("Your device time is not in sync. Please synchronize your device's time to continue using the app.")
-                                .setPositiveButton("ok") { _, _ ->
+                                .setTitle(getString(R.string.time_not_synced))
+                                .setMessage(getString(R.string.your_device_time_is_not_in_sync_please_synchronize_your_device_s_time_to_continue_using_the_app))
+                                .setPositiveButton(getString(R.string.ok)) { _, _ ->
                                     viewModel.fetchServerTime()
                                 }
                                 .setCancelable(false)
@@ -503,7 +528,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Snackbar.make(
                             binding.parentConstraintLayout,
                             currentAdTemplate?.completionMessage
-                                ?: "Your ad-free period has concluded. We appreciate your support!",
+                                ?: getString(R.string.your_ad_free_period_has_concluded_we_appreciate_your_support),
                             Snackbar.LENGTH_LONG
                         )
                             .show()
@@ -838,7 +863,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         } else {
                             Snackbar.make(
                                 binding.mainCoordinatorLayout,
-                                "You need to be logged in to delete your account",
+                                getString(R.string.you_need_to_be_logged_in_to_delete_your_account),
                                 Snackbar.LENGTH_LONG
                             ).show()
                         }
@@ -855,7 +880,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                 } else {
                                     Snackbar.make(
                                         binding.mainCoordinatorLayout,
-                                        "You need to be logged in to access the content",
+                                        getString(R.string.you_need_to_be_logged_in_to_access_the_content),
                                         Snackbar.LENGTH_LONG
                                     ).show()
                                 }

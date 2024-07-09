@@ -12,8 +12,8 @@ import app.efficientbytes.booleanbear.services.AuthenticationService
 import app.efficientbytes.booleanbear.services.models.PasswordAuthenticationResponse
 import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInTokenResponse
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import app.efficientbytes.booleanbear.utils.PASSWORD_CREATED_FLAG
@@ -26,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -38,11 +37,10 @@ import java.net.SocketTimeoutException
 class AuthenticationRepository(
     private val authenticationService: AuthenticationService,
     private val authenticationDao: AuthenticationDao,
-    private val externalScope: CoroutineScope,
     private val authStateCoroutineScope: AuthStateCoroutineScope,
     private val singleDeviceLoginCoroutineScope: SingleDeviceLoginCoroutineScope,
     private val singleDeviceLoginListener: SingleDeviceLoginListener,
-    private val customAuthStateListener: CustomAuthStateListener
+    private val appAuthStateListener: AppAuthStateListener
 ) {
 
     private val gson = Gson()
@@ -216,13 +214,13 @@ class AuthenticationRepository(
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    fun listenForAuthStateChanges() {
+    fun getLiveAuthStateFromRemote() {
         if (authStateCoroutineScope.scopeStatus() == null) {
             authStateCoroutineScope.getScope().launch {
                 try {
                     val auth = FirebaseAuth.getInstance()
                     auth.authStateFlow().collect { authState ->
-                        customAuthStateListener.postValue(authState is AuthState.Authenticated)
+                        appAuthStateListener.updateLiveAuthStateFromRemote(authState is AuthState.Authenticated)
                     }
                 } catch (exception: Exception) {
                 }
@@ -239,7 +237,7 @@ class AuthenticationRepository(
     fun generateIDToken(idTokenListener: IDTokenListener) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            externalScope.launch {
+            authStateCoroutineScope.getScope().launch {
                 currentUser.getIdToken(true)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -253,20 +251,18 @@ class AuthenticationRepository(
         }
     }
 
-    fun deleteIDToken() {
-        externalScope.launch {
-            authenticationDao.deleteIDTokenTable()
-        }
+    suspend fun deleteIDToken() {
+        authenticationDao.deleteIDTokenTable()
     }
 
     fun saveIDToken(idToken: IDToken) {
-        externalScope.launch {
+        authStateCoroutineScope.getScope().launch {
             authenticationDao.insertIDToken(idToken)
         }
     }
 
     fun insertPasswordCreated(value: Boolean) {
-        externalScope.launch {
+        authStateCoroutineScope.getScope().launch {
             authenticationDao.insertPasswordCreatedFlag(
                 LocalBooleanFlag(
                     PASSWORD_CREATED_FLAG,
@@ -350,10 +346,8 @@ class AuthenticationRepository(
     }.catch { emit(null) }
         .flowOn(Dispatchers.IO)
 
-    fun deletePasswordCreated() {
-        externalScope.launch {
-            authenticationDao.deletePasswordCreatedFlag(PASSWORD_CREATED_FLAG)
-        }
+    suspend fun deletePasswordCreated() {
+        authenticationDao.deletePasswordCreatedFlag(PASSWORD_CREATED_FLAG)
     }
 
     fun authenticateWithPassword(userAccountId: String, password: String) = flow {

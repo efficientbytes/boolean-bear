@@ -10,7 +10,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentEditProfileBinding
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
@@ -21,7 +21,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
     private val binding get() = _binding
     private lateinit var rootView: View
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
-    private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val appAuthStateListener: AppAuthStateListener by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +36,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        customAuthStateListener.liveData.observe(viewLifecycleOwner) {
+        appAuthStateListener.liveAuthStateFromRemote.observe(viewLifecycleOwner) {
             it?.let { authState ->
                 when (authState) {
                     true -> {

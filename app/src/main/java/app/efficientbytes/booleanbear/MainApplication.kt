@@ -90,12 +90,9 @@ class MainApplication : Application(), KoinComponent {
         assetsRepository.deleteCourseTopics()
         assetsRepository.deleteCourses()
         if (currentUser != null) {
-            authenticationRepository.listenForAuthStateChanges()
+            authenticationRepository.getLiveAuthStateFromRemote()
             authenticationRepository.getLiveSingleDeviceLoginFromRemote(currentUser.uid)
             userProfileRepository.getLiveUserProfileFromRemote(currentUser.uid)
-        } else {
-            authenticationRepository.deleteIDToken()
-            assetsRepository.deleteCourseWaitingList()
         }
 
     }

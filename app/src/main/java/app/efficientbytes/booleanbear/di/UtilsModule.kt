@@ -13,7 +13,7 @@ val utilsModule = module {
     single { provideAuthStateCoroutineScope() }
     single { provideUserAccountCoroutineScope() }
     single { provideSingleDeviceLoginCoroutineScope() }
-    single { provideCustomAuthStateListener() }
+    single { provideAppAuthStateListener() }
     single { provideServiceError() }
     single { provideInstructorLiveListener() }
     single { provideMentionedLinksLiveListener() }
