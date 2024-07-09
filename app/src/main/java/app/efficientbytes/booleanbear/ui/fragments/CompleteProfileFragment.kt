@@ -194,7 +194,6 @@ class CompleteProfileFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     it.data?.let { userProfile ->
                         binding.progressStatusValueTextView.text = it.message.toString()
-                        mainViewModel.saveUserProfile(userProfile)
                         if (passwordCreated) {
                             findNavController().popBackStack(R.id.homeFragment, false)
                         } else {

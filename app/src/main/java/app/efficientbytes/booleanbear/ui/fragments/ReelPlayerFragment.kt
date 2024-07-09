@@ -48,7 +48,7 @@ import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
@@ -103,7 +103,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private var isPlayerQualityOrSpeedDialogOpened: Boolean = false
     private var currentVideoQuality = VideoQualityType.AUTO
     private var currentPlaybackSpeed = VideoPlaybackSpeed.x1
-    private val customAuthStateListener: CustomAuthStateListener by inject()
+    private val customAuthStateListener: AppAuthStateListener by inject()
     private val safeArgs: ReelPlayerFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels<MainViewModel>()
 
@@ -480,7 +480,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             startActivity(shareIntent)
         }
 
-        customAuthStateListener.liveData.observe(viewLifecycleOwner) {
+        customAuthStateListener.liveAuthStateFromRemote.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
 
@@ -488,6 +488,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
                 false -> {
                     findNavController().popBackStack(R.id.homeFragment, false)
+                }
+
+                null->{
+
                 }
             }
         }

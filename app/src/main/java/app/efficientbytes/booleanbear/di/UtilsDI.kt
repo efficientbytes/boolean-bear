@@ -1,10 +1,10 @@
 package app.efficientbytes.booleanbear.di
 
 import android.content.Context
+import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
-import app.efficientbytes.booleanbear.utils.CustomAuthStateListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
 import app.efficientbytes.booleanbear.utils.ServiceError
@@ -36,7 +36,7 @@ fun provideUserAccountCoroutineScope() = UserAccountCoroutineScope
 
 fun provideSingleDeviceLoginCoroutineScope() = SingleDeviceLoginCoroutineScope
 
-fun provideCustomAuthStateListener() = CustomAuthStateListener
+fun provideAppAuthStateListener() = AppAuthStateListener
 
 fun provideServiceError() = ServiceError
 

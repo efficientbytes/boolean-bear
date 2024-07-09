@@ -2,7 +2,6 @@ package app.efficientbytes.booleanbear.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import org.koin.core.component.KoinComponent
@@ -12,6 +11,6 @@ class AccountSettingsViewModel :
     ViewModel(), KoinComponent {
 
     private val userProfileRepository: UserProfileRepository by inject()
-    val userProfile: LiveData<UserProfile?> = userProfileRepository.userProfile.asLiveData()
+    val userProfile: LiveData<UserProfile?> = userProfileRepository.liveUserProfileFromLocal
 
 }

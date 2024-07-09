@@ -200,5 +200,14 @@
     <string name="_1080p">1080p</string>
     <string name="please_wait_while_we_submit_your_feedback">Please wait while we submit your feedback...</string>
     <string name="hi">Hi %1$s</string>
+    <string name="you_have_been_signed_out">You have been signed out.</string>
+    <string name="you_have_denied_the_permission_to_show_notifications_to_show_notifications_you_can_enable_it_in_settings">You have denied the permission to show notifications. To show notifications you can enable it in settings.</string>
+    <string name="permission_denied">PERMISSION_DENIED</string>
+    <string name="time_not_synced">Time Not Synced</string>
+    <string name="your_device_time_is_not_in_sync_please_synchronize_your_device_s_time_to_continue_using_the_app">Your device time is not in sync. Please synchronize your device\'s time to continue using the app.</string>
+    <string name="ok">ok</string>
+    <string name="your_ad_free_period_has_concluded_we_appreciate_your_support">Your ad-free period has concluded. We appreciate your support!</string>
+    <string name="you_need_to_be_logged_in_to_delete_your_account">You need to be logged in to delete your account</string>
+    <string name="you_need_to_be_logged_in_to_access_the_content">You need to be logged in to access the content</string>
 
 </resources>

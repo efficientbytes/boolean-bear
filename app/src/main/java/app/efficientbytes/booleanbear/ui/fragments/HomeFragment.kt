@@ -477,7 +477,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         super.onStart()
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            authenticationRepository.listenForAuthStateChanges()
+            authenticationRepository.getLiveAuthStateFromRemote()
         }
     }
 

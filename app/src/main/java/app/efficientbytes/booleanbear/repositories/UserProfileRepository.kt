@@ -1,5 +1,6 @@
 package app.efficientbytes.booleanbear.repositories
 
+import androidx.lifecycle.LiveData
 import app.efficientbytes.booleanbear.database.dao.AssetsDao
 import app.efficientbytes.booleanbear.database.dao.UserProfileDao
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
@@ -7,7 +8,6 @@ import app.efficientbytes.booleanbear.database.models.LocalWaitingListCourse
 import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.UserProfileService
-import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.UserProfileResponse
 import app.efficientbytes.booleanbear.services.models.WaitingListCoursesResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
@@ -21,9 +21,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -34,18 +32,17 @@ import java.net.SocketTimeoutException
 class UserProfileRepository(
     private val userProfileService: UserProfileService,
     private val userProfileDao: UserProfileDao,
-    private val externalScope: CoroutineScope,
     private val userProfileCoroutineScope: UserAccountCoroutineScope,
     private val userProfileListener: UserProfileListener,
     private val assetsDao: AssetsDao
 ) {
 
-    val userProfile: Flow<UserProfile?> = userProfileDao.getUserProfile()
     private val gson = Gson()
+    val liveUserProfileFromLocal: LiveData<UserProfile?> = userProfileDao.getUserProfile()
 
-    fun getUserProfile() {
-        userProfileListener.postValue(DataStatus.loading())
-        externalScope.launch {
+    fun getUserProfileFromRemote() {
+        userProfileCoroutineScope.getScope().launch {
+            userProfileListener.updateUserProfileFromRemote(DataStatus.loading())
             try {
                 val response = userProfileService.getUserProfile()
                 val responseCode = response.code()
@@ -54,7 +51,8 @@ class UserProfileRepository(
                         val userProfileResponse = response.body()
                         val user = userProfileResponse?.data
                         if (user != null) {
-                            userProfileListener.postValue(DataStatus.success(user))
+                            userProfileDao.insertUserProfile(user)
+                            userProfileListener.updateUserProfileFromRemote(DataStatus.success(user))
                         }
                     }
 
@@ -66,16 +64,24 @@ class UserProfileRepository(
                         if (!(responseCode == 404 && errorResponse.message.equals("User profile does not exists."))) {
                             val message =
                                 "Error Code $responseCode. ${errorResponse.message.toString()}"
-                            userProfileListener.postValue(DataStatus.failed(message))
+                            userProfileListener.updateUserProfileFromRemote(
+                                DataStatus.failed(
+                                    message
+                                )
+                            )
                         }
                     }
                 }
             } catch (noInternet: NoInternetException) {
-                userProfileListener.postValue(DataStatus.noInternet())
+                userProfileListener.updateUserProfileFromRemote(DataStatus.noInternet())
             } catch (socketTimeOutException: SocketTimeoutException) {
-                userProfileListener.postValue(DataStatus.timeOut())
+                userProfileListener.updateUserProfileFromRemote(DataStatus.timeOut())
             } catch (exception: IOException) {
-                userProfileListener.postValue(DataStatus.unknownException(exception.message.toString()))
+                userProfileListener.updateUserProfileFromRemote(
+                    DataStatus.unknownException(
+                        exception.message.toString()
+                    )
+                )
             }
         }
     }
@@ -108,6 +114,7 @@ class UserProfileRepository(
                     val userProfileResponse = response.body()
                     val user = userProfileResponse?.data
                     if (user != null) {
+                        userProfileDao.insertUserProfile(user)
                         emit(DataStatus.success(data = user, message = userProfileResponse.message))
                     }
                 }
@@ -160,6 +167,7 @@ class UserProfileRepository(
                     val userProfileResponse = response.body()
                     val user = userProfileResponse?.data
                     if (user != null) {
+                        userProfileDao.insertUserProfile(user)
                         emit(DataStatus.success(user))
                     }
                 }
@@ -184,15 +192,7 @@ class UserProfileRepository(
     }.catch { emit(DataStatus.unknownException<UserProfile>(it.message.toString())) }
         .flowOn(Dispatchers.IO)
 
-    suspend fun saveUserProfile(userProfile: UserProfile) {
-        userProfileDao.insertUserProfile(userProfile)
-    }
-
-    suspend fun deleteUserProfile() {
-        userProfileDao.delete()
-    }
-
-    fun listenToUserProfileChange(userAccountId: String) {
+    fun getLiveUserProfileFromRemote(userAccountId: String) {
         if (userProfileCoroutineScope.scopeStatus() == null) {
             userProfileCoroutineScope.getScope().launch {
                 val userProfileSnapshot =
@@ -202,20 +202,24 @@ class UserProfileRepository(
                     userProfileSnapshot.addSnapshotListenerFlow().collect {
                         when {
                             it.status == DataStatus.Status.Failed -> {
-                                userProfileListener.postLatestValue(it)
+                                userProfileListener.updateLiveUserProfileFromRemote(it)
                             }
 
                             it.status == DataStatus.Status.Success -> {
-                                userProfileListener.postLatestValue(it)
+                                userProfileListener.updateLiveUserProfileFromRemote(it)
                             }
                         }
                     }
                 } catch (noInternet: NoInternetException) {
-                    userProfileListener.postLatestValue(DataStatus.noInternet())
+                    userProfileListener.updateLiveUserProfileFromRemote(DataStatus.noInternet())
                 } catch (socketTimeOutException: SocketTimeoutException) {
-                    userProfileListener.postLatestValue(DataStatus.timeOut())
+                    userProfileListener.updateLiveUserProfileFromRemote(DataStatus.timeOut())
                 } catch (exception: IOException) {
-                    userProfileListener.postLatestValue(DataStatus.unknownException(exception.message.toString()))
+                    userProfileListener.updateLiveUserProfileFromRemote(
+                        DataStatus.unknownException(
+                            exception.message.toString()
+                        )
+                    )
                 }
             }
         }
@@ -227,60 +231,27 @@ class UserProfileRepository(
         }
     }
 
-    fun uploadNotificationsToken(
-        token: String,
-        notificationListener: NotificationUploadListener? = null
-    ) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            externalScope.launch {
-                notificationListener?.onTokenStatusChanged(DataStatus.loading())
-                try {
-                    val response = userProfileService.uploadNotificationsToken(token)
-                    val responseCode = response.code()
-                    when {
-                        responseCode == 200 -> {
-                            val body = response.body()
-                            if (body != null) notificationListener?.onTokenStatusChanged(
-                                DataStatus.success(
-                                    body
-                                )
-                            ) else notificationListener?.onTokenStatusChanged(DataStatus.emptyResult())
-                        }
+    fun resetUserProfileListener() {
+        userProfileListener.resetAll()
+    }
 
-                        responseCode >= 400 -> {
-                            val errorResponse: ResponseMessage = gson.fromJson(
-                                response.errorBody()!!.string(),
-                                ResponseMessage::class.java
-                            )
-                            notificationListener?.onTokenStatusChanged(
-                                DataStatus.failed(
-                                    errorResponse.message.toString()
-                                )
-                            )
-                        }
-                    }
-                } catch (noInternet: NoInternetException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.noInternet()
-                    )
-                } catch (socketTimeOutException: SocketTimeoutException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.timeOut()
-                    )
-                } catch (exception: IOException) {
-                    notificationListener?.onTokenStatusChanged(
-                        DataStatus.unknownException(exception.message.toString())
-                    )
-                }
+    suspend fun resetUserProfileInLocal() {
+        userProfileDao.deleteUserProfile()
+    }
+
+    fun uploadNotificationsToken(token: String) {
+        userProfileCoroutineScope.getScope().launch {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null) {
+                userProfileService.uploadNotificationsToken(token)
             }
         }
     }
 
-    fun generateFCMToken(notificationListener: NotificationUploadListener) {
+    fun generateFCMToken() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            externalScope.launch {
+            userProfileCoroutineScope.getScope().launch {
                 val result = userProfileDao.getFCMToken()
                 if (result == null) {
                     FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -288,31 +259,29 @@ class UserProfileRepository(
                             return@OnCompleteListener
                         }
                         val token = task.result
-                        notificationListener.onTokenGenerated(token)
+                        userProfileCoroutineScope.getScope().launch {
+                            userProfileDao.insertFCMToken(
+                                LocalNotificationToken(
+                                    token,
+                                    currentUser.uid
+                                )
+                            )
+                            userProfileService.uploadNotificationsToken(token)
+                        }
                     })
                 }
             }
         }
     }
 
-    fun saveNotificationToken(localNotificationToken: LocalNotificationToken) {
-        externalScope.launch {
-            userProfileDao.insertFCMToken(localNotificationToken)
-        }
+    suspend fun resetLocalNotificationToken() {
+        userProfileDao.deleteFCMToken()
     }
 
-    fun deleteLocalNotificationToken() {
-        externalScope.launch {
-            userProfileDao.deleteFCMToken()
-        }
-    }
-
-    fun deleteRemoteNotificationToken() {
+    suspend fun resetRemoteNotificationToken() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            externalScope.launch {
-                userProfileService.deleteFCMToken()
-            }
+            userProfileService.deleteFCMToken()
         }
     }
 
@@ -324,12 +293,12 @@ class UserProfileRepository(
             when {
                 responseCode == 200 -> {
                     val courses = response.body()?.data
-                    emit(DataStatus.success(courses))
                     response.body()?.data?.let {
                         val courseList =
                             it.map { course -> LocalWaitingListCourse(course) }
                         assetsDao.insertCourseWaitingList(courseList)
                     }
+                    emit(DataStatus.success(courses))
                 }
 
                 responseCode >= 400 -> {
@@ -349,12 +318,4 @@ class UserProfileRepository(
         }
     }.catch { emit(DataStatus.unknownException(it.message.toString())) }
         .flowOn(Dispatchers.IO)
-
-    interface NotificationUploadListener {
-
-        fun onTokenStatusChanged(status: DataStatus<ResponseMessage>)
-
-        fun onTokenGenerated(token: String)
-    }
-
 }
