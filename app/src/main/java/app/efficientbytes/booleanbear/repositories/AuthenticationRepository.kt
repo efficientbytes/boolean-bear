@@ -59,6 +59,10 @@ class AuthenticationRepository(
                     }
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: SignInTokenResponse = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -100,6 +104,12 @@ class AuthenticationRepository(
                                 )
                             }
                         }
+                    }
+
+                    responseCode in 414..417 -> {
+                        singleDeviceLoginListener.updateSingleDeviceLoginFromRemote(
+                            DataStatus.unAuthorized(responseCode.toString())
+                        )
                     }
 
                     responseCode >= 400 -> {
@@ -195,6 +205,10 @@ class AuthenticationRepository(
                     emit(DataStatus.success(response.body()))
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: ResponseMessage = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -287,6 +301,10 @@ class AuthenticationRepository(
                     )
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: ResponseMessage = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -319,6 +337,10 @@ class AuthenticationRepository(
                             PASSWORD_CREATED_FLAG, true
                         )
                     )
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -364,6 +386,10 @@ class AuthenticationRepository(
                             emit(DataStatus.success(phoneNumber))
                         }
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {

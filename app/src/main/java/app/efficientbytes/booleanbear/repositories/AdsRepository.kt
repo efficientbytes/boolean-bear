@@ -46,6 +46,10 @@ class AdsRepository(
                     }
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: HomePageBannerListResponse = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -118,7 +122,7 @@ class AdsRepository(
                         )
 
                         DataStatus.Status.UnAuthorized -> homePageAdsListener.onHomePageAdsStatusChanged(
-                            DataStatus.unAuthorized()
+                            DataStatus.unAuthorized(it.message)
                         )
 
                         DataStatus.Status.UnKnownException -> homePageAdsListener.onHomePageAdsStatusChanged(

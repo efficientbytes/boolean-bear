@@ -1,10 +1,10 @@
 package app.efficientbytes.booleanbear.repositories
 
 import app.efficientbytes.booleanbear.database.dao.UtilityDataDao
-import app.efficientbytes.booleanbear.repositories.models.DataStatus
-import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
+import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.utils.NoInternetException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +34,10 @@ class UtilityDataRepository(
                     } else {
                         emit(DataStatus.success(professionList))
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -88,7 +92,7 @@ class UtilityDataRepository(
                         )
 
                         DataStatus.Status.UnAuthorized -> utilityListener.onProfessionsAdapterListStatusChanged(
-                            DataStatus.unAuthorized()
+                            DataStatus.unAuthorized(it.message)
                         )
 
                         DataStatus.Status.UnKnownException -> utilityListener.onProfessionsAdapterListStatusChanged(
@@ -119,6 +123,10 @@ class UtilityDataRepository(
                     } else {
                         emit(DataStatus.success(issueCategoriesList))
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -173,7 +181,7 @@ class UtilityDataRepository(
                         )
 
                         DataStatus.Status.UnAuthorized -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
-                            DataStatus.unAuthorized()
+                            DataStatus.unAuthorized(it.message)
                         )
 
                         DataStatus.Status.UnKnownException -> utilityListener.onIssueCategoriesAdapterListStatusChanged(
