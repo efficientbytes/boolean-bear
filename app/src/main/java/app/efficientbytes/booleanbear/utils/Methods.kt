@@ -604,6 +604,15 @@ class AppCheckInterceptor : Interceptor, IDTokenListener {
             .build()
         val response = chain.proceed(modifiedRequest)
         return when (response.code) {
+            414 -> { // requires token
+                response.close()
+                val newAccessToken = getIdToken(refresh = false, replayProtection = false)
+                val newRequest = originalRequest.newBuilder()
+                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .build()
+                chain.proceed(newRequest)
+            }
+
             415 -> { // for expired token
                 response.close()
                 val newAccessToken = getIdToken(refresh = true, replayProtection = false)
@@ -613,14 +622,13 @@ class AppCheckInterceptor : Interceptor, IDTokenListener {
                 chain.proceed(newRequest)
             }
 
-            416 -> { // for replay protection
+            416, 417 -> { // for replay protection or token is consumed already
                 response.close()
                 val newAccessToken = getIdToken(refresh = false, replayProtection = true)
                 val newRequest = originalRequest.newBuilder()
                     .header("X-Firebase-AppCheck", newAccessToken.toString())
                     .build()
                 chain.proceed(newRequest)
-                response
             }
 
             else -> {
