@@ -7,8 +7,9 @@ val serviceModule = module {
     single { baseUrl }
     single { provideMoshi() }
     single { provideNetworkInterceptor(androidContext()) }
+    single { provideAppCheckInterceptor() }
     single { provideTokenInterceptor(get(), get()) }
-    single { provideOkHttpClient(get(), get()) }
+    single { provideOkHttpClient(get(), get(), get()) }
     single { provideRetrofit(get(), get(), get()) }
     single { provideVerificationService(get()) }
     single { provideUserProfileService(get()) }

@@ -114,7 +114,7 @@ class MainViewModel(
         }
     }
 
-    fun saveIDToken(token : String){
+    fun saveIDToken(token: String) {
         authenticationRepository.saveIDToken(IDToken(token = token))
     }
 
@@ -452,6 +452,7 @@ class MainViewModel(
                 crossCheckRewardedAdPauseTime()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
+                    getSingleDeviceLoginFromRemote()
                     getSingleDeviceLoginFromLocal()
                 }
             }

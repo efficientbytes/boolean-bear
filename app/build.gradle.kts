@@ -218,4 +218,5 @@ dependencies {
     implementation("com.google.android.play:integrity:1.3.0")
     //app check play integrity
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation("com.google.firebase:firebase-appcheck-debug")
 }

@@ -18,6 +18,9 @@ import app.efficientbytes.booleanbear.services.models.ReelDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.AppCheckToken
+import com.google.firebase.appcheck.appCheck
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -26,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -36,6 +40,8 @@ import java.util.Currency
 import java.util.Date
 import java.util.Locale
 import java.util.regex.Pattern
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 fun formatTimestampToDateString(timestampInSeconds: Long): String {
     val date = Date(timestampInSeconds * 1000) // Convert seconds to milliseconds
@@ -546,4 +552,115 @@ fun createShareIntent(shareLink: String, message: String): Intent {
     val shareMessage = message + shareLink + "\n"
     intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
     return intent
+}
+
+fun formatRunTime(seconds: Long): String {
+    val hrs = seconds / 3600
+    val mins = (seconds % 3600) / 60
+
+    return when {
+        seconds < 60 -> String.format("%d %s", seconds, if (seconds == 1L) "sec" else "secs")
+        hrs > 0 && mins > 0 -> String.format(
+            "%d %s %d %s",
+            hrs, if (hrs == 1L) "hr" else "hrs",
+            mins, if (mins == 1L) "min" else "mins"
+        )
+
+        hrs > 0 -> String.format(
+            "%d %s",
+            hrs, if (hrs == 1L) "hr" else "hrs"
+        )
+
+        mins > 0 -> String.format(
+            "%d %s",
+            mins, if (mins == 1L) "min" else "mins"
+        )
+
+        else -> "0 mins"
+    }
+}
+
+suspend fun getAppCheckToken(foreRefresh: Boolean = false): String =
+    suspendCancellableCoroutine { continuation ->
+        Firebase.appCheck.getAppCheckToken(foreRefresh)
+            .addOnSuccessListener { appCheckToken: AppCheckToken ->
+                continuation.resume(appCheckToken.token)
+            }.addOnFailureListener { exception ->
+                continuation.resumeWithException(exception)
+            }
+    }
+
+class AppCheckInterceptor : Interceptor, IDTokenListener {
+
+    private var token: String? = null
+    private var isComplete: Boolean = false
+
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val accessToken = getIdToken(refresh = false, replayProtection = false)
+        val modifiedRequest = originalRequest.newBuilder()
+            .header("X-Firebase-AppCheck", accessToken.toString())
+            .build()
+        val response = chain.proceed(modifiedRequest)
+        return when (response.code) {
+            415 -> { // for expired token
+                response.close()
+                val newAccessToken = getIdToken(refresh = true, replayProtection = false)
+                val newRequest = originalRequest.newBuilder()
+                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .build()
+                chain.proceed(newRequest)
+            }
+
+            416 -> { // for replay protection
+                response.close()
+                val newAccessToken = getIdToken(refresh = false, replayProtection = true)
+                val newRequest = originalRequest.newBuilder()
+                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .build()
+                chain.proceed(newRequest)
+                response
+            }
+
+            else -> {
+                response
+            }
+        }
+    }
+
+    private fun generateIDToken(
+        idTokenListener: IDTokenListener,
+        refresh: Boolean = false,
+        replayProtection: Boolean = false
+    ) {
+        if (replayProtection) {
+            Firebase.appCheck.limitedUseAppCheckToken
+                .addOnSuccessListener { appCheckToken: AppCheckToken ->
+                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
+                }.addOnFailureListener { _ ->
+                    idTokenListener.onIDTokenGenerated()
+                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
+        } else {
+            Firebase.appCheck.getAppCheckToken(refresh)
+                .addOnSuccessListener { appCheckToken: AppCheckToken ->
+                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
+                }.addOnFailureListener { _ ->
+                    idTokenListener.onIDTokenGenerated()
+                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
+        }
+    }
+
+    private fun getIdToken(refresh: Boolean = false, replayProtection: Boolean = false): String? {
+        generateIDToken(this, refresh, replayProtection)
+        while (!isComplete) {
+        }
+        return this.token
+    }
+
+    override fun onIDTokenGenerated(token: String?) {
+        this.token = token
+        this.isComplete = true
+    }
+
 }

@@ -10,6 +10,7 @@ import app.efficientbytes.booleanbear.services.StatisticsService
 import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.VerificationService
+import app.efficientbytes.booleanbear.utils.AppCheckInterceptor
 import app.efficientbytes.booleanbear.utils.BASE_URL
 import app.efficientbytes.booleanbear.utils.NetworkInterceptor
 import app.efficientbytes.booleanbear.utils.TokenInterceptor
@@ -26,6 +27,8 @@ fun provideMoshi(): Moshi = Moshi.Builder().build()
 
 fun provideNetworkInterceptor(context: Context): NetworkInterceptor = NetworkInterceptor(context)
 
+fun provideAppCheckInterceptor(): AppCheckInterceptor = AppCheckInterceptor()
+
 fun provideTokenInterceptor(
     authenticationDao: AuthenticationDao,
     coroutineScope: CoroutineScope
@@ -33,12 +36,14 @@ fun provideTokenInterceptor(
 
 fun provideOkHttpClient(
     networkInterceptor: NetworkInterceptor,
+    appCheckInterceptor: AppCheckInterceptor,
     tokenInterceptor: TokenInterceptor
 ) = OkHttpClient.Builder()
     .connectTimeout(60, TimeUnit.SECONDS)
     .writeTimeout(60, TimeUnit.SECONDS)
     .readTimeout(60, TimeUnit.SECONDS)
     .addInterceptor(networkInterceptor)
+    .addInterceptor(appCheckInterceptor)
     .addInterceptor(tokenInterceptor)
     .build()
 
