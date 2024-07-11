@@ -339,7 +339,6 @@
                                     android:paddingEnd="8dp"
                                     android:textColor="@color/white_1000"
                                     android:textSize="11sp"
-                                    app:runTime="@{reelDetails.runTime}"
                                     tools:ignore="RtlSymmetry"
                                     tools:text="12 min">
 
