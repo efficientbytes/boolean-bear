@@ -15,6 +15,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentOTPVerificationBinding
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.utils.validateOTPFormat
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.PhoneNumberOTPVerificationViewModel
@@ -156,6 +157,11 @@ class OTPVerificationFragment : Fragment() {
                     timeOutResponse()
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
                     binding.otpPinViewLayout.isEnabled = true
                     unknownExceptionResponse()
@@ -197,6 +203,11 @@ class OTPVerificationFragment : Fragment() {
 
                 DataStatus.Status.NoInternet -> noInternetResponse()
                 DataStatus.Status.TimeOut -> timeOutResponse()
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> unknownExceptionResponse()
             }
         }
@@ -226,6 +237,8 @@ class OTPVerificationFragment : Fragment() {
                             binding.progressStatusValueTextView.text =
                                 getString(R.string.you_have_been_signed_in_successfully)
                             mainViewModel.saveSingleDeviceLogin(singleDeviceLogin)
+                            mainViewModel.getUserProfileFromRemote()
+                            mainViewModel.getAllWaitingListCourses()
                             Toast.makeText(
                                 requireContext(),
                                 getString(R.string.signed_in_successfully),
@@ -285,6 +298,11 @@ class OTPVerificationFragment : Fragment() {
 
                 DataStatus.Status.NoInternet -> noInternetResponse()
                 DataStatus.Status.TimeOut -> timeOutResponse()
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> unknownExceptionResponse()
             }
         }
@@ -319,6 +337,11 @@ class OTPVerificationFragment : Fragment() {
 
                 DataStatus.Status.NoInternet -> noInternetResponse()
                 DataStatus.Status.TimeOut -> timeOutResponse()
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> unknownExceptionResponse()
             }
         }

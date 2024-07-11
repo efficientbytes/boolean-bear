@@ -19,6 +19,7 @@ import androidx.navigation.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentLoginOrSignUpBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.LoginOrSignUpViewModel
 
 class LoginOrSignUpFragment : Fragment() {
@@ -225,6 +226,11 @@ class LoginOrSignUpFragment : Fragment() {
                             getString(R.string.time_out_please_try_again)
                         viewModel.resetLoginMode()
                     }
+
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
 
                     else -> {
                         binding.continueButton.isEnabled = true

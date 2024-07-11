@@ -27,6 +27,10 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
                     emit(DataStatus.success(response.body()))
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: ResponseMessage = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -61,6 +65,10 @@ class FeedbackNSupportRepository(private val feedbackNSupportService: FeedbackNS
             when {
                 responseCode == 200 -> {
                     emit(DataStatus.success(response.body()))
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {

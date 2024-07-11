@@ -22,6 +22,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentVerifyPrimaryEmailBind
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.VerifyPrimaryEmailAddress
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -182,6 +183,11 @@ class VerifyPrimaryEmailFragment : Fragment() {
                         viewModel.resetPrimaryEmailAddress()
                     }
 
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
+
                     else -> {
                         binding.resendEmailLabelTextView.isEnabled = true
                         Snackbar.make(
@@ -234,6 +240,11 @@ class VerifyPrimaryEmailFragment : Fragment() {
                         }
                     }
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
 

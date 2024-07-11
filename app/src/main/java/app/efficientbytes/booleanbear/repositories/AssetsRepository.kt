@@ -78,6 +78,10 @@ class AssetsRepository(
                         }
                     }
 
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
+                    }
+
                     responseCode >= 400 -> {
                         val errorResponse: ReelTopicsResponse = gson.fromJson(
                             response.errorBody()!!.string(),
@@ -114,6 +118,10 @@ class AssetsRepository(
                                 emit(DataStatus.success(reelTopics))
                             }
                         }
+                    }
+
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
                     }
 
                     responseCode >= 400 -> {
@@ -173,6 +181,10 @@ class AssetsRepository(
                         }
                     }
 
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
+                    }
+
                     responseCode >= 400 -> {
                         val errorResponse: ReelsResponse = gson.fromJson(
                             response.errorBody()!!.string(),
@@ -211,6 +223,10 @@ class AssetsRepository(
                         }
                     }
 
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
+                    }
+
                     responseCode >= 400 -> {
                         val errorResponse: ReelsResponse = gson.fromJson(
                             response.errorBody()!!.string(),
@@ -243,6 +259,10 @@ class AssetsRepository(
                             emit(DataStatus.success(reel))
                         }
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -284,6 +304,10 @@ class AssetsRepository(
 
                 responseCode == 404 -> {
                     emit(DataStatus.emptyResult())
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 && responseCode != 404 -> {
@@ -335,6 +359,10 @@ class AssetsRepository(
                             emit(DataStatus.success<RemoteInstructorProfile>(instructorProfile))
                         }
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -415,7 +443,7 @@ class AssetsRepository(
                         )
 
                         DataStatus.Status.UnAuthorized -> instructorProfileListener.onInstructorProfileDataStatusChanged(
-                            DataStatus.unAuthorized()
+                            DataStatus.unAuthorized(it.message)
                         )
 
                         DataStatus.Status.UnKnownException -> instructorProfileListener.onInstructorProfileDataStatusChanged(
@@ -448,6 +476,10 @@ class AssetsRepository(
                     } else {
                         emit(DataStatus.emptyResult<RemoteMentionedLink>())
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -620,6 +652,10 @@ class AssetsRepository(
                         }
                     }
 
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
+                    }
+
                     responseCode >= 400 -> {
                         val errorResponse: RemoteCourseBundleResponse = gson.fromJson(
                             response.errorBody()!!.string(),
@@ -702,6 +738,12 @@ class AssetsRepository(
                         }?.let {
                             assetsDao.insertCourseWaitingList(it)
                         }
+                    }
+
+                    responseCode in 414..417 -> {
+                        courseWaitingListListener?.onJoinCourseWaitingListDataStatusChanged(
+                            DataStatus.unAuthorized(responseCode.toString())
+                        )
                     }
 
                     responseCode >= 400 -> {

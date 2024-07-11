@@ -19,6 +19,7 @@ import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomLinearLayoutManager
 import app.efficientbytes.booleanbear.utils.dummyCourseBundle
 import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import org.koin.android.ext.android.inject
 
@@ -85,6 +86,11 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                     }
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 DataStatus.Status.NoInternet -> {
                     reelTopicsInternetIssue = true
                     failedToLoadReelTopics()
@@ -123,6 +129,11 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
                     courseBundleInternetIssue = true
                     failedToLoadCourseBundle()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     failedToLoadCourseBundle()

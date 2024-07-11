@@ -16,8 +16,8 @@ android {
         applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.0.6"
+        versionCode = 6
+        versionName = "1.2.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -218,4 +218,5 @@ dependencies {
     implementation("com.google.android.play:integrity:1.3.0")
     //app check play integrity
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation("com.google.firebase:firebase-appcheck-debug")
 }

@@ -12,7 +12,7 @@ data class DataStatus<out T>(
             return DataStatus(Status.Loading)
         }
 
-        fun <T> success(data: T,message: String?=null): DataStatus<T> {
+        fun <T> success(data: T, message: String? = null): DataStatus<T> {
             return DataStatus(
                 status = Status.Success,
                 data = data,
@@ -39,8 +39,9 @@ data class DataStatus<out T>(
             return DataStatus(Status.NoInternet)
         }
 
-        fun <T> unAuthorized(): DataStatus<T> {
-            return DataStatus(Status.UnAuthorized)
+        fun <T> unAuthorized(code: String?): DataStatus<T> {
+            val message = "Error $code. Unauthorized"
+            return DataStatus(status = Status.UnAuthorized, message = message)
         }
 
         fun <T> unknownException(exceptionMessage: String): DataStatus<T> {

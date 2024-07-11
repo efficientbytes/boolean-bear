@@ -146,10 +146,7 @@
     <color name="black_1300">#0d0b09</color>
     <color name="black_1100">#0f0e0d</color>
     <color name="black_1000">#110f0e</color>
-    <color name="black_900">#121010</color>
-    <color name="black_700">#141312</color>
     <color name="black_600">#151414</color>
-    <color name="black_500">#161515</color>
 
 
     <color name="black_100">#191919</color>
@@ -162,6 +159,10 @@
     <color name="black_800">#121111</color>
     <color name="black_400">#272727</color>
     <color name="black">#000000</color>
+    <color name="black_500">#313131</color>
+    <color name="black_700">#1B1B1B</color>
+    <color name="black_900">#151515</color>
+
     <color name="white">#FFFFFF</color>
 
     <color name="violet_1500">#a23eef</color>

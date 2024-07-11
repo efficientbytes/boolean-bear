@@ -72,7 +72,7 @@ class ReelTopicsChipRecyclerViewAdapter(
                     } else {
                         binding.chipCardView.strokeWidth = 2
                         binding.chipCardView.strokeColor =
-                            context.getColor(R.color.md_theme_surfaceVariant)
+                            context.getColor(R.color.black_500)
                         binding.chipCardView.setCardBackgroundColor(context.getColor(R.color.cell_chip_playlist_color))
                         binding.titleValueTextView.setTextColor(context.getColor(R.color.md_theme_onSurface))
                     }

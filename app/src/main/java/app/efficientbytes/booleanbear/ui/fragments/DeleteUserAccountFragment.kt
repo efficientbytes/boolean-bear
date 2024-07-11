@@ -16,6 +16,7 @@ import app.efficientbytes.booleanbear.databinding.DialogDeleteAccountConfirmatio
 import app.efficientbytes.booleanbear.databinding.FragmentDeleteUserAccountBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
@@ -136,6 +137,11 @@ class DeleteUserAccountFragment : Fragment() {
                             "Deleting account is taking unusually long time. Please try again after some time."
                         binding.takeMeToHomePageButton.visibility = View.VISIBLE
                     }
+
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
 
                     else -> {
 

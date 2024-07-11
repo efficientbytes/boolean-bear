@@ -19,6 +19,7 @@ import app.efficientbytes.booleanbear.models.UserProfile
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.PhoneNumber
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.CompleteProfileViewModel
@@ -96,6 +97,11 @@ class CompleteProfileFragment : Fragment() {
                         )
                     }
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 DataStatus.Status.TimeOut -> {
                     professionsListFailedToLoad = true
@@ -205,6 +211,11 @@ class CompleteProfileFragment : Fragment() {
                         }
                     }
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 DataStatus.Status.NoInternet -> {
                     binding.submitButton.isEnabled = true

@@ -65,7 +65,11 @@ class StatisticsRepository(
                         contentId
                     )
                 val responseCode = response.code()
-                if (responseCode == 200) emit(DataStatus.success(Unit))
+                if (responseCode == 200) {
+                    emit(DataStatus.success(Unit))
+                } else if (responseCode in 414..417) {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
             } catch (noInternet: NoInternetException) {
                 emit(DataStatus.noInternet<Unit>())
             } catch (socketTimeOutException: SocketTimeoutException) {

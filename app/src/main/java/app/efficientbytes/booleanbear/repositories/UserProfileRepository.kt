@@ -56,6 +56,14 @@ class UserProfileRepository(
                         }
                     }
 
+                    responseCode in 414..417 -> {
+                        userProfileListener.updateUserProfileFromRemote(
+                            DataStatus.unAuthorized(
+                                responseCode.toString()
+                            )
+                        )
+                    }
+
                     responseCode >= 400 -> {
                         val errorResponse: UserProfileResponse = gson.fromJson(
                             response.errorBody()!!.string(),
@@ -119,6 +127,10 @@ class UserProfileRepository(
                     }
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: UserProfileResponse = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -170,6 +182,10 @@ class UserProfileRepository(
                         userProfileDao.insertUserProfile(user)
                         emit(DataStatus.success(user))
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -299,6 +315,10 @@ class UserProfileRepository(
                         assetsDao.insertCourseWaitingList(courseList)
                     }
                     emit(DataStatus.success(courses))
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {

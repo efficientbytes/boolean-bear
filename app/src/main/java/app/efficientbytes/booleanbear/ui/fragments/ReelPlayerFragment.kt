@@ -47,9 +47,11 @@ import app.efficientbytes.booleanbear.models.VideoPlaybackSpeed
 import app.efficientbytes.booleanbear.models.VideoQualityType
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
-import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.AppAuthStateListener
+import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
+import app.efficientbytes.booleanbear.utils.formatRunTime
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.button.MaterialButton
@@ -219,6 +221,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     findNavController().popBackStack()
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
 
                 }
@@ -273,6 +280,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                         }
                         binding.reelDetails = playDetails
                         playerTitleText.text = playDetails.title
+                        val runTime = playDetails.runTime
+                        binding.contentDurationValueTextView.text = formatRunTime(runTime)
                         contentTitle = playDetails.title
                         val instructorFullName = if (playDetails.instructorLastName == null) {
                             playDetails.instructorFirstName
@@ -308,6 +317,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 DataStatus.Status.EmptyResult -> {
                     findNavController().popBackStack()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 DataStatus.Status.UnKnownException -> {
                     //show error
@@ -355,6 +369,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     binding.shimmerSuggestedContent.visibility = View.VISIBLE
                     binding.shimmerSuggestedContent.stopShimmer()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 DataStatus.Status.UnKnownException -> {
                     //show error
@@ -470,6 +489,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     ReelPlayerViewModel.countRecorded = true
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {}
             }
         }
@@ -490,7 +514,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     findNavController().popBackStack(R.id.homeFragment, false)
                 }
 
-                null->{
+                null -> {
 
                 }
             }

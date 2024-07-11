@@ -9,7 +9,9 @@ import app.efficientbytes.booleanbear.repositories.UserProfileRepository
 import app.efficientbytes.booleanbear.repositories.UtilityDataRepository
 import app.efficientbytes.booleanbear.utils.NotificationsHelper
 import com.google.firebase.Firebase
+import com.google.firebase.appcheck.AppCheckProviderFactory
 import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.initialize
@@ -30,8 +32,13 @@ class MainApplication : Application(), KoinComponent {
         super.onCreate()
 
         Firebase.initialize(context = this)
+        val appCheckProviderFactory: AppCheckProviderFactory = if (BuildConfig.DEBUG) {
+            DebugAppCheckProviderFactory.getInstance()
+        } else {
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        }
         Firebase.appCheck.installAppCheckProviderFactory(
-            PlayIntegrityAppCheckProviderFactory.getInstance(),
+            appCheckProviderFactory, true
         )
 
         startKoin {

@@ -28,6 +28,7 @@ import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerView
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
 import app.efficientbytes.booleanbear.utils.dummyReelsList
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.auth.FirebaseAuth
@@ -235,6 +236,11 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                     reelsLoadingFailed()
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
                     reelsLoadingFailed()
                 }
@@ -264,6 +270,11 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                     }
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
                     findNavController().popBackStack()
                 }
@@ -291,6 +302,11 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 DataStatus.Status.EmptyResult -> {
                     noSearchResult()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     noSearchResult()

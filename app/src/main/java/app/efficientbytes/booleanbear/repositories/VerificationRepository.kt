@@ -33,6 +33,10 @@ class VerificationRepository(private val verificationService: VerificationServic
                     }
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: LoginModeResponse = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -73,6 +77,10 @@ class VerificationRepository(private val verificationService: VerificationServic
                             )
                         }
                     }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
                 }
 
                 responseCode >= 400 -> {
@@ -118,6 +126,10 @@ class VerificationRepository(private val verificationService: VerificationServic
                     }
                 }
 
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
                 responseCode >= 400 -> {
                     val errorResponse: VerifyPhoneResponse = gson.fromJson(
                         response.errorBody()!!.string(),
@@ -152,6 +164,10 @@ class VerificationRepository(private val verificationService: VerificationServic
                     responseCode == 200 -> {
                         val verificationStatus = response.body()
                         emit(DataStatus.success(verificationStatus))
+                    }
+
+                    responseCode in 414..417 -> {
+                        emit(DataStatus.unAuthorized(responseCode.toString()))
                     }
 
                     responseCode >= 400 -> {
