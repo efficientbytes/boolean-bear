@@ -140,10 +140,10 @@
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/booleanBearLoadingGif"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/boolean_bear_loading_gif"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@id/barrier1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -519,7 +519,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:visibility="gone"
-                            app:cardBackgroundColor="@color/black_1200"
+                            app:cardBackgroundColor="@color/black_900"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/barrier2"

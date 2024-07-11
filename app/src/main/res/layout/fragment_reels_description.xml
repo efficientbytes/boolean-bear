@@ -90,7 +90,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:visibility="visible"
-                    app:cardBackgroundColor="@color/black_200"
+                    app:cardBackgroundColor="@color/black_700"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
