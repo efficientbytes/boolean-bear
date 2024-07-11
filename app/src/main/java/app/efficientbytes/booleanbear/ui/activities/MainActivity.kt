@@ -892,8 +892,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         }
                     }
 
-                    else -> {
+                    uri.toString().startsWith("https://app.booleanbear.com/binge-watch/topic/") -> {
                         navController.navigate(navDeepLink)
+                    }
+
+                    else -> {
+
                     }
                 }
             }
