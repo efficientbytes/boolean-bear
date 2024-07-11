@@ -14,6 +14,7 @@ import app.efficientbytes.booleanbear.databinding.FragmentReporterPhoneNumberBin
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SingletonRequestSupport
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
@@ -166,6 +167,10 @@ class ReporterPhoneNumberFragment : Fragment() {
 
                 DataStatus.Status.NoInternet -> noInternetResponse()
                 DataStatus.Status.TimeOut -> timeOutResponse()
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
                 else -> unknownExceptionResponse()
             }
         }
@@ -212,6 +217,11 @@ class ReporterPhoneNumberFragment : Fragment() {
                     binding.submitButton.isEnabled = true
                     timeOutResponse()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.submitButton.isEnabled = true

@@ -13,6 +13,7 @@ import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShareFeedbackBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.ShareFeedbackViewModel
 
 class ShareFeedbackFragment : Fragment() {
@@ -93,6 +94,11 @@ class ShareFeedbackFragment : Fragment() {
                         getString(R.string.time_out_please_try_again)
                     binding.goToHomePageButton.visibility = View.VISIBLE
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
 

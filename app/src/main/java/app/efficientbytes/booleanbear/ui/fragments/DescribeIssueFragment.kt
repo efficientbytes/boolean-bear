@@ -13,6 +13,7 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RequestSupport
 import app.efficientbytes.booleanbear.services.models.SingletonRequestSupport
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import org.koin.android.ext.android.inject
 
@@ -70,6 +71,11 @@ class DescribeIssueFragment : Fragment() {
                 DataStatus.Status.TimeOut -> {
                     issueCategoriesFailedToLoad = true
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
 

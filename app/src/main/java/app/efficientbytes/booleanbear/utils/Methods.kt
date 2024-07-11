@@ -17,6 +17,8 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.ReelDetails
 import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
+import com.google.android.material.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.AppCheckToken
@@ -671,4 +673,15 @@ class AppCheckInterceptor : Interceptor, IDTokenListener {
         this.isComplete = true
     }
 
+}
+
+fun showUnauthorizedDeviceDialog(context: Context, title: String?) {
+    MaterialAlertDialogBuilder(
+        context,
+        R.style.MaterialAlertDialog_Material3
+    )
+        .setTitle(title.toString())
+        .setMessage(context.getString(app.efficientbytes.booleanbear.R.string.you_are_using_an_unregistered_app_or_an_outdated_version_please_upgrade_to_the_latest_version_from_the_play_store))
+        .setCancelable(false)
+        .show()
 }

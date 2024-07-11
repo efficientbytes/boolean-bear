@@ -24,6 +24,7 @@ import app.efficientbytes.booleanbear.utils.extractUsernameFromGitHubUrl
 import app.efficientbytes.booleanbear.utils.extractUsernameFromLinkedInUrl
 import app.efficientbytes.booleanbear.utils.isGitHubAddress
 import app.efficientbytes.booleanbear.utils.isLinkedInAddress
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.utils.validateEmailIdFormat
 import app.efficientbytes.booleanbear.utils.validateNameFormat
 import app.efficientbytes.booleanbear.viewmodels.EditProfileFieldViewModel
@@ -125,6 +126,11 @@ class EditProfileFieldFragment : Fragment() {
                     professionsListFailedToLoad = true
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
 
                 }
@@ -141,6 +147,11 @@ class EditProfileFieldFragment : Fragment() {
                         binding.emailVerified = this@EditProfileFieldFragment.emailVerified
                     }
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
 
@@ -339,6 +350,11 @@ class EditProfileFieldFragment : Fragment() {
                     binding.saveButton.isEnabled = true
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
@@ -408,6 +424,11 @@ class EditProfileFieldFragment : Fragment() {
                         binding.verifyButton.isEnabled = true
                         viewModel.resetPrimaryEmailAddress()
                     }
+
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
 
                     else -> {
                         binding.progressBar.visibility = View.GONE

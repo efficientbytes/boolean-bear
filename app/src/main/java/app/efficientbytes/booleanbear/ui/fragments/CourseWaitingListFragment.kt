@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCourseWaitingListBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.CourseWaitingListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
@@ -130,6 +131,11 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
                             getString(R.string.time_out_please_try_again)
                         viewModel.resetWaitingList()
                     }
+
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
 
                     else -> {
                         binding.progressLinearLayout.visibility = View.VISIBLE

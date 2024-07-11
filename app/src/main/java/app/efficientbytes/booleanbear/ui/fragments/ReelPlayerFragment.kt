@@ -50,6 +50,7 @@ import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.button.MaterialButton
@@ -219,6 +220,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     findNavController().popBackStack()
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
 
                 }
@@ -309,6 +315,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     findNavController().popBackStack()
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 DataStatus.Status.UnKnownException -> {
                     //show error
                     //snack bar
@@ -355,6 +366,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     binding.shimmerSuggestedContent.visibility = View.VISIBLE
                     binding.shimmerSuggestedContent.stopShimmer()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 DataStatus.Status.UnKnownException -> {
                     //show error
@@ -469,6 +485,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 DataStatus.Status.Success -> {
                     ReelPlayerViewModel.countRecorded = true
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {}
             }

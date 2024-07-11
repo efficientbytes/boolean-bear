@@ -16,6 +16,7 @@ import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentPasswordLoginBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SignInToken
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import org.koin.android.ext.android.inject
@@ -238,6 +239,11 @@ class PasswordLoginFragment : Fragment() {
                         viewModel.resetAuthenticateUserLiveData()
                     }
 
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
+
                     else -> {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
@@ -291,6 +297,11 @@ class PasswordLoginFragment : Fragment() {
                         getString(R.string.time_out_please_try_again)
                     binding.loginButton.isEnabled = true
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.progressBar.visibility = View.GONE
@@ -373,6 +384,11 @@ class PasswordLoginFragment : Fragment() {
                         getString(R.string.time_out_please_try_again)
                     binding.loginButton.isEnabled = true
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.progressBar.visibility = View.GONE

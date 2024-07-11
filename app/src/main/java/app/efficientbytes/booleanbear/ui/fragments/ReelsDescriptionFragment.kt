@@ -17,6 +17,7 @@ import app.efficientbytes.booleanbear.ui.bindingadapters.loadImageFromUrl
 import app.efficientbytes.booleanbear.utils.ContentDetailsLiveListener
 import app.efficientbytes.booleanbear.utils.InstructorLiveListener
 import app.efficientbytes.booleanbear.utils.MentionedLinksLiveListener
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import org.koin.android.ext.android.inject
@@ -87,6 +88,11 @@ class ReelsDescriptionFragment : BottomSheetDialogFragment(),
                     }
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 else -> {
 
                 }
@@ -111,6 +117,11 @@ class ReelsDescriptionFragment : BottomSheetDialogFragment(),
                         binding.instructorProfilePicImage.loadImageFromUrl(remoteInstructorProfile.profileImage)
                     }
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.shimmerInstructor.stopShimmer()
@@ -140,6 +151,11 @@ class ReelsDescriptionFragment : BottomSheetDialogFragment(),
                     }
                     binding.mentionedLinksRecyclerView.adapter = mentionedLinkRecyclerViewAdapter
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.shimmerMentionedLinks.stopShimmer()

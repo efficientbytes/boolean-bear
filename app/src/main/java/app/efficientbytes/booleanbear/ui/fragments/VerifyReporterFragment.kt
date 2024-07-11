@@ -13,6 +13,7 @@ import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentVerifyReporterBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.SingletonRequestSupport
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import `in`.aabhasjindal.otptextview.OTPListener
 import org.koin.android.ext.android.inject
@@ -108,7 +109,7 @@ class VerifyReporterFragment : Fragment() {
                             userAccountId = null
                             prefix = phoneNumberData.prefix
                             phoneNumber = phoneNumberData.phoneNumber
-                            completePhoneNumber = prefix+phoneNumber
+                            completePhoneNumber = prefix + phoneNumber
                         }
                     }
                     singletonRequestSupport?.let { requestSupport ->
@@ -125,6 +126,11 @@ class VerifyReporterFragment : Fragment() {
                     binding.otpPinViewLayout.isEnabled = true
                     timeOutResponse()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.otpPinViewLayout.isEnabled = true
@@ -163,6 +169,11 @@ class VerifyReporterFragment : Fragment() {
                     }
                 }
 
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
                 DataStatus.Status.NoInternet -> {
                     noInternetResponse()
                 }
@@ -170,6 +181,11 @@ class VerifyReporterFragment : Fragment() {
                 DataStatus.Status.TimeOut -> {
                     timeOutResponse()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     unknownExceptionResponse()
@@ -213,6 +229,11 @@ class VerifyReporterFragment : Fragment() {
                     binding.resendOtpChip.isEnabled = true
                     timeOutResponse()
                 }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
 
                 else -> {
                     binding.resendOtpChip.isEnabled = true

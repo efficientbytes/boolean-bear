@@ -17,6 +17,7 @@ import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentManagePasswordBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.ui.models.PASSWORD_MANAGE_MODE
+import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -292,6 +293,11 @@ class ManagePasswordFragment : Fragment() {
                         viewModel.resetCreatePasswordLiveData()
                     }
 
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
+
                     else -> {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
@@ -359,6 +365,11 @@ class ManagePasswordFragment : Fragment() {
                         binding.continueButton.isEnabled = true
                         viewModel.resetUpdatePasswordLiveData()
                     }
+
+                    DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
 
                     else -> {
                         binding.progressBar.visibility = View.GONE
