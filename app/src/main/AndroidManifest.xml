@@ -97,6 +97,18 @@
                 <data android:host="app.booleanbear.com" />
                 <data android:path="/binge-watch/topic/" />
             </intent-filter>
+            <!--for all patterns-->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="app.booleanbear.com"
+                    android:pathPattern="/*"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
 
         <service
