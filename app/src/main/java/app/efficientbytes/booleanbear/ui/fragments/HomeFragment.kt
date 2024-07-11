@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SnapHelper
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentHomeBinding
 import app.efficientbytes.booleanbear.repositories.AuthenticationRepository
@@ -39,7 +38,6 @@ import app.efficientbytes.booleanbear.utils.dummyReelsList
 import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -498,10 +496,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onStart() {
         super.onStart()
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            authenticationRepository.getLiveAuthStateFromRemote()
-        }
     }
 
     override fun onStop() {
@@ -530,6 +524,10 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
     override fun onResume() {
         super.onResume()
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            authenticationRepository.getLiveAuthStateFromRemote()
+        }
         if (selectedReelTopicPosition != -1 && selectedReelTopicId.isNotBlank()) {
             reelTopicsChipRecyclerViewAdapter.checkedPosition = selectedReelTopicPosition
             reelTopicsChipRecyclerViewAdapter.notifyItemChanged(selectedReelTopicPosition)

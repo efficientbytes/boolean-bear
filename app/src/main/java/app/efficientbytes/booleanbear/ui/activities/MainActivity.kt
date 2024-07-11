@@ -179,8 +179,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setUpLiveDataObserver() {
         //user profile process
         viewModel.liveUserProfileFromLocal.observe(this) { userProfile ->
-            userProfile?.let {
-                SingletonUserData.setInstance(it)
+            if (userProfile == null) {
+                if (FirebaseAuth.getInstance().currentUser != null) {
+                    viewModel.getUserProfileFromRemote()
+                }
+            } else {
+                SingletonUserData.setInstance(userProfile)
             }
         }
         userProfileListener.liveUserProfileFromRemote.observe(this) {
@@ -200,8 +204,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     DataStatus.Status.Success -> {
                         val currentUser = FirebaseAuth.getInstance().currentUser
                         currentUser?.let {
-                            viewModel.getUserProfileFromRemote()
                             viewModel.getFirebaseUserToken()
+                            viewModel.getUserProfileFromRemote()
                         }
                     }
 

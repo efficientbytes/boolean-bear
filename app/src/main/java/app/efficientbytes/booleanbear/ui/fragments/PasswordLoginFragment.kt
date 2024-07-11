@@ -337,6 +337,7 @@ class PasswordLoginFragment : Fragment() {
                             binding.progressStatusValueTextView.text =
                                 getString(R.string.you_have_been_signed_in_successfully)
                             mainViewModel.saveSingleDeviceLogin(signInToken.singleDeviceLogin)
+                            mainViewModel.getUserProfileFromRemote()
                             Toast.makeText(
                                 requireContext(),
                                 getString(R.string.signed_in_successfully),
