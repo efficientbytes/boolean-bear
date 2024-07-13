@@ -113,6 +113,55 @@
 
                 </androidx.recyclerview.widget.RecyclerView>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/contentUnderDevelopmentConstraintLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/rounded_constraint_layout_version_2_background"
+                    android:padding="4dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/contentUnderDevelopmentLabelTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="6dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="6dp"
+                        android:fontFamily="@font/montserrat"
+                        android:text="@string/contents_are_still_being_developed_release_will_take_some_time_we_appreciate_your_patience"
+                        android:textAlignment="textStart"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/contentUnderDevelopmentCancelIcon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                    </com.google.android.material.textview.MaterialTextView>
+
+                    <ImageButton
+                        android:id="@+id/contentUnderDevelopmentCancelIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="6dp"
+                        android:src="@drawable/baseline_cancel_24"
+                        app:layout_constraintBottom_toBottomOf="@id/contentUnderDevelopmentLabelTextView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/contentUnderDevelopmentLabelTextView"
+                        app:layout_constraintTop_toTopOf="@id/contentUnderDevelopmentLabelTextView">
+
+                    </ImageButton>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/reelsRecyclerView"
                     android:layout_width="0dp"
@@ -122,7 +171,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/reelTopicsRecyclerView"
+                    app:layout_constraintTop_toBottomOf="@id/contentUnderDevelopmentConstraintLayout"
                     tools:listitem="@layout/recycler_view_item_youtube_content_view">
 
                 </androidx.recyclerview.widget.RecyclerView>
