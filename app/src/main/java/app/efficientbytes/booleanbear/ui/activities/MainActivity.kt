@@ -81,7 +81,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.completeProfileFragment,
                 R.id.reportSubmittedFragment,
                 R.id.managePasswordFragment,
-                R.id.verifyPrimaryEmailFragment
+                R.id.verifyPrimaryEmailFragment,
+                R.id.verifyReporterFragment
             )
         )
     }
