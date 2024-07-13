@@ -44,6 +44,7 @@ class OTPVerificationFragment : Fragment() {
     private lateinit var prefix: String
     private var forceSendOTP: Boolean = false
     private var passwordAuthFailed: Boolean = false
+    private var uploadedOTP = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -97,19 +98,19 @@ class OTPVerificationFragment : Fragment() {
 
         binding.otpPinViewLayout.otpListener = object : OTPListener {
             override fun onInteractionListener() {
-
+                val len = binding.otpPinViewLayout.otp?.length ?: 0
+                binding.reSubmitOtpChip.isEnabled = len >= 6
             }
 
             override fun onOTPComplete(otp: String) {
                 if (validateOTPFormat(otp)) {
+                    binding.reSubmitOtpChip.isEnabled = false
+                    uploadedOTP = otp
                     viewModel.verifyPhoneNumberOTP(prefix, phoneNumber, otp)
                 }
             }
         }
 
-        binding.takeMeToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.homeFragment, false)
-        }
         binding.resendOtpChip.setOnClickListener {
             viewModel.sendOTPToPhoneNumber(prefix = prefix, phoneNumber = phoneNumber)
         }
@@ -122,7 +123,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -164,7 +164,12 @@ class OTPVerificationFragment : Fragment() {
 
                 else -> {
                     binding.otpPinViewLayout.isEnabled = true
-                    unknownExceptionResponse()
+                    binding.reSubmitOtpChip.visibility = View.VISIBLE
+                    binding.reSubmitOtpChip.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.we_encountered_a_problem_resubmit_the_same_otp_or_try_again_after_some_time)
                 }
             }
         }
@@ -176,7 +181,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -219,7 +223,6 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
-                    binding.takeMeToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -345,6 +348,11 @@ class OTPVerificationFragment : Fragment() {
                 else -> unknownExceptionResponse()
             }
         }
+
+        binding.reSubmitOtpChip.setOnClickListener {
+            binding.reSubmitOtpChip.isEnabled = false
+            viewModel.verifyPhoneNumberOTP(prefix, phoneNumber, uploadedOTP)
+        }
     }
 
     private fun noInternetResponse() {
@@ -352,7 +360,6 @@ class OTPVerificationFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.VISIBLE
         binding.progressStatusValueTextView.text =
             getString(R.string.no_internet_connection_please_try_again)
-        binding.takeMeToHomePageButton.visibility = View.VISIBLE
     }
 
     private fun timeOutResponse() {
@@ -360,7 +367,6 @@ class OTPVerificationFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.VISIBLE
         binding.progressStatusValueTextView.text =
             getString(R.string.time_out_please_try_again)
-        binding.takeMeToHomePageButton.visibility = View.VISIBLE
     }
 
     private fun unknownExceptionResponse() {
@@ -368,7 +374,6 @@ class OTPVerificationFragment : Fragment() {
         binding.progressStatusValueTextView.visibility = View.VISIBLE
         binding.progressStatusValueTextView.text =
             getString(R.string.we_encountered_a_problem_please_try_again_after_some_time)
-        binding.takeMeToHomePageButton.visibility = View.VISIBLE
     }
 
     override fun onDetach() {

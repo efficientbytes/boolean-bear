@@ -18,7 +18,7 @@ interface UtilityDataDao {
     @Query("DELETE FROM $PROFESSION_ADAPTER_TABLE ")
     suspend fun deleteProfessionAdapterList()
 
-    @Query("SELECT * FROM $PROFESSION_ADAPTER_TABLE ")
+    @Query("SELECT * FROM $PROFESSION_ADAPTER_TABLE ORDER BY `index` ASC ")
     suspend fun getProfessionAdapterList(): List<Profession>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -27,7 +27,7 @@ interface UtilityDataDao {
     @Query("DELETE FROM $ISSUE_CATEGORY_ADAPTER_TABLE ")
     suspend fun deleteIssueCategoryAdapterList()
 
-    @Query("SELECT * FROM $ISSUE_CATEGORY_ADAPTER_TABLE ")
+    @Query("SELECT * FROM $ISSUE_CATEGORY_ADAPTER_TABLE ORDER BY `index` ASC ")
     suspend fun getIssueCategoryAdapterList(): List<IssueCategory>?
 
 }

@@ -80,7 +80,7 @@ class VerifyPrimaryEmailFragment : Fragment() {
             2 -> {
                 // from edit profile field
                 emailSentMessage =
-                    getString(R.string.we_ve_sent_an_email_to_your_registered_email_address_tap_on_the_verify_button_in_the_email_to_verify_your_account)
+                    getString(R.string.we_ve_sent_an_email_to_email_address_you_entered_tap_on_the_verify_button_in_the_email_to_verify_your_account)
                 binding.resendEmailLabelTextView.visibility = View.GONE
             }
 

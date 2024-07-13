@@ -80,8 +80,10 @@ class UtilityDataRepository(
 
                         DataStatus.Status.Success -> {
                             it.data?.let { professionList ->
+                                val sortedBy =
+                                    professionList.sortedBy { profession -> profession.index }
                                 utilityListener.onProfessionsAdapterListStatusChanged(
-                                    DataStatus.success(professionList)
+                                    DataStatus.success(sortedBy)
                                 )
                                 utilityDataDao.insertProfessionAdapterList(professionList)
                             }
@@ -169,8 +171,10 @@ class UtilityDataRepository(
 
                         DataStatus.Status.Success -> {
                             it.data?.let { issueCategoriesList ->
+                                val sorted =
+                                    issueCategoriesList.sortedBy { issueCategory -> issueCategory.index }
                                 utilityListener.onIssueCategoriesAdapterListStatusChanged(
-                                    DataStatus.success(issueCategoriesList)
+                                    DataStatus.success(sorted)
                                 )
                                 utilityDataDao.insertIssueCategoryAdapterList(issueCategoriesList)
                             }

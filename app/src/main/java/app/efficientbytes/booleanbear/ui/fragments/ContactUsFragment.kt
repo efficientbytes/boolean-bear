@@ -53,7 +53,10 @@ class ContactUsFragment : Fragment() {
                 } else {
                     @ReviewErrorCode val reviewErrorCode =
                         (task.exception as ReviewException).errorCode
+                    openLink("https://play.google.com/store/apps/details?id=app.efficientbytes.booleanbear")
                 }
+            }.addOnFailureListener {
+                openLink("https://play.google.com/store/apps/details?id=app.efficientbytes.booleanbear")
             }
         }
 
