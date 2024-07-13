@@ -76,6 +76,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
     private var isFirstHintText = false
     private var isSearchViewOpen = false
     private var hintRunnable: Runnable? = null
+    private var showContentUnderDevelopmentMessage = true
 
     companion object {
 
@@ -274,6 +275,7 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             when (it.status) {
                 DataStatus.Status.EmptyResult -> {
                     emptyReels()
+                    binding.contentUnderDevelopmentConstraintLayout.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Failed -> {
@@ -293,6 +295,10 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                     it.data?.let { list ->
                         reelsLoaded()
                         reelsRecyclerViewAdapter.setYoutubeContentViewList(list)
+                        if (showContentUnderDevelopmentMessage) {
+                            binding.contentUnderDevelopmentConstraintLayout.visibility =
+                                View.VISIBLE
+                        }
                     }
                 }
 
@@ -406,6 +412,11 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
                 }
             }
+        }
+
+        binding.contentUnderDevelopmentCancelIcon.setOnClickListener {
+            showContentUnderDevelopmentMessage = false
+            binding.contentUnderDevelopmentConstraintLayout.visibility = View.GONE
         }
 
     }

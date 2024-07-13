@@ -140,8 +140,8 @@
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/booleanBearLoadingGif"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
                 android:src="@drawable/boolean_bear_loading_gif"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@id/barrier1"
