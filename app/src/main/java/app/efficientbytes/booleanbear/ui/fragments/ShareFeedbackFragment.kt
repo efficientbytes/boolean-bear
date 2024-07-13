@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentShareFeedbackBinding
 import app.efficientbytes.booleanbear.models.SingletonUserData
@@ -53,7 +52,6 @@ class ShareFeedbackFragment : Fragment() {
                     val error = it.message
                     binding.progressStatusValueTextView.text = error
                     binding.submitButton.isEnabled = true
-                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -72,7 +70,6 @@ class ShareFeedbackFragment : Fragment() {
                     val message = it.data?.message
                     binding.progressStatusValueTextView.text = message
                     binding.submitButton.isEnabled = false
-                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.NoInternet -> {
@@ -82,7 +79,6 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
                         getString(R.string.no_internet_connection_please_try_again)
-                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.TimeOut -> {
@@ -92,7 +88,6 @@ class ShareFeedbackFragment : Fragment() {
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text =
                         getString(R.string.time_out_please_try_again)
-                    binding.goToHomePageButton.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
@@ -121,9 +116,6 @@ class ShareFeedbackFragment : Fragment() {
             }
 
         })
-        binding.goToHomePageButton.setOnClickListener {
-            findNavController().popBackStack(R.id.homeFragment, false)
-        }
     }
 
     private fun validateInput(input: String): Boolean {
