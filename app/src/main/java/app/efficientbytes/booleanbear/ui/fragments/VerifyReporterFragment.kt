@@ -28,6 +28,7 @@ class VerifyReporterFragment : Fragment() {
     private val mainViewModel: MainViewModel by inject()
     private val safeArgs: VerifyReporterFragmentArgs by navArgs()
     private lateinit var timer: CountDownTimer
+    private var uploadedOTP = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,10 +72,13 @@ class VerifyReporterFragment : Fragment() {
         binding.otpPinViewLayout.requestFocusOTP()
         binding.otpPinViewLayout.otpListener = object : OTPListener {
             override fun onInteractionListener() {
-
+                val len = binding.otpPinViewLayout.otp?.length ?: 0
+                binding.reSubmitOtpChip.isEnabled = len >= 6
             }
 
             override fun onOTPComplete(otp: String) {
+                binding.reSubmitOtpChip.isEnabled = false
+                uploadedOTP = otp
                 mainViewModel.verifyPhoneNumberOTP(
                     prefix = prefix,
                     phoneNumber = phoneNumber,
@@ -134,7 +138,12 @@ class VerifyReporterFragment : Fragment() {
 
                 else -> {
                     binding.otpPinViewLayout.isEnabled = true
-                    unknownExceptionResponse()
+                    binding.reSubmitOtpChip.visibility = View.VISIBLE
+                    binding.reSubmitOtpChip.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                    binding.progressStatusValueTextView.visibility = View.VISIBLE
+                    binding.progressStatusValueTextView.text =
+                        getString(R.string.we_encountered_a_problem_resubmit_the_same_otp_or_try_again_after_some_time)
                 }
             }
         }
@@ -242,6 +251,10 @@ class VerifyReporterFragment : Fragment() {
             }
         }
 
+        binding.reSubmitOtpChip.setOnClickListener {
+            binding.reSubmitOtpChip.isEnabled = false
+            mainViewModel.verifyPhoneNumberOTP(prefix, phoneNumber, uploadedOTP)
+        }
     }
 
     private fun noInternetResponse() {

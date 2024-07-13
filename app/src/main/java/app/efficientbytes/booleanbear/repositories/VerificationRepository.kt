@@ -136,7 +136,7 @@ class VerificationRepository(private val verificationService: VerificationServic
                         VerifyPhoneResponse::class.java
                     )
                     val message =
-                        "Error $responseCode. Communication code ${errorResponse.message.toString()}"
+                        "Error $responseCode. ${errorResponse.message.toString()}"
                     emit(DataStatus.failed(message))
                 }
             }
@@ -176,7 +176,7 @@ class VerificationRepository(private val verificationService: VerificationServic
                             ResponseMessage::class.java
                         )
                         val message =
-                            "Error $responseCode. Communication code ${errorResponse.message}"
+                            "Error $responseCode. ${errorResponse.message}"
                         emit(DataStatus.failed(message))
                     }
                 }

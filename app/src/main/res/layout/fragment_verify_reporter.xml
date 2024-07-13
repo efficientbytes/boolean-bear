@@ -10,10 +10,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
         android:paddingHorizontal="24dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:background="@color/black"
         tools:context=".ui.fragments.VerifyReporterFragment">
 
         <com.google.android.material.textview.MaterialTextView
@@ -49,10 +49,10 @@
             android:id="@+id/reasonForVerificationLabelTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:fontFamily="@font/montserrat"
+            android:layout_marginTop="8dp"
             android:text="@string/by_verifying_your_phone_number_you_help_us_maintain_a_secure_and_trustworthy_environment_by_preventing_abuse_and_spamming_of_our_support_feature"
-            app:layout_constraintTop_toBottomOf="@id/verifyYourPhoneNumberLabelTextView"
-            android:layout_marginTop="8dp">
+            app:fontFamily="@font/montserrat"
+            app:layout_constraintTop_toBottomOf="@id/verifyYourPhoneNumberLabelTextView">
 
         </com.google.android.material.textview.MaterialTextView>
 
@@ -63,11 +63,11 @@
             android:layout_marginTop="18dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:visibility="gone"
             android:paddingHorizontal="30dp"
             android:paddingVertical="4dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/reasonForVerificationLabelTextView">
 
             <ProgressBar
@@ -84,10 +84,10 @@
                 android:id="@+id/progressStatusValueTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textAlignment="center"
                 android:textSize="14sp"
                 android:visibility="visible"
                 app:fontFamily="@font/montserrat"
-                android:textAlignment="center"
                 app:layout_constraintEnd_toStartOf="@id/guideline3"
                 app:layout_constraintStart_toEndOf="@id/progressBar"
                 app:layout_constraintTop_toBottomOf="@id/loginOrSignUpToContinueLabelTextView"
@@ -115,12 +115,12 @@
             android:textColor="@color/white"
             app:bar_enabled="false"
             app:bar_height="2dp"
-            app:bar_inactive_color="@color/white"
             app:height="40dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/otpHasBeenSentLabelTextView"
             app:length="6"
-            app:otp_box_background="@drawable/otp_cell_background"
+            app:otp_box_background_active="@drawable/otp_cell_background_active"
+            app:otp_box_background_inactive="@drawable/otp_cell_background_inactive"
             app:otp_text_size="24dp"
             app:width="40dp" />
 
@@ -136,6 +136,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/otpPinViewLayout"
             tools:text="Resend OTP by SMS in " />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/reSubmitOtpChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="40dp"
+            android:checkable="false"
+            android:clickable="true"
+            android:enabled="true"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:text="@string/resubmit_otp"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:chipCornerRadius="50dp"
+            app:chipStrokeWidth="0dp"
+            app:layout_constraintStart_toEndOf="@id/resendOtpChip"
+            app:layout_constraintTop_toBottomOf="@id/otpPinViewLayout"
+            tools:text="Resubmit OTP" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
