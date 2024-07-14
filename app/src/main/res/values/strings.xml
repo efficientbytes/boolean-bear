@@ -163,7 +163,7 @@
     <string name="signed_in_successfully">Signed in successfully.</string>
     <string name="resend_otp_by_sms_in_secs">Resend OTP by SMS in %1$s secs</string>
     <string name="otp_sent_to">OTP sent to %1$s%2$s</string>
-    <string name="please_wait_while_we_resend_the_otp">Please wait while we resend the OTP…</string>
+    <string name="please_wait_while_we_resend_the_otp">Please wait while we send the OTP…</string>
     <string name="please_wait_while_we_verify_the_entered_otp">Please wait while we verify the entered OTP…</string>
     <string name="by_continuing_i_agree_to_the_terms_of_use_privacy_policy"><![CDATA[By continuing, I agree to the Terms of Use & Privacy Policy]]></string>
     <string name="updating_your_profile">Updating your profile…</string>
