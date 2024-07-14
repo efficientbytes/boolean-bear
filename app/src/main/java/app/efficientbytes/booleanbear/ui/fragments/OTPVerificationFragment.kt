@@ -71,7 +71,6 @@ class OTPVerificationFragment : Fragment() {
             binding.resendOtpChip.visibility = View.VISIBLE
         }
         //timer
-        binding.resendOtpChip.visibility = View.VISIBLE
         timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 binding.resendOtpChip.isEnabled = false

@@ -111,6 +111,8 @@
                 app:bar_enabled="false"
                 app:bar_height="2dp"
                 app:height="40dp"
+                android:autofillHints="smsOTPCode"
+                android:importantForAutofill="yes"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/otpSentToLabelTextView"
                 app:length="6"
