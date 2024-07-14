@@ -680,8 +680,11 @@ fun showUnauthorizedDeviceDialog(context: Context, title: String?) {
         context,
         R.style.MaterialAlertDialog_Material3
     )
-        .setTitle(title.toString())
-        .setMessage(context.getString(app.efficientbytes.booleanbear.R.string.you_are_using_an_unregistered_app_or_an_outdated_version_please_upgrade_to_the_latest_version_from_the_play_store))
+        .setTitle(title)
+        .setMessage(context.getString(app.efficientbytes.booleanbear.R.string.there_was_an_issue_in_authenticating_your_request))
+        .setPositiveButton(context.getString(app.efficientbytes.booleanbear.R.string.dismiss)) { dialog, _ ->
+            dialog.dismiss()
+        }
         .setCancelable(false)
         .show()
 }

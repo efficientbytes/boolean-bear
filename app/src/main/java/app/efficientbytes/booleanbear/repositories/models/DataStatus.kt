@@ -40,7 +40,7 @@ data class DataStatus<out T>(
         }
 
         fun <T> unAuthorized(code: String?): DataStatus<T> {
-            val message = "Error $code. Unauthorized"
+            val message = "Error $code. Authentication Issue."
             return DataStatus(status = Status.UnAuthorized, message = message)
         }
 
