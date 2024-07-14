@@ -65,7 +65,10 @@ class OTPVerificationFragment : Fragment() {
         passwordAuthFailed = safeArgs.passwordAuthFailed
 
         if (forceSendOTP) {
+            binding.resendOtpChip.visibility = View.GONE
             viewModel.sendOTPToPhoneNumber(prefix = prefix, phoneNumber = phoneNumber)
+        } else {
+            binding.resendOtpChip.visibility = View.VISIBLE
         }
         //timer
         binding.resendOtpChip.visibility = View.VISIBLE
@@ -317,6 +320,7 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
+                    binding.resendOtpChip.visibility = View.VISIBLE
                 }
 
                 DataStatus.Status.Loading -> {
@@ -334,18 +338,33 @@ class OTPVerificationFragment : Fragment() {
                     binding.progressLinearLayout.visibility = View.GONE
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.GONE
+                    binding.resendOtpChip.visibility = View.VISIBLE
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_LONG).show()
                     timer.start()
                 }
 
-                DataStatus.Status.NoInternet -> noInternetResponse()
-                DataStatus.Status.TimeOut -> timeOutResponse()
-                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
-                    requireContext(),
-                    it.message
-                )
+                DataStatus.Status.NoInternet -> {
+                    noInternetResponse()
+                    binding.resendOtpChip.visibility = View.VISIBLE
+                }
 
-                else -> unknownExceptionResponse()
+                DataStatus.Status.TimeOut -> {
+                    timeOutResponse()
+                    binding.resendOtpChip.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.UnAuthorized -> {
+                    showUnauthorizedDeviceDialog(
+                        requireContext(),
+                        it.message
+                    )
+                    binding.resendOtpChip.visibility = View.VISIBLE
+                }
+
+                else -> {
+                    unknownExceptionResponse()
+                    binding.resendOtpChip.visibility = View.VISIBLE
+                }
             }
         }
 
