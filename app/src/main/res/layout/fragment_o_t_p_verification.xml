@@ -111,6 +111,8 @@
                 app:bar_enabled="false"
                 app:bar_height="2dp"
                 app:height="40dp"
+                android:autofillHints="smsOTPCode"
+                android:importantForAutofill="yes"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/otpSentToLabelTextView"
                 app:length="6"
@@ -141,6 +143,7 @@
                 android:textSize="12sp"
                 app:chipCornerRadius="50dp"
                 app:chipStrokeWidth="0dp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/otpPinViewLayout"
                 tools:text="Resend OTP by SMS in " />

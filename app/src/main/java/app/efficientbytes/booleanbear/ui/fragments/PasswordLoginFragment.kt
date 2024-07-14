@@ -19,6 +19,7 @@ import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel
 import app.efficientbytes.booleanbear.viewmodels.ManagePasswordViewModel
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.android.inject
 
 class PasswordLoginFragment : Fragment() {
@@ -45,6 +46,10 @@ class PasswordLoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            mainViewModel.signOutUser()
+        }
 
         binding.forgotPasswordLinearLayout.visibility = View.GONE
         val userAccountId = safeArgs.userAccountId
