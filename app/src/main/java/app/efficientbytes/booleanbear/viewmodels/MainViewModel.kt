@@ -85,17 +85,15 @@ class MainViewModel(
     private val _isUserSignedIn: MutableLiveData<DataStatus<Boolean>> = MutableLiveData()
     val isUserSignedIn: LiveData<DataStatus<Boolean>> = _isUserSignedIn
     fun signInWithToken(token: SignInToken) {
-        viewModelScope.launch(Dispatchers.IO) {
-            token.token.let {
-                auth.signInWithCustomToken(it)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            _isUserSignedIn.postValue(DataStatus.success(true))
-                        } else _isUserSignedIn.postValue(DataStatus.failed(task.exception?.message.toString()))
-                    }.addOnFailureListener { exception ->
-                        _isUserSignedIn.postValue(DataStatus.failed(exception.message.toString()))
-                    }
-            }
+        token.token.let {
+            auth.signInWithCustomToken(it)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _isUserSignedIn.postValue(DataStatus.success(true))
+                    } else _isUserSignedIn.postValue(DataStatus.failed(task.exception?.message.toString()))
+                }.addOnFailureListener { exception ->
+                    _isUserSignedIn.postValue(DataStatus.failed(exception.message.toString()))
+                }
         }
     }
 
@@ -438,12 +436,7 @@ class MainViewModel(
             }
 
             ON_START -> {
-                val currentUser = auth.currentUser
-                if (currentUser != null) {
-                    _isUserSignedIn.postValue(DataStatus.success(true))
-                } else {
-                    _isUserSignedIn.postValue(DataStatus.success(false))
-                }
+
             }
 
             ON_RESUME -> {
