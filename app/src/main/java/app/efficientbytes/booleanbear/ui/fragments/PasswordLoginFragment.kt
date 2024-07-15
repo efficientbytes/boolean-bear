@@ -47,10 +47,6 @@ class PasswordLoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (FirebaseAuth.getInstance().currentUser != null) {
-            mainViewModel.signOutUser()
-        }
-
         binding.forgotPasswordLinearLayout.visibility = View.GONE
         val userAccountId = safeArgs.userAccountId
 
@@ -267,6 +263,7 @@ class PasswordLoginFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
                     binding.progressStatusValueTextView.visibility = View.VISIBLE
                     binding.progressStatusValueTextView.text = it.message
+                    binding.loginButton.isEnabled = true
                 }
 
                 DataStatus.Status.Loading -> {
