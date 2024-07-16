@@ -568,8 +568,8 @@ fun formatRunTime(seconds: Long): String {
     }
 }
 
-suspend fun getAppCheckToken(foreRefresh: Boolean = false): String =
-    suspendCancellableCoroutine { continuation ->
+suspend fun getAppCheckToken(foreRefresh: Boolean = false): String {
+    val freshToken = suspendCancellableCoroutine { continuation ->
         Firebase.appCheck.getAppCheckToken(foreRefresh)
             .addOnSuccessListener { appCheckToken: AppCheckToken ->
                 continuation.resume(appCheckToken.token)
@@ -577,6 +577,8 @@ suspend fun getAppCheckToken(foreRefresh: Boolean = false): String =
                 continuation.resumeWithException(exception)
             }
     }
+    return freshToken
+}
 
 suspend fun getFirebaseIdToken(foreRefresh: Boolean = false): String? {
     val result = try {
@@ -595,43 +597,31 @@ suspend fun getFirebaseIdToken(foreRefresh: Boolean = false): String? {
     return result
 }
 
-class AppCheckInterceptor : Interceptor, IDTokenListener {
-
-    private var token: String? = null
-    private var isComplete: Boolean = false
+class AppCheckInterceptor(private val externalScope: CoroutineScope) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
-        val accessToken = getIdToken(refresh = false, replayProtection = false)
+        val accessToken = fetchFreshAppCheckToken(refresh = false)
         val modifiedRequest = originalRequest.newBuilder()
-            .header("X-Firebase-AppCheck", accessToken.toString())
+            .header("X-Firebase-AppCheck", accessToken)
             .build()
         val response = chain.proceed(modifiedRequest)
         return when (response.code) {
             414 -> { // requires token
                 response.close()
-                val newAccessToken = getIdToken(refresh = false, replayProtection = false)
+                val newAccessToken = fetchFreshAppCheckToken(refresh = false)
                 val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .header("X-Firebase-AppCheck", newAccessToken)
                     .build()
                 chain.proceed(newRequest)
             }
 
             415 -> { // for expired token
                 response.close()
-                val newAccessToken = getIdToken(refresh = true, replayProtection = false)
+                val newAccessToken = fetchFreshAppCheckToken(refresh = true)
                 val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
-                    .build()
-                chain.proceed(newRequest)
-            }
-
-            416, 417 -> { // for replay protection or token is consumed already
-                response.close()
-                val newAccessToken = getIdToken(refresh = false, replayProtection = true)
-                val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .header("X-Firebase-AppCheck", newAccessToken)
                     .build()
                 chain.proceed(newRequest)
             }
@@ -642,38 +632,16 @@ class AppCheckInterceptor : Interceptor, IDTokenListener {
         }
     }
 
-    private fun generateIDToken(
-        idTokenListener: IDTokenListener,
-        refresh: Boolean = false,
-        replayProtection: Boolean = false
-    ) {
-        if (replayProtection) {
-            Firebase.appCheck.limitedUseAppCheckToken
-                .addOnSuccessListener { appCheckToken: AppCheckToken ->
-                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
-                }.addOnFailureListener { _ ->
-                    idTokenListener.onIDTokenGenerated()
-                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
-        } else {
-            Firebase.appCheck.getAppCheckToken(refresh)
-                .addOnSuccessListener { appCheckToken: AppCheckToken ->
-                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
-                }.addOnFailureListener { _ ->
-                    idTokenListener.onIDTokenGenerated()
-                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun fetchFreshAppCheckToken(
+        refresh: Boolean = false
+    ): String {
+        val deferred: Deferred<String> = externalScope.async {
+            getAppCheckToken(refresh)
         }
-    }
-
-    private fun getIdToken(refresh: Boolean = false, replayProtection: Boolean = false): String? {
-        generateIDToken(this, refresh, replayProtection)
-        while (!isComplete) {
+        while (!deferred.isCompleted) {
         }
-        return this.token
-    }
-
-    override fun onIDTokenGenerated(token: String?) {
-        this.token = token
-        this.isComplete = true
+        return deferred.getCompleted()
     }
 
 }
