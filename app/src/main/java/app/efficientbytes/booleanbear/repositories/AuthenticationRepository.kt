@@ -251,17 +251,15 @@ class AuthenticationRepository(
     fun generateIDToken(idTokenListener: IDTokenListener) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            authStateCoroutineScope.getScope().launch {
-                currentUser.getIdToken(true)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val idToken: String? = task.result.token
-                            idTokenListener.onIDTokenGenerated(idToken)
-                        } else {
-                            idTokenListener.onIDTokenGenerated()
-                        }
+            currentUser.getIdToken(true)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val idToken: String? = task.result.token
+                        idTokenListener.onIDTokenGenerated(idToken)
+                    } else {
+                        idTokenListener.onIDTokenGenerated()
                     }
-            }
+                }
         }
     }
 
