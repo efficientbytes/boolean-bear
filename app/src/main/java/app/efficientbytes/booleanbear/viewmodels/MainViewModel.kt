@@ -39,7 +39,6 @@ import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.IDTokenListener
-import app.efficientbytes.booleanbear.utils.getAppCheckToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
@@ -442,9 +441,6 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
-                externalScope.launch {
-                    getAppCheckToken(true)
-                }
                 fetchServerTime()
                 crossCheckRewardedAdPauseTime()
                 val currentUser = auth.currentUser
