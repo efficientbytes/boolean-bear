@@ -27,8 +27,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -383,26 +386,22 @@ class ContentDetailsLiveListener() {
 class TokenInterceptor(
     private val authenticationDao: AuthenticationDao,
     private val externalScope: CoroutineScope
-) : Interceptor,
-    IDTokenListener {
-
-    private var token: String? = null
-    private var isComplete: Boolean = false
+) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         if (FirebaseAuth.getInstance().currentUser != null) {
-            val newAccessToken = getIdToken()
+            val accessToken = getIdToken()
             val newRequest = chain.request().newBuilder()
-                .header("authorization", "Bearer $newAccessToken")
+                .header("authorization", "Bearer $accessToken")
                 .build()
             val response = chain.proceed(newRequest)
             if (response.code == 401) {
                 return if (FirebaseAuth.getInstance().currentUser != null) {
                     response.close()
-                    val secondToken = getIdToken()
+                    val freshToken = getIdToken()
                     val secondRequest = newRequest.newBuilder()
-                        .header("authorization", "Bearer $secondToken")
+                        .header("authorization", "Bearer $freshToken")
                         .build()
                     chain.proceed(secondRequest)
                 } else {
@@ -416,9 +415,9 @@ class TokenInterceptor(
             if (response.code == 401) {
                 return if (FirebaseAuth.getInstance().currentUser != null) {
                     response.close()
-                    val newAccessToken = getIdToken()
+                    val freshToken = getIdToken()
                     val newRequest = originalRequest.newBuilder()
-                        .header("authorization", "Bearer $newAccessToken")
+                        .header("authorization", "Bearer $freshToken")
                         .build()
                     chain.proceed(newRequest)
                 } else {
@@ -429,40 +428,27 @@ class TokenInterceptor(
         }
     }
 
-    private fun generateIDToken(idTokenListener: IDTokenListener) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            currentUser.getIdToken(true)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val idToken: String? = task.result.token
-                        idTokenListener.onIDTokenGenerated(idToken)
-                    } else {
-                        idTokenListener.onIDTokenGenerated()
-                    }
-                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
-        }
-    }
-
     private fun getIdToken(): String? {
-        val result = authenticationDao.getIDToken()
-        return if (result == null) {
-            generateIDToken(this)
-            while (!isComplete) {
+        val localToken = authenticationDao.getIDToken()
+        return if (localToken == null) {
+            val freshToken = fetchFreshIDToken()
+            externalScope.launch {
+                if (freshToken != null) authenticationDao.insertIDToken(IDToken(token = freshToken))
             }
-            this.token
+            freshToken
         } else {
-            this.token = result
-            this.token
+            localToken
         }
     }
 
-    override fun onIDTokenGenerated(token: String?) {
-        this.token = token
-        this.isComplete = true
-        externalScope.launch {
-            if (token != null) authenticationDao.insertIDToken(IDToken(token = token))
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun fetchFreshIDToken(): String? {
+        val deferred: Deferred<String?> = externalScope.async {
+            getFirebaseIdToken(true)
         }
+        while (!deferred.isCompleted) {
+        }
+        return deferred.getCompleted()
     }
 
 }
@@ -582,8 +568,8 @@ fun formatRunTime(seconds: Long): String {
     }
 }
 
-suspend fun getAppCheckToken(foreRefresh: Boolean = false): String =
-    suspendCancellableCoroutine { continuation ->
+suspend fun getAppCheckToken(foreRefresh: Boolean = false): String {
+    val freshToken = suspendCancellableCoroutine { continuation ->
         Firebase.appCheck.getAppCheckToken(foreRefresh)
             .addOnSuccessListener { appCheckToken: AppCheckToken ->
                 continuation.resume(appCheckToken.token)
@@ -591,44 +577,51 @@ suspend fun getAppCheckToken(foreRefresh: Boolean = false): String =
                 continuation.resumeWithException(exception)
             }
     }
+    return freshToken
+}
 
-class AppCheckInterceptor : Interceptor, IDTokenListener {
+suspend fun getFirebaseIdToken(foreRefresh: Boolean = false): String? {
+    val result = try {
+        val freshToken = suspendCancellableCoroutine { continuation ->
+            FirebaseAuth.getInstance().currentUser?.getIdToken(foreRefresh)
+                ?.addOnSuccessListener { task ->
+                    continuation.resume(task.token)
+                }?.addOnFailureListener { _ ->
+                    continuation.resume(null)
+                }
+        }
+        freshToken
+    } catch (exception: Exception) {
+        null
+    }
+    return result
+}
 
-    private var token: String? = null
-    private var isComplete: Boolean = false
+class AppCheckInterceptor(private val externalScope: CoroutineScope) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
-        val accessToken = getIdToken(refresh = false, replayProtection = false)
+        val accessToken = fetchFreshAppCheckToken(refresh = false)
         val modifiedRequest = originalRequest.newBuilder()
-            .header("X-Firebase-AppCheck", accessToken.toString())
+            .header("X-Firebase-AppCheck", accessToken)
             .build()
         val response = chain.proceed(modifiedRequest)
         return when (response.code) {
             414 -> { // requires token
                 response.close()
-                val newAccessToken = getIdToken(refresh = false, replayProtection = false)
+                val newAccessToken = fetchFreshAppCheckToken(refresh = false)
                 val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .header("X-Firebase-AppCheck", newAccessToken)
                     .build()
                 chain.proceed(newRequest)
             }
 
             415 -> { // for expired token
                 response.close()
-                val newAccessToken = getIdToken(refresh = true, replayProtection = false)
+                val newAccessToken = fetchFreshAppCheckToken(refresh = true)
                 val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
-                    .build()
-                chain.proceed(newRequest)
-            }
-
-            416, 417 -> { // for replay protection or token is consumed already
-                response.close()
-                val newAccessToken = getIdToken(refresh = false, replayProtection = true)
-                val newRequest = originalRequest.newBuilder()
-                    .header("X-Firebase-AppCheck", newAccessToken.toString())
+                    .header("X-Firebase-AppCheck", newAccessToken)
                     .build()
                 chain.proceed(newRequest)
             }
@@ -639,38 +632,16 @@ class AppCheckInterceptor : Interceptor, IDTokenListener {
         }
     }
 
-    private fun generateIDToken(
-        idTokenListener: IDTokenListener,
-        refresh: Boolean = false,
-        replayProtection: Boolean = false
-    ) {
-        if (replayProtection) {
-            Firebase.appCheck.limitedUseAppCheckToken
-                .addOnSuccessListener { appCheckToken: AppCheckToken ->
-                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
-                }.addOnFailureListener { _ ->
-                    idTokenListener.onIDTokenGenerated()
-                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
-        } else {
-            Firebase.appCheck.getAppCheckToken(refresh)
-                .addOnSuccessListener { appCheckToken: AppCheckToken ->
-                    idTokenListener.onIDTokenGenerated(appCheckToken.token)
-                }.addOnFailureListener { _ ->
-                    idTokenListener.onIDTokenGenerated()
-                }.addOnFailureListener { idTokenListener.onIDTokenGenerated() }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun fetchFreshAppCheckToken(
+        refresh: Boolean = false
+    ): String {
+        val deferred: Deferred<String> = externalScope.async {
+            getAppCheckToken(refresh)
         }
-    }
-
-    private fun getIdToken(refresh: Boolean = false, replayProtection: Boolean = false): String? {
-        generateIDToken(this, refresh, replayProtection)
-        while (!isComplete) {
+        while (!deferred.isCompleted) {
         }
-        return this.token
-    }
-
-    override fun onIDTokenGenerated(token: String?) {
-        this.token = token
-        this.isComplete = true
+        return deferred.getCompleted()
     }
 
 }

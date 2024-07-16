@@ -27,7 +27,8 @@ fun provideMoshi(): Moshi = Moshi.Builder().build()
 
 fun provideNetworkInterceptor(context: Context): NetworkInterceptor = NetworkInterceptor(context)
 
-fun provideAppCheckInterceptor(): AppCheckInterceptor = AppCheckInterceptor()
+fun provideAppCheckInterceptor(coroutineScope: CoroutineScope): AppCheckInterceptor =
+    AppCheckInterceptor(coroutineScope)
 
 fun provideTokenInterceptor(
     authenticationDao: AuthenticationDao,

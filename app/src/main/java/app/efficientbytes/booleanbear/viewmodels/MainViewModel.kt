@@ -428,10 +428,11 @@ class MainViewModel(
         when (event) {
             ON_CREATE -> {
                 getProfessionalAdapterList()
-                getIssueCategoriesAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
+                } else {
+                    deleteActiveAdsTemplate()
                 }
             }
 
@@ -440,11 +441,11 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
-                generateIDToken()
                 fetchServerTime()
                 crossCheckRewardedAdPauseTime()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
+                    generateIDToken()
                     getSingleDeviceLoginFromRemote()
                     getSingleDeviceLoginFromLocal()
                 }
