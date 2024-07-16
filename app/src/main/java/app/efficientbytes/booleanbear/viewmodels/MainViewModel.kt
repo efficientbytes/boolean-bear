@@ -39,6 +39,7 @@ import app.efficientbytes.booleanbear.services.models.ResponseMessage
 import app.efficientbytes.booleanbear.services.models.SignInToken
 import app.efficientbytes.booleanbear.ui.activities.MainActivity
 import app.efficientbytes.booleanbear.utils.IDTokenListener
+import app.efficientbytes.booleanbear.utils.getAppCheckToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
@@ -428,10 +429,11 @@ class MainViewModel(
         when (event) {
             ON_CREATE -> {
                 getProfessionalAdapterList()
-                getIssueCategoriesAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
+                } else {
+                    deleteActiveAdsTemplate()
                 }
             }
 
@@ -440,11 +442,14 @@ class MainViewModel(
             }
 
             ON_RESUME -> {
-                generateIDToken()
+                externalScope.launch {
+                    getAppCheckToken(true)
+                }
                 fetchServerTime()
                 crossCheckRewardedAdPauseTime()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
+                    generateIDToken()
                     getSingleDeviceLoginFromRemote()
                     getSingleDeviceLoginFromLocal()
                 }
