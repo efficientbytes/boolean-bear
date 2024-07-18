@@ -16,14 +16,14 @@ android {
         applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.7.2"
+        versionCode = 13
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        val debugT20PauseTime = 2L
+        val debugT20PauseTime = 20L
         val debugT20AdsToShow = 1
         val debugT40PauseTime = 3L
         val debugT40AdsToShow = 2

@@ -16,7 +16,7 @@
         </intent>
     </queries>
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:name=".MainApplication"
@@ -121,7 +121,14 @@
 
         <service
             android:name=".services.AdFreeSessionService"
-            android:foregroundServiceType="shortService" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Foreground service needed to show user the duration left for ad free contents" />
+
+        </service>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

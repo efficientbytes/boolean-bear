@@ -6,6 +6,7 @@ import app.efficientbytes.booleanbear.services.models.ReelPlayLink
 import app.efficientbytes.booleanbear.services.models.ReelResponse
 import app.efficientbytes.booleanbear.services.models.ReelTopicResponse
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
+import app.efficientbytes.booleanbear.services.models.ReelVideoIdResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLinkResponse
@@ -45,9 +46,14 @@ interface AssetsService {
         @Query("in_detailed") detailed: Int = 1
     ): Response<ReelDetailsResponse>
 
-    @GET("reels/{reelId}/play-link")
-    suspend fun getReelPlayLink(
+    @GET("reels/{reelId}/video-id")
+    suspend fun getReelVideoId(
         @Path("reelId") reelId: String
+    ): Response<ReelVideoIdResponse>
+
+    @GET("reels/{videoId}/play-link")
+    suspend fun getReelPlayLink(
+        @Path("videoId") videoId: String
     ): Response<ReelPlayLink>
 
     @GET("instructors/profile/{instructorId}")

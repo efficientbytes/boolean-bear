@@ -15,6 +15,7 @@ import app.efficientbytes.booleanbear.services.models.ReelDetailsResponse
 import app.efficientbytes.booleanbear.services.models.ReelPlayLink
 import app.efficientbytes.booleanbear.services.models.ReelTopicResponse
 import app.efficientbytes.booleanbear.services.models.ReelTopicsResponse
+import app.efficientbytes.booleanbear.services.models.ReelVideoIdResponse
 import app.efficientbytes.booleanbear.services.models.ReelsResponse
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundleResponse
@@ -245,6 +246,45 @@ class AssetsRepository(
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
+    fun getReelVideoId(reelId: String) = flow {
+        emit(DataStatus.loading())
+        try {
+            val response = assetsService.getReelVideoId(reelId)
+            val responseCode = response.code()
+            when {
+                responseCode == 200 -> {
+                    val body = response.body()
+                    if (body != null) {
+                        val videoIdResponse = body.data
+                        if (videoIdResponse != null) {
+                            emit(DataStatus.success(videoIdResponse.videoId))
+                        } else {
+                            emit(DataStatus.emptyResult())
+                        }
+                    }
+                }
+
+                responseCode in 414..417 -> {
+                    emit(DataStatus.unAuthorized(responseCode.toString()))
+                }
+
+                responseCode >= 400 -> {
+                    val errorResponse: ReelVideoIdResponse = gson.fromJson(
+                        response.errorBody()!!.string(),
+                        ReelVideoIdResponse::class.java
+                    )
+                    emit(DataStatus.failed(errorResponse.message.toString()))
+                }
+            }
+        } catch (noInternet: NoInternetException) {
+            emit(DataStatus.noInternet())
+        } catch (socketTimeOutException: SocketTimeoutException) {
+            emit(DataStatus.timeOut())
+        } catch (exception: IOException) {
+            emit(DataStatus.unknownException(exception.message.toString()))
+        }
+    }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
+
     fun getReelDetails(reelId: String) = flow {
         emit(DataStatus.loading())
         try {
@@ -282,10 +322,10 @@ class AssetsRepository(
         }
     }.catch { t -> emit(DataStatus.unknownException(t.message.toString())) }.flowOn(Dispatchers.IO)
 
-    suspend fun getReelPlayLink(reelId: String) = flow {
+    suspend fun getReelPlayLink(videoId: String) = flow {
         try {
             emit(DataStatus.loading())
-            val response = assetsService.getReelPlayLink(reelId)
+            val response = assetsService.getReelPlayLink(videoId)
             val responseCode = response.code()
             when {
                 responseCode == 200 -> {

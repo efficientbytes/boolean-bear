@@ -39,13 +39,25 @@ class ReelPlayerViewModel : ViewModel(), KoinComponent, LifecycleEventObserver,
         var countRecorded = false
     }
 
+    private val _reelVideoId: MutableLiveData<DataStatus<String>> = MutableLiveData()
+    val reelVideoId: LiveData<DataStatus<String>> = _reelVideoId
+    private var reelVideoIdJob: Job? = null
+
+    fun getReelVideoId(reelId: String) {
+        reelVideoIdJob = externalScope.launch {
+            assetsRepository.getReelVideoId(reelId).collect {
+                _reelVideoId.postValue(it)
+            }
+        }
+    }
+
     private val _reelPlayLink: MutableLiveData<DataStatus<String>> = MutableLiveData()
     val reelPlayLink: LiveData<DataStatus<String>> = _reelPlayLink
     private var reelPlayLinkJob: Job? = null
 
-    fun getReelPlayLink(reelId: String) {
+    fun getReelPlayLink(videoId: String) {
         reelPlayLinkJob = externalScope.launch(Dispatchers.IO) {
-            assetsRepository.getReelPlayLink(reelId).collect {
+            assetsRepository.getReelPlayLink(videoId).collect {
                 _reelPlayLink.postValue(it)
             }
         }
@@ -109,6 +121,9 @@ class ReelPlayerViewModel : ViewModel(), KoinComponent, LifecycleEventObserver,
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event.targetState) {
             Lifecycle.State.DESTROYED -> {
+                if (reelVideoIdJob != null) {
+                    reelVideoIdJob?.cancel()
+                }
                 if (reelPlayLinkJob != null) {
                     reelPlayLinkJob?.cancel()
                 }
