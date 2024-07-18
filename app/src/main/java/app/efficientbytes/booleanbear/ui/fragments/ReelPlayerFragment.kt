@@ -19,6 +19,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.OptIn
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -27,6 +28,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -36,8 +38,12 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MergingMediaSource
+import androidx.media3.exoplayer.source.SingleSampleMediaSource
 import androidx.media3.exoplayer.trackselection.AdaptiveTrackSelection
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.SubtitleView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import app.efficientbytes.booleanbear.R
@@ -78,6 +84,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private val playbackStateListener: Player.Listener = playbackStateListener()
     private lateinit var trackSelector: DefaultTrackSelector
     private var mediaItem: MediaItem? = null
+    private var subtitleItem: MediaItem.SubtitleConfiguration? = null
 
     //all view late init
     private lateinit var rootView: View
@@ -86,16 +93,20 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     private lateinit var fullScreenButton: ImageButton
     private lateinit var gifDrawable: GifDrawable
     private lateinit var reelId: String
+    private var videoId: String? = null
     private lateinit var playerQualityButton: ImageButton
     private lateinit var playerPlaybackSpeedButton: ImageButton
     private lateinit var playerQualityPortraitText: MaterialTextView
     private lateinit var playerSpeedPortraitText: MaterialTextView
     private lateinit var playerCloseButton: ImageButton
+    private lateinit var playerSubtitleToggleButton: ImageButton
     private var dialog: Dialog? = null
 
     //flags
     private var isFullScreen = false
     private var isPlayingSuggested = false
+    private var subtitleEnabled = false
+    private var subtitleAvailable = false
     private val viewModel: ReelPlayerViewModel by viewModels()
     private var nextSuggestedContentId: String? = null
     private var noInternet = false
@@ -165,6 +176,13 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         playerPlaybackSpeedButton =
             rootView.findViewById<ImageButton>(R.id.playerPortraitChooseSpeedImageButton)
         fullScreenButton = rootView.findViewById(R.id.playerFullScreenImageButton)
+        playerSubtitleToggleButton = rootView.findViewById(R.id.playerSubtitleImageButton)
+        playerSubtitleToggleButton.setImageDrawable(
+            AppCompatResources.getDrawable(
+                requireContext(),
+                R.drawable.subtitles_off_icon
+            )
+        )
 
         playerQualityPortraitText = rootView.findViewById(R.id.playerPortraitQualityValueTextView)
         playerSpeedPortraitText = rootView.findViewById(R.id.playerPortraitSpeedValueTextView)
@@ -177,14 +195,93 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         } else {
             binding.noInternetLinearLayout.visibility = View.GONE
             binding.parentConstraintLayout.visibility = View.VISIBLE
-            viewModel.getReelPlayLink(reelId)
+            viewModel.getReelVideoId(reelId)
             viewModel.getReelDetails(reelId)
+        }
+
+        viewModel.reelVideoId.observe(viewLifecycleOwner) {
+            when (it.status) {
+                DataStatus.Status.EmptyResult -> {
+                    gifDrawable.stop()
+                    binding.booleanBearLoadingGif.visibility = View.GONE
+                    val snackBar = Snackbar.make(
+                        binding.constraintLayout,
+                        "Requested content is not available",
+                        Snackbar.LENGTH_LONG
+                    )
+                    snackBar.show()
+                    findNavController().popBackStack()
+                }
+
+                DataStatus.Status.Failed -> {
+                    gifDrawable.stop()
+                    binding.booleanBearLoadingGif.visibility = View.GONE
+                    it.message?.let { message ->
+                        val snackBar = Snackbar.make(
+                            binding.constraintLayout,
+                            message,
+                            Snackbar.LENGTH_LONG
+                        )
+                        snackBar.show()
+                    }
+                }
+
+                DataStatus.Status.Loading -> {
+                    binding.noNetworkLinearLayout.visibility = View.GONE
+                    binding.booleanBearLoadingGif.visibility = View.VISIBLE
+                    gifDrawable.start()
+                }
+
+                DataStatus.Status.NoInternet -> {
+                    noInternet = true
+                    gifDrawable.stop()
+                    binding.booleanBearLoadingGif.visibility = View.GONE
+                    binding.noNetworkLinearLayout.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.Success -> {
+                    it.data?.let { videoId ->
+                        this@ReelPlayerFragment.videoId = videoId
+                        val subtitleLink = "https://vz-1dcf0c6d-a1b.b-cdn.net/".plus(videoId)
+                            .plus("/captions/en-auto.vtt")
+                        val subtitleUri = Uri.parse(subtitleLink)
+                        subtitleItem = MediaItem.SubtitleConfiguration.Builder(subtitleUri)
+                            .setMimeType(MimeTypes.TEXT_VTT)
+                            .setLanguage("en")
+                            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                            .build()
+                        viewModel.getReelPlayLink(videoId)
+                    }
+                }
+
+                DataStatus.Status.TimeOut -> {
+                    gifDrawable.stop()
+                    binding.booleanBearLoadingGif.visibility = View.GONE
+                    binding.noNetworkLinearLayout.visibility = View.VISIBLE
+                }
+
+                DataStatus.Status.UnAuthorized -> showUnauthorizedDeviceDialog(
+                    requireContext(),
+                    it.message
+                )
+
+                else -> {
+
+                }
+            }
         }
 
         viewModel.reelPlayLink.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.Failed -> {
-
+                    it.message?.let { message ->
+                        val snackBar = Snackbar.make(
+                            binding.constraintLayout,
+                            message,
+                            Snackbar.LENGTH_LONG
+                        )
+                        snackBar.show()
+                    }
                 }
 
                 DataStatus.Status.Loading -> {
@@ -428,10 +525,41 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             playerPlaybackSpeedSelectorDialog()
         }
 
+        playerSubtitleToggleButton.setOnClickListener {
+            binding.videoPlayer.subtitleView?.visibility = if (subtitleEnabled) {
+                subtitleEnabled = false
+                playerSubtitleToggleButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.subtitles_off_icon
+                    )
+                )
+                SubtitleView.INVISIBLE
+            } else {
+                if (subtitleAvailable) {
+                    subtitleEnabled = true
+                    playerSubtitleToggleButton.setImageDrawable(
+                        AppCompatResources.getDrawable(
+                            requireContext(),
+                            R.drawable.subtitles_on_icon
+                        )
+                    )
+                    SubtitleView.VISIBLE
+                } else {
+                    Snackbar.make(
+                        binding.constraintLayout,
+                        "Subtitle not available.",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    SubtitleView.INVISIBLE
+                }
+            }
+        }
+
         binding.retryButton.setOnClickListener {
             if (noInternet) {
                 noInternet = false
-                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelVideoId(reelId)
                 viewModel.getReelDetails(reelId)
             } else {
                 initializePlayer()
@@ -449,7 +577,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 ReelPlayerViewModel.countRecorded = false
                 binding.videoPlayer.hideController()
                 playerQualityMenu.visibility = View.GONE
-                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelVideoId(reelId)
                 viewModel.getReelDetails(reelId)
             }
         }
@@ -459,7 +587,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 noInternet = false
                 binding.noInternetLinearLayout.visibility = View.GONE
                 binding.parentConstraintLayout.visibility = View.VISIBLE
-                viewModel.getReelPlayLink(reelId)
+                viewModel.getReelVideoId(reelId)
                 viewModel.getReelDetails(reelId)
             }
         }
@@ -625,6 +753,22 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                     exoPlayer.addListener(playbackStateListener)
                     binding.videoPlayer.player = exoPlayer
                     binding.videoPlayer.keepScreenOn = true
+                    binding.videoPlayer.subtitleView?.visibility = SubtitleView.INVISIBLE
+                    binding.videoPlayer.subtitleView?.apply {
+                        setPadding(16, 16, 16, 40)
+                        setStyle(
+                            CaptionStyleCompat(
+                                Color.WHITE,
+                                Color.BLACK,
+                                Color.TRANSPARENT,
+                                CaptionStyleCompat.EDGE_TYPE_NONE,
+                                Color.BLACK,
+                                ResourcesCompat.getFont(requireContext(), R.font.montserrat)
+                            )
+                        )
+                        setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION)
+                        setBottomPaddingFraction(SubtitleView.DEFAULT_BOTTOM_PADDING_FRACTION * 4)
+                    }
                 }
         }
         if (isPlayingSuggested) {
@@ -635,14 +779,32 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (haveStartPosition) {
             player!!.seekTo(mediaItemIndex, playbackPosition)
         }
-        val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
-        mediaItem?.let {
-            HlsMediaSource.Factory(defaultHttpDataSourceFactory).createMediaSource(
+        val mediaSource = mediaItem?.let {
+            HlsMediaSource.Factory(DefaultHttpDataSource.Factory()).createMediaSource(
                 it
             )
-        }?.also {
-            player!!.setMediaSource(it,  /* resetPosition= */!haveStartPosition)
+        }
+        val subtitleSource = subtitleItem?.let { subtitle ->
+            SingleSampleMediaSource.Factory(
+                DefaultHttpDataSource.Factory()
+            ).createMediaSource(subtitle, C.TIME_UNSET)
+        }
+        if (mediaSource != null && subtitleSource != null) {
+            subtitleAvailable = true
+            val mergedSource = MergingMediaSource(mediaSource, subtitleSource)
+            player!!.setMediaSource(mergedSource,  /* resetPosition= */!haveStartPosition)
             player!!.prepare()
+        } else if (mediaSource != null) {
+            //set subtitle not available
+            subtitleAvailable = false
+            player!!.setMediaSource(mediaSource)
+            player!!.prepare()
+        } else {
+            Snackbar.make(
+                binding.constraintLayout,
+                "Issue in playing the content",
+                Snackbar.LENGTH_LONG
+            ).show()
         }
         return
     }
@@ -712,7 +874,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                         isPlayingSuggested = true
                         this@ReelPlayerFragment.reelId = reelId
                         ReelPlayerViewModel.countRecorded = false
-                        viewModel.getReelPlayLink(reelId)
+                        viewModel.getReelVideoId(reelId)
                         viewModel.getReelDetails(reelId)
                     }
                     gifDrawable.stop()
@@ -734,7 +896,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             if (cause is HttpDataSource.HttpDataSourceException) {
                 if (cause is HttpDataSource.InvalidResponseCodeException) {
                     if (cause.responseCode == 403) {
-                        viewModel.getReelPlayLink(reelId)
+                        this@ReelPlayerFragment.videoId?.let { id ->
+                            viewModel.getReelPlayLink(id)
+                        }
                     }
 
                 } else {
