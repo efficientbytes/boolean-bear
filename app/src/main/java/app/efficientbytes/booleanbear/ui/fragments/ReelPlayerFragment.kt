@@ -799,12 +799,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             subtitleAvailable = false
             player!!.setMediaSource(mediaSource)
             player!!.prepare()
-        } else {
-            Snackbar.make(
-                binding.constraintLayout,
-                "Issue in playing the content",
-                Snackbar.LENGTH_LONG
-            ).show()
         }
         return
     }
