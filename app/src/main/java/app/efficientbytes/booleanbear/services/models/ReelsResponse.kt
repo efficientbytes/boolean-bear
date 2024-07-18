@@ -78,3 +78,14 @@ data class ReelPlayLink(
     val data: String? = null,
     val message: String? = null
 )
+
+@JsonClass(generateAdapter = true)
+data class ReelVideoIdResponse(
+    val data: ReelVideoId? = null,
+    val message: String? = null
+)
+
+@JsonClass(generateAdapter = true)
+data class ReelVideoId(
+    val videoId: String
+)
