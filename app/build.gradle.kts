@@ -23,7 +23,7 @@ android {
     }
 
     buildTypes {
-        val debugT20PauseTime = 2L
+        val debugT20PauseTime = 20L
         val debugT20AdsToShow = 1
         val debugT40PauseTime = 3L
         val debugT40AdsToShow = 2
