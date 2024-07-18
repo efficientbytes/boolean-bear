@@ -558,14 +558,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             binding.internetIsBackLabelTextView.visibility = View.GONE
                         }
                         val currentUser = FirebaseAuth.getInstance().currentUser
-                        if (professionalAdapterFailedToLoad) {
-                            professionalAdapterFailedToLoad = false
-                            viewModel.getProfessionalAdapterList()
-                        }
-                        if (issueCategoriesFailedToLoad) {
-                            issueCategoriesFailedToLoad = false
-                            viewModel.getIssueCategoriesAdapterList()
-                        }
                         if (serverTimeFailedToLoad) {
                             serverTimeFailedToLoad = false
                             viewModel.fetchServerTime()
@@ -593,14 +585,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                     if (networkNotAvailableAtAppLoading) {
                         networkNotAvailableAtAppLoading = false
-                        if (professionalAdapterFailedToLoad) {
-                            professionalAdapterFailedToLoad = false
-                            viewModel.getProfessionalAdapterList()
-                        }
-                        if (issueCategoriesFailedToLoad) {
-                            issueCategoriesFailedToLoad = false
-                            viewModel.getIssueCategoriesAdapterList()
-                        }
                         if (serverTimeFailedToLoad) {
                             serverTimeFailedToLoad = false
                             viewModel.fetchServerTime()

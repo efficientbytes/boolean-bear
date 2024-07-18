@@ -427,7 +427,6 @@ class MainViewModel(
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             ON_CREATE -> {
-                getProfessionalAdapterList()
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
