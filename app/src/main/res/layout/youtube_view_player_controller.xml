@@ -139,28 +139,6 @@
 
         </LinearLayout>
 
-       <!-- <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/playerGoToHomePage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/player_instructor_name_text_background"
-            android:clickable="true"
-            android:drawableStart="@drawable/home_icon"
-            android:drawablePadding="12dp"
-            android:focusable="true"
-            android:fontFamily="@font/montserrat"
-            android:foreground="?attr/selectableItemBackground"
-            android:paddingVertical="12dp"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp"
-            android:text="Description"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@id/durationLinearLayout"
-            app:layout_constraintStart_toStartOf="parent">
-
-        </com.google.android.material.textview.MaterialTextView>-->
-
         <LinearLayout
             android:id="@+id/durationLinearLayout"
             android:layout_width="wrap_content"
@@ -211,6 +189,21 @@
             </com.google.android.material.textview.MaterialTextView>
 
         </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/playerSubtitleImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/subtitles_off_icon"
+            app:layout_constraintBottom_toBottomOf="@id/playerFullScreenImageButton"
+            app:layout_constraintEnd_toStartOf="@id/playerFullScreenImageButton"
+            app:layout_constraintTop_toTopOf="@id/playerFullScreenImageButton">
+
+        </ImageButton>
 
         <ImageButton
             android:id="@+id/playerFullScreenImageButton"
