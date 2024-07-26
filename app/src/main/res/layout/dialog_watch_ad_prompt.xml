@@ -78,13 +78,13 @@
             </com.google.android.material.textview.MaterialTextView>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/fortyMinutesAdFreeButton"
+                android:id="@+id/firstAdOptionButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="40dp"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="40 Minutes Ad-free.\n Watch 5 Ads"
+                android:text="@string/_15_minutes_ad_free_n_watch_2_ads"
                 app:cornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -93,17 +93,17 @@
             </com.google.android.material.button.MaterialButton>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/twentyMinutesAdFreeButton"
+                android:id="@+id/secondAdOptionButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="40dp"
                 android:layout_marginTop="18dp"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="20 Minutes Ad-free.\n Watch 3 Ads"
+                android:text="@string/_30_minutes_ad_free_n_watch_3_ads"
                 app:cornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/fortyMinutesAdFreeButton">
+                app:layout_constraintTop_toBottomOf="@id/firstAdOptionButton">
 
             </com.google.android.material.button.MaterialButton>
 

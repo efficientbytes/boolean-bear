@@ -10,20 +10,30 @@ enum class AdTemplate(
     val completionMessage: String,
 ) {
 
-    TEMPLATE_20(
-        templateName = "Template20",
-        templateId = "t20",
-        pauseTime = BuildConfig.t20PauseTime,
-        adsToShow = BuildConfig.t20AdsToShow,
-        completionMessage = "Your 20-minute ad-free session has concluded.",
+    TEMPLATE_10(
+        templateName = "Template10",
+        templateId = "t10",
+        pauseTime = BuildConfig.t10PauseTime,
+        adsToShow = BuildConfig.t10AdsToShow,
+        completionMessage = "Your 15-minute ad-free session has concluded.",
     ),
-    TEMPLATE_40(
-        templateName = "Template40",
-        templateId = "t40",
-        pauseTime = BuildConfig.t40PauseTime,
-        adsToShow = BuildConfig.t40AdsToShow,
-        completionMessage = "Your 40-minute ad-free session has concluded.",
+
+    TEMPLATE_15(
+        templateName = "Template15",
+        templateId = "t15",
+        pauseTime = BuildConfig.t15PauseTime,
+        adsToShow = BuildConfig.t15AdsToShow,
+        completionMessage = "Your 15-minute ad-free session has concluded.",
     ),
+
+    TEMPLATE_30(
+        templateName = "Template30",
+        templateId = "t30",
+        pauseTime = BuildConfig.t30PauseTime,
+        adsToShow = BuildConfig.t30AdsToShow,
+        completionMessage = "Your 30-minute ad-free session has concluded.",
+    ),
+
     TEMPLATE_60(
         templateName = "Template60",
         templateId = "t60",
@@ -35,10 +45,11 @@ enum class AdTemplate(
     companion object {
 
         fun getPauseTimeFor(templateId: String) = when (templateId) {
-            "t20" -> TEMPLATE_20
-            "t40" -> TEMPLATE_40
+            "t10" -> TEMPLATE_10
+            "t15" -> TEMPLATE_15
+            "t30" -> TEMPLATE_30
             "t60" -> TEMPLATE_60
-            else -> TEMPLATE_40
+            else -> TEMPLATE_15
         }
 
     }

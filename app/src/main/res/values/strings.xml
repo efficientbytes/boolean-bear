@@ -214,5 +214,7 @@
     <string name="resubmit_otp">Resubmit OTP</string>
     <string name="we_ve_sent_an_email_to_email_address_you_entered_tap_on_the_verify_button_in_the_email_to_verify_your_account">We\\\'ve sent an email to email address you entered. Tap on the verify button in the email to verify your account.</string>
     <string name="there_was_an_issue_in_authenticating_your_request">There was an issue in authenticating your request.</string>
+    <string name="_30_minutes_ad_free_n_watch_3_ads">30 Minutes Ad-free.\n Watch 3 Ads</string>
+    <string name="_15_minutes_ad_free_n_watch_2_ads">15 Minutes Ad-free.\n Watch 2 Ads</string>
 
 </resources>

@@ -23,16 +23,20 @@ android {
     }
 
     buildTypes {
-        val debugT20PauseTime = 20L
-        val debugT20AdsToShow = 1
-        val debugT40PauseTime = 3L
-        val debugT40AdsToShow = 2
+        val debugT10PauseTime = 10L
+        val debugT10AdsToShow = 1
+        val debugT15PauseTime = 15L
+        val debugT15AdsToShow = 1
+        val debugT30PauseTime = 30L
+        val debugT30AdsToShow = 2
         val debugT60PauseTime = 4L
         val debugT60AdsToShow = 3
-        val releaseT20PauseTime = 20L
-        val releaseT20AdsToShow = 3
-        val releaseT40PauseTime = 40L
-        val releaseT40AdsToShow = 5
+        val releaseT10PauseTime = 10L
+        val releaseT10AdsToShow = 1
+        val releaseT15PauseTime = 15L
+        val releaseT15AdsToShow = 2
+        val releaseT30PauseTime = 30L
+        val releaseT30AdsToShow = 3
         val releaseT60PauseTime = 60L
         val releaseT60AdsToShow = 7
 
@@ -44,26 +48,40 @@ android {
                 "AD_MOB_UNIT_ID",
                 "\"ca-app-pub-4895323871451209/7334897949\""
             )
+
             buildConfigField(
                 "long",
-                "t20PauseTime",
-                "$releaseT20PauseTime"
+                "t10PauseTime",
+                "$releaseT10PauseTime"
             )
             buildConfigField(
                 "int",
-                "t20AdsToShow",
-                "$releaseT20AdsToShow"
+                "t10AdsToShow",
+                "$releaseT10AdsToShow"
             )
+
             buildConfigField(
                 "long",
-                "t40PauseTime",
-                "$releaseT40PauseTime"
+                "t15PauseTime",
+                "$releaseT15PauseTime"
             )
             buildConfigField(
                 "int",
-                "t40AdsToShow",
-                "$releaseT40AdsToShow"
+                "t15AdsToShow",
+                "$releaseT15AdsToShow"
             )
+
+            buildConfigField(
+                "long",
+                "t30PauseTime",
+                "$releaseT30PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t30AdsToShow",
+                "$releaseT30AdsToShow"
+            )
+
             buildConfigField(
                 "long",
                 "t60PauseTime",
@@ -87,25 +105,38 @@ android {
                 "AD_MOB_UNIT_ID",
                 "\"ca-app-pub-3940256099942544/5224354917\""
             )
+
             buildConfigField(
                 "long",
-                "t20PauseTime",
-                "$debugT20PauseTime"
+                "t10PauseTime",
+                "$debugT10PauseTime"
             )
             buildConfigField(
                 "int",
-                "t20AdsToShow",
-                "$debugT20AdsToShow"
+                "t10AdsToShow",
+                "$debugT10AdsToShow"
             )
+
             buildConfigField(
                 "long",
-                "t40PauseTime",
-                "$debugT40PauseTime"
+                "t15PauseTime",
+                "$debugT15PauseTime"
             )
             buildConfigField(
                 "int",
-                "t40AdsToShow",
-                "$debugT40AdsToShow"
+                "t15AdsToShow",
+                "$debugT15AdsToShow"
+            )
+
+            buildConfigField(
+                "long",
+                "t30PauseTime",
+                "$debugT30PauseTime"
+            )
+            buildConfigField(
+                "int",
+                "t30AdsToShow",
+                "$debugT30AdsToShow"
             )
             buildConfigField(
                 "long",
