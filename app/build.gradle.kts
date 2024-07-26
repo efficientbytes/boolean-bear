@@ -25,20 +25,8 @@ android {
     buildTypes {
         val debugT10PauseTime = 10L
         val debugT10AdsToShow = 1
-        val debugT15PauseTime = 15L
-        val debugT15AdsToShow = 1
-        val debugT30PauseTime = 30L
-        val debugT30AdsToShow = 2
-        val debugT60PauseTime = 4L
-        val debugT60AdsToShow = 3
         val releaseT10PauseTime = 10L
         val releaseT10AdsToShow = 1
-        val releaseT15PauseTime = 15L
-        val releaseT15AdsToShow = 2
-        val releaseT30PauseTime = 30L
-        val releaseT30AdsToShow = 3
-        val releaseT60PauseTime = 60L
-        val releaseT60AdsToShow = 7
 
 
         release {
@@ -58,39 +46,6 @@ android {
                 "int",
                 "t10AdsToShow",
                 "$releaseT10AdsToShow"
-            )
-
-            buildConfigField(
-                "long",
-                "t15PauseTime",
-                "$releaseT15PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t15AdsToShow",
-                "$releaseT15AdsToShow"
-            )
-
-            buildConfigField(
-                "long",
-                "t30PauseTime",
-                "$releaseT30PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t30AdsToShow",
-                "$releaseT30AdsToShow"
-            )
-
-            buildConfigField(
-                "long",
-                "t60PauseTime",
-                "$releaseT60PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t60AdsToShow",
-                "$releaseT60AdsToShow"
             )
             isMinifyEnabled = false
             proguardFiles(
@@ -115,38 +70,6 @@ android {
                 "int",
                 "t10AdsToShow",
                 "$debugT10AdsToShow"
-            )
-
-            buildConfigField(
-                "long",
-                "t15PauseTime",
-                "$debugT15PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t15AdsToShow",
-                "$debugT15AdsToShow"
-            )
-
-            buildConfigField(
-                "long",
-                "t30PauseTime",
-                "$debugT30PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t30AdsToShow",
-                "$debugT30AdsToShow"
-            )
-            buildConfigField(
-                "long",
-                "t60PauseTime",
-                "$debugT60PauseTime"
-            )
-            buildConfigField(
-                "int",
-                "t60AdsToShow",
-                "$debugT60AdsToShow"
             )
             /*  manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
               buildConfigField(

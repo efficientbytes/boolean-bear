@@ -934,15 +934,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             )
             val firstAdOptionButton =
                 dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
-            val secondAdOptionButton =
-                dialog!!.findViewById<MaterialButton>(R.id.secondAdOptionButton)
 
             firstAdOptionButton.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_15)
-            }
-
-            secondAdOptionButton.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_30)
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_10)
             }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

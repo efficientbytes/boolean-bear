@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
                 android:gravity="center_horizontal"
-                android:text="Watch Video Ads"
+                android:text="@string/watch_video_ad"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:paddingHorizontal="22dp"
-                android:text="To access this content for free, please watch video ad. Select an option below to enjoy ad-free viewing:"
+                android:text="@string/watch_1_video_ad_and_enjoy_ad_free_viewing_for_the_next_10_minutes"
                 android:textAlignment="center"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -62,50 +62,36 @@
 
             </com.google.android.material.textview.MaterialTextView>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/adReasonLabelTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/montserrat"
-                android:text="Ads help us keep the platform running."
-                android:textAlignment="center"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/descriptionLabelTextView">
-
-            </com.google.android.material.textview.MaterialTextView>
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/firstAdOptionButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="40dp"
+                android:layout_marginHorizontal="14dp"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/montserrat_medium"
-                android:text="@string/_15_minutes_ad_free_n_watch_2_ads"
-                app:cornerRadius="8dp"
+                android:text="@string/play_ad"
+                app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/adReasonLabelTextView">
+                app:layout_constraintTop_toBottomOf="@id/descriptionLabelTextView">
 
             </com.google.android.material.button.MaterialButton>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/secondAdOptionButton"
-                android:layout_width="match_parent"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/adReasonLabelTextView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="40dp"
-                android:layout_marginTop="18dp"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="@string/_30_minutes_ad_free_n_watch_3_ads"
-                app:cornerRadius="8dp"
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/montserrat"
+                android:paddingHorizontal="22dp"
+                android:text="@string/reason_ads_help_us_keep_the_platform_running"
+                android:textAlignment="textStart"
+                android:textSize="11sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/firstAdOptionButton">
 
-            </com.google.android.material.button.MaterialButton>
+            </com.google.android.material.textview.MaterialTextView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
