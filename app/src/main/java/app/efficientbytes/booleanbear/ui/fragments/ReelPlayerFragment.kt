@@ -932,17 +932,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            val twentyMinuteAdFreeWatch =
-                dialog!!.findViewById<MaterialButton>(R.id.twentyMinutesAdFreeButton)
-            val fortyMinuteAdFreeWatch =
-                dialog!!.findViewById<MaterialButton>(R.id.fortyMinutesAdFreeButton)
+            val firstAdOptionButton =
+                dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
 
-            twentyMinuteAdFreeWatch.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_20)
-            }
-
-            fortyMinuteAdFreeWatch.setOnClickListener {
-                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_40)
+            firstAdOptionButton.setOnClickListener {
+                mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_10)
             }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

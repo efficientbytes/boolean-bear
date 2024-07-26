@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_constraint_layout_background">
+    android:layout_marginHorizontal="20dp"
+    android:background="@drawable/rounded_constraint_layout_version_3_background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:layout_marginHorizontal="8dp"
             android:layout_marginVertical="8dp"
             android:paddingHorizontal="20dp"
-            android:paddingBottom="26dp">
+            android:paddingTop="40dp"
+            android:paddingBottom="46dp">
 
             <ImageView
                 android:id="@+id/watchingContentsIcon"
@@ -38,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_medium"
                 android:gravity="center_horizontal"
-                android:text="Watch Video Ads"
+                android:text="@string/watch_video_ad"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat"
                 android:paddingHorizontal="22dp"
-                android:text="To access this content for free, please watch video ad. Select an option below to enjoy ad-free viewing:"
+                android:text="@string/watch_1_video_ad_and_enjoy_ad_free_viewing_for_the_next_10_minutes"
                 android:textAlignment="center"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -62,50 +64,36 @@
 
             </com.google.android.material.textview.MaterialTextView>
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/adReasonLabelTextView"
-                android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/firstAdOptionButton"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/montserrat"
-                android:text="Ads help us keep the platform running."
-                android:textAlignment="center"
-                android:textSize="14sp"
+                android:layout_marginHorizontal="14dp"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/montserrat_medium"
+                android:text="@string/play_ad"
+                app:cornerRadius="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/descriptionLabelTextView">
 
+            </com.google.android.material.button.MaterialButton>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/adReasonLabelTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/montserrat"
+                android:paddingHorizontal="22dp"
+                android:text="@string/reason_ads_help_us_keep_the_platform_running"
+                android:textAlignment="textStart"
+                android:textSize="11sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/firstAdOptionButton">
+
             </com.google.android.material.textview.MaterialTextView>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/fortyMinutesAdFreeButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="40dp"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="40 Minutes Ad-free.\n Watch 5 Ads"
-                app:cornerRadius="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/adReasonLabelTextView">
-
-            </com.google.android.material.button.MaterialButton>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/twentyMinutesAdFreeButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="40dp"
-                android:layout_marginTop="18dp"
-                android:fontFamily="@font/montserrat_medium"
-                android:text="20 Minutes Ad-free.\n Watch 3 Ads"
-                app:cornerRadius="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/fortyMinutesAdFreeButton">
-
-            </com.google.android.material.button.MaterialButton>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var isUserLoggedIn = false
         var isAdLoading = false
         var isAdTemplateActive = false
-        var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_20
+        var currentAdTemplate: AdTemplate? = AdTemplate.TEMPLATE_10
         var adPauseOverMessageDisplayed = true
         private val isSingleDeviceLoginLaunched = AtomicBoolean(false)
     }
@@ -486,19 +486,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 }
 
-                AdTemplate.TEMPLATE_20 -> {
-                    adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow, it)
-                    viewModel.showRewardedAds(null)
-                }
-
-                AdTemplate.TEMPLATE_40 -> {
-                    adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow, it)
-                    viewModel.showRewardedAds(null)
-                }
-
-                AdTemplate.TEMPLATE_60 -> {
+                AdTemplate.TEMPLATE_10 -> {
                     adsToShow = it.adsToShow
                     showRewardedAds(adsToShow, it)
                     viewModel.showRewardedAds(null)
