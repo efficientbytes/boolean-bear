@@ -216,7 +216,7 @@
     <string name="there_was_an_issue_in_authenticating_your_request">There was an issue in authenticating your request.</string>
     <string name="watch_1_video_ad_and_enjoy_ad_free_viewing_for_the_next_10_minutes">Watch 1 video ad and enjoy ad-free viewing for the next 10 minutes.</string>
     <string name="play_ad">Play Ad</string>
-    <string name="reason_ads_help_us_keep_the_platform_running">*Reason - Ads help us keep the platform running.</string>
+    <string name="reason_ads_help_us_keep_the_platform_running">*Reason: Ads help us keep the platform running.</string>
     <string name="watch_video_ad">Watch Video Ad</string>
 
 </resources>

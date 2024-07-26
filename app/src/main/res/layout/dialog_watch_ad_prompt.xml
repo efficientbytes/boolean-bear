@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_constraint_layout_background">
+    android:layout_marginHorizontal="20dp"
+    android:background="@drawable/rounded_constraint_layout_version_3_background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:layout_marginHorizontal="8dp"
             android:layout_marginVertical="8dp"
             android:paddingHorizontal="20dp"
-            android:paddingBottom="26dp">
+            android:paddingTop="40dp"
+            android:paddingBottom="46dp">
 
             <ImageView
                 android:id="@+id/watchingContentsIcon"
