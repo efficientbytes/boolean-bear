@@ -18,7 +18,6 @@ class LoginToContinueFragment : BottomSheetDialogFragment() {
 
     companion object {
 
-        const val LOGIN_TO_CONTINUE_FRAGMENT: String = "frag-login-to-continue"
         var isOpened: Boolean = false
     }
 
@@ -36,7 +35,7 @@ class LoginToContinueFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.loginButton.setOnClickListener {
             dismiss()
-            findNavController().navigate(R.id.homeFragment_to_loginOrSignUpFragment)
+            findNavController().navigate(R.id.loginToContinueFragment_to_loginOrSignUpFragment)
         }
     }
 

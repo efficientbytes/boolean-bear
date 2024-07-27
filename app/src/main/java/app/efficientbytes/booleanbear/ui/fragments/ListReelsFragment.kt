@@ -61,7 +61,6 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
     }
     private val connectivityListener: ConnectivityListener by inject()
     private var loadingReelsFailed = false
-    private var loginToContinueFragment: LoginToContinueFragment? = null
     private val delay3k: Long = 3000 // Delay in milliseconds
     private var searchView: SearchView? = null
     private var isSearchViewOpen = false
@@ -398,15 +397,9 @@ class ListReelsFragment : Fragment(), YoutubeContentViewRecyclerViewAdapter.OnIt
                 ListReelsFragmentDirections.listReelsFragmentToShuffledContentPlayerFragment(reelId = remoteReel.reelId)
             findNavController().navigate(directions)
         } else {
-            if (loginToContinueFragment == null) {
-                loginToContinueFragment = LoginToContinueFragment()
-            }
             if (!LoginToContinueFragment.isOpened) {
                 LoginToContinueFragment.isOpened = true
-                loginToContinueFragment!!.show(
-                    parentFragmentManager,
-                    LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
-                )
+                findNavController().navigate(R.id.listReelsFragment_to_loginToContinueFragment)
             }
         }
     }

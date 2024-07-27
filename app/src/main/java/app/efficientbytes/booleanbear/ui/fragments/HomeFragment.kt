@@ -68,7 +68,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
-    private var loginToContinueFragment: LoginToContinueFragment? = null
     private var accountSettingsFragment: AccountSettingsFragment? = null
     private var searchView: SearchView? = null
     private val alternateSearchHint = "Search for tags \"#advanced\""
@@ -557,15 +556,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(reelId = remoteReel.reelId)
             findNavController().navigate(directions)
         } else {
-            if (loginToContinueFragment == null) {
-                loginToContinueFragment = LoginToContinueFragment()
-            }
             if (!LoginToContinueFragment.isOpened) {
                 LoginToContinueFragment.isOpened = true
-                loginToContinueFragment!!.show(
-                    parentFragmentManager,
-                    LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
-                )
+                findNavController().navigate(R.id.homeFragment_to_loginToContinueFragment)
             }
         }
     }
@@ -576,15 +569,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
                 HomeFragmentDirections.homeFragmentToShuffledContentPlayerFragment(contentId)
             findNavController().navigate(directions)
         } else {
-            if (loginToContinueFragment == null) {
-                loginToContinueFragment = LoginToContinueFragment()
-            }
             if (!LoginToContinueFragment.isOpened) {
                 LoginToContinueFragment.isOpened = true
-                loginToContinueFragment!!.show(
-                    parentFragmentManager,
-                    LoginToContinueFragment.LOGIN_TO_CONTINUE_FRAGMENT
-                )
+                findNavController().navigate(R.id.homeFragment_to_loginToContinueFragment)
             }
         }
     }
