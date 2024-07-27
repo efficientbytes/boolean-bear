@@ -284,7 +284,14 @@
     <dialog
         android:id="@+id/loginToContinueFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.LoginToContinueFragment"
-        android:label="LoginToContinueFragment" />
+        android:label="LoginToContinueFragment">
+
+        <action
+            android:id="@+id/loginToContinueFragment_to_loginOrSignUpFragment"
+            app:destination="@id/loginOrSignUpFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </dialog>
     <fragment
         android:id="@+id/discoverFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.DiscoverFragment"
@@ -313,6 +320,9 @@
         <deepLink
             android:autoVerify="true"
             app:uri="https://app.booleanbear.com/binge-watch/topic/{topicId}/" />
+        <action
+            android:id="@+id/listReelsFragment_to_loginToContinueFragment"
+            app:destination="@id/loginToContinueFragment" />
 
     </fragment>
     <fragment
