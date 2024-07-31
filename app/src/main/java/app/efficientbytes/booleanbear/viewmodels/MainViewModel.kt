@@ -178,9 +178,7 @@ class MainViewModel(
     }
 
     fun resetAssets() {
-        viewModelScope.launch(Dispatchers.IO) {
-            assetsRepository.deleteCourseWaitingList()
-        }
+        assetsRepository.deleteCourseWaitingList()
     }
 
     fun resetFCMToken() {
@@ -430,6 +428,7 @@ class MainViewModel(
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
                     getFirebaseUserToken()
+                    getAllWaitingListCourses()
                 } else {
                     deleteActiveAdsTemplate()
                 }

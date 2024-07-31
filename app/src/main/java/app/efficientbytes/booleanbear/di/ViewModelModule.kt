@@ -33,6 +33,6 @@ val viewModelModule = module {
     viewModel { ReelPlayerViewModel() }
     viewModel { DiscoverViewModel() }
     viewModel { ListReelViewModel() }
-    viewModel { CourseWaitingListViewModel() }
+    viewModel { CourseWaitingListViewModel(get()) }
     viewModel { ManagePasswordViewModel() }
 }
