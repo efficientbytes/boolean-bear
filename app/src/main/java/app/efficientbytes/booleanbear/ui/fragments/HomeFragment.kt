@@ -68,7 +68,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
-    private var accountSettingsFragment: AccountSettingsFragment? = null
     private var searchView: SearchView? = null
     private val alternateSearchHint = "Search for tags \"#advanced\""
     private val hintHandler = Handler(Looper.getMainLooper())
@@ -170,15 +169,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.accountSettingsMenu -> {
-                        if (accountSettingsFragment == null) {
-                            accountSettingsFragment = AccountSettingsFragment()
-                        }
                         if (!AccountSettingsFragment.isOpened) {
                             AccountSettingsFragment.isOpened = true
-                            accountSettingsFragment!!.show(
-                                parentFragmentManager,
-                                AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
-                            )
+                            findNavController().navigate(R.id.homeFragment_to_accountSettingsFragment)
                         }
                         return true
                     }

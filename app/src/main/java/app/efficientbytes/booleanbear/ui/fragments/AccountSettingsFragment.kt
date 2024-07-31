@@ -22,7 +22,6 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
 
     companion object {
 
-        const val ACCOUNT_SETTINGS_FRAGMENT: String = "frag-account-settings"
         var isOpened: Boolean = false
     }
 
