@@ -35,7 +35,6 @@ class ReelsDescriptionFragment : BottomSheetDialogFragment(),
 
     companion object {
 
-        const val SHUFFLED_DESCRIPTION_FRAGMENT: String = "frag-shuffled-description"
         var isOpened: Boolean = false
     }
 

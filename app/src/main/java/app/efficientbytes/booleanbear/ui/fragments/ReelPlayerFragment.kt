@@ -718,15 +718,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     }
 
     private fun openDescriptionFragment() {
-        if (reelsDescriptionFragment == null) {
-            reelsDescriptionFragment = ReelsDescriptionFragment()
-        }
         if (!ReelsDescriptionFragment.isOpened) {
             ReelsDescriptionFragment.isOpened = true
-            reelsDescriptionFragment!!.show(
-                parentFragmentManager,
-                ReelsDescriptionFragment.SHUFFLED_DESCRIPTION_FRAGMENT
-            )
+            findNavController().navigate(R.id.shuffledContentPlayerFragment_to_reelsDescriptionFragment)
         }
     }
 
