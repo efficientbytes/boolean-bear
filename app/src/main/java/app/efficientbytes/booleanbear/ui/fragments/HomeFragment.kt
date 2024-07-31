@@ -122,12 +122,12 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
                 })
                 searchView = search.actionView as? SearchView
-                val linearLayout1 = searchView!!.getChildAt(0) as LinearLayout
-                val linearLayout2 = linearLayout1.getChildAt(2) as LinearLayout
-                val linearLayout3 = linearLayout2.getChildAt(1) as LinearLayout
-                val searchEditText = linearLayout3.getChildAt(0) as TextView
-                searchEditText.textSize = 16f
-                searchEditText.setTextColor(
+                val linearLayout1 = searchView?.getChildAt(0) as LinearLayout?
+                val linearLayout2 = linearLayout1?.getChildAt(2) as LinearLayout?
+                val linearLayout3 = linearLayout2?.getChildAt(1) as LinearLayout?
+                val searchEditText = linearLayout3?.getChildAt(0) as TextView?
+                searchEditText?.textSize = 16f
+                searchEditText?.setTextColor(
                     AppCompatResources.getColorStateList(
                         requireContext(),
                         R.color.white
