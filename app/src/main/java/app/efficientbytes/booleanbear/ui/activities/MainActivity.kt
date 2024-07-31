@@ -731,7 +731,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         R.style.HomeToolbarTitleAppearance
                     )
                     binding.mainToolbar.visibility = View.VISIBLE
-                    binding.mainToolbar.title = resources.getString(R.string.app_name)
+                    binding.mainToolbar.title = resources.getString(R.string.app_name_styled)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
