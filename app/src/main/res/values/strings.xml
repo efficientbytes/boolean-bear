@@ -219,5 +219,8 @@
     <string name="play_ad">Play Ad</string>
     <string name="reason_ads_help_us_keep_the_platform_running">*Reason: Ads help us keep the platform running.</string>
     <string name="watch_video_ad">Watch Video Ad</string>
+    <string name="brand_logo_amp_name"><![CDATA[Brand Logo & Name]]></string>
+    <string name="brand_name">Brand Name</string>
+    <string name="brand_logo">Brand Logo</string>
 
 </resources>

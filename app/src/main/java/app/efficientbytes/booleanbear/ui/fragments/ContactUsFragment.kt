@@ -41,6 +41,12 @@ class ContactUsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val versionName = "version " + getVersionCode()
         binding.appVersionLabelTextView.text = versionName
+        binding.appVersionLabelTextView.setOnClickListener {
+            if (!ChooseBrandDisplayModeFragment.isOpened) {
+                ChooseBrandDisplayModeFragment.isOpened = true
+                findNavController().navigate(R.id.contactUsFragment_to_chooseBrandDisplayModeFragment)
+            }
+        }
 
         binding.rateUsLabelTextView.setOnClickListener {
             val request = reviewManager.requestReviewFlow()

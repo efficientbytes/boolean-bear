@@ -780,6 +780,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
+                R.id.brandDisplayFragment->{
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.DefaultToolbarTitleAppearance
+                    )
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    binding.mainToolbar.visibility = View.GONE
+                }
+
                 else -> {
                     binding.mainToolbar.subtitle = null
                     binding.mainToolbar.setTitleTextAppearance(
