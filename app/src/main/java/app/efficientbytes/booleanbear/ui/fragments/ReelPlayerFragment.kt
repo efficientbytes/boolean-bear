@@ -1192,8 +1192,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (FirebaseAuth.getInstance().currentUser != null) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             if (Util.SDK_INT > 23) {
-                initializePlayer()
-                binding.videoPlayer.onResume()
+                if (!isWatchAdPromptDialogOpened) {
+                    initializePlayer()
+                    binding.videoPlayer.onResume()
+                }
             }
         }
     }
@@ -1204,8 +1206,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (FirebaseAuth.getInstance().currentUser != null) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             if ((Util.SDK_INT <= 23 || player == null)) {
-                initializePlayer()
-                binding.videoPlayer.onResume()
+                if (!isWatchAdPromptDialogOpened) {
+                    initializePlayer()
+                    binding.videoPlayer.onResume()
+                }
             }
         } else {
             findNavController().popBackStack()
