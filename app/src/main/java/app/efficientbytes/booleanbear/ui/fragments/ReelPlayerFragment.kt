@@ -932,6 +932,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             firstAdOptionButton.setOnClickListener {
                 mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_10)
             }
+            val goHomeButton = dialog!!.findViewById<MaterialTextView>(R.id.goHomeTextViewLabel)
+            goHomeButton.setOnClickListener {
+                findNavController().popBackStack(R.id.homeFragment, false)
+                dialog!!.dismiss()
+            }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog!!.setOnDismissListener {

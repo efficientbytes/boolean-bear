@@ -222,5 +222,6 @@
     <string name="brand_logo_amp_name"><![CDATA[Brand Logo & Name]]></string>
     <string name="brand_name">Brand Name</string>
     <string name="brand_logo">Brand Logo</string>
+    <string name="homepage"><![CDATA[<< Homepage]]></string>
 
 </resources>
