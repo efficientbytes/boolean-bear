@@ -901,6 +901,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
+            if (!MainActivity.isAdTemplateActive) {
+                mainViewModel.preLoadRewardedAd()
+            }
         }
 
         @OptIn(UnstableApi::class)
