@@ -9,6 +9,9 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scrollbarSize="0dp"
+        android:scrollbars="vertical"
+        android:paddingBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,8 +23,7 @@
             android:layout_marginHorizontal="8dp"
             android:layout_marginVertical="8dp"
             android:paddingHorizontal="20dp"
-            android:paddingTop="40dp"
-            android:paddingBottom="46dp">
+            android:paddingTop="40dp">
 
             <ImageView
                 android:id="@+id/watchingContentsIcon"
@@ -92,6 +94,27 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/firstAdOptionButton">
+
+            </com.google.android.material.textview.MaterialTextView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/goHomeTextViewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/homepage"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/adReasonLabelTextView">
 
             </com.google.android.material.textview.MaterialTextView>
 

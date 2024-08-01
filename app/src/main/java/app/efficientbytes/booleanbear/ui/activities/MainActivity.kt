@@ -731,7 +731,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         R.style.HomeToolbarTitleAppearance
                     )
                     binding.mainToolbar.visibility = View.VISIBLE
-                    binding.mainToolbar.title = resources.getString(R.string.app_name)
+                    binding.mainToolbar.title = resources.getString(R.string.app_name_styled)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -778,6 +778,33 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+
+                R.id.brandDisplayFragment -> {
+                    binding.mainToolbar.subtitle = null
+                    binding.mainToolbar.setTitleTextAppearance(
+                        this,
+                        R.style.DefaultToolbarTitleAppearance
+                    )
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    binding.mainToolbar.visibility = View.GONE
+                }
+
+                R.id.loginToContinueFragment -> {
+
+                }
+
+                R.id.accountSettingsFragment -> {
+
+                }
+
+                R.id.chooseBrandDisplayModeFragment -> {
+
+                }
+
+                R.id.reelsDescriptionFragment -> {
+
                 }
 
                 else -> {

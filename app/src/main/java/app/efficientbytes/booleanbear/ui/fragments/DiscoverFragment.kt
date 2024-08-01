@@ -56,7 +56,7 @@ class DiscoverFragment : Fragment(), ReelTopicsRecyclerViewAdapter.OnItemClickLi
         super.onViewCreated(view, savedInstanceState)
 
         binding.refreshReelTopicButton.visibility = View.GONE
-        val reelTopicsManager = GridLayoutManager(context, 3, GridLayoutManager.HORIZONTAL, false)
+        val reelTopicsManager = GridLayoutManager(context, 2, GridLayoutManager.HORIZONTAL, false)
         binding.reelTopicsRecyclerView.layoutManager = reelTopicsManager
         binding.reelTopicsRecyclerView.adapter = reelTopicsRecyclerViewAdapter
 

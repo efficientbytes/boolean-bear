@@ -43,8 +43,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
-                android:src="@drawable/player_quality_icon"
-                android:text="Quality">
+                android:src="@drawable/player_quality_icon">
 
             </ImageButton>
 
@@ -66,8 +65,7 @@
                 android:layout_marginStart="20dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="10dp"
-                android:src="@drawable/player_speed_icon"
-                android:text="Speed">
+                android:src="@drawable/player_speed_icon">
 
             </ImageButton>
 

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import app.efficientbytes.booleanbear.R
 import app.efficientbytes.booleanbear.databinding.FragmentCourseWaitingListBinding
 import app.efficientbytes.booleanbear.repositories.models.DataStatus
@@ -14,6 +13,7 @@ import app.efficientbytes.booleanbear.viewmodels.CourseWaitingListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import org.koin.android.ext.android.inject
 
 class CourseWaitingListFragment : BottomSheetDialogFragment() {
 
@@ -29,7 +29,7 @@ class CourseWaitingListFragment : BottomSheetDialogFragment() {
     private lateinit var _binding: FragmentCourseWaitingListBinding
     private val binding get() = _binding
     private lateinit var rootView: View
-    private val viewModel: CourseWaitingListViewModel by viewModels()
+    private val viewModel: CourseWaitingListViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

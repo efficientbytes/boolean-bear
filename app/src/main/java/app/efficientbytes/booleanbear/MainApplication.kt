@@ -90,6 +90,7 @@ class MainApplication : Application(), KoinComponent {
         val currentUser = FirebaseAuth.getInstance().currentUser
         assetsRepository.deleteReelTopics()
         assetsRepository.deleteReels()
+        assetsRepository.deleteCourseWaitingList()
         utilityDataRepository.deleteProfessions()
         utilityDataRepository.deleteIssueCategories()
         assetsRepository.deleteAllInstructorDetails()

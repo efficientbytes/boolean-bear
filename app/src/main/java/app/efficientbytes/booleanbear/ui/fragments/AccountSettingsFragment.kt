@@ -22,7 +22,6 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
 
     companion object {
 
-        const val ACCOUNT_SETTINGS_FRAGMENT: String = "frag-account-settings"
         var isOpened: Boolean = false
     }
 
@@ -50,12 +49,12 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.loginOrSignUpCardView.setOnClickListener {
+            findNavController().navigate(R.id.accountSettingsFragment_to_loginOrSignUpFragment)
             dismiss()
-            findNavController().navigate(R.id.homeFragment_to_loginOrSignUpFragment)
         }
         binding.accountSettingsCardView.setOnClickListener {
+            findNavController().navigate(R.id.accountSettingsFragment_to_editProfileFragment)
             dismiss()
-            findNavController().navigate(R.id.homeFragment_to_editProfileFragment)
         }
         viewModel.userProfile.observe(viewLifecycleOwner) {
             if (auth.currentUser != null) {
@@ -70,8 +69,8 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
             shareAppLink()
         }
         binding.getInTouchWithUsCardView.setOnClickListener {
+            findNavController().navigate(R.id.accountSettingsFragment_to_contactUsFragment)
             dismiss()
-            findNavController().navigate(R.id.homeFragment_to_contactUsFragment)
         }
     }
 

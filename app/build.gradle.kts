@@ -16,8 +16,8 @@ android {
         applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
-        versionCode = 15
-        versionName = "1.9.1"
+        versionCode = 16
+        versionName = "1.9.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -71,12 +71,6 @@ android {
                 "t10AdsToShow",
                 "$debugT10AdsToShow"
             )
-            /*  manifestPlaceholders["AD_MOB_PUB_ID"] = "ca-app-pub-2509573406487029~4755379798"
-              buildConfigField(
-                  "String",
-                  "AD_MOB_UNIT_ID",
-                  "\"ca-app-pub-2509573406487029/9481911106\""
-              )*/
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -68,7 +68,6 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
         YoutubeContentViewRecyclerViewAdapter(dummyReelsList, requireContext(), this@HomeFragment)
     }
     private val connectivityListener: ConnectivityListener by inject()
-    private var accountSettingsFragment: AccountSettingsFragment? = null
     private var searchView: SearchView? = null
     private val alternateSearchHint = "Search for tags \"#advanced\""
     private val hintHandler = Handler(Looper.getMainLooper())
@@ -122,12 +121,12 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
 
                 })
                 searchView = search.actionView as? SearchView
-                val linearLayout1 = searchView!!.getChildAt(0) as LinearLayout
-                val linearLayout2 = linearLayout1.getChildAt(2) as LinearLayout
-                val linearLayout3 = linearLayout2.getChildAt(1) as LinearLayout
-                val searchEditText = linearLayout3.getChildAt(0) as TextView
-                searchEditText.textSize = 16f
-                searchEditText.setTextColor(
+                val linearLayout1 = searchView?.getChildAt(0) as LinearLayout?
+                val linearLayout2 = linearLayout1?.getChildAt(2) as LinearLayout?
+                val linearLayout3 = linearLayout2?.getChildAt(1) as LinearLayout?
+                val searchEditText = linearLayout3?.getChildAt(0) as TextView?
+                searchEditText?.textSize = 16f
+                searchEditText?.setTextColor(
                     AppCompatResources.getColorStateList(
                         requireContext(),
                         R.color.white
@@ -170,15 +169,9 @@ class HomeFragment : Fragment(), ReelTopicsChipRecyclerViewAdapter.OnItemClickLi
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.accountSettingsMenu -> {
-                        if (accountSettingsFragment == null) {
-                            accountSettingsFragment = AccountSettingsFragment()
-                        }
                         if (!AccountSettingsFragment.isOpened) {
                             AccountSettingsFragment.isOpened = true
-                            accountSettingsFragment!!.show(
-                                parentFragmentManager,
-                                AccountSettingsFragment.ACCOUNT_SETTINGS_FRAGMENT
-                            )
+                            findNavController().navigate(R.id.homeFragment_to_accountSettingsFragment)
                         }
                         return true
                     }

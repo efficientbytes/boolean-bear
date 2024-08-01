@@ -41,6 +41,12 @@ class ContactUsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val versionName = "version " + getVersionCode()
         binding.appVersionLabelTextView.text = versionName
+        binding.appVersionLabelTextView.setOnClickListener {
+            if (!ChooseBrandDisplayModeFragment.isOpened) {
+                ChooseBrandDisplayModeFragment.isOpened = true
+                findNavController().navigate(R.id.contactUsFragment_to_chooseBrandDisplayModeFragment)
+            }
+        }
 
         binding.rateUsLabelTextView.setOnClickListener {
             val request = reviewManager.requestReviewFlow()
@@ -82,13 +88,13 @@ class ContactUsFragment : Fragment() {
 
         binding.privacyPolicyLabelTextView.setOnClickListener {
             val link =
-                "https://efficientbytes.notion.site/Boolean-Bear-Privacy-Policy-b2f43ae39b8a4c5880ef2a1cbd811b15"
+                "https://island-actor-02e.notion.site/Boolean-Bear-Privacy-Policy-bd52c6fc6df7405bb3619babf373fa12"
             openLink(link)
         }
 
         binding.termsNConditionLabelTextView.setOnClickListener {
             val link =
-                "https://efficientbytes.notion.site/Boolean-Bear-Terms-of-use-803e636c627946e4b6fdefdbf23b9ede"
+                "https://island-actor-02e.notion.site/Boolean-Bear-Terms-of-use-25473076514a45768dd0c8682b5021d8"
             openLink(link)
         }
 

@@ -47,6 +47,7 @@
                 android:layout_marginBottom="22dp"
                 android:clickable="false"
                 android:focusable="false"
+                tools:visibility="visible"
                 android:visibility="@{(customAuthState.liveAuthStateFromRemote ==true) ? View.VISIBLE : View.GONE}"
                 app:cardBackgroundColor="@color/black_1200"
                 app:cardCornerRadius="50dp"
@@ -61,18 +62,6 @@
                     android:paddingHorizontal="22dp"
                     android:paddingVertical="6dp">
 
-                    <ImageView
-                        android:id="@+id/appLogoImageView1"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:src="@drawable/app_logo_type_no_shape_no_name_no_black_background_svg_format"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription">
-
-                    </ImageView>
-
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/firstNameValueTextView"
                         android:layout_width="0dp"
@@ -84,9 +73,9 @@
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/appLogoImageView1"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Anubhav">
+                        tools:text="Hi Anubhav">
 
                     </com.google.android.material.textview.MaterialTextView>
 
@@ -101,6 +90,7 @@
                 android:layout_marginBottom="22dp"
                 android:clickable="true"
                 android:focusable="true"
+                tools:visibility="gone"
                 android:visibility="@{(customAuthState.liveAuthStateFromRemote==true) ? View.GONE : View.VISIBLE}"
                 app:cardBackgroundColor="@color/black_200"
                 app:cardCornerRadius="50dp"
@@ -114,18 +104,6 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="22dp"
                     android:paddingVertical="6dp">
-
-                    <ImageView
-                        android:id="@+id/appLogoImageView2"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:src="@drawable/app_logo_type_no_shape_no_name_no_black_background_svg_format"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription">
-
-                    </ImageView>
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/loginOrSignUpLabelTextView"

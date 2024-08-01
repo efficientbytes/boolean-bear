@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner_top_radius_layout_background"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:paddingTop="22dp"
+        android:paddingBottom="22dp"
+        tools:context=".ui.fragments.ChooseBrandDisplayModeFragment">
+
+        <View
+            android:id="@+id/bottomSheetPullBarView"
+            android:layout_width="40dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/white" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/onlyLogoTextViewLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="10dp"
+            android:text="@string/brand_logo"
+            android:textColor="@color/white"
+            android:textSize="14sp">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/onlyNameTextViewLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="10dp"
+            android:text="@string/brand_name"
+            android:textColor="@color/white"
+            android:textSize="14sp">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/logoNNameTextViewLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="10dp"
+            android:text="@string/brand_logo_amp_name"
+            android:textColor="@color/white"
+            android:textSize="14sp">
+
+        </com.google.android.material.textview.MaterialTextView>
+
+
+    </LinearLayout>
+</layout>

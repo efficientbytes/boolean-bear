@@ -57,17 +57,30 @@
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
-    <fragment
+    <dialog
         android:id="@+id/accountSettingsFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.AccountSettingsFragment"
-        android:label="Account Settings"
+        android:label=""
         tools:layout="@layout/fragment_account_settings">
         <action
             android:id="@+id/accountSettingsFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpToSaveState="true"
-            app:restoreState="true" />
-    </fragment>
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/accountSettingsFragment_to_loginOrSignUpFragment"
+            app:destination="@id/loginOrSignUpFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/accountSettingsFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/accountSettingsFragment_to_contactUsFragment"
+            app:destination="@id/contactUsFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </dialog>
     <fragment
         android:id="@+id/loginOrSignUpFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.LoginOrSignUpFragment"
@@ -195,6 +208,9 @@
             app:destination="@id/deleteUserAccountFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/contactUsFragment_to_chooseBrandDisplayModeFragment"
+            app:destination="@id/chooseBrandDisplayModeFragment" />
     </fragment>
     <fragment
         android:id="@+id/shareFeedbackFragment"
@@ -280,6 +296,9 @@
         <action
             android:id="@+id/shuffledContentPlayerFragment_to_loginOrSignUpFragment"
             app:destination="@id/loginOrSignUpFragment" />
+        <action
+            android:id="@+id/shuffledContentPlayerFragment_to_reelsDescriptionFragment"
+            app:destination="@id/reelsDescriptionFragment" />
     </fragment>
     <dialog
         android:id="@+id/loginToContinueFragment"
@@ -301,6 +320,9 @@
             app:destination="@id/listReelsFragment"
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/discoverFragment_to_courseWaitingListFragment"
+            app:destination="@id/courseWaitingListFragment" />
     </fragment>
     <fragment
         android:id="@+id/listReelsFragment"
@@ -370,4 +392,30 @@
             app:enterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+    <dialog
+        android:id="@+id/chooseBrandDisplayModeFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ChooseBrandDisplayModeFragment"
+        android:label=""
+        tools:layout="@layout/fragment_choose_brand_display_mode">
+        <action
+            android:id="@+id/chooseBrandDisplayModeFragment_to_brandDisplayFragment"
+            app:destination="@id/brandDisplayFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/brandDisplayFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.BrandDisplayFragment"
+        android:label="">
+        <argument
+            android:name="mode"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
+    <dialog
+        android:id="@+id/courseWaitingListFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.CourseWaitingListFragment"
+        android:label="" />
+    <dialog
+        android:id="@+id/reelsDescriptionFragment"
+        android:name="app.efficientbytes.booleanbear.ui.fragments.ReelsDescriptionFragment"
+        android:label="" />
 </navigation>

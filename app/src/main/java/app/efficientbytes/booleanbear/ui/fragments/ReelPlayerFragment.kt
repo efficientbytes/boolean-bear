@@ -718,15 +718,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     }
 
     private fun openDescriptionFragment() {
-        if (reelsDescriptionFragment == null) {
-            reelsDescriptionFragment = ReelsDescriptionFragment()
-        }
         if (!ReelsDescriptionFragment.isOpened) {
             ReelsDescriptionFragment.isOpened = true
-            reelsDescriptionFragment!!.show(
-                parentFragmentManager,
-                ReelsDescriptionFragment.SHUFFLED_DESCRIPTION_FRAGMENT
-            )
+            findNavController().navigate(R.id.shuffledContentPlayerFragment_to_reelsDescriptionFragment)
         }
     }
 
@@ -907,6 +901,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
+            if (!MainActivity.isAdTemplateActive) {
+                mainViewModel.preLoadRewardedAd()
+            }
         }
 
         @OptIn(UnstableApi::class)
@@ -937,6 +934,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
             firstAdOptionButton.setOnClickListener {
                 mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_10)
+            }
+            val goHomeButton = dialog!!.findViewById<MaterialTextView>(R.id.goHomeTextViewLabel)
+            goHomeButton.setOnClickListener {
+                findNavController().popBackStack(R.id.homeFragment, false)
+                dialog!!.dismiss()
             }
 
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -1193,8 +1195,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (FirebaseAuth.getInstance().currentUser != null) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             if (Util.SDK_INT > 23) {
-                initializePlayer()
-                binding.videoPlayer.onResume()
+                if (!isWatchAdPromptDialogOpened) {
+                    initializePlayer()
+                    binding.videoPlayer.onResume()
+                }
             }
         }
     }
@@ -1205,8 +1209,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         if (FirebaseAuth.getInstance().currentUser != null) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             if ((Util.SDK_INT <= 23 || player == null)) {
-                initializePlayer()
-                binding.videoPlayer.onResume()
+                if (!isWatchAdPromptDialogOpened) {
+                    initializePlayer()
+                    binding.videoPlayer.onResume()
+                }
             }
         } else {
             findNavController().popBackStack()
