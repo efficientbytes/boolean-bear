@@ -47,7 +47,10 @@ android {
                 "t10AdsToShow",
                 "$releaseT10AdsToShow"
             )
+            ndk.debugSymbolLevel = "FULL"
             isMinifyEnabled = true
+            isShrinkResources = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -72,6 +75,7 @@ android {
                 "$debugT10AdsToShow"
             )
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
