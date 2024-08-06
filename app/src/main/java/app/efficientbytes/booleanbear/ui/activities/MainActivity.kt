@@ -329,7 +329,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.resetFCMToken()
 
                         cancelAdFreeSessionWorker()
-                        cancelAdFreeSessionService()
                         viewModel.deleteActiveAdsTemplate()
                     }
                     Toast.makeText(
@@ -515,6 +514,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             } else {
                 isAdTemplateActive = false
+                cancelAdFreeSessionService()
                 if (!adPauseOverMessageDisplayed) {
                     adPauseOverMessageDisplayed = true
                     if (FirebaseAuth.getInstance().currentUser != null) {
@@ -796,11 +796,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.accountSettingsFragment -> {
-
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
                 R.id.chooseBrandDisplayModeFragment -> {
-
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
                 R.id.reelsDescriptionFragment -> {

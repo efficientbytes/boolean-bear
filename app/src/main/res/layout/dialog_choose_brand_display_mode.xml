@@ -76,6 +76,22 @@
 
         </com.google.android.material.textview.MaterialTextView>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/onlyLogoAnimationTextViewLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:drawableEnd="@drawable/baseline_keyboard_arrow_right_24"
+            android:focusable="true"
+            android:fontFamily="@font/montserrat"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingHorizontal="22dp"
+            android:paddingVertical="10dp"
+            android:text="@string/brand_logo_animation"
+            android:textColor="@color/white"
+            android:textSize="14sp">
+
+        </com.google.android.material.textview.MaterialTextView>
 
     </LinearLayout>
 </layout>
