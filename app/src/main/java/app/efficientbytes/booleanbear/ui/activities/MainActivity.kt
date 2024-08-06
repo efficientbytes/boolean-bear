@@ -329,7 +329,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         viewModel.resetFCMToken()
 
                         cancelAdFreeSessionWorker()
-                        cancelAdFreeSessionService()
                         viewModel.deleteActiveAdsTemplate()
                     }
                     Toast.makeText(
@@ -515,6 +514,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             } else {
                 isAdTemplateActive = false
+                cancelAdFreeSessionService()
                 if (!adPauseOverMessageDisplayed) {
                     adPauseOverMessageDisplayed = true
                     if (FirebaseAuth.getInstance().currentUser != null) {
