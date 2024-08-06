@@ -80,7 +80,7 @@ class AccountSettingsFragment : BottomSheetDialogFragment() {
         intent.setType("text/plain")
         intent.putExtra(Intent.EXTRA_SUBJECT, "boolean bear")
         var shareMessage =
-            "\n\n The only dedicated complete android development learning platform\n\n"
+            "\n\n The only dedicated platform for learning C++ and Kotlin\n\n"
         shareMessage =
             shareMessage + "https://play.google.com/store/apps/details?id=" + requireContext().packageName + "\n"
         intent.putExtra(Intent.EXTRA_TEXT, shareMessage)
