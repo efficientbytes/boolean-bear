@@ -16,8 +16,8 @@ android {
         applicationId = "app.efficientbytes.booleanbear"
         minSdk = 24
         targetSdk = 34
-        versionCode = 19
-        versionName = "1.10.3"
+        versionCode = 20
+        versionName = "1.10.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
