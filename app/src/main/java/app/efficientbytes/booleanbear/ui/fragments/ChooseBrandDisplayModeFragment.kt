@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import app.efficientbytes.booleanbear.databinding.FragmentChooseBrandDisplayModeBinding
+import app.efficientbytes.booleanbear.databinding.DialogChooseBrandDisplayModeBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ChooseBrandDisplayModeFragment : BottomSheetDialogFragment() {
 
-    private lateinit var _binding: FragmentChooseBrandDisplayModeBinding
+    private lateinit var _binding: DialogChooseBrandDisplayModeBinding
     private val binding get() = _binding
     private lateinit var rootView: View
 
@@ -24,7 +24,7 @@ class ChooseBrandDisplayModeFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentChooseBrandDisplayModeBinding.inflate(inflater, container, false)
+        _binding = DialogChooseBrandDisplayModeBinding.inflate(inflater, container, false)
         rootView = binding.root
         binding.lifecycleOwner = viewLifecycleOwner
         return rootView
@@ -55,6 +55,15 @@ class ChooseBrandDisplayModeFragment : BottomSheetDialogFragment() {
             val directions =
                 ChooseBrandDisplayModeFragmentDirections.chooseBrandDisplayModeFragmentToBrandDisplayFragment(
                     2
+                )
+            findNavController().navigate(directions)
+            dismiss()
+        }
+
+        binding.onlyLogoAnimationTextViewLabel.setOnClickListener {
+            val directions =
+                ChooseBrandDisplayModeFragmentDirections.chooseBrandDisplayModeFragmentToBrandDisplayFragment(
+                    3
                 )
             findNavController().navigate(directions)
             dismiss()

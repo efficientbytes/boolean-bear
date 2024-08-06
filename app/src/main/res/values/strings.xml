@@ -223,5 +223,6 @@
     <string name="brand_name">Brand Name</string>
     <string name="brand_logo">Brand Logo</string>
     <string name="homepage"><![CDATA[<< Homepage]]></string>
+    <string name="brand_logo_animation">Brand Logo Animation</string>
 
 </resources>

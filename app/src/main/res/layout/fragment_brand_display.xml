@@ -62,7 +62,7 @@
             android:id="@+id/logoNNameConstraintLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/logoImage"
@@ -93,6 +93,27 @@
 
             </com.google.android.material.textview.MaterialTextView>
 
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/logoGifConstraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/booleanBearLoadingGif"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/boolean_bear_loading_gif"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </pl.droidsonroids.gif.GifImageView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

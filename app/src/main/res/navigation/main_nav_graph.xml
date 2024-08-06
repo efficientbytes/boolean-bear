@@ -396,7 +396,7 @@
         android:id="@+id/chooseBrandDisplayModeFragment"
         android:name="app.efficientbytes.booleanbear.ui.fragments.ChooseBrandDisplayModeFragment"
         android:label=""
-        tools:layout="@layout/fragment_choose_brand_display_mode">
+        tools:layout="@layout/dialog_choose_brand_display_mode">
         <action
             android:id="@+id/chooseBrandDisplayModeFragment_to_brandDisplayFragment"
             app:destination="@id/brandDisplayFragment" />
