@@ -47,7 +47,7 @@ android {
                 "t10AdsToShow",
                 "$releaseT10AdsToShow"
             )
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -71,7 +71,7 @@ android {
                 "t10AdsToShow",
                 "$debugT10AdsToShow"
             )
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
