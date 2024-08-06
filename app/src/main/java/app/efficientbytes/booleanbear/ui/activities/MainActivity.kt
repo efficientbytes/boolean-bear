@@ -796,11 +796,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.accountSettingsFragment -> {
-
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
                 R.id.chooseBrandDisplayModeFragment -> {
-
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 }
 
                 R.id.reelsDescriptionFragment -> {
