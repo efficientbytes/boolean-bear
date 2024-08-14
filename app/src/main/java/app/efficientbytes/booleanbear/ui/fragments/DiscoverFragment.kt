@@ -17,8 +17,8 @@ import app.efficientbytes.booleanbear.ui.adapters.CourseRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.CustomLinearLayoutManager
-import app.efficientbytes.booleanbear.utils.dummyCourseBundle
-import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
+import app.efficientbytes.booleanbear.utils.Pi.dummyCourseBundle
+import app.efficientbytes.booleanbear.utils.Pi.dummyReelTopicsList
 import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.DiscoverViewModel
 import org.koin.android.ext.android.inject

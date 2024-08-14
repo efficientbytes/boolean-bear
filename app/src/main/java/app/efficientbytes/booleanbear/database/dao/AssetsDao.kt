@@ -17,14 +17,14 @@ import app.efficientbytes.booleanbear.services.models.RemoteInstructorProfile
 import app.efficientbytes.booleanbear.services.models.RemoteMentionedLink
 import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
-import app.efficientbytes.booleanbear.utils.COURSE_TABLE
-import app.efficientbytes.booleanbear.utils.COURSE_TOPIC_TABLE
-import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
-import app.efficientbytes.booleanbear.utils.MENTIONED_LINKS_TABLE
-import app.efficientbytes.booleanbear.utils.REELS_TABLE
-import app.efficientbytes.booleanbear.utils.REELS_TABLE_FTS
-import app.efficientbytes.booleanbear.utils.REEL_TOPICS_TABLE
-import app.efficientbytes.booleanbear.utils.WAITING_LIST_COURSE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.COURSE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.COURSE_TOPIC_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.INSTRUCTOR_PROFILE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.MENTIONED_LINKS_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.REELS_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.REELS_TABLE_FTS
+import app.efficientbytes.booleanbear.utils.Pi.REEL_TOPICS_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.WAITING_LIST_COURSE_TABLE
 
 @Dao
 interface AssetsDao {

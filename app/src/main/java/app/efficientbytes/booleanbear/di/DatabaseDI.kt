@@ -3,7 +3,7 @@ package app.efficientbytes.booleanbear.di
 import android.content.Context
 import androidx.room.Room
 import app.efficientbytes.booleanbear.database.room.AppDatabase
-import app.efficientbytes.booleanbear.utils.DATABASE_NAME
+import app.efficientbytes.booleanbear.utils.Pi.DATABASE_NAME
 
 const val appDatabaseName = DATABASE_NAME
 

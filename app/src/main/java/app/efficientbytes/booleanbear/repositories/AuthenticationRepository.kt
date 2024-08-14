@@ -16,8 +16,8 @@ import app.efficientbytes.booleanbear.utils.AppAuthStateListener
 import app.efficientbytes.booleanbear.utils.AuthStateCoroutineScope
 import app.efficientbytes.booleanbear.utils.IDTokenListener
 import app.efficientbytes.booleanbear.utils.NoInternetException
-import app.efficientbytes.booleanbear.utils.PASSWORD_CREATED_FLAG
-import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
+import app.efficientbytes.booleanbear.utils.Pi.PASSWORD_CREATED_FLAG
+import app.efficientbytes.booleanbear.utils.Pi.SINGLE_DEVICE_LOGIN_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginCoroutineScope
 import app.efficientbytes.booleanbear.utils.SingleDeviceLoginListener
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow

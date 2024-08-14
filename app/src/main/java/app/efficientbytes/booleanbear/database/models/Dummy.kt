@@ -2,7 +2,7 @@ package app.efficientbytes.booleanbear.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.DUMMY_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.DUMMY_TABLE
 
 /**
  * This class was created at the time of implementing room database.

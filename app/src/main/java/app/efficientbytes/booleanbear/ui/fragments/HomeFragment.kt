@@ -32,9 +32,9 @@ import app.efficientbytes.booleanbear.ui.adapters.InfiniteViewPagerAdapter
 import app.efficientbytes.booleanbear.ui.adapters.ReelTopicsChipRecyclerViewAdapter
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
-import app.efficientbytes.booleanbear.utils.dummyHomePageBannersList
-import app.efficientbytes.booleanbear.utils.dummyReelTopicsList
-import app.efficientbytes.booleanbear.utils.dummyReelsList
+import app.efficientbytes.booleanbear.utils.Pi.dummyHomePageBannersList
+import app.efficientbytes.booleanbear.utils.Pi.dummyReelTopicsList
+import app.efficientbytes.booleanbear.utils.Pi.dummyReelsList
 import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.HomeViewModel
 import app.efficientbytes.booleanbear.viewmodels.MainViewModel

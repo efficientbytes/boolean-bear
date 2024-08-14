@@ -27,7 +27,7 @@ import app.efficientbytes.booleanbear.services.models.RemoteReel
 import app.efficientbytes.booleanbear.ui.adapters.YoutubeContentViewRecyclerViewAdapter
 import app.efficientbytes.booleanbear.utils.ConnectivityListener
 import app.efficientbytes.booleanbear.utils.createShareIntent
-import app.efficientbytes.booleanbear.utils.dummyReelsList
+import app.efficientbytes.booleanbear.utils.Pi.dummyReelsList
 import app.efficientbytes.booleanbear.utils.showUnauthorizedDeviceDialog
 import app.efficientbytes.booleanbear.viewmodels.ListReelViewModel
 import com.google.android.material.appbar.MaterialToolbar

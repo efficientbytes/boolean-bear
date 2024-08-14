@@ -2,7 +2,7 @@ package app.efficientbytes.booleanbear.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.SINGLE_DEVICE_LOGIN_TABLE
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

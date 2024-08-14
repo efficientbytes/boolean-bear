@@ -3,9 +3,9 @@ package app.efficientbytes.booleanbear.database.models
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.REELS_TABLE
-import app.efficientbytes.booleanbear.utils.REELS_TABLE_FTS
-import app.efficientbytes.booleanbear.utils.REEL_TOPICS_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.REELS_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.REELS_TABLE_FTS
+import app.efficientbytes.booleanbear.utils.Pi.REEL_TOPICS_TABLE
 
 @Entity(tableName = REELS_TABLE)
 data class LocalReel(

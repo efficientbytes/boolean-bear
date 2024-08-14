@@ -8,9 +8,9 @@ import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.IDToken
 import app.efficientbytes.booleanbear.models.LocalBooleanFlag
 import app.efficientbytes.booleanbear.models.SingleDeviceLogin
-import app.efficientbytes.booleanbear.utils.BOOLEAN_FLAG_TABLE
-import app.efficientbytes.booleanbear.utils.ID_TOKEN_TABLE
-import app.efficientbytes.booleanbear.utils.SINGLE_DEVICE_LOGIN_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.BOOLEAN_FLAG_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.ID_TOKEN_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.SINGLE_DEVICE_LOGIN_TABLE
 
 @Dao
 interface AuthenticationDao {

@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.models.IssueCategory
 import app.efficientbytes.booleanbear.models.Profession
-import app.efficientbytes.booleanbear.utils.ISSUE_CATEGORY_ADAPTER_TABLE
-import app.efficientbytes.booleanbear.utils.PROFESSION_ADAPTER_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.ISSUE_CATEGORY_ADAPTER_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.PROFESSION_ADAPTER_TABLE
 
 @Dao
 interface UtilityDataDao {

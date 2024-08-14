@@ -2,7 +2,7 @@ package app.efficientbytes.booleanbear.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.HOME_PAGE_BANNER_AD_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.HOME_PAGE_BANNER_AD_TABLE
 
 @Entity(tableName = HOME_PAGE_BANNER_AD_TABLE)
 data class LocalHomePageBanner(
