@@ -109,7 +109,7 @@ class DeleteUserAccountFragment : Fragment() {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "Please wait while we process your request."
+                            getString(R.string.please_wait)
                     }
 
                     DataStatus.Status.Success -> {
@@ -126,7 +126,7 @@ class DeleteUserAccountFragment : Fragment() {
                     DataStatus.Status.NoInternet -> {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
-                        binding.progressStatusValueTextView.text = "No Internet Connection."
+                        binding.progressStatusValueTextView.text = getString(R.string.no_internet_connection_please_try_again)
                         binding.takeMeToHomePageButton.visibility = View.VISIBLE
                     }
 
@@ -134,7 +134,7 @@ class DeleteUserAccountFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.progressStatusValueTextView.visibility = View.VISIBLE
                         binding.progressStatusValueTextView.text =
-                            "Deleting account is taking unusually long time. Please try again after some time."
+                            getString(R.string.deleting_account_is_taking_unusually_long_time_please_try_again_after_some_time)
                         binding.takeMeToHomePageButton.visibility = View.VISIBLE
                     }
 

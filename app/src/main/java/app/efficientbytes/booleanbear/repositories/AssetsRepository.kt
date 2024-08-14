@@ -501,7 +501,7 @@ class AssetsRepository(
         }
     }
 
-    suspend fun fetchMentionedLink(linkId: String) = flow {
+    private suspend fun fetchMentionedLink(linkId: String) = flow {
         try {
             val response = assetsService.getMentionedLinks(linkId)
             val responseCode = response.code()
@@ -545,7 +545,7 @@ class AssetsRepository(
         emit(DataStatus.unknownException(it.message.toString()))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getMentionedLink(linkId: String) = flow {
+    private suspend fun getMentionedLink(linkId: String) = flow {
         val result = assetsDao.getMentionedLink(linkId)
         if (result != null) {
             emit(DataStatus.success(result))
@@ -714,7 +714,7 @@ class AssetsRepository(
         }
     }
 
-    suspend fun insertCourseBundle(courseBundle: List<RemoteCourseBundle>) {
+    private suspend fun insertCourseBundle(courseBundle: List<RemoteCourseBundle>) {
         externalScope.launch {
             courseBundle.forEach { remoteCourseBundles ->
                 val remoteTopic = remoteCourseBundles.topicDetails

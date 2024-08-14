@@ -11,7 +11,7 @@ import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.UtilityDataService
 import app.efficientbytes.booleanbear.services.VerificationService
 import app.efficientbytes.booleanbear.utils.AppCheckInterceptor
-import app.efficientbytes.booleanbear.utils.BASE_URL
+import app.efficientbytes.booleanbear.utils.Pi.BASE_URL
 import app.efficientbytes.booleanbear.utils.NetworkInterceptor
 import app.efficientbytes.booleanbear.utils.TokenInterceptor
 import com.squareup.moshi.Moshi

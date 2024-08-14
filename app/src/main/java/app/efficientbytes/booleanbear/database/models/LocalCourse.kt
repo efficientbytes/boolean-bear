@@ -3,10 +3,10 @@ package app.efficientbytes.booleanbear.database.models
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.COURSE_TABLE
-import app.efficientbytes.booleanbear.utils.COURSE_TABLE_FTS
-import app.efficientbytes.booleanbear.utils.COURSE_TOPIC_TABLE
-import app.efficientbytes.booleanbear.utils.WAITING_LIST_COURSE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.COURSE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.COURSE_TABLE_FTS
+import app.efficientbytes.booleanbear.utils.Pi.COURSE_TOPIC_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.WAITING_LIST_COURSE_TABLE
 
 @Entity(tableName = COURSE_TOPIC_TABLE)
 data class LocalCourseTopic(

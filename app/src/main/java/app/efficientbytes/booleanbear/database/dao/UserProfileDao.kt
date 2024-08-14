@@ -7,8 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.LocalNotificationToken
 import app.efficientbytes.booleanbear.models.UserProfile
-import app.efficientbytes.booleanbear.utils.FCM_TOKEN_TABLE
-import app.efficientbytes.booleanbear.utils.USER_PROFILE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.FCM_TOKEN_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.USER_PROFILE_TABLE
 
 @Dao
 interface UserProfileDao {

@@ -2,7 +2,7 @@ package app.efficientbytes.booleanbear.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.USER_PROFILE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.USER_PROFILE_TABLE
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

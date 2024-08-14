@@ -11,7 +11,7 @@ import app.efficientbytes.booleanbear.services.UserProfileService
 import app.efficientbytes.booleanbear.services.models.UserProfileResponse
 import app.efficientbytes.booleanbear.services.models.WaitingListCoursesResponse
 import app.efficientbytes.booleanbear.utils.NoInternetException
-import app.efficientbytes.booleanbear.utils.USER_PROFILE_DOCUMENT_PATH
+import app.efficientbytes.booleanbear.utils.Pi.USER_PROFILE_DOCUMENT_PATH
 import app.efficientbytes.booleanbear.utils.UserAccountCoroutineScope
 import app.efficientbytes.booleanbear.utils.UserProfileListener
 import app.efficientbytes.booleanbear.utils.addSnapshotListenerFlow

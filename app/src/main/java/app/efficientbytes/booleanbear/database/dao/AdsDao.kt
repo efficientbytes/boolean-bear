@@ -8,8 +8,8 @@ import androidx.room.Query
 import app.efficientbytes.booleanbear.database.models.ActiveAdTemplate
 import app.efficientbytes.booleanbear.database.models.LocalHomePageBanner
 import app.efficientbytes.booleanbear.services.models.RemoteHomePageBanner
-import app.efficientbytes.booleanbear.utils.ACTIVE_AD_TEMPLATE
-import app.efficientbytes.booleanbear.utils.HOME_PAGE_BANNER_AD_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.ACTIVE_AD_TEMPLATE
+import app.efficientbytes.booleanbear.utils.Pi.HOME_PAGE_BANNER_AD_TABLE
 
 @Dao
 interface AdsDao {

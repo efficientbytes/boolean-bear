@@ -2,7 +2,7 @@ package app.efficientbytes.booleanbear.database.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.efficientbytes.booleanbear.utils.INSTRUCTOR_PROFILE_TABLE
+import app.efficientbytes.booleanbear.utils.Pi.INSTRUCTOR_PROFILE_TABLE
 
 @Entity(INSTRUCTOR_PROFILE_TABLE)
 class LocalInstructorProfile(
