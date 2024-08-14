@@ -128,7 +128,8 @@ class MainViewModel(
 
     val liveSingleDeviceLoginFromLocal = authenticationRepository.liveSingleDeviceLoginFromLocal
 
-    private fun getSingleDeviceLoginFromLocal() = authenticationRepository.getSingleDeviceLoginFromLocal()
+    private fun getSingleDeviceLoginFromLocal() =
+        authenticationRepository.getSingleDeviceLoginFromLocal()
 
     fun getLiveSingleDeviceLoginFromRemote(userAccountId: String) {
         authenticationRepository.getLiveSingleDeviceLoginFromRemote(userAccountId)
@@ -335,30 +336,6 @@ class MainViewModel(
 
     private fun generateIDToken() {
         authenticationRepository.generateIDToken(this@MainViewModel)
-    }
-
-    private val _preLoadRewardedAdRequested: MutableLiveData<Boolean?> = MutableLiveData()
-    val preLoadRewardedAdRequested: LiveData<Boolean?> = _preLoadRewardedAdRequested
-
-    fun preLoadRewardedAd() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _preLoadRewardedAdRequested.postValue(true)
-        }
-    }
-
-    fun resetPreLoadRewardedAd() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _preLoadRewardedAdRequested.postValue(null)
-        }
-    }
-
-    private val _preLoadingRewardedAdStatus: MutableLiveData<Boolean?> = MutableLiveData()
-    val preLoadingRewardedAdStatus: LiveData<Boolean?> = _preLoadingRewardedAdStatus
-
-    fun onPreLoadingRewardedAdStatusChanged(isSuccess: Boolean?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _preLoadingRewardedAdStatus.postValue(isSuccess)
-        }
     }
 
     private val _adDisplayCompleted: MutableLiveData<Boolean?> = MutableLiveData()
