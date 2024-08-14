@@ -63,6 +63,7 @@ import app.efficientbytes.booleanbear.viewmodels.ReelPlayerViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
@@ -284,8 +285,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         binding.suggestedContentCardView.setOnClickListener {
             nextSuggestedContentId?.let { reelId ->
-                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
-                    mainViewModel.preLoadRewardedAd()
+                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable() && !isWatchAdPromptDialogOpened) {
+                    binding.videoPlayer.onPause()
+                    releasePlayer()
+                    showWatchAdPromptDialog()
                 }
                 clearStartPosition()
                 isPlayingSuggested = true
@@ -354,8 +357,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 }
 
                 true -> {
-                    if (!MainActivity.isAdTemplateActive) {
-                        mainViewModel.preLoadRewardedAd()
+                    if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened) {
+                        binding.videoPlayer.onPause()
+                        showWatchAdPromptDialog()
                     }
                 }
 
@@ -676,37 +680,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     }
 
     private fun mainViewModelObservers() {
-        mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
-            when (it) {
-                true -> {
-                    if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
-                        binding.videoPlayer.onPause()
-                        releasePlayer()
-                        showWatchAdPromptDialog()
-                    }
-                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
-                }
-
-                false -> {
-                    mainViewModel.onPreLoadingRewardedAdStatusChanged(null)
-                }
-
-                null -> {
-
-                }
-            }
-        }
-
         mainViewModel.adDisplayCompleted.observe(viewLifecycleOwner) {
             when (it) {
-                true -> {
-                    dialog?.dismiss()
-                    binding.videoPlayer.onResume()
-                    initializePlayer()
-                    mainViewModel.adDisplayCompleted(null)
-                }
-
-                false -> {
+                true, false -> {
                     dialog?.dismiss()
                     binding.videoPlayer.onResume()
                     initializePlayer()
@@ -720,8 +696,14 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         }
 
         mainViewModel.getActiveAdTemplate.observe(viewLifecycleOwner) {
-            if (it == null && connectivityListener.isInternetAvailable()) {
-                mainViewModel.preLoadRewardedAd()
+            if (it == null && connectivityListener.isInternetAvailable() && !isWatchAdPromptDialogOpened) {
+                binding.videoPlayer.onPause()
+                releasePlayer()
+                showWatchAdPromptDialog()
+            }else if(it!=null && it.isActive){
+                if (isWatchAdPromptDialogOpened){
+                    dialog!!.dismiss()
+                }
             }
         }
     }
@@ -735,8 +717,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
-        if (!MainActivity.isAdTemplateActive) {
-            mainViewModel.preLoadRewardedAd()
+        if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened && connectivityListener.isInternetAvailable()) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
+            showWatchAdPromptDialog()
         }
         if (player == null) {
             trackSelector = DefaultTrackSelector(requireContext(), AdaptiveTrackSelection.Factory())
@@ -802,6 +786,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             subtitleAvailable = false
             player!!.setMediaSource(mediaSource)
             player!!.prepare()
+        }
+        if (isWatchAdPromptDialogOpened) {
+            binding.videoPlayer.onPause()
+            releasePlayer()
         }
         return
     }
@@ -910,8 +898,10 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
-            if (!MainActivity.isAdTemplateActive) {
-                mainViewModel.preLoadRewardedAd()
+            if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened && connectivityListener.isInternetAvailable()) {
+                binding.videoPlayer.onPause()
+                releasePlayer()
+                showWatchAdPromptDialog()
             }
         }
 
@@ -938,10 +928,22 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            val firstAdOptionButton =
-                dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
+            val title = dialog!!.findViewById<MaterialTextView>(R.id.watchVideoAdLabelTextView)
+            val description = dialog!!.findViewById<MaterialTextView>(R.id.descriptionLabelTextView)
+            val loadingAdTitle = dialog!!.findViewById<MaterialTextView>(R.id.loadVideoAdLabelTextView)
+            loadingAdTitle.visibility = View.GONE
+            val firstAdOptionButton = dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
+            firstAdOptionButton.visibility = View.VISIBLE
+            val progressBar =
+                dialog!!.findViewById<LinearProgressIndicator>(R.id.adLoadingProgressBar)
+            progressBar.visibility = View.GONE
 
             firstAdOptionButton.setOnClickListener {
+                title.visibility = View.INVISIBLE
+                description.visibility = View.INVISIBLE
+                firstAdOptionButton.visibility = View.INVISIBLE
+                loadingAdTitle.visibility = View.VISIBLE
+                progressBar.visibility = View.VISIBLE
                 mainViewModel.showRewardedAds(AdTemplate.TEMPLATE_10)
             }
             val goHomeButton = dialog!!.findViewById<MaterialTextView>(R.id.goHomeTextViewLabel)

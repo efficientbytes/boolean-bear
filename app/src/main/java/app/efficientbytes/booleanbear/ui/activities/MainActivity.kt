@@ -467,18 +467,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        viewModel.preLoadRewardedAdRequested.observe(this) {
-            when (it) {
-                true -> {
-                    preloadRewardedAd()
-                    viewModel.resetPreLoadRewardedAd()
-                }
-
-                else -> {
-
-                }
-            }
-        }
         viewModel.showRewardedAds.observe(this) {
             when (it) {
                 null -> {
@@ -487,7 +475,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 AdTemplate.TEMPLATE_10 -> {
                     adsToShow = it.adsToShow
-                    showRewardedAds(adsToShow, it)
+                    loadRewardedAd(adsToShow,it)
                     viewModel.showRewardedAds(null)
                 }
             }
@@ -602,7 +590,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun preloadRewardedAd() {
+    private fun loadRewardedAd(count: Int, adTemplate: AdTemplate) {
         if (isAdLoading) return
         isAdLoading = true
         val adRequest = AdRequest.Builder().build()
@@ -611,13 +599,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
                 isAdLoading = false
-                viewModel.onPreLoadingRewardedAdStatusChanged(false)
             }
 
             override fun onAdLoaded(ad: RewardedAd) {
                 rewardedAd = ad
                 isAdLoading = false
-                viewModel.onPreLoadingRewardedAdStatusChanged(true)
+                showRewardedAds(count,adTemplate)
             }
         })
 
@@ -650,19 +637,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 override fun onAdShowedFullScreenContent() {
-                    preloadRewardedAd()
                     // Called when ad is shown.
                     // This is the place to pause any background processes if needed.
+                }
+
+                override fun onAdImpression() {
+                    super.onAdImpression()
+                }
+
+                override fun onAdClicked() {
+                    super.onAdClicked()
                 }
             }
 
             ad.show(this) { _ ->
                 adsShown++
                 if (adsShown < adsToShow) {
-                    preloadRewardedAd()
-                    showRewardedAds(count - 1, adTemplate)
+                    loadRewardedAd(count-1,adTemplate)
                 } else {
                     adsShown = 0
+                    rewardedAd = null
                     currentAdTemplate = adTemplate
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(true)

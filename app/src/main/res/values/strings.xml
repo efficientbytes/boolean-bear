@@ -226,5 +226,6 @@
     <string name="brand_logo_animation">Brand Logo Animation</string>
     <string name="reel_hashtags">#%1$s</string>
     <string name="deleting_account_is_taking_unusually_long_time_please_try_again_after_some_time">Deleting account is taking unusually long time. Please try again after some time.</string>
+    <string name="loading_ad">Loading Your Ad…</string>
 
 </resources>
