@@ -14,20 +14,19 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
+-flattenpackagehierarchy 'com.pankratov.yevgeny'
+-allowaccessmodification
+
 -keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-#-keep class app.efficientbytes.booleanbear.models.** { *; }
-#-keep class app.efficientbytes.booleanbear.database.models.** { *; }
-#-keep class app.efficientbytes.booleanbear.services.models.** { *; }
-#-keep class app.efficientbytes.booleanbear.di.** { *; }
-
 -ignorewarnings
 -keep class * {
-    public private *;
+    public *;
 }
 
 -keep class com.google.android.gms.** { *; }
@@ -67,10 +66,78 @@
 -keep class com.parse.*{ *; }
 -dontwarn com.parse.**
 -dontwarn com.squareup.picasso.**
+
 -keepclasseswithmembernames class * {
     native <methods>;
 }
 
+#for room DB
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# all repositories
+-keep class app.efficientbytes.booleanbear.repositories.AdsRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.AssetsRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.AuthenticationRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.FeedbackNSupportRepository{
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.StatisticsRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.UserProfileRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.UtilityDataRepository {
+    public *;
+}
+
+-keep class app.efficientbytes.booleanbear.repositories.VerificationRepository{
+    public *;
+}
+
+# all services
+-keep class app.efficientbytes.booleanbear.services.AdFreeSessionService{
+    public *;
+}
+-keep class app.efficientbytes.booleanbear.services.PushNotificationService{
+    public *;
+}
+
+# all viewmodel
+-keep class app.efficientbytes.booleanbear.viewmodels.* {
+    public *;
+}
+
+#adapters
+-keep class app.efficientbytes.booleanbear.ui.adapters.* {
+    public *;
+}
+
+#koin DI
+-keep class app.efficientbytes.booleanbear.di.* {
+    public *;
+}
+
+#utils
+-keep class app.efficientbytes.booleanbear.utils.* {
+    public *;
+}
+
+#all models
 -keep class app.efficientbytes.booleanbear.models.** { *; }
 -keep class app.efficientbytes.booleanbear.services.models.** { *; }
 -keep class app.efficientbytes.booleanbear.database.models.** { *; }
