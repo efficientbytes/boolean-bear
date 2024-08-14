@@ -11,6 +11,8 @@ plugins {
 android {
     namespace = "app.efficientbytes.booleanbear"
     compileSdk = 34
+    ndkPath = "C:/Users/Anubh/AppData/Local/Android/Sdk/ndk/27.0.12077973"
+    ndkVersion = "27.0.12077973"
 
     defaultConfig {
         applicationId = "app.efficientbytes.booleanbear"
