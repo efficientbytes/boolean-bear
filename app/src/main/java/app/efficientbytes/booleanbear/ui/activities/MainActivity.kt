@@ -475,7 +475,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 AdTemplate.TEMPLATE_10 -> {
                     adsToShow = it.adsToShow
-                    loadRewardedAd(adsToShow,it)
+                    loadRewardedAd(adsToShow, it)
                     viewModel.showRewardedAds(null)
                 }
             }
@@ -599,12 +599,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
                 isAdLoading = false
+                currentAdTemplate = adTemplate
+                viewModel.insertActiveAdTemplate(adTemplate)
+                viewModel.adDisplayCompleted(false)
+                activateAdFreeSessionWorker(adTemplate)
+                activateAdFreeSessionService(adTemplate)
+                val rewardMessage = getString(
+                    R.string.enjoy_ad_free_contents_for_next_minutes,
+                    adTemplate.pauseTime.toString()
+                )
+                Toast.makeText(this@MainActivity, rewardMessage, Toast.LENGTH_LONG)
+                    .show()
             }
 
             override fun onAdLoaded(ad: RewardedAd) {
                 rewardedAd = ad
                 isAdLoading = false
-                showRewardedAds(count,adTemplate)
+                showRewardedAds(count, adTemplate)
             }
         })
 
@@ -624,6 +635,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     // Called when ad fails to show.
                     rewardedAd = null
                     adsShown = 0
+                    currentAdTemplate = adTemplate
                     viewModel.insertActiveAdTemplate(adTemplate)
                     viewModel.adDisplayCompleted(false)
                     activateAdFreeSessionWorker(adTemplate)
@@ -653,7 +665,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             ad.show(this) { _ ->
                 adsShown++
                 if (adsShown < adsToShow) {
-                    loadRewardedAd(count-1,adTemplate)
+                    loadRewardedAd(count - 1, adTemplate)
                 } else {
                     adsShown = 0
                     rewardedAd = null
