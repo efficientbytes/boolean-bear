@@ -70,7 +70,7 @@ class ReelsDescriptionFragment : BottomSheetDialogFragment(),
                                 binding.hashtagsChipGroup.visibility = View.VISIBLE
                                 val chip = Chip(requireContext())
                                 chip.textSize = 10F
-                                chip.text = "#" + item
+                                chip.text = getString(R.string.reel_hashtags, item)
                                 chip.chipStrokeWidth = 0F
                                 chip.elevation = 0F
                                 chip.isCheckable = false

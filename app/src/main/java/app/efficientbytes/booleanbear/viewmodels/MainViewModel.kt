@@ -128,7 +128,7 @@ class MainViewModel(
 
     val liveSingleDeviceLoginFromLocal = authenticationRepository.liveSingleDeviceLoginFromLocal
 
-    fun getSingleDeviceLoginFromLocal() = authenticationRepository.getSingleDeviceLoginFromLocal()
+    private fun getSingleDeviceLoginFromLocal() = authenticationRepository.getSingleDeviceLoginFromLocal()
 
     fun getLiveSingleDeviceLoginFromRemote(userAccountId: String) {
         authenticationRepository.getLiveSingleDeviceLoginFromRemote(userAccountId)

@@ -198,7 +198,175 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             viewModel.getReelVideoId(reelId)
             viewModel.getReelDetails(reelId)
         }
+        viewModelObservers()
+        fullScreenButton.setOnClickListener {
+            if (isFullScreen) {  // tapped on minimize button
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.full_screen_player_icon
+                    )
+                )
+                isFullScreen = false
+            } else { // tapped on full screen
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                isFullScreen = true
+                fullScreenButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.portrait_player_icon
+                    )
+                )
+            }
+        }
 
+        playerCloseButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        if (isFullScreen) {
+            playerTitleText.visibility = View.VISIBLE
+            playerCloseButton.visibility = View.INVISIBLE
+        } else {
+            playerTitleText.visibility = View.GONE
+            playerCloseButton.visibility = View.VISIBLE
+        }
+
+        playerQualityButton.setOnClickListener {
+            playerQualitySelectorDialog()
+        }
+
+        playerPlaybackSpeedButton.setOnClickListener {
+            playerPlaybackSpeedSelectorDialog()
+        }
+
+        playerSubtitleToggleButton.setOnClickListener {
+            binding.videoPlayer.subtitleView?.visibility = if (subtitleEnabled) {
+                subtitleEnabled = false
+                playerSubtitleToggleButton.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        R.drawable.subtitles_off_icon
+                    )
+                )
+                SubtitleView.INVISIBLE
+            } else {
+                if (subtitleAvailable) {
+                    subtitleEnabled = true
+                    playerSubtitleToggleButton.setImageDrawable(
+                        AppCompatResources.getDrawable(
+                            requireContext(),
+                            R.drawable.subtitles_on_icon
+                        )
+                    )
+                    SubtitleView.VISIBLE
+                } else {
+                    Snackbar.make(
+                        binding.constraintLayout,
+                        "Subtitle not available.",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    SubtitleView.INVISIBLE
+                }
+            }
+        }
+
+        binding.retryButton.setOnClickListener {
+            if (noInternet) {
+                noInternet = false
+                viewModel.getReelVideoId(reelId)
+                viewModel.getReelDetails(reelId)
+            } else {
+                initializePlayer()
+            }
+        }
+
+        binding.suggestedContentCardView.setOnClickListener {
+            nextSuggestedContentId?.let { reelId ->
+                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
+                    mainViewModel.preLoadRewardedAd()
+                }
+                clearStartPosition()
+                isPlayingSuggested = true
+                this@ReelPlayerFragment.reelId = reelId
+                ReelPlayerViewModel.countRecorded = false
+                binding.videoPlayer.hideController()
+                playerQualityMenu.visibility = View.GONE
+                viewModel.getReelVideoId(reelId)
+                viewModel.getReelDetails(reelId)
+            }
+        }
+
+        binding.retryAfterNoInternetButton.setOnClickListener {
+            if (connectivityListener.isInternetAvailable()) {
+                noInternet = false
+                binding.noInternetLinearLayout.visibility = View.GONE
+                binding.parentConstraintLayout.visibility = View.VISIBLE
+                viewModel.getReelVideoId(reelId)
+                viewModel.getReelDetails(reelId)
+            }
+        }
+
+        binding.descriptionLinearLayout.setOnClickListener {
+            openDescriptionFragment()
+        }
+
+        playerTitleText.setOnClickListener {
+            openDescriptionFragment()
+        }
+
+        binding.fullDescriptionLabelTextView.setOnClickListener {
+            openDescriptionFragment()
+        }
+        mainViewModelObservers()
+        binding.shareContentLabelTextView.setOnClickListener {
+            val shareLink = "https://app.booleanbear.com/watch/content/$reelId"
+            val shareMessage = "$contentTitle \n\nWatch it on boolean bear.\n"
+            val shareIntent = createShareIntent(shareLink, shareMessage)
+            startActivity(shareIntent)
+        }
+
+        customAuthStateListener.liveAuthStateFromRemote.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+
+                }
+
+                false -> {
+                    findNavController().popBackStack(R.id.homeFragment, false)
+                }
+
+                null -> {
+
+                }
+            }
+        }
+
+        connectivityListeners()
+    }
+
+    private fun connectivityListeners() {
+        connectivityListener.observe(viewLifecycleOwner) {
+            when (it) {
+                null -> {
+
+                }
+
+                true -> {
+                    if (!MainActivity.isAdTemplateActive) {
+                        mainViewModel.preLoadRewardedAd()
+                    }
+                }
+
+                false -> {
+
+                }
+            }
+        }
+    }
+
+    private fun viewModelObservers() {
         viewModel.reelVideoId.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.EmptyResult -> {
@@ -483,126 +651,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             }
         }
 
-        fullScreenButton.setOnClickListener {
-            if (isFullScreen) {  // tapped on minimize button
-                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.full_screen_player_icon
-                    )
-                )
-                isFullScreen = false
-            } else { // tapped on full screen
-                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                isFullScreen = true
-                fullScreenButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.portrait_player_icon
-                    )
-                )
-            }
-        }
-
-        playerCloseButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        if (isFullScreen) {
-            playerTitleText.visibility = View.VISIBLE
-            playerCloseButton.visibility = View.INVISIBLE
-        } else {
-            playerTitleText.visibility = View.GONE
-            playerCloseButton.visibility = View.VISIBLE
-        }
-
-        playerQualityButton.setOnClickListener {
-            playerQualitySelectorDialog()
-        }
-
-        playerPlaybackSpeedButton.setOnClickListener {
-            playerPlaybackSpeedSelectorDialog()
-        }
-
-        playerSubtitleToggleButton.setOnClickListener {
-            binding.videoPlayer.subtitleView?.visibility = if (subtitleEnabled) {
-                subtitleEnabled = false
-                playerSubtitleToggleButton.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.subtitles_off_icon
-                    )
-                )
-                SubtitleView.INVISIBLE
-            } else {
-                if (subtitleAvailable) {
-                    subtitleEnabled = true
-                    playerSubtitleToggleButton.setImageDrawable(
-                        AppCompatResources.getDrawable(
-                            requireContext(),
-                            R.drawable.subtitles_on_icon
-                        )
-                    )
-                    SubtitleView.VISIBLE
-                } else {
-                    Snackbar.make(
-                        binding.constraintLayout,
-                        "Subtitle not available.",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                    SubtitleView.INVISIBLE
-                }
-            }
-        }
-
-        binding.retryButton.setOnClickListener {
-            if (noInternet) {
-                noInternet = false
-                viewModel.getReelVideoId(reelId)
-                viewModel.getReelDetails(reelId)
-            } else {
-                initializePlayer()
-            }
-        }
-
-        binding.suggestedContentCardView.setOnClickListener {
-            nextSuggestedContentId?.let { reelId ->
-                if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable()) {
-                    mainViewModel.preLoadRewardedAd()
-                }
-                clearStartPosition()
-                isPlayingSuggested = true
-                this@ReelPlayerFragment.reelId = reelId
-                ReelPlayerViewModel.countRecorded = false
-                binding.videoPlayer.hideController()
-                playerQualityMenu.visibility = View.GONE
-                viewModel.getReelVideoId(reelId)
-                viewModel.getReelDetails(reelId)
-            }
-        }
-
-        binding.retryAfterNoInternetButton.setOnClickListener {
-            if (connectivityListener.isInternetAvailable()) {
-                noInternet = false
-                binding.noInternetLinearLayout.visibility = View.GONE
-                binding.parentConstraintLayout.visibility = View.VISIBLE
-                viewModel.getReelVideoId(reelId)
-                viewModel.getReelDetails(reelId)
-            }
-        }
-
-        binding.descriptionLinearLayout.setOnClickListener {
-            openDescriptionFragment()
-        }
-
-        playerTitleText.setOnClickListener {
-            openDescriptionFragment()
-        }
-
-        binding.fullDescriptionLabelTextView.setOnClickListener {
-            openDescriptionFragment()
-        }
         viewModel.viewCount.observe(viewLifecycleOwner) {
             when (it.status) {
                 DataStatus.Status.NoInternet -> {
@@ -625,29 +673,9 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 else -> {}
             }
         }
-        binding.shareContentLabelTextView.setOnClickListener {
-            val shareLink = "https://app.booleanbear.com/watch/content/$reelId"
-            val shareMessage = "$contentTitle \n\nWatch it on boolean bear.\n"
-            val shareIntent = createShareIntent(shareLink, shareMessage)
-            startActivity(shareIntent)
-        }
+    }
 
-        customAuthStateListener.liveAuthStateFromRemote.observe(viewLifecycleOwner) {
-            when (it) {
-                true -> {
-
-                }
-
-                false -> {
-                    findNavController().popBackStack(R.id.homeFragment, false)
-                }
-
-                null -> {
-
-                }
-            }
-        }
-
+    private fun mainViewModelObservers() {
         mainViewModel.preLoadingRewardedAdStatus.observe(viewLifecycleOwner) {
             when (it) {
                 true -> {
@@ -696,25 +724,6 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
                 mainViewModel.preLoadRewardedAd()
             }
         }
-
-        connectivityListener.observe(viewLifecycleOwner) {
-            when (it) {
-                null -> {
-
-                }
-
-                true -> {
-                    if (!MainActivity.isAdTemplateActive) {
-                        mainViewModel.preLoadRewardedAd()
-                    }
-                }
-
-                false -> {
-
-                }
-            }
-        }
-
     }
 
     private fun openDescriptionFragment() {
