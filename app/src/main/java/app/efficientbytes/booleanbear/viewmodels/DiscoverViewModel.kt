@@ -18,7 +18,6 @@ import app.efficientbytes.booleanbear.repositories.models.DataStatus
 import app.efficientbytes.booleanbear.services.models.RemoteCourseBundle
 import app.efficientbytes.booleanbear.services.models.RemoteReelTopic
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -44,7 +43,6 @@ class DiscoverViewModel : ViewModel(), KoinComponent,
                     }
 
                     else -> {
-                        delay(4000)
                         _reelTopics.postValue(it)
                     }
                 }
@@ -69,7 +67,6 @@ class DiscoverViewModel : ViewModel(), KoinComponent,
                     }
 
                     else -> {
-                        delay(4000)
                         _courseBundle.postValue(it)
                     }
                 }
