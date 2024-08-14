@@ -599,6 +599,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 rewardedAd = null
                 isAdLoading = false
+                viewModel.adDisplayCompleted(false)
             }
 
             override fun onAdLoaded(ad: RewardedAd) {
