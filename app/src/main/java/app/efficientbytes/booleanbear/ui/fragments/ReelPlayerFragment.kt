@@ -286,8 +286,7 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         binding.suggestedContentCardView.setOnClickListener {
             nextSuggestedContentId?.let { reelId ->
                 if (!MainActivity.isAdTemplateActive && connectivityListener.isInternetAvailable() && !isWatchAdPromptDialogOpened) {
-                    binding.videoPlayer.onPause()
-                    releasePlayer()
+                    player?.playWhenReady = false
                     showWatchAdPromptDialog()
                 }
                 clearStartPosition()
@@ -358,7 +357,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
                 true -> {
                     if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened) {
-                        binding.videoPlayer.onPause()
+                        player?.playWhenReady = false
+                        updateStartPosition()
                         showWatchAdPromptDialog()
                     }
                 }
@@ -684,8 +684,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             when (it) {
                 true, false -> {
                     dialog?.dismiss()
-                    binding.videoPlayer.onResume()
-                    initializePlayer()
+                    val haveStartPosition = mediaItemIndex != C.INDEX_UNSET
+                    if (haveStartPosition) {
+                        player!!.seekTo(mediaItemIndex, playbackPosition)
+                    }
+                    player?.playWhenReady = true
                     mainViewModel.adDisplayCompleted(null)
                 }
 
@@ -697,11 +700,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
 
         mainViewModel.getActiveAdTemplate.observe(viewLifecycleOwner) {
             if (it == null && connectivityListener.isInternetAvailable() && !isWatchAdPromptDialogOpened) {
-                binding.videoPlayer.onPause()
-                releasePlayer()
+                player?.playWhenReady = false
+                updateStartPosition()
                 showWatchAdPromptDialog()
-            }else if(it!=null && it.isActive){
-                if (isWatchAdPromptDialogOpened){
+            } else if (it != null && it.isActive) {
+                if (isWatchAdPromptDialogOpened) {
                     dialog!!.dismiss()
                 }
             }
@@ -718,8 +721,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
     @OptIn(UnstableApi::class)
     private fun initializePlayer() {
         if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened && connectivityListener.isInternetAvailable()) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
+            player?.playWhenReady = false
+            updateStartPosition()
             showWatchAdPromptDialog()
         }
         if (player == null) {
@@ -788,8 +791,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             player!!.prepare()
         }
         if (isWatchAdPromptDialogOpened) {
-            binding.videoPlayer.onPause()
-            releasePlayer()
+            player?.playWhenReady = false
+            updateStartPosition()
         }
         return
     }
@@ -899,8 +902,8 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             if (!MainActivity.isAdTemplateActive && !isWatchAdPromptDialogOpened && connectivityListener.isInternetAvailable()) {
-                binding.videoPlayer.onPause()
-                releasePlayer()
+                player?.playWhenReady = false
+                updateStartPosition()
                 showWatchAdPromptDialog()
             }
         }
@@ -930,9 +933,11 @@ class ReelPlayerFragment : Fragment(), AnimationListener {
             )
             val title = dialog!!.findViewById<MaterialTextView>(R.id.watchVideoAdLabelTextView)
             val description = dialog!!.findViewById<MaterialTextView>(R.id.descriptionLabelTextView)
-            val loadingAdTitle = dialog!!.findViewById<MaterialTextView>(R.id.loadVideoAdLabelTextView)
+            val loadingAdTitle =
+                dialog!!.findViewById<MaterialTextView>(R.id.loadVideoAdLabelTextView)
             loadingAdTitle.visibility = View.GONE
-            val firstAdOptionButton = dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
+            val firstAdOptionButton =
+                dialog!!.findViewById<MaterialButton>(R.id.firstAdOptionButton)
             firstAdOptionButton.visibility = View.VISIBLE
             val progressBar =
                 dialog!!.findViewById<LinearProgressIndicator>(R.id.adLoadingProgressBar)
